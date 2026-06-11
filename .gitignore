@@ -1,0 +1,10 @@
+.DS_Store
+.build/
+.swiftpm/
+DerivedData/
+xcuserdata/
+_trash/
+build/
+.gradle/
+kotlin/build/
+kotlin/.gradle/
