@@ -20,4 +20,4 @@ dependencyResolutionManagement {
 rootProject.name = "petrel-catbird"
 
 // Composite build: substitutes com.atproto:petrel-kotlin with the local checkout.
-includeBuild("../../Petrel/petrel-kotlin")
+includeBuild("../../Petrel/kotlin")

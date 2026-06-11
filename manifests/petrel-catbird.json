@@ -6,7 +6,7 @@
   },
   "lexicons": {
     "emit": ["../PetrelCatbird/lexicons"],
-    "reference": ["Generator/lexicons"],
+    "reference": ["generator/lexicons"],
     "exclude_namespaces": ["tools.ozone"]
   },
   "swift": {
