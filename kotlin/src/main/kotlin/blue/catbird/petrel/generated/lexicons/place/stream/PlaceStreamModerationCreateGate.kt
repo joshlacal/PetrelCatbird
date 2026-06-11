@@ -1,0 +1,61 @@
+// Lexicon: 1, ID: place.stream.moderation.createGate
+// Create a gate (hide message) on behalf of a streamer. Requires 'hide' permission. Creates a place.stream.chat.gate record in the streamer's repository.
+package blue.catbird.petrel.generated
+
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import blue.catbird.petrel.core.types.*
+import blue.catbird.petrel.core.*
+import blue.catbird.petrel.client.*
+import blue.catbird.petrel.network.*
+import blue.catbird.petrel.runtime.subscription.openSubscription
+import kotlinx.coroutines.flow.*
+
+object PlaceStreamModerationCreateGateDefs {
+    const val TYPE_IDENTIFIER = "place.stream.moderation.createGate"
+}
+
+@Serializable
+    data class PlaceStreamModerationCreateGateInput(
+// The DID of the streamer.        @SerialName("streamer")
+        val streamer: DID,// The AT-URI of the chat message to hide.        @SerialName("messageUri")
+        val messageUri: ATProtocolURI    )
+
+    @Serializable
+    data class PlaceStreamModerationCreateGateOutput(
+// The AT-URI of the created gate record.        @SerialName("uri")
+        val uri: ATProtocolURI,// The CID of the created gate record.        @SerialName("cid")
+        val cid: CID    )
+
+sealed class PlaceStreamModerationCreateGateError(val name: String, val description: String?) {
+        object Unauthorized: PlaceStreamModerationCreateGateError("Unauthorized", "The request lacks valid authentication credentials.")
+        object Forbidden: PlaceStreamModerationCreateGateError("Forbidden", "The caller does not have permission to hide messages for this streamer.")
+        object SessionNotFound: PlaceStreamModerationCreateGateError("SessionNotFound", "The streamer's OAuth session could not be found or is invalid.")
+    }
+
+/**
+ * Create a gate (hide message) on behalf of a streamer. Requires 'hide' permission. Creates a place.stream.chat.gate record in the streamer's repository.
+ *
+ * Endpoint: place.stream.moderation.createGate
+ */
+suspend fun PlaceStreamModerationNamespace.createGate(
+input: PlaceStreamModerationCreateGateInput): ATProtoResponse<PlaceStreamModerationCreateGateOutput> {
+    val endpoint = "place.stream.moderation.createGate"
+
+    // JSON serialization
+    val body = Json.encodeToString(input)
+    val contentType = "application/json"
+
+    val queryItems: List<Pair<String, String>>? = null
+
+    return client.networkService.performRequest(
+        method = "POST",
+        endpoint = endpoint,
+        queryItems = queryItems,
+        headers = mapOf(
+            "Content-Type" to contentType,
+            "Accept" to "application/json"
+        ),
+        body = body
+    )
+}

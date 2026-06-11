@@ -1,0 +1,63 @@
+// Lexicon: 1, ID: place.stream.branding.updateBlob
+// Update or create a branding asset blob. Requires admin authorization.
+package blue.catbird.petrel.generated
+
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import blue.catbird.petrel.core.types.*
+import blue.catbird.petrel.core.*
+import blue.catbird.petrel.client.*
+import blue.catbird.petrel.network.*
+import blue.catbird.petrel.runtime.subscription.openSubscription
+import kotlinx.coroutines.flow.*
+
+object PlaceStreamBrandingUpdateBlobDefs {
+    const val TYPE_IDENTIFIER = "place.stream.branding.updateBlob"
+}
+
+@Serializable
+    data class PlaceStreamBrandingUpdateBlobInput(
+// Branding asset key (mainLogo, favicon, siteTitle, etc.)        @SerialName("key")
+        val key: String,// DID of the broadcaster. If not provided, uses the server's default broadcaster.        @SerialName("broadcaster")
+        val broadcaster: DID? = null,// Base64-encoded blob data        @SerialName("data")
+        val `data`: String,// MIME type of the blob (e.g., image/png, text/plain)        @SerialName("mimeType")
+        val mimeType: String,// Image width in pixels (optional, for images only)        @SerialName("width")
+        val width: Int? = null,// Image height in pixels (optional, for images only)        @SerialName("height")
+        val height: Int? = null    )
+
+    @Serializable
+    data class PlaceStreamBrandingUpdateBlobOutput(
+        @SerialName("success")
+        val success: Boolean    )
+
+sealed class PlaceStreamBrandingUpdateBlobError(val name: String, val description: String?) {
+        object Unauthorized: PlaceStreamBrandingUpdateBlobError("Unauthorized", "The authenticated DID is not authorized to modify branding")
+        object BlobTooLarge: PlaceStreamBrandingUpdateBlobError("BlobTooLarge", "The blob exceeds the maximum size limit")
+    }
+
+/**
+ * Update or create a branding asset blob. Requires admin authorization.
+ *
+ * Endpoint: place.stream.branding.updateBlob
+ */
+suspend fun PlaceStreamBrandingNamespace.updateBlob(
+input: PlaceStreamBrandingUpdateBlobInput): ATProtoResponse<PlaceStreamBrandingUpdateBlobOutput> {
+    val endpoint = "place.stream.branding.updateBlob"
+
+    // JSON serialization
+    val body = Json.encodeToString(input)
+    val contentType = "application/json"
+
+    val queryItems: List<Pair<String, String>>? = null
+
+    return client.networkService.performRequest(
+        method = "POST",
+        endpoint = endpoint,
+        queryItems = queryItems,
+        headers = mapOf(
+            "Content-Type" to contentType,
+            "Accept" to "application/json"
+        ),
+        body = body
+    )
+}

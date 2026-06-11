@@ -1,0 +1,54 @@
+// Lexicon: 1, ID: blue.catbird.bskychat.updateMuteStatus
+// Update the server-side mute status for a conversation. Used for push notification suppression.
+package blue.catbird.petrel.generated
+
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import blue.catbird.petrel.core.types.*
+import blue.catbird.petrel.core.*
+import blue.catbird.petrel.client.*
+import blue.catbird.petrel.network.*
+import blue.catbird.petrel.runtime.subscription.openSubscription
+import kotlinx.coroutines.flow.*
+
+object BlueCatbirdBskychatUpdateMuteStatusDefs {
+    const val TYPE_IDENTIFIER = "blue.catbird.bskychat.updateMuteStatus"
+}
+
+@Serializable
+    data class BlueCatbirdBskychatUpdateMuteStatusInput(
+// The conversation identifier        @SerialName("convoId")
+        val convoId: String,// Whether the conversation should be muted        @SerialName("muted")
+        val muted: Boolean    )
+
+    @Serializable
+    data class BlueCatbirdBskychatUpdateMuteStatusOutput(
+        @SerialName("success")
+        val success: Boolean    )
+
+/**
+ * Update the server-side mute status for a conversation. Used for push notification suppression.
+ *
+ * Endpoint: blue.catbird.bskychat.updateMuteStatus
+ */
+suspend fun BlueCatbirdBskychatNamespace.updateMuteStatus(
+input: BlueCatbirdBskychatUpdateMuteStatusInput): ATProtoResponse<BlueCatbirdBskychatUpdateMuteStatusOutput> {
+    val endpoint = "blue.catbird.bskychat.updateMuteStatus"
+
+    // JSON serialization
+    val body = Json.encodeToString(input)
+    val contentType = "application/json"
+
+    val queryItems: List<Pair<String, String>>? = null
+
+    return client.networkService.performRequest(
+        method = "POST",
+        endpoint = endpoint,
+        queryItems = queryItems,
+        headers = mapOf(
+            "Content-Type" to contentType,
+            "Accept" to "application/json"
+        ),
+        body = body
+    )
+}

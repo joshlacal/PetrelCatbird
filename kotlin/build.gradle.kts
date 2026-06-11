@@ -9,7 +9,7 @@ group = "blue.catbird"
 version = "0.1.0"
 
 dependencies {
-    api("com.atproto:petrel-kotlin:0.1.0")
+    api("blue.catbird:petrel-kotlin:0.1.0")
 
     implementation(kotlin("stdlib"))
 

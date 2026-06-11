@@ -1,0 +1,53 @@
+// Lexicon: 1, ID: place.stream.branding.getBlob
+// Get a specific branding asset blob by key.
+package blue.catbird.petrel.generated
+
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import blue.catbird.petrel.core.types.*
+import blue.catbird.petrel.core.*
+import blue.catbird.petrel.client.*
+import blue.catbird.petrel.network.*
+import blue.catbird.petrel.runtime.subscription.openSubscription
+import kotlinx.coroutines.flow.*
+
+object PlaceStreamBrandingGetBlobDefs {
+    const val TYPE_IDENTIFIER = "place.stream.branding.getBlob"
+}
+
+@Serializable
+    data class PlaceStreamBrandingGetBlobParameters(
+// Branding asset key (mainLogo, favicon, siteTitle, etc.)        @SerialName("key")
+        val key: String,// DID of the broadcaster. If not provided, uses the server's default broadcaster.        @SerialName("broadcaster")
+        val broadcaster: DID? = null    )
+
+    @Serializable
+    data class PlaceStreamBrandingGetBlobOutput(
+        @SerialName("data")
+        val `data`: ByteArray    )
+
+sealed class PlaceStreamBrandingGetBlobError(val name: String, val description: String?) {
+        object BrandingNotFound: PlaceStreamBrandingGetBlobError("BrandingNotFound", "The requested branding asset does not exist")
+    }
+
+/**
+ * Get a specific branding asset blob by key.
+ *
+ * Endpoint: place.stream.branding.getBlob
+ */
+suspend fun PlaceStreamBrandingNamespace.getBlob(
+parameters: PlaceStreamBrandingGetBlobParameters): ATProtoResponse<PlaceStreamBrandingGetBlobOutput> {
+    val endpoint = "place.stream.branding.getBlob"
+
+    // List<Pair<String, String>> preserves repeated keys, which ATProto
+    // array-valued query params rely on (e.g. `?actors=a&actors=b`).
+    val queryItems = parameters.toQueryItems()
+
+    return client.networkService.performRequest(
+        method = "GET",
+        endpoint = endpoint,
+        queryItems = queryItems,
+        headers = mapOf("Accept" to "*/*"),
+        body = null
+    )
+}
