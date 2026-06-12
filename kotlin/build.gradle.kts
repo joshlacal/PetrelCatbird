@@ -9,7 +9,14 @@ group = "blue.catbird"
 version = "0.1.0"
 
 dependencies {
-    api("blue.catbird:petrel-kotlin:0.1.0")
+    // Sibling subproject when embedded in the Android build (include + projectDir);
+    // module coordinate (substituted by includeBuild) when built standalone.
+    val petrelKotlinSubproject = findProject(":petrel-kotlin")
+    if (petrelKotlinSubproject != null) {
+        api(petrelKotlinSubproject)
+    } else {
+        api("blue.catbird:petrel-kotlin:0.1.0")
+    }
 
     implementation(kotlin("stdlib"))
 
