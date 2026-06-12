@@ -53,7 +53,7 @@ object BlueCatbirdMlsChatCreateConvoDefs {
     data class BlueCatbirdMlsChatCreateConvoOutput(
 // The created conversation view        @SerialName("convo")
         val convo: BlueCatbirdMlsChatDefsConvoView,// Generated invite code (only present if invite.action was 'create')        @SerialName("inviteCode")
-        val inviteCode: String? = null,// DID of the delivery service acting as sequencer for this conversation        @SerialName("sequencerDs")
+        val inviteCode: String? = null,// DID of the delivery service acting as sequencer for this conversation. Deprecated: read convo.sequencerDid instead.        @SerialName("sequencerDs")
         val sequencerDs: DID? = null    )
 
 sealed class BlueCatbirdMlsChatCreateConvoError(val name: String, val description: String?) {

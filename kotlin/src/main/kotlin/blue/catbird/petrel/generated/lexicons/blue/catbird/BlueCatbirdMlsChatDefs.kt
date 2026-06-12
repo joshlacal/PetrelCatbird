@@ -30,7 +30,8 @@ object BlueCatbirdMlsChatDefsDefs {
         val createdAt: ATProtocolDate,/** Timestamp of last message */        @SerialName("lastMessageAt")
         val lastMessageAt: ATProtocolDate? = null,/** Confirmation tag of the server's canonical MLS tree state. */        @SerialName("confirmationTag")
         val confirmationTag: Bytes? = null,/** Number of times this conversation's MLS group has been reset. Absent or 0 means never reset. */        @SerialName("resetGeneration")
-        val resetGeneration: Int? = null    ) {
+        val resetGeneration: Int? = null,/** Base DID of the delivery service currently acting as sequencer for this conversation. Clients append #atproto_mls when using ATProto proxy routing. */        @SerialName("sequencerDid")
+        val sequencerDid: DID? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdMlsChatDefsConvoView"
         }

@@ -18,9 +18,10 @@ public enum BlueCatbirdMlsChatDefs {
         public let lastMessageAt: ATProtocolDate?
         public let confirmationTag: Bytes?
         public let resetGeneration: Int?
+        public let sequencerDid: DID?
 
         public init(
-            conversationId: String, groupId: String, creator: DID, members: [MemberView], epoch: Int, cipherSuite: String, createdAt: ATProtocolDate, lastMessageAt: ATProtocolDate?, confirmationTag: Bytes?, resetGeneration: Int?
+            conversationId: String, groupId: String, creator: DID, members: [MemberView], epoch: Int, cipherSuite: String, createdAt: ATProtocolDate, lastMessageAt: ATProtocolDate?, confirmationTag: Bytes?, resetGeneration: Int?, sequencerDid: DID?
         ) {
             self.conversationId = conversationId
             self.groupId = groupId
@@ -32,6 +33,7 @@ public enum BlueCatbirdMlsChatDefs {
             self.lastMessageAt = lastMessageAt
             self.confirmationTag = confirmationTag
             self.resetGeneration = resetGeneration
+            self.sequencerDid = sequencerDid
         }
 
         public init(from decoder: Decoder) throws {
@@ -102,6 +104,14 @@ public enum BlueCatbirdMlsChatDefs {
                 LogManager.logWarning("Decoding error for optional property 'resetGeneration' — degrading to nil: \(error)")
                 resetGeneration = nil
             }
+            do {
+                sequencerDid = try container.decodeIfPresent(DID.self, forKey: .sequencerDid)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerDid' — degrading to nil: \(error)")
+                sequencerDid = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -117,6 +127,7 @@ public enum BlueCatbirdMlsChatDefs {
             try container.encodeIfPresent(lastMessageAt, forKey: .lastMessageAt)
             try container.encodeIfPresent(confirmationTag, forKey: .confirmationTag)
             try container.encodeIfPresent(resetGeneration, forKey: .resetGeneration)
+            try container.encodeIfPresent(sequencerDid, forKey: .sequencerDid)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -138,6 +149,11 @@ public enum BlueCatbirdMlsChatDefs {
                 hasher.combine(nil as Int?)
             }
             if let value = resetGeneration {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = sequencerDid {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
@@ -176,6 +192,9 @@ public enum BlueCatbirdMlsChatDefs {
             if resetGeneration != other.resetGeneration {
                 return false
             }
+            if sequencerDid != other.sequencerDid {
+                return false
+            }
             return true
         }
 
@@ -212,6 +231,10 @@ public enum BlueCatbirdMlsChatDefs {
                 let resetGenerationValue = try value.toCBORValue()
                 map = map.adding(key: "resetGeneration", value: resetGenerationValue)
             }
+            if let value = sequencerDid {
+                let sequencerDidValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerDid", value: sequencerDidValue)
+            }
             return map
         }
 
@@ -227,6 +250,7 @@ public enum BlueCatbirdMlsChatDefs {
             case lastMessageAt
             case confirmationTag
             case resetGeneration
+            case sequencerDid
         }
     }
 
