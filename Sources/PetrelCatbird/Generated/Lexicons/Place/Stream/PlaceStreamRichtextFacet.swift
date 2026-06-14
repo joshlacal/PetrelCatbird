@@ -123,11 +123,15 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
 
         public static func == (lhs: PlaceStreamRichtextFacetFeaturesUnion, rhs: PlaceStreamRichtextFacetFeaturesUnion) -> Bool {
             switch (lhs, rhs) {
-            case let (.appBskyRichtextFacetMention(lhsValue),
-                      .appBskyRichtextFacetMention(rhsValue)):
+            case let (
+                .appBskyRichtextFacetMention(lhsValue),
+                .appBskyRichtextFacetMention(rhsValue)
+            ):
                 return lhsValue == rhsValue
-            case let (.appBskyRichtextFacetLink(lhsValue),
-                      .appBskyRichtextFacetLink(rhsValue)):
+            case let (
+                .appBskyRichtextFacetLink(lhsValue),
+                .appBskyRichtextFacetLink(rhsValue)
+            ):
                 return lhsValue == rhsValue
             case let (.unexpected(lhsValue), .unexpected(rhsValue)):
                 return lhsValue.isEqual(to: rhsValue)
@@ -300,11 +304,15 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
             guard let otherValue = other as? FeaturesForUnionArray else { return false }
 
             switch (self, otherValue) {
-            case let (.appBskyRichtextFacetMention(selfValue),
-                      .appBskyRichtextFacetMention(otherValue)):
+            case let (
+                .appBskyRichtextFacetMention(selfValue),
+                .appBskyRichtextFacetMention(otherValue)
+            ):
                 return selfValue == otherValue
-            case let (.appBskyRichtextFacetLink(selfValue),
-                      .appBskyRichtextFacetLink(otherValue)):
+            case let (
+                .appBskyRichtextFacetLink(selfValue),
+                .appBskyRichtextFacetLink(otherValue)
+            ):
                 return selfValue == otherValue
             case let (.unexpected(selfValue), .unexpected(otherValue)):
                 return selfValue.isEqual(to: otherValue)

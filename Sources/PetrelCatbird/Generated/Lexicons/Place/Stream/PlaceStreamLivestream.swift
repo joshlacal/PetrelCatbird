@@ -951,32 +951,50 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
 
         public static func == (lhs: StreamplaceAnythingLivestreamUnion, rhs: StreamplaceAnythingLivestreamUnion) -> Bool {
             switch (lhs, rhs) {
-            case let (.placeStreamLivestreamLivestreamView(lhsValue),
-                      .placeStreamLivestreamLivestreamView(rhsValue)):
+            case let (
+                .placeStreamLivestreamLivestreamView(lhsValue),
+                .placeStreamLivestreamLivestreamView(rhsValue)
+            ):
                 return lhsValue == rhsValue
-            case let (.placeStreamLivestreamViewerCount(lhsValue),
-                      .placeStreamLivestreamViewerCount(rhsValue)):
+            case let (
+                .placeStreamLivestreamViewerCount(lhsValue),
+                .placeStreamLivestreamViewerCount(rhsValue)
+            ):
                 return lhsValue == rhsValue
-            case let (.placeStreamLivestreamTeleportArrival(lhsValue),
-                      .placeStreamLivestreamTeleportArrival(rhsValue)):
+            case let (
+                .placeStreamLivestreamTeleportArrival(lhsValue),
+                .placeStreamLivestreamTeleportArrival(rhsValue)
+            ):
                 return lhsValue == rhsValue
-            case let (.placeStreamLivestreamTeleportCanceled(lhsValue),
-                      .placeStreamLivestreamTeleportCanceled(rhsValue)):
+            case let (
+                .placeStreamLivestreamTeleportCanceled(lhsValue),
+                .placeStreamLivestreamTeleportCanceled(rhsValue)
+            ):
                 return lhsValue == rhsValue
-            case let (.placeStreamDefsBlockView(lhsValue),
-                      .placeStreamDefsBlockView(rhsValue)):
+            case let (
+                .placeStreamDefsBlockView(lhsValue),
+                .placeStreamDefsBlockView(rhsValue)
+            ):
                 return lhsValue == rhsValue
-            case let (.placeStreamDefsRenditions(lhsValue),
-                      .placeStreamDefsRenditions(rhsValue)):
+            case let (
+                .placeStreamDefsRenditions(lhsValue),
+                .placeStreamDefsRenditions(rhsValue)
+            ):
                 return lhsValue == rhsValue
-            case let (.placeStreamDefsRendition(lhsValue),
-                      .placeStreamDefsRendition(rhsValue)):
+            case let (
+                .placeStreamDefsRendition(lhsValue),
+                .placeStreamDefsRendition(rhsValue)
+            ):
                 return lhsValue == rhsValue
-            case let (.placeStreamChatDefsMessageView(lhsValue),
-                      .placeStreamChatDefsMessageView(rhsValue)):
+            case let (
+                .placeStreamChatDefsMessageView(lhsValue),
+                .placeStreamChatDefsMessageView(rhsValue)
+            ):
                 return lhsValue == rhsValue
-            case let (.placeStreamChatDefsPinnedRecordView(lhsValue),
-                      .placeStreamChatDefsPinnedRecordView(rhsValue)):
+            case let (
+                .placeStreamChatDefsPinnedRecordView(lhsValue),
+                .placeStreamChatDefsPinnedRecordView(rhsValue)
+            ):
                 return lhsValue == rhsValue
             case let (.unexpected(lhsValue), .unexpected(rhsValue)):
                 return lhsValue.isEqual(to: rhsValue)

@@ -96,8 +96,10 @@ public enum PlaceStreamIngestGetIngestUrls {
 
         public static func == (lhs: OutputIngestsUnion, rhs: OutputIngestsUnion) -> Bool {
             switch (lhs, rhs) {
-            case let (.placeStreamIngestDefsIngest(lhsValue),
-                      .placeStreamIngestDefsIngest(rhsValue)):
+            case let (
+                .placeStreamIngestDefsIngest(lhsValue),
+                .placeStreamIngestDefsIngest(rhsValue)
+            ):
                 return lhsValue == rhsValue
             case let (.unexpected(lhsValue), .unexpected(rhsValue)):
                 return lhsValue.isEqual(to: rhsValue)

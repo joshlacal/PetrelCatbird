@@ -424,8 +424,10 @@ public enum PlaceStreamChatDefs {
 
         public static func == (lhs: MessageViewReplyToUnion, rhs: MessageViewReplyToUnion) -> Bool {
             switch (lhs, rhs) {
-            case let (.placeStreamChatDefsMessageView(lhsValue),
-                      .placeStreamChatDefsMessageView(rhsValue)):
+            case let (
+                .placeStreamChatDefsMessageView(lhsValue),
+                .placeStreamChatDefsMessageView(rhsValue)
+            ):
                 return lhsValue == rhsValue
             case let (.unexpected(lhsValue), .unexpected(rhsValue)):
                 return lhsValue.isEqual(to: rhsValue)
