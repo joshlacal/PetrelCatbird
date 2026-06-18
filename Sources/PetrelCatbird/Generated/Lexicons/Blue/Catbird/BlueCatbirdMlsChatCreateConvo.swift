@@ -163,16 +163,18 @@ public enum BlueCatbirdMlsChatCreateConvo {
         public let cipherSuite: String
         public let initialMembers: [DID]?
         public let welcomeMessage: Bytes?
+        public let groupInfo: Bytes?
         public let keyPackageHashes: [KeyPackageHashEntry]?
         public let invite: InviteAction?
         public let currentEpoch: Int?
 
         /// Standard public initializer
-        public init(groupId: String, cipherSuite: String, initialMembers: [DID]? = nil, welcomeMessage: Bytes? = nil, keyPackageHashes: [KeyPackageHashEntry]? = nil, invite: InviteAction? = nil, currentEpoch: Int? = nil) {
+        public init(groupId: String, cipherSuite: String, initialMembers: [DID]? = nil, welcomeMessage: Bytes? = nil, groupInfo: Bytes? = nil, keyPackageHashes: [KeyPackageHashEntry]? = nil, invite: InviteAction? = nil, currentEpoch: Int? = nil) {
             self.groupId = groupId
             self.cipherSuite = cipherSuite
             self.initialMembers = initialMembers
             self.welcomeMessage = welcomeMessage
+            self.groupInfo = groupInfo
             self.keyPackageHashes = keyPackageHashes
             self.invite = invite
             self.currentEpoch = currentEpoch
@@ -184,6 +186,7 @@ public enum BlueCatbirdMlsChatCreateConvo {
             cipherSuite = try container.decode(String.self, forKey: .cipherSuite)
             initialMembers = try container.decodeIfPresent([DID].self, forKey: .initialMembers)
             welcomeMessage = try container.decodeIfPresent(Bytes.self, forKey: .welcomeMessage)
+            groupInfo = try container.decodeIfPresent(Bytes.self, forKey: .groupInfo)
             keyPackageHashes = try container.decodeIfPresent([KeyPackageHashEntry].self, forKey: .keyPackageHashes)
             invite = try container.decodeIfPresent(InviteAction.self, forKey: .invite)
             currentEpoch = try container.decodeIfPresent(Int.self, forKey: .currentEpoch)
@@ -195,6 +198,7 @@ public enum BlueCatbirdMlsChatCreateConvo {
             try container.encode(cipherSuite, forKey: .cipherSuite)
             try container.encodeIfPresent(initialMembers, forKey: .initialMembers)
             try container.encodeIfPresent(welcomeMessage, forKey: .welcomeMessage)
+            try container.encodeIfPresent(groupInfo, forKey: .groupInfo)
             try container.encodeIfPresent(keyPackageHashes, forKey: .keyPackageHashes)
             try container.encodeIfPresent(invite, forKey: .invite)
             try container.encodeIfPresent(currentEpoch, forKey: .currentEpoch)
@@ -213,6 +217,10 @@ public enum BlueCatbirdMlsChatCreateConvo {
             if let value = welcomeMessage {
                 let welcomeMessageValue = try value.toCBORValue()
                 map = map.adding(key: "welcomeMessage", value: welcomeMessageValue)
+            }
+            if let value = groupInfo {
+                let groupInfoValue = try value.toCBORValue()
+                map = map.adding(key: "groupInfo", value: groupInfoValue)
             }
             if let value = keyPackageHashes {
                 let keyPackageHashesValue = try value.toCBORValue()
@@ -234,6 +242,7 @@ public enum BlueCatbirdMlsChatCreateConvo {
             case cipherSuite
             case initialMembers
             case welcomeMessage
+            case groupInfo
             case keyPackageHashes
             case invite
             case currentEpoch
