@@ -7,11 +7,11 @@ public enum BlueCatbirdMlsChatReissueWelcome {
     public static let typeIdentifier = "blue.catbird.mlsChat.reissueWelcome"
     public struct Input: ATProtocolCodable {
         public let convoId: String
-        public let recipientDeviceDid: DID
+        public let recipientDeviceDid: String
         public let reason: String
 
         /// Standard public initializer
-        public init(convoId: String, recipientDeviceDid: DID, reason: String) {
+        public init(convoId: String, recipientDeviceDid: String, reason: String) {
             self.convoId = convoId
             self.recipientDeviceDid = recipientDeviceDid
             self.reason = reason
@@ -20,7 +20,7 @@ public enum BlueCatbirdMlsChatReissueWelcome {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             convoId = try container.decode(String.self, forKey: .convoId)
-            recipientDeviceDid = try container.decode(DID.self, forKey: .recipientDeviceDid)
+            recipientDeviceDid = try container.decode(String.self, forKey: .recipientDeviceDid)
             reason = try container.decode(String.self, forKey: .reason)
         }
 
@@ -52,20 +52,26 @@ public enum BlueCatbirdMlsChatReissueWelcome {
     public struct Output: ATProtocolCodable {
         public let welcomeRequested: Bool
 
+        public let requestId: String
+
         public let requestedAt: ATProtocolDate
 
-        public let inviterDevice: DID?
+        public let inviterDevice: String?
 
         /// Standard public initializer
         public init(
             welcomeRequested: Bool,
 
+            requestId: String,
+
             requestedAt: ATProtocolDate,
 
-            inviterDevice: DID? = nil
+            inviterDevice: String? = nil
 
         ) {
             self.welcomeRequested = welcomeRequested
+
+            self.requestId = requestId
 
             self.requestedAt = requestedAt
 
@@ -77,10 +83,12 @@ public enum BlueCatbirdMlsChatReissueWelcome {
 
             welcomeRequested = try container.decode(Bool.self, forKey: .welcomeRequested)
 
+            requestId = try container.decode(String.self, forKey: .requestId)
+
             requestedAt = try container.decode(ATProtocolDate.self, forKey: .requestedAt)
 
             do {
-                inviterDevice = try container.decodeIfPresent(DID.self, forKey: .inviterDevice)
+                inviterDevice = try container.decodeIfPresent(String.self, forKey: .inviterDevice)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'inviterDevice' — degrading to nil: \(error)")
@@ -93,6 +101,8 @@ public enum BlueCatbirdMlsChatReissueWelcome {
 
             try container.encode(welcomeRequested, forKey: .welcomeRequested)
 
+            try container.encode(requestId, forKey: .requestId)
+
             try container.encode(requestedAt, forKey: .requestedAt)
 
             // Encode optional property even if it's an empty array
@@ -104,6 +114,9 @@ public enum BlueCatbirdMlsChatReissueWelcome {
 
             let welcomeRequestedValue = try welcomeRequested.toCBORValue()
             map = map.adding(key: "welcomeRequested", value: welcomeRequestedValue)
+
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
 
             let requestedAtValue = try requestedAt.toCBORValue()
             map = map.adding(key: "requestedAt", value: requestedAtValue)
@@ -119,6 +132,7 @@ public enum BlueCatbirdMlsChatReissueWelcome {
 
         private enum CodingKeys: String, CodingKey {
             case welcomeRequested
+            case requestId
             case requestedAt
             case inviterDevice
         }

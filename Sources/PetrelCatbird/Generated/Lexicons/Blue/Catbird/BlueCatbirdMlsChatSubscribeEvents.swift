@@ -1610,12 +1610,12 @@ public enum BlueCatbirdMlsChatSubscribeEvents {
         public static let typeIdentifier = "blue.catbird.mlsChat.subscribeEvents#welcomeReissueRequestedEvent"
         public let cursor: String
         public let convoId: String
-        public let recipientDeviceDid: DID
+        public let recipientDeviceDid: String
         public let requestedAt: ATProtocolDate
         public let requestId: String
 
         public init(
-            cursor: String, convoId: String, recipientDeviceDid: DID, requestedAt: ATProtocolDate, requestId: String
+            cursor: String, convoId: String, recipientDeviceDid: String, requestedAt: ATProtocolDate, requestId: String
         ) {
             self.cursor = cursor
             self.convoId = convoId
@@ -1639,7 +1639,7 @@ public enum BlueCatbirdMlsChatSubscribeEvents {
                 throw error
             }
             do {
-                recipientDeviceDid = try container.decode(DID.self, forKey: .recipientDeviceDid)
+                recipientDeviceDid = try container.decode(String.self, forKey: .recipientDeviceDid)
             } catch {
                 LogManager.logError("Decoding error for required property 'recipientDeviceDid': \(error)")
                 throw error

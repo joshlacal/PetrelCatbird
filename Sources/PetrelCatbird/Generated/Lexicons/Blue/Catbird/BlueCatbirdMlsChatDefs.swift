@@ -801,12 +801,12 @@ public enum BlueCatbirdMlsChatDefs {
     public struct WelcomeReissueRequest: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.mlsChat.defs#welcomeReissueRequest"
         public let convoId: String
-        public let recipientDeviceDid: DID
+        public let recipientDeviceDid: String
         public let requestedAt: ATProtocolDate
         public let requestId: String
 
         public init(
-            convoId: String, recipientDeviceDid: DID, requestedAt: ATProtocolDate, requestId: String
+            convoId: String, recipientDeviceDid: String, requestedAt: ATProtocolDate, requestId: String
         ) {
             self.convoId = convoId
             self.recipientDeviceDid = recipientDeviceDid
@@ -823,7 +823,7 @@ public enum BlueCatbirdMlsChatDefs {
                 throw error
             }
             do {
-                recipientDeviceDid = try container.decode(DID.self, forKey: .recipientDeviceDid)
+                recipientDeviceDid = try container.decode(String.self, forKey: .recipientDeviceDid)
             } catch {
                 LogManager.logError("Decoding error for required property 'recipientDeviceDid': \(error)")
                 throw error

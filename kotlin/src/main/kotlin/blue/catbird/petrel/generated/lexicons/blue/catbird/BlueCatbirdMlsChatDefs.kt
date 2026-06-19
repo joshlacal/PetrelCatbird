@@ -98,8 +98,8 @@ object BlueCatbirdMlsChatDefsDefs {
     @Serializable
     data class BlueCatbirdMlsChatDefsWelcomeReissueRequest(
 /** Conversation needing a reissued Welcome. */        @SerialName("convoId")
-        val convoId: String,/** Recipient device that cannot decrypt the original Welcome. */        @SerialName("recipientDeviceDid")
-        val recipientDeviceDid: DID,        @SerialName("requestedAt")
+        val convoId: String,/** Recipient device that cannot decrypt the original Welcome. This may be a device-qualified DID (did#deviceId). */        @SerialName("recipientDeviceDid")
+        val recipientDeviceDid: String,        @SerialName("requestedAt")
         val requestedAt: ATProtocolDate,/** Server-generated request identifier. Inviter echoes this in the replacement commit's idempotencyKey. */        @SerialName("requestId")
         val requestId: String    ) {
         companion object {

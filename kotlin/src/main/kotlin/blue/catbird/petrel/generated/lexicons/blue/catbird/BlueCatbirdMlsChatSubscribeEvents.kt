@@ -409,8 +409,8 @@ object BlueCatbirdMlsChatSubscribeEventsMessageUnionSerializer : kotlinx.seriali
     data class BlueCatbirdMlsChatSubscribeEventsWelcomeReissueRequestedEvent(
 /** Resume cursor for this event position */        @SerialName("cursor")
         val cursor: String,/** Conversation needing a reissued Welcome. */        @SerialName("convoId")
-        val convoId: String,/** Recipient device that cannot decrypt the original Welcome. */        @SerialName("recipientDeviceDid")
-        val recipientDeviceDid: DID,/** When the reissue was requested (RFC3339). */        @SerialName("requestedAt")
+        val convoId: String,/** Recipient device that cannot decrypt the original Welcome. This may be a device-qualified DID (did#deviceId). */        @SerialName("recipientDeviceDid")
+        val recipientDeviceDid: String,/** When the reissue was requested (RFC3339). */        @SerialName("requestedAt")
         val requestedAt: ATProtocolDate,/** Server-generated request identifier. Inviter echoes this in the replacement commit's idempotencyKey. */        @SerialName("requestId")
         val requestId: String    ) {
         companion object {

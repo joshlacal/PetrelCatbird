@@ -18,16 +18,17 @@ object BlueCatbirdMlsChatReissueWelcomeDefs {
 @Serializable
     data class BlueCatbirdMlsChatReissueWelcomeInput(
 // Conversation the failed Welcome is for.        @SerialName("convoId")
-        val convoId: String,// Recipient device that cannot decrypt.        @SerialName("recipientDeviceDid")
-        val recipientDeviceDid: DID,// Free-form reason for diagnostics (e.g., NoMatchingKeyPackage hex_ref=...).        @SerialName("reason")
+        val convoId: String,// Recipient device that cannot decrypt. This may be a device-qualified DID (did#deviceId).        @SerialName("recipientDeviceDid")
+        val recipientDeviceDid: String,// Free-form reason for diagnostics (e.g., NoMatchingKeyPackage hex_ref=...).        @SerialName("reason")
         val reason: String    )
 
     @Serializable
     data class BlueCatbirdMlsChatReissueWelcomeOutput(
 // True if request was recorded and inviter notified.        @SerialName("welcomeRequested")
-        val welcomeRequested: Boolean,// Server timestamp.        @SerialName("requestedAt")
+        val welcomeRequested: Boolean,// Server-generated request identifier for the reissue workflow.        @SerialName("requestId")
+        val requestId: String,// Server timestamp.        @SerialName("requestedAt")
         val requestedAt: ATProtocolDate,// Device that will be asked to re-issue. May be empty if no admin exists.        @SerialName("inviterDevice")
-        val inviterDevice: DID? = null    )
+        val inviterDevice: String? = null    )
 
 sealed class BlueCatbirdMlsChatReissueWelcomeError(val name: String, val description: String?) {
         object ConvoNotFound: BlueCatbirdMlsChatReissueWelcomeError("ConvoNotFound", "Conversation not found.")
