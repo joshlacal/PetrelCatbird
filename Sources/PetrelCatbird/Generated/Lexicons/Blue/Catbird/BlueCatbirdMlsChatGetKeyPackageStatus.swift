@@ -1,16 +1,20 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.mlsChat.getKeyPackageStatus
 
-public enum BlueCatbirdMlsChatGetKeyPackageStatus {
-    public static let typeIdentifier = "blue.catbird.mlsChat.getKeyPackageStatus"
 
-    public struct KeyPackageStats: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "blue.catbird.mlsChat.getKeyPackageStatus#keyPackageStats"
-        public let totalAvailable: Int
-        public let totalConsumed: Int
-        public let byDevice: [DeviceKeyPackageCount]?
+public struct BlueCatbirdMlsChatGetKeyPackageStatus { 
+
+    public static let typeIdentifier = "blue.catbird.mlsChat.getKeyPackageStatus"
+        
+public struct KeyPackageStats: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.mlsChat.getKeyPackageStatus#keyPackageStats"
+            public let totalAvailable: Int
+            public let totalConsumed: Int
+            public let byDevice: [DeviceKeyPackageCount]?
 
         public init(
             totalAvailable: Int, totalConsumed: Int, byDevice: [DeviceKeyPackageCount]?
@@ -23,24 +27,24 @@ public enum BlueCatbirdMlsChatGetKeyPackageStatus {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                totalAvailable = try container.decode(Int.self, forKey: .totalAvailable)
+                self.totalAvailable = try container.decode(Int.self, forKey: .totalAvailable)
             } catch {
                 LogManager.logError("Decoding error for required property 'totalAvailable': \(error)")
                 throw error
             }
             do {
-                totalConsumed = try container.decode(Int.self, forKey: .totalConsumed)
+                self.totalConsumed = try container.decode(Int.self, forKey: .totalConsumed)
             } catch {
                 LogManager.logError("Decoding error for required property 'totalConsumed': \(error)")
                 throw error
             }
             do {
-                byDevice = try container.decodeIfPresent([DeviceKeyPackageCount].self, forKey: .byDevice)
+                self.byDevice = try container.decodeIfPresent([DeviceKeyPackageCount].self, forKey: .byDevice)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'byDevice' — degrading to nil: \(error)")
-                byDevice = nil
+                self.byDevice = nil
             }
         }
 
@@ -101,11 +105,11 @@ public enum BlueCatbirdMlsChatGetKeyPackageStatus {
             case byDevice
         }
     }
-
-    public struct DeviceKeyPackageCount: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "blue.catbird.mlsChat.getKeyPackageStatus#deviceKeyPackageCount"
-        public let deviceId: String
-        public let available: Int
+        
+public struct DeviceKeyPackageCount: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.mlsChat.getKeyPackageStatus#deviceKeyPackageCount"
+            public let deviceId: String
+            public let available: Int
 
         public init(
             deviceId: String, available: Int
@@ -117,13 +121,13 @@ public enum BlueCatbirdMlsChatGetKeyPackageStatus {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                deviceId = try container.decode(String.self, forKey: .deviceId)
+                self.deviceId = try container.decode(String.self, forKey: .deviceId)
             } catch {
                 LogManager.logError("Decoding error for required property 'deviceId': \(error)")
                 throw error
             }
             do {
-                available = try container.decode(Int.self, forKey: .available)
+                self.available = try container.decode(Int.self, forKey: .available)
             } catch {
                 LogManager.logError("Decoding error for required property 'available': \(error)")
                 throw error
@@ -173,15 +177,15 @@ public enum BlueCatbirdMlsChatGetKeyPackageStatus {
             case available
         }
     }
-
-    public struct KeyPackageStatusItem: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "blue.catbird.mlsChat.getKeyPackageStatus#keyPackageStatusItem"
-        public let id: String
-        public let deviceId: String
-        public let cipherSuite: String
-        public let createdAt: ATProtocolDate
-        public let expiresAt: ATProtocolDate?
-        public let consumed: Bool
+        
+public struct KeyPackageStatusItem: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.mlsChat.getKeyPackageStatus#keyPackageStatusItem"
+            public let id: String
+            public let deviceId: String
+            public let cipherSuite: String
+            public let createdAt: ATProtocolDate
+            public let expiresAt: ATProtocolDate?
+            public let consumed: Bool
 
         public init(
             id: String, deviceId: String, cipherSuite: String, createdAt: ATProtocolDate, expiresAt: ATProtocolDate?, consumed: Bool
@@ -197,39 +201,39 @@ public enum BlueCatbirdMlsChatGetKeyPackageStatus {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                id = try container.decode(String.self, forKey: .id)
+                self.id = try container.decode(String.self, forKey: .id)
             } catch {
                 LogManager.logError("Decoding error for required property 'id': \(error)")
                 throw error
             }
             do {
-                deviceId = try container.decode(String.self, forKey: .deviceId)
+                self.deviceId = try container.decode(String.self, forKey: .deviceId)
             } catch {
                 LogManager.logError("Decoding error for required property 'deviceId': \(error)")
                 throw error
             }
             do {
-                cipherSuite = try container.decode(String.self, forKey: .cipherSuite)
+                self.cipherSuite = try container.decode(String.self, forKey: .cipherSuite)
             } catch {
                 LogManager.logError("Decoding error for required property 'cipherSuite': \(error)")
                 throw error
             }
             do {
-                createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+                self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'createdAt': \(error)")
                 throw error
             }
             do {
-                expiresAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expiresAt)
+                self.expiresAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expiresAt)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'expiresAt' — degrading to nil: \(error)")
-                expiresAt = nil
+                self.expiresAt = nil
             }
             do {
-                consumed = try container.decode(Bool.self, forKey: .consumed)
+                self.consumed = try container.decode(Bool.self, forKey: .consumed)
             } catch {
                 LogManager.logError("Decoding error for required property 'consumed': \(error)")
                 throw error
@@ -317,13 +321,13 @@ public enum BlueCatbirdMlsChatGetKeyPackageStatus {
             case consumed
         }
     }
-
-    public struct KeyPackageHistoryItem: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "blue.catbird.mlsChat.getKeyPackageStatus#keyPackageHistoryItem"
-        public let id: String
-        public let action: String
-        public let createdAt: ATProtocolDate
-        public let consumedByDid: DID?
+        
+public struct KeyPackageHistoryItem: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.mlsChat.getKeyPackageStatus#keyPackageHistoryItem"
+            public let id: String
+            public let action: String
+            public let createdAt: ATProtocolDate
+            public let consumedByDid: DID?
 
         public init(
             id: String, action: String, createdAt: ATProtocolDate, consumedByDid: DID?
@@ -337,30 +341,30 @@ public enum BlueCatbirdMlsChatGetKeyPackageStatus {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                id = try container.decode(String.self, forKey: .id)
+                self.id = try container.decode(String.self, forKey: .id)
             } catch {
                 LogManager.logError("Decoding error for required property 'id': \(error)")
                 throw error
             }
             do {
-                action = try container.decode(String.self, forKey: .action)
+                self.action = try container.decode(String.self, forKey: .action)
             } catch {
                 LogManager.logError("Decoding error for required property 'action': \(error)")
                 throw error
             }
             do {
-                createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+                self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'createdAt': \(error)")
                 throw error
             }
             do {
-                consumedByDid = try container.decodeIfPresent(DID.self, forKey: .consumedByDid)
+                self.consumedByDid = try container.decodeIfPresent(DID.self, forKey: .consumedByDid)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'consumedByDid' — degrading to nil: \(error)")
-                consumedByDid = nil
+                self.consumedByDid = nil
             }
         }
 
@@ -428,164 +432,208 @@ public enum BlueCatbirdMlsChatGetKeyPackageStatus {
             case createdAt
             case consumedByDid
         }
-    }
-
-    public struct Parameters: Parametrizable {
+    }    
+public struct Parameters: Parametrizable {
         public let did: DID?
         public let cipherSuite: String?
         public let include: String?
         public let limit: Int?
         public let cursor: String?
-
+        
         public init(
-            did: DID? = nil,
-            cipherSuite: String? = nil,
-            include: String? = nil,
-            limit: Int? = nil,
+            did: DID? = nil, 
+            cipherSuite: String? = nil, 
+            include: String? = nil, 
+            limit: Int? = nil, 
             cursor: String? = nil
-        ) {
+            ) {
             self.did = did
             self.cipherSuite = cipherSuite
             self.include = include
             self.limit = limit
             self.cursor = cursor
+            
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let stats: KeyPackageStats?
-
+        
         public let status: [KeyPackageStatusItem]?
-
+        
         public let history: [KeyPackageHistoryItem]?
-
+        
         public let cursor: String?
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             stats: KeyPackageStats? = nil,
-
+            
             status: [KeyPackageStatusItem]? = nil,
-
+            
             history: [KeyPackageHistoryItem]? = nil,
-
+            
             cursor: String? = nil
-
+            
+            
         ) {
+            
+            
             self.stats = stats
-
+            
             self.status = status
-
+            
             self.history = history
-
+            
             self.cursor = cursor
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
+            
             do {
-                stats = try container.decodeIfPresent(KeyPackageStats.self, forKey: .stats)
+                self.stats = try container.decodeIfPresent(KeyPackageStats.self, forKey: .stats)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'stats' — degrading to nil: \(error)")
-                stats = nil
+                self.stats = nil
             }
-
+            
+            
             do {
-                status = try container.decodeIfPresent([KeyPackageStatusItem].self, forKey: .status)
+                self.status = try container.decodeIfPresent([KeyPackageStatusItem].self, forKey: .status)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'status' — degrading to nil: \(error)")
-                status = nil
+                self.status = nil
             }
-
+            
+            
             do {
-                history = try container.decodeIfPresent([KeyPackageHistoryItem].self, forKey: .history)
+                self.history = try container.decodeIfPresent([KeyPackageHistoryItem].self, forKey: .history)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'history' — degrading to nil: \(error)")
-                history = nil
+                self.history = nil
             }
-
+            
+            
             do {
-                cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
+                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
-                cursor = nil
+                self.cursor = nil
             }
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(stats, forKey: .stats)
-
+            
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(status, forKey: .status)
-
+            
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(history, forKey: .history)
-
+            
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(cursor, forKey: .cursor)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             if let value = stats {
                 // Encode optional property even if it's an empty array for CBOR
                 let statsValue = try value.toCBORValue()
                 map = map.adding(key: "stats", value: statsValue)
             }
-
+            
+            
+            
             if let value = status {
                 // Encode optional property even if it's an empty array for CBOR
                 let statusValue = try value.toCBORValue()
                 map = map.adding(key: "status", value: statusValue)
             }
-
+            
+            
+            
             if let value = history {
                 // Encode optional property even if it's an empty array for CBOR
                 let historyValue = try value.toCBORValue()
                 map = map.adding(key: "history", value: historyValue)
             }
-
+            
+            
+            
             if let value = cursor {
                 // Encode optional property even if it's an empty array for CBOR
                 let cursorValue = try value.toCBORValue()
                 map = map.adding(key: "cursor", value: cursorValue)
             }
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case stats
             case status
             case history
             case cursor
         }
+        
     }
+
+
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.MlsChat {
+
+
+extension ATProtoClient.Blue.Catbird.MlsChat {
     // MARK: - getKeyPackageStatus
 
     /// Get key package statistics and status for the authenticated user's devices Retrieve key package counts, status, and history for the authenticated user. Useful for clients to know when to replenish key packages.
-    ///
+    /// 
     /// - Parameter input: The input parameters for the request
-    ///
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getKeyPackageStatus(input: BlueCatbirdMlsChatGetKeyPackageStatus.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsChatGetKeyPackageStatus.Output?) {
+    public func getKeyPackageStatus(input: BlueCatbirdMlsChatGetKeyPackageStatus.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsChatGetKeyPackageStatus.Output?) {
         let endpoint = "blue.catbird.mlsChat.getKeyPackageStatus"
 
+        
         let queryItems = input.asQueryItems()
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -603,7 +651,8 @@ public extension ATProtoClient.Blue.Catbird.MlsChat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -611,11 +660,13 @@ public extension ATProtoClient.Blue.Catbird.MlsChat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdMlsChatGetKeyPackageStatus.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -623,9 +674,12 @@ public extension ATProtoClient.Blue.Catbird.MlsChat {
                 return (responseCode, nil)
             }
         } else {
+            
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
+                           
+

@@ -1,15 +1,19 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: place.stream.live.searchActorsTypeahead
 
-public enum PlaceStreamLiveSearchActorsTypeahead {
-    public static let typeIdentifier = "place.stream.live.searchActorsTypeahead"
 
-    public struct Actor: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "place.stream.live.searchActorsTypeahead#actor"
-        public let did: DID
-        public let handle: Handle
+public struct PlaceStreamLiveSearchActorsTypeahead { 
+
+    public static let typeIdentifier = "place.stream.live.searchActorsTypeahead"
+        
+public struct Actor: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "place.stream.live.searchActorsTypeahead#actor"
+            public let did: DID
+            public let handle: Handle
 
         public init(
             did: DID, handle: Handle
@@ -21,13 +25,13 @@ public enum PlaceStreamLiveSearchActorsTypeahead {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                did = try container.decode(DID.self, forKey: .did)
+                self.did = try container.decode(DID.self, forKey: .did)
             } catch {
                 LogManager.logError("Decoding error for required property 'did': \(error)")
                 throw error
             }
             do {
-                handle = try container.decode(Handle.self, forKey: .handle)
+                self.handle = try container.decode(Handle.self, forKey: .handle)
             } catch {
                 LogManager.logError("Decoding error for required property 'handle': \(error)")
                 throw error
@@ -76,73 +80,105 @@ public enum PlaceStreamLiveSearchActorsTypeahead {
             case did
             case handle
         }
-    }
-
-    public struct Parameters: Parametrizable {
+    }    
+public struct Parameters: Parametrizable {
         public let q: String?
         public let limit: Int?
-
+        
         public init(
-            q: String? = nil,
+            q: String? = nil, 
             limit: Int? = nil
-        ) {
+            ) {
             self.q = q
             self.limit = limit
+            
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let actors: [Actor]
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             actors: [Actor]
-
+            
+            
         ) {
+            
+            
             self.actors = actors
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            actors = try container.decode([Actor].self, forKey: .actors)
+            
+            self.actors = try container.decode([Actor].self, forKey: .actors)
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(actors, forKey: .actors)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let actorsValue = try actors.toCBORValue()
             map = map.adding(key: "actors", value: actorsValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case actors
         }
+        
     }
+
+
+
+
 }
 
-public extension ATProtoClient.Place.Stream.Live {
+
+
+extension ATProtoClient.Place.Stream.Live {
     // MARK: - searchActorsTypeahead
 
     /// Find actor suggestions for a prefix search term. Expected use is for auto-completion during text field entry.
-    ///
+    /// 
     /// - Parameter input: The input parameters for the request
-    ///
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func searchActorsTypeahead(input: PlaceStreamLiveSearchActorsTypeahead.Parameters) async throws -> (responseCode: Int, data: PlaceStreamLiveSearchActorsTypeahead.Output?) {
+    public func searchActorsTypeahead(input: PlaceStreamLiveSearchActorsTypeahead.Parameters) async throws -> (responseCode: Int, data: PlaceStreamLiveSearchActorsTypeahead.Output?) {
         let endpoint = "place.stream.live.searchActorsTypeahead"
 
+        
         let queryItems = input.asQueryItems()
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -160,7 +196,8 @@ public extension ATProtoClient.Place.Stream.Live {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -168,11 +205,13 @@ public extension ATProtoClient.Place.Stream.Live {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(PlaceStreamLiveSearchActorsTypeahead.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -180,9 +219,12 @@ public extension ATProtoClient.Place.Stream.Live {
                 return (responseCode, nil)
             }
         } else {
+            
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
+                           
+

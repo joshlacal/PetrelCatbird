@@ -4,11 +4,9 @@ import Petrel
 // Generated namespace extensions for the PetrelCatbird overlay package.
 
 public extension ATProtoClient {
-    var blue: Blue {
-        Blue(networkService: networkService)
-    }
+    var blue: Blue { Blue(networkService: networkService) }
 
-    final class Blue: @unchecked Sendable {
+    public final class Blue: @unchecked Sendable {
         public let networkService: NetworkService
         public init(networkService: NetworkService) {
             self.networkService = networkService
@@ -29,6 +27,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var mlsChat: MlsChat = .init(networkService: networkService)
@@ -38,6 +37,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var mlsDS: MlsDS = .init(networkService: networkService)
@@ -47,17 +47,19 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
+
         }
+
     }
+
 }
 
 public extension ATProtoClient {
-    var place: Place {
-        Place(networkService: networkService)
-    }
+    var place: Place { Place(networkService: networkService) }
 
-    final class Place: @unchecked Sendable {
+    public final class Place: @unchecked Sendable {
         public let networkService: NetworkService
         public init(networkService: NetworkService) {
             self.networkService = networkService
@@ -78,6 +80,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var key: Key = .init(networkService: networkService)
@@ -87,6 +90,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var livestream: Livestream = .init(networkService: networkService)
@@ -96,6 +100,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var segment: Segment = .init(networkService: networkService)
@@ -105,6 +110,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var video: Video = .init(networkService: networkService)
@@ -114,6 +120,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var badge: Badge = .init(networkService: networkService)
@@ -123,6 +130,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var branding: Branding = .init(networkService: networkService)
@@ -132,6 +140,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var broadcast: Broadcast = .init(networkService: networkService)
@@ -141,6 +150,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var chat: Chat = .init(networkService: networkService)
@@ -150,6 +160,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var config: Config = .init(networkService: networkService)
@@ -159,6 +170,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var graph: Graph = .init(networkService: networkService)
@@ -168,6 +180,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var ingest: Ingest = .init(networkService: networkService)
@@ -177,6 +190,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var live: Live = .init(networkService: networkService)
@@ -186,6 +200,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var metadata: Metadata = .init(networkService: networkService)
@@ -195,6 +210,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var moderation: Moderation = .init(networkService: networkService)
@@ -204,6 +220,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var multistream: Multistream = .init(networkService: networkService)
@@ -213,6 +230,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var muxl: Muxl = .init(networkService: networkService)
@@ -222,6 +240,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var playback: Playback = .init(networkService: networkService)
@@ -231,6 +250,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var richtext: Richtext = .init(networkService: networkService)
@@ -240,6 +260,7 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
             public lazy var server: Server = .init(networkService: networkService)
@@ -249,7 +270,12 @@ public extension ATProtoClient {
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
+
         }
+
     }
+
 }
+

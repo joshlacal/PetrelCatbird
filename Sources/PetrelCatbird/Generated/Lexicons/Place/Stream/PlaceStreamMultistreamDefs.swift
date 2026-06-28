@@ -1,17 +1,21 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: place.stream.multistream.defs
 
-public enum PlaceStreamMultistreamDefs {
-    public static let typeIdentifier = "place.stream.multistream.defs"
 
-    public struct TargetView: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "place.stream.multistream.defs#targetView"
-        public let uri: ATProtocolURI
-        public let cid: CID
-        public let record: ATProtocolValueContainer
-        public let latestEvent: PlaceStreamMultistreamDefs.Event?
+public struct PlaceStreamMultistreamDefs { 
+
+    public static let typeIdentifier = "place.stream.multistream.defs"
+        
+public struct TargetView: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "place.stream.multistream.defs#targetView"
+            public let uri: ATProtocolURI
+            public let cid: CID
+            public let record: ATProtocolValueContainer
+            public let latestEvent: PlaceStreamMultistreamDefs.Event?
 
         public init(
             uri: ATProtocolURI, cid: CID, record: ATProtocolValueContainer, latestEvent: PlaceStreamMultistreamDefs.Event?
@@ -25,30 +29,30 @@ public enum PlaceStreamMultistreamDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
             } catch {
                 LogManager.logError("Decoding error for required property 'uri': \(error)")
                 throw error
             }
             do {
-                cid = try container.decode(CID.self, forKey: .cid)
+                self.cid = try container.decode(CID.self, forKey: .cid)
             } catch {
                 LogManager.logError("Decoding error for required property 'cid': \(error)")
                 throw error
             }
             do {
-                record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+                self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
             } catch {
                 LogManager.logError("Decoding error for required property 'record': \(error)")
                 throw error
             }
             do {
-                latestEvent = try container.decodeIfPresent(PlaceStreamMultistreamDefs.Event.self, forKey: .latestEvent)
+                self.latestEvent = try container.decodeIfPresent(PlaceStreamMultistreamDefs.Event.self, forKey: .latestEvent)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'latestEvent' — degrading to nil: \(error)")
-                latestEvent = nil
+                self.latestEvent = nil
             }
         }
 
@@ -117,12 +121,12 @@ public enum PlaceStreamMultistreamDefs {
             case latestEvent
         }
     }
-
-    public struct Event: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "place.stream.multistream.defs#event"
-        public let message: String
-        public let status: String
-        public let createdAt: ATProtocolDate
+        
+public struct Event: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "place.stream.multistream.defs#event"
+            public let message: String
+            public let status: String
+            public let createdAt: ATProtocolDate
 
         public init(
             message: String, status: String, createdAt: ATProtocolDate
@@ -135,19 +139,19 @@ public enum PlaceStreamMultistreamDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                message = try container.decode(String.self, forKey: .message)
+                self.message = try container.decode(String.self, forKey: .message)
             } catch {
                 LogManager.logError("Decoding error for required property 'message': \(error)")
                 throw error
             }
             do {
-                status = try container.decode(String.self, forKey: .status)
+                self.status = try container.decode(String.self, forKey: .status)
             } catch {
                 LogManager.logError("Decoding error for required property 'status': \(error)")
                 throw error
             }
             do {
-                createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+                self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'createdAt': \(error)")
                 throw error
@@ -205,4 +209,11 @@ public enum PlaceStreamMultistreamDefs {
             case createdAt
         }
     }
+
+
+
 }
+
+
+                           
+

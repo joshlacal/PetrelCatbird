@@ -1,11 +1,15 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.mlsChat.reportRecoveryFailure
 
-public enum BlueCatbirdMlsChatReportRecoveryFailure {
+
+public struct BlueCatbirdMlsChatReportRecoveryFailure { 
+
     public static let typeIdentifier = "blue.catbird.mlsChat.reportRecoveryFailure"
-    public struct Input: ATProtocolCodable {
+public struct Input: ATProtocolCodable {
         public let convoId: String
         public let failureType: String?
         public let failureMode: String?
@@ -18,13 +22,14 @@ public enum BlueCatbirdMlsChatReportRecoveryFailure {
             self.failureMode = failureMode
             self.epochAuthenticator = epochAuthenticator
         }
+        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            convoId = try container.decode(String.self, forKey: .convoId)
-            failureType = try container.decodeIfPresent(String.self, forKey: .failureType)
-            failureMode = try container.decodeIfPresent(String.self, forKey: .failureMode)
-            epochAuthenticator = try container.decodeIfPresent(String.self, forKey: .epochAuthenticator)
+            self.convoId = try container.decode(String.self, forKey: .convoId)
+            self.failureType = try container.decodeIfPresent(String.self, forKey: .failureType)
+            self.failureMode = try container.decodeIfPresent(String.self, forKey: .failureMode)
+            self.epochAuthenticator = try container.decodeIfPresent(String.self, forKey: .epochAuthenticator)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -61,147 +66,195 @@ public enum BlueCatbirdMlsChatReportRecoveryFailure {
             case epochAuthenticator
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let recorded: Bool
-
+        
         public let autoResetTriggered: Bool
-
+        
         public let failureCount: Int
-
+        
         public let memberCount: Int
-
+        
         public let reason: String?
-
+        
         public let newGroupId: String?
-
+        
         public let resetGeneration: Int?
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             recorded: Bool,
-
+            
             autoResetTriggered: Bool,
-
+            
             failureCount: Int,
-
+            
             memberCount: Int,
-
+            
             reason: String? = nil,
-
+            
             newGroupId: String? = nil,
-
+            
             resetGeneration: Int? = nil
-
+            
+            
         ) {
+            
+            
             self.recorded = recorded
-
+            
             self.autoResetTriggered = autoResetTriggered
-
+            
             self.failureCount = failureCount
-
+            
             self.memberCount = memberCount
-
+            
             self.reason = reason
-
+            
             self.newGroupId = newGroupId
-
+            
             self.resetGeneration = resetGeneration
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            recorded = try container.decode(Bool.self, forKey: .recorded)
-
-            autoResetTriggered = try container.decode(Bool.self, forKey: .autoResetTriggered)
-
-            failureCount = try container.decode(Int.self, forKey: .failureCount)
-
-            memberCount = try container.decode(Int.self, forKey: .memberCount)
-
+            
+            self.recorded = try container.decode(Bool.self, forKey: .recorded)
+            
+            
+            self.autoResetTriggered = try container.decode(Bool.self, forKey: .autoResetTriggered)
+            
+            
+            self.failureCount = try container.decode(Int.self, forKey: .failureCount)
+            
+            
+            self.memberCount = try container.decode(Int.self, forKey: .memberCount)
+            
+            
             do {
-                reason = try container.decodeIfPresent(String.self, forKey: .reason)
+                self.reason = try container.decodeIfPresent(String.self, forKey: .reason)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'reason' — degrading to nil: \(error)")
-                reason = nil
+                self.reason = nil
             }
-
+            
+            
             do {
-                newGroupId = try container.decodeIfPresent(String.self, forKey: .newGroupId)
+                self.newGroupId = try container.decodeIfPresent(String.self, forKey: .newGroupId)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'newGroupId' — degrading to nil: \(error)")
-                newGroupId = nil
+                self.newGroupId = nil
             }
-
+            
+            
             do {
-                resetGeneration = try container.decodeIfPresent(Int.self, forKey: .resetGeneration)
+                self.resetGeneration = try container.decodeIfPresent(Int.self, forKey: .resetGeneration)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'resetGeneration' — degrading to nil: \(error)")
-                resetGeneration = nil
+                self.resetGeneration = nil
             }
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(recorded, forKey: .recorded)
-
+            
+            
             try container.encode(autoResetTriggered, forKey: .autoResetTriggered)
-
+            
+            
             try container.encode(failureCount, forKey: .failureCount)
-
+            
+            
             try container.encode(memberCount, forKey: .memberCount)
-
+            
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(reason, forKey: .reason)
-
+            
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(newGroupId, forKey: .newGroupId)
-
+            
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(resetGeneration, forKey: .resetGeneration)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let recordedValue = try recorded.toCBORValue()
             map = map.adding(key: "recorded", value: recordedValue)
-
+            
+            
+            
             let autoResetTriggeredValue = try autoResetTriggered.toCBORValue()
             map = map.adding(key: "autoResetTriggered", value: autoResetTriggeredValue)
-
+            
+            
+            
             let failureCountValue = try failureCount.toCBORValue()
             map = map.adding(key: "failureCount", value: failureCountValue)
-
+            
+            
+            
             let memberCountValue = try memberCount.toCBORValue()
             map = map.adding(key: "memberCount", value: memberCountValue)
-
+            
+            
+            
             if let value = reason {
                 // Encode optional property even if it's an empty array for CBOR
                 let reasonValue = try value.toCBORValue()
                 map = map.adding(key: "reason", value: reasonValue)
             }
-
+            
+            
+            
             if let value = newGroupId {
                 // Encode optional property even if it's an empty array for CBOR
                 let newGroupIdValue = try value.toCBORValue()
                 map = map.adding(key: "newGroupId", value: newGroupIdValue)
             }
-
+            
+            
+            
             if let value = resetGeneration {
                 // Encode optional property even if it's an empty array for CBOR
                 let resetGenerationValue = try value.toCBORValue()
                 map = map.adding(key: "resetGeneration", value: resetGenerationValue)
             }
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case recorded
             case autoResetTriggered
@@ -211,49 +264,59 @@ public enum BlueCatbirdMlsChatReportRecoveryFailure {
             case newGroupId
             case resetGeneration
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case convoNotFound = "ConvoNotFound.Conversation not found"
+                case notMember = "NotMember.Caller is not a member of the conversation"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case convoNotFound = "ConvoNotFound.Conversation not found"
-        case notMember = "NotMember.Caller is not a member of the conversation"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                // Extract just the error name from the raw value
+                let parts = self.rawValue.split(separator: ".")
+                return String(parts.first ?? "")
+            }
         }
 
-        public var errorName: String {
-            // Extract just the error name from the raw value
-            let parts = rawValue.split(separator: ".")
-            return String(parts.first ?? "")
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.MlsChat {
+extension ATProtoClient.Blue.Catbird.MlsChat {
     // MARK: - reportRecoveryFailure
 
-    // Report that recovery has been exhausted for a conversation Report that a client has exhausted all recovery attempts for a conversation. Any member may report. When votes from at least ceil(2/3) of the active identity DIDs carry a valid epoch_authenticator within the 1-hour expiry window, the server auto-resets the group (see ADR-002).
-    //
-    // - Parameter input: The input parameters for the request
-
-    ///
+    /// Report that recovery has been exhausted for a conversation Report that a client has exhausted all recovery attempts for a conversation. Any member may report. When votes from at least ceil(2/3) of the active identity DIDs carry a valid epoch_authenticator within the 1-hour expiry window, the server auto-resets the group (see ADR-002).
+    /// 
+    /// - Parameter input: The input parameters for the request
+    
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func reportRecoveryFailure(
+    public func reportRecoveryFailure(
+        
         input: BlueCatbirdMlsChatReportRecoveryFailure.Input
-
+        
     ) async throws -> (responseCode: Int, data: BlueCatbirdMlsChatReportRecoveryFailure.Output?) {
         let endpoint = "blue.catbird.mlsChat.reportRecoveryFailure"
-
+        
         var headers: [String: String] = [:]
-
+        
         headers["Content-Type"] = "application/json"
-
+        
+        
+        
         headers["Accept"] = "application/json"
+        
 
+        
         let requestData: Data? = try JSONEncoder().encode(input)
-
+        
+        
         let queryItems: [URLQueryItem]? = nil
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -268,10 +331,12 @@ public extension ATProtoClient.Blue.Catbird.MlsChat {
         let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
+        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -279,11 +344,13 @@ public extension ATProtoClient.Blue.Catbird.MlsChat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdMlsChatReportRecoveryFailure.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -294,5 +361,9 @@ public extension ATProtoClient.Blue.Catbird.MlsChat {
             // Don't try to decode error responses as success types
             return (responseCode, nil)
         }
+        
     }
+    
 }
+                           
+

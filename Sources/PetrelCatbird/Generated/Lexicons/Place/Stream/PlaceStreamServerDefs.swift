@@ -1,27 +1,31 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: place.stream.server.defs
 
-public enum PlaceStreamServerDefs {
-    public static let typeIdentifier = "place.stream.server.defs"
 
-    public struct Webhook: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "place.stream.server.defs#webhook"
-        public let id: String
-        public let url: URI
-        public let events: [String]
-        public let active: Bool
-        public let prefix: String?
-        public let suffix: String?
-        public let rewrite: [RewriteRule]?
-        public let createdAt: ATProtocolDate
-        public let updatedAt: ATProtocolDate?
-        public let name: String?
-        public let description: String?
-        public let lastTriggered: ATProtocolDate?
-        public let errorCount: Int?
-        public let muteWords: [String]?
+public struct PlaceStreamServerDefs { 
+
+    public static let typeIdentifier = "place.stream.server.defs"
+        
+public struct Webhook: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "place.stream.server.defs#webhook"
+            public let id: String
+            public let url: URI
+            public let events: [String]
+            public let active: Bool
+            public let prefix: String?
+            public let suffix: String?
+            public let rewrite: [RewriteRule]?
+            public let createdAt: ATProtocolDate
+            public let updatedAt: ATProtocolDate?
+            public let name: String?
+            public let description: String?
+            public let lastTriggered: ATProtocolDate?
+            public let errorCount: Int?
+            public let muteWords: [String]?
 
         public init(
             id: String, url: URI, events: [String], active: Bool, prefix: String?, suffix: String?, rewrite: [RewriteRule]?, createdAt: ATProtocolDate, updatedAt: ATProtocolDate?, name: String?, description: String?, lastTriggered: ATProtocolDate?, errorCount: Int?, muteWords: [String]?
@@ -45,106 +49,106 @@ public enum PlaceStreamServerDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                id = try container.decode(String.self, forKey: .id)
+                self.id = try container.decode(String.self, forKey: .id)
             } catch {
                 LogManager.logError("Decoding error for required property 'id': \(error)")
                 throw error
             }
             do {
-                url = try container.decode(URI.self, forKey: .url)
+                self.url = try container.decode(URI.self, forKey: .url)
             } catch {
                 LogManager.logError("Decoding error for required property 'url': \(error)")
                 throw error
             }
             do {
-                events = try container.decode([String].self, forKey: .events)
+                self.events = try container.decode([String].self, forKey: .events)
             } catch {
                 LogManager.logError("Decoding error for required property 'events': \(error)")
                 throw error
             }
             do {
-                active = try container.decode(Bool.self, forKey: .active)
+                self.active = try container.decode(Bool.self, forKey: .active)
             } catch {
                 LogManager.logError("Decoding error for required property 'active': \(error)")
                 throw error
             }
             do {
-                prefix = try container.decodeIfPresent(String.self, forKey: .prefix)
+                self.prefix = try container.decodeIfPresent(String.self, forKey: .prefix)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'prefix' — degrading to nil: \(error)")
-                prefix = nil
+                self.prefix = nil
             }
             do {
-                suffix = try container.decodeIfPresent(String.self, forKey: .suffix)
+                self.suffix = try container.decodeIfPresent(String.self, forKey: .suffix)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'suffix' — degrading to nil: \(error)")
-                suffix = nil
+                self.suffix = nil
             }
             do {
-                rewrite = try container.decodeIfPresent([RewriteRule].self, forKey: .rewrite)
+                self.rewrite = try container.decodeIfPresent([RewriteRule].self, forKey: .rewrite)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'rewrite' — degrading to nil: \(error)")
-                rewrite = nil
+                self.rewrite = nil
             }
             do {
-                createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+                self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'createdAt': \(error)")
                 throw error
             }
             do {
-                updatedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .updatedAt)
+                self.updatedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .updatedAt)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'updatedAt' — degrading to nil: \(error)")
-                updatedAt = nil
+                self.updatedAt = nil
             }
             do {
-                name = try container.decodeIfPresent(String.self, forKey: .name)
+                self.name = try container.decodeIfPresent(String.self, forKey: .name)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'name' — degrading to nil: \(error)")
-                name = nil
+                self.name = nil
             }
             do {
-                description = try container.decodeIfPresent(String.self, forKey: .description)
+                self.description = try container.decodeIfPresent(String.self, forKey: .description)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'description' — degrading to nil: \(error)")
-                description = nil
+                self.description = nil
             }
             do {
-                lastTriggered = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastTriggered)
+                self.lastTriggered = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastTriggered)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'lastTriggered' — degrading to nil: \(error)")
-                lastTriggered = nil
+                self.lastTriggered = nil
             }
             do {
-                errorCount = try container.decodeIfPresent(Int.self, forKey: .errorCount)
+                self.errorCount = try container.decodeIfPresent(Int.self, forKey: .errorCount)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'errorCount' — degrading to nil: \(error)")
-                errorCount = nil
+                self.errorCount = nil
             }
             do {
-                muteWords = try container.decodeIfPresent([String].self, forKey: .muteWords)
+                self.muteWords = try container.decodeIfPresent([String].self, forKey: .muteWords)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'muteWords' — degrading to nil: \(error)")
-                muteWords = nil
+                self.muteWords = nil
             }
         }
 
@@ -341,11 +345,11 @@ public enum PlaceStreamServerDefs {
             case muteWords
         }
     }
-
-    public struct RewriteRule: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "place.stream.server.defs#rewriteRule"
-        public let from: String
-        public let to: String
+        
+public struct RewriteRule: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "place.stream.server.defs#rewriteRule"
+            public let from: String
+            public let to: String
 
         public init(
             from: String, to: String
@@ -357,13 +361,13 @@ public enum PlaceStreamServerDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                from = try container.decode(String.self, forKey: .from)
+                self.from = try container.decode(String.self, forKey: .from)
             } catch {
                 LogManager.logError("Decoding error for required property 'from': \(error)")
                 throw error
             }
             do {
-                to = try container.decode(String.self, forKey: .to)
+                self.to = try container.decode(String.self, forKey: .to)
             } catch {
                 LogManager.logError("Decoding error for required property 'to': \(error)")
                 throw error
@@ -413,4 +417,11 @@ public enum PlaceStreamServerDefs {
             case to
         }
     }
+
+
+
 }
+
+
+                           
+

@@ -1,19 +1,23 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: place.stream.branding.getBranding
 
-public enum PlaceStreamBrandingGetBranding {
-    public static let typeIdentifier = "place.stream.branding.getBranding"
 
-    public struct BrandingAsset: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "place.stream.branding.getBranding#brandingAsset"
-        public let key: String
-        public let mimeType: String
-        public let url: String?
-        public let data: String?
-        public let width: Int?
-        public let height: Int?
+public struct PlaceStreamBrandingGetBranding { 
+
+    public static let typeIdentifier = "place.stream.branding.getBranding"
+        
+public struct BrandingAsset: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "place.stream.branding.getBranding#brandingAsset"
+            public let key: String
+            public let mimeType: String
+            public let url: String?
+            public let data: String?
+            public let width: Int?
+            public let height: Int?
 
         public init(
             key: String, mimeType: String, url: String?, data: String?, width: Int?, height: Int?
@@ -29,48 +33,48 @@ public enum PlaceStreamBrandingGetBranding {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                key = try container.decode(String.self, forKey: .key)
+                self.key = try container.decode(String.self, forKey: .key)
             } catch {
                 LogManager.logError("Decoding error for required property 'key': \(error)")
                 throw error
             }
             do {
-                mimeType = try container.decode(String.self, forKey: .mimeType)
+                self.mimeType = try container.decode(String.self, forKey: .mimeType)
             } catch {
                 LogManager.logError("Decoding error for required property 'mimeType': \(error)")
                 throw error
             }
             do {
-                url = try container.decodeIfPresent(String.self, forKey: .url)
+                self.url = try container.decodeIfPresent(String.self, forKey: .url)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'url' — degrading to nil: \(error)")
-                url = nil
+                self.url = nil
             }
             do {
-                data = try container.decodeIfPresent(String.self, forKey: .data)
+                self.data = try container.decodeIfPresent(String.self, forKey: .data)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'data' — degrading to nil: \(error)")
-                data = nil
+                self.data = nil
             }
             do {
-                width = try container.decodeIfPresent(Int.self, forKey: .width)
+                self.width = try container.decodeIfPresent(Int.self, forKey: .width)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'width' — degrading to nil: \(error)")
-                width = nil
+                self.width = nil
             }
             do {
-                height = try container.decodeIfPresent(Int.self, forKey: .height)
+                self.height = try container.decodeIfPresent(Int.self, forKey: .height)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'height' — degrading to nil: \(error)")
-                height = nil
+                self.height = nil
             }
         }
 
@@ -172,70 +176,102 @@ public enum PlaceStreamBrandingGetBranding {
             case width
             case height
         }
-    }
-
-    public struct Parameters: Parametrizable {
+    }    
+public struct Parameters: Parametrizable {
         public let broadcaster: DID?
-
+        
         public init(
             broadcaster: DID? = nil
-        ) {
+            ) {
             self.broadcaster = broadcaster
+            
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let assets: [BrandingAsset]
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             assets: [BrandingAsset]
-
+            
+            
         ) {
+            
+            
             self.assets = assets
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            assets = try container.decode([BrandingAsset].self, forKey: .assets)
+            
+            self.assets = try container.decode([BrandingAsset].self, forKey: .assets)
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(assets, forKey: .assets)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let assetsValue = try assets.toCBORValue()
             map = map.adding(key: "assets", value: assetsValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case assets
         }
+        
     }
+
+
+
+
 }
 
-public extension ATProtoClient.Place.Stream.Branding {
+
+
+extension ATProtoClient.Place.Stream.Branding {
     // MARK: - getBranding
 
     /// Get all branding configuration for the broadcaster.
-    ///
+    /// 
     /// - Parameter input: The input parameters for the request
-    ///
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getBranding(input: PlaceStreamBrandingGetBranding.Parameters) async throws -> (responseCode: Int, data: PlaceStreamBrandingGetBranding.Output?) {
+    public func getBranding(input: PlaceStreamBrandingGetBranding.Parameters) async throws -> (responseCode: Int, data: PlaceStreamBrandingGetBranding.Output?) {
         let endpoint = "place.stream.branding.getBranding"
 
+        
         let queryItems = input.asQueryItems()
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -253,7 +289,8 @@ public extension ATProtoClient.Place.Stream.Branding {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -261,11 +298,13 @@ public extension ATProtoClient.Place.Stream.Branding {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(PlaceStreamBrandingGetBranding.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -273,9 +312,12 @@ public extension ATProtoClient.Place.Stream.Branding {
                 return (responseCode, nil)
             }
         } else {
+            
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
+                           
+

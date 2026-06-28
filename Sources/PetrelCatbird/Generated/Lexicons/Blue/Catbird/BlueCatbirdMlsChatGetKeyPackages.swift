@@ -1,113 +1,153 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.mlsChat.getKeyPackages
 
-public enum BlueCatbirdMlsChatGetKeyPackages {
-    public static let typeIdentifier = "blue.catbird.mlsChat.getKeyPackages"
-    public struct Parameters: Parametrizable {
+
+public struct BlueCatbirdMlsChatGetKeyPackages { 
+
+    public static let typeIdentifier = "blue.catbird.mlsChat.getKeyPackages"    
+public struct Parameters: Parametrizable {
         public let dids: [DID]
         public let cipherSuite: String?
-
+        
         public init(
-            dids: [DID],
+            dids: [DID], 
             cipherSuite: String? = nil
-        ) {
+            ) {
             self.dids = dids
             self.cipherSuite = cipherSuite
+            
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let keyPackages: [BlueCatbirdMlsChatDefs.KeyPackageRef]
-
+        
         public let missing: [DID]?
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             keyPackages: [BlueCatbirdMlsChatDefs.KeyPackageRef],
-
+            
             missing: [DID]? = nil
-
+            
+            
         ) {
+            
+            
             self.keyPackages = keyPackages
-
+            
             self.missing = missing
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            keyPackages = try container.decode([BlueCatbirdMlsChatDefs.KeyPackageRef].self, forKey: .keyPackages)
-
+            
+            self.keyPackages = try container.decode([BlueCatbirdMlsChatDefs.KeyPackageRef].self, forKey: .keyPackages)
+            
+            
             do {
-                missing = try container.decodeIfPresent([DID].self, forKey: .missing)
+                self.missing = try container.decodeIfPresent([DID].self, forKey: .missing)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'missing' — degrading to nil: \(error)")
-                missing = nil
+                self.missing = nil
             }
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(keyPackages, forKey: .keyPackages)
-
+            
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(missing, forKey: .missing)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let keyPackagesValue = try keyPackages.toCBORValue()
             map = map.adding(key: "keyPackages", value: keyPackagesValue)
-
+            
+            
+            
             if let value = missing {
                 // Encode optional property even if it's an empty array for CBOR
                 let missingValue = try value.toCBORValue()
                 map = map.adding(key: "missing", value: missingValue)
             }
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case keyPackages
             case missing
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case tooManyDids = "TooManyDids.Too many DIDs requested (max 100)"
+                case invalidDid = "InvalidDid.One or more DIDs are invalid"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case tooManyDids = "TooManyDids.Too many DIDs requested (max 100)"
-        case invalidDid = "InvalidDid.One or more DIDs are invalid"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                // Extract just the error name from the raw value
+                let parts = self.rawValue.split(separator: ".")
+                return String(parts.first ?? "")
+            }
         }
 
-        public var errorName: String {
-            // Extract just the error name from the raw value
-            let parts = rawValue.split(separator: ".")
-            return String(parts.first ?? "")
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.MlsChat {
+
+
+extension ATProtoClient.Blue.Catbird.MlsChat {
     // MARK: - getKeyPackages
 
     /// Retrieve key packages for one or more DIDs (same as v1, in v2 namespace for consistency) Retrieve key packages for one or more DIDs to add them to conversations. Returns one key package per device per DID.
-    ///
+    /// 
     /// - Parameter input: The input parameters for the request
-    ///
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getKeyPackages(input: BlueCatbirdMlsChatGetKeyPackages.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsChatGetKeyPackages.Output?) {
+    public func getKeyPackages(input: BlueCatbirdMlsChatGetKeyPackages.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsChatGetKeyPackages.Output?) {
         let endpoint = "blue.catbird.mlsChat.getKeyPackages"
 
+        
         let queryItems = input.asQueryItems()
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -125,7 +165,8 @@ public extension ATProtoClient.Blue.Catbird.MlsChat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -133,11 +174,13 @@ public extension ATProtoClient.Blue.Catbird.MlsChat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdMlsChatGetKeyPackages.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -145,9 +188,12 @@ public extension ATProtoClient.Blue.Catbird.MlsChat {
                 return (responseCode, nil)
             }
         } else {
+            
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
+                           
+

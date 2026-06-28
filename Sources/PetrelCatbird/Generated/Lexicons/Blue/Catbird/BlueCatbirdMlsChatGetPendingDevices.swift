@@ -1,17 +1,21 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.mlsChat.getPendingDevices
 
-public enum BlueCatbirdMlsChatGetPendingDevices {
-    public static let typeIdentifier = "blue.catbird.mlsChat.getPendingDevices"
 
-    public struct PendingDeviceAddition: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "blue.catbird.mlsChat.getPendingDevices#pendingDeviceAddition"
-        public let convoId: String
-        public let deviceId: String
-        public let createdAt: ATProtocolDate
-        public let welcome: Bytes?
+public struct BlueCatbirdMlsChatGetPendingDevices { 
+
+    public static let typeIdentifier = "blue.catbird.mlsChat.getPendingDevices"
+        
+public struct PendingDeviceAddition: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.mlsChat.getPendingDevices#pendingDeviceAddition"
+            public let convoId: String
+            public let deviceId: String
+            public let createdAt: ATProtocolDate
+            public let welcome: Bytes?
 
         public init(
             convoId: String, deviceId: String, createdAt: ATProtocolDate, welcome: Bytes?
@@ -25,30 +29,30 @@ public enum BlueCatbirdMlsChatGetPendingDevices {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                convoId = try container.decode(String.self, forKey: .convoId)
+                self.convoId = try container.decode(String.self, forKey: .convoId)
             } catch {
                 LogManager.logError("Decoding error for required property 'convoId': \(error)")
                 throw error
             }
             do {
-                deviceId = try container.decode(String.self, forKey: .deviceId)
+                self.deviceId = try container.decode(String.self, forKey: .deviceId)
             } catch {
                 LogManager.logError("Decoding error for required property 'deviceId': \(error)")
                 throw error
             }
             do {
-                createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+                self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'createdAt': \(error)")
                 throw error
             }
             do {
-                welcome = try container.decodeIfPresent(Bytes.self, forKey: .welcome)
+                self.welcome = try container.decodeIfPresent(Bytes.self, forKey: .welcome)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'welcome' — degrading to nil: \(error)")
-                welcome = nil
+                self.welcome = nil
             }
         }
 
@@ -116,73 +120,105 @@ public enum BlueCatbirdMlsChatGetPendingDevices {
             case createdAt
             case welcome
         }
-    }
-
-    public struct Parameters: Parametrizable {
+    }    
+public struct Parameters: Parametrizable {
         public let convoIds: [String]?
         public let limit: Int?
-
+        
         public init(
-            convoIds: [String]? = nil,
+            convoIds: [String]? = nil, 
             limit: Int? = nil
-        ) {
+            ) {
             self.convoIds = convoIds
             self.limit = limit
+            
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let pendingAdditions: [PendingDeviceAddition]
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             pendingAdditions: [PendingDeviceAddition]
-
+            
+            
         ) {
+            
+            
             self.pendingAdditions = pendingAdditions
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            pendingAdditions = try container.decode([PendingDeviceAddition].self, forKey: .pendingAdditions)
+            
+            self.pendingAdditions = try container.decode([PendingDeviceAddition].self, forKey: .pendingAdditions)
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(pendingAdditions, forKey: .pendingAdditions)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let pendingAdditionsValue = try pendingAdditions.toCBORValue()
             map = map.adding(key: "pendingAdditions", value: pendingAdditionsValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case pendingAdditions
         }
+        
     }
+
+
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.MlsChat {
+
+
+extension ATProtoClient.Blue.Catbird.MlsChat {
     // MARK: - getPendingDevices
 
     /// Get pending device additions for the authenticated user List pending device additions — conversations that a newly registered device should join via Welcome messages.
-    ///
+    /// 
     /// - Parameter input: The input parameters for the request
-    ///
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getPendingDevices(input: BlueCatbirdMlsChatGetPendingDevices.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsChatGetPendingDevices.Output?) {
+    public func getPendingDevices(input: BlueCatbirdMlsChatGetPendingDevices.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsChatGetPendingDevices.Output?) {
         let endpoint = "blue.catbird.mlsChat.getPendingDevices"
 
+        
         let queryItems = input.asQueryItems()
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -200,7 +236,8 @@ public extension ATProtoClient.Blue.Catbird.MlsChat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -208,11 +245,13 @@ public extension ATProtoClient.Blue.Catbird.MlsChat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdMlsChatGetPendingDevices.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -220,9 +259,12 @@ public extension ATProtoClient.Blue.Catbird.MlsChat {
                 return (responseCode, nil)
             }
         } else {
+            
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
+                           
+

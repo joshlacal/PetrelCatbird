@@ -1,16 +1,20 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.mlsChat.optIn
 
-public enum BlueCatbirdMlsChatOptIn {
-    public static let typeIdentifier = "blue.catbird.mlsChat.optIn"
 
-    public struct OptInStatus: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "blue.catbird.mlsChat.optIn#optInStatus"
-        public let did: DID
-        public let optedIn: Bool
-        public let optedInAt: ATProtocolDate?
+public struct BlueCatbirdMlsChatOptIn { 
+
+    public static let typeIdentifier = "blue.catbird.mlsChat.optIn"
+        
+public struct OptInStatus: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.mlsChat.optIn#optInStatus"
+            public let did: DID
+            public let optedIn: Bool
+            public let optedInAt: ATProtocolDate?
 
         public init(
             did: DID, optedIn: Bool, optedInAt: ATProtocolDate?
@@ -23,24 +27,24 @@ public enum BlueCatbirdMlsChatOptIn {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                did = try container.decode(DID.self, forKey: .did)
+                self.did = try container.decode(DID.self, forKey: .did)
             } catch {
                 LogManager.logError("Decoding error for required property 'did': \(error)")
                 throw error
             }
             do {
-                optedIn = try container.decode(Bool.self, forKey: .optedIn)
+                self.optedIn = try container.decode(Bool.self, forKey: .optedIn)
             } catch {
                 LogManager.logError("Decoding error for required property 'optedIn': \(error)")
                 throw error
             }
             do {
-                optedInAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .optedInAt)
+                self.optedInAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .optedInAt)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'optedInAt' — degrading to nil: \(error)")
-                optedInAt = nil
+                self.optedInAt = nil
             }
         }
 
@@ -101,8 +105,7 @@ public enum BlueCatbirdMlsChatOptIn {
             case optedInAt
         }
     }
-
-    public struct Input: ATProtocolCodable {
+public struct Input: ATProtocolCodable {
         public let action: String
         public let dids: [DID]?
         public let deviceId: String?
@@ -119,15 +122,16 @@ public enum BlueCatbirdMlsChatOptIn {
             self.allowFollowingBypass = allowFollowingBypass
             self.autoExpireDays = autoExpireDays
         }
+        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            action = try container.decode(String.self, forKey: .action)
-            dids = try container.decodeIfPresent([DID].self, forKey: .dids)
-            deviceId = try container.decodeIfPresent(String.self, forKey: .deviceId)
-            allowFollowersBypass = try container.decodeIfPresent(Bool.self, forKey: .allowFollowersBypass)
-            allowFollowingBypass = try container.decodeIfPresent(Bool.self, forKey: .allowFollowingBypass)
-            autoExpireDays = try container.decodeIfPresent(Int.self, forKey: .autoExpireDays)
+            self.action = try container.decode(String.self, forKey: .action)
+            self.dids = try container.decodeIfPresent([DID].self, forKey: .dids)
+            self.deviceId = try container.decodeIfPresent(String.self, forKey: .deviceId)
+            self.allowFollowersBypass = try container.decodeIfPresent(Bool.self, forKey: .allowFollowersBypass)
+            self.allowFollowingBypass = try container.decodeIfPresent(Bool.self, forKey: .allowFollowingBypass)
+            self.autoExpireDays = try container.decodeIfPresent(Int.self, forKey: .autoExpireDays)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -176,187 +180,235 @@ public enum BlueCatbirdMlsChatOptIn {
             case autoExpireDays
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let success: Bool?
-
+        
         public let optedIn: Bool?
-
+        
         public let optedInAt: ATProtocolDate?
-
+        
         public let statuses: [OptInStatus]?
-
+        
         public let allowFollowersBypass: Bool?
-
+        
         public let allowFollowingBypass: Bool?
-
+        
         public let autoExpireDays: Int?
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             success: Bool? = nil,
-
+            
             optedIn: Bool? = nil,
-
+            
             optedInAt: ATProtocolDate? = nil,
-
+            
             statuses: [OptInStatus]? = nil,
-
+            
             allowFollowersBypass: Bool? = nil,
-
+            
             allowFollowingBypass: Bool? = nil,
-
+            
             autoExpireDays: Int? = nil
-
+            
+            
         ) {
+            
+            
             self.success = success
-
+            
             self.optedIn = optedIn
-
+            
             self.optedInAt = optedInAt
-
+            
             self.statuses = statuses
-
+            
             self.allowFollowersBypass = allowFollowersBypass
-
+            
             self.allowFollowingBypass = allowFollowingBypass
-
+            
             self.autoExpireDays = autoExpireDays
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
+            
             do {
-                success = try container.decodeIfPresent(Bool.self, forKey: .success)
+                self.success = try container.decodeIfPresent(Bool.self, forKey: .success)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'success' — degrading to nil: \(error)")
-                success = nil
+                self.success = nil
             }
-
+            
+            
             do {
-                optedIn = try container.decodeIfPresent(Bool.self, forKey: .optedIn)
+                self.optedIn = try container.decodeIfPresent(Bool.self, forKey: .optedIn)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'optedIn' — degrading to nil: \(error)")
-                optedIn = nil
+                self.optedIn = nil
             }
-
+            
+            
             do {
-                optedInAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .optedInAt)
+                self.optedInAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .optedInAt)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'optedInAt' — degrading to nil: \(error)")
-                optedInAt = nil
+                self.optedInAt = nil
             }
-
+            
+            
             do {
-                statuses = try container.decodeIfPresent([OptInStatus].self, forKey: .statuses)
+                self.statuses = try container.decodeIfPresent([OptInStatus].self, forKey: .statuses)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'statuses' — degrading to nil: \(error)")
-                statuses = nil
+                self.statuses = nil
             }
-
+            
+            
             do {
-                allowFollowersBypass = try container.decodeIfPresent(Bool.self, forKey: .allowFollowersBypass)
+                self.allowFollowersBypass = try container.decodeIfPresent(Bool.self, forKey: .allowFollowersBypass)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'allowFollowersBypass' — degrading to nil: \(error)")
-                allowFollowersBypass = nil
+                self.allowFollowersBypass = nil
             }
-
+            
+            
             do {
-                allowFollowingBypass = try container.decodeIfPresent(Bool.self, forKey: .allowFollowingBypass)
+                self.allowFollowingBypass = try container.decodeIfPresent(Bool.self, forKey: .allowFollowingBypass)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'allowFollowingBypass' — degrading to nil: \(error)")
-                allowFollowingBypass = nil
+                self.allowFollowingBypass = nil
             }
-
+            
+            
             do {
-                autoExpireDays = try container.decodeIfPresent(Int.self, forKey: .autoExpireDays)
+                self.autoExpireDays = try container.decodeIfPresent(Int.self, forKey: .autoExpireDays)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'autoExpireDays' — degrading to nil: \(error)")
-                autoExpireDays = nil
+                self.autoExpireDays = nil
             }
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(success, forKey: .success)
-
+            
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(optedIn, forKey: .optedIn)
-
+            
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(optedInAt, forKey: .optedInAt)
-
+            
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(statuses, forKey: .statuses)
-
+            
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(allowFollowersBypass, forKey: .allowFollowersBypass)
-
+            
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(allowFollowingBypass, forKey: .allowFollowingBypass)
-
+            
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(autoExpireDays, forKey: .autoExpireDays)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             if let value = success {
                 // Encode optional property even if it's an empty array for CBOR
                 let successValue = try value.toCBORValue()
                 map = map.adding(key: "success", value: successValue)
             }
-
+            
+            
+            
             if let value = optedIn {
                 // Encode optional property even if it's an empty array for CBOR
                 let optedInValue = try value.toCBORValue()
                 map = map.adding(key: "optedIn", value: optedInValue)
             }
-
+            
+            
+            
             if let value = optedInAt {
                 // Encode optional property even if it's an empty array for CBOR
                 let optedInAtValue = try value.toCBORValue()
                 map = map.adding(key: "optedInAt", value: optedInAtValue)
             }
-
+            
+            
+            
             if let value = statuses {
                 // Encode optional property even if it's an empty array for CBOR
                 let statusesValue = try value.toCBORValue()
                 map = map.adding(key: "statuses", value: statusesValue)
             }
-
+            
+            
+            
             if let value = allowFollowersBypass {
                 // Encode optional property even if it's an empty array for CBOR
                 let allowFollowersBypassValue = try value.toCBORValue()
                 map = map.adding(key: "allowFollowersBypass", value: allowFollowersBypassValue)
             }
-
+            
+            
+            
             if let value = allowFollowingBypass {
                 // Encode optional property even if it's an empty array for CBOR
                 let allowFollowingBypassValue = try value.toCBORValue()
                 map = map.adding(key: "allowFollowingBypass", value: allowFollowingBypassValue)
             }
-
+            
+            
+            
             if let value = autoExpireDays {
                 // Encode optional property even if it's an empty array for CBOR
                 let autoExpireDaysValue = try value.toCBORValue()
                 map = map.adding(key: "autoExpireDays", value: autoExpireDaysValue)
             }
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case success
             case optedIn
@@ -366,51 +418,61 @@ public enum BlueCatbirdMlsChatOptIn {
             case allowFollowingBypass
             case autoExpireDays
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case invalidAction = "InvalidAction.Unknown action value"
+                case alreadyOptedIn = "AlreadyOptedIn.User is already opted in"
+                case alreadyOptedOut = "AlreadyOptedOut.User is already opted out"
+                case tooManyDids = "TooManyDids.Too many DIDs requested (max 100)"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case invalidAction = "InvalidAction.Unknown action value"
-        case alreadyOptedIn = "AlreadyOptedIn.User is already opted in"
-        case alreadyOptedOut = "AlreadyOptedOut.User is already opted out"
-        case tooManyDids = "TooManyDids.Too many DIDs requested (max 100)"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                // Extract just the error name from the raw value
+                let parts = self.rawValue.split(separator: ".")
+                return String(parts.first ?? "")
+            }
         }
 
-        public var errorName: String {
-            // Extract just the error name from the raw value
-            let parts = rawValue.split(separator: ".")
-            return String(parts.first ?? "")
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.MlsChat {
+extension ATProtoClient.Blue.Catbird.MlsChat {
     // MARK: - optIn
 
-    // Manage MLS chat opt-in status (consolidates optIn + optOut + getOptInStatus + getChatRequestSettings + updateChatRequestSettings + acceptChatRequest + declineChatRequest + sendChatRequest) Manage MLS chat participation. Supports opting in/out, checking status for multiple DIDs, and managing chat request settings.
-    //
-    // - Parameter input: The input parameters for the request
-
-    ///
+    /// Manage MLS chat opt-in status (consolidates optIn + optOut + getOptInStatus + getChatRequestSettings + updateChatRequestSettings + acceptChatRequest + declineChatRequest + sendChatRequest) Manage MLS chat participation. Supports opting in/out, checking status for multiple DIDs, and managing chat request settings.
+    /// 
+    /// - Parameter input: The input parameters for the request
+    
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func optIn(
+    public func optIn(
+        
         input: BlueCatbirdMlsChatOptIn.Input
-
+        
     ) async throws -> (responseCode: Int, data: BlueCatbirdMlsChatOptIn.Output?) {
         let endpoint = "blue.catbird.mlsChat.optIn"
-
+        
         var headers: [String: String] = [:]
-
+        
         headers["Content-Type"] = "application/json"
-
+        
+        
+        
         headers["Accept"] = "application/json"
+        
 
+        
         let requestData: Data? = try JSONEncoder().encode(input)
-
+        
+        
         let queryItems: [URLQueryItem]? = nil
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -425,10 +487,12 @@ public extension ATProtoClient.Blue.Catbird.MlsChat {
         let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
+        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -436,11 +500,13 @@ public extension ATProtoClient.Blue.Catbird.MlsChat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdMlsChatOptIn.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -451,5 +517,9 @@ public extension ATProtoClient.Blue.Catbird.MlsChat {
             // Don't try to decode error responses as success types
             return (responseCode, nil)
         }
+        
     }
+    
 }
+                           
+

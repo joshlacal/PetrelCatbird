@@ -1,22 +1,26 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: place.stream.chat.defs
 
-public enum PlaceStreamChatDefs {
-    public static let typeIdentifier = "place.stream.chat.defs"
 
-    public struct MessageView: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "place.stream.chat.defs#messageView"
-        public let uri: ATProtocolURI
-        public let cid: CID
-        public let author: AppBskyActorDefs.ProfileViewBasic
-        public let record: ATProtocolValueContainer
-        public let indexedAt: ATProtocolDate
-        public let chatProfile: PlaceStreamChatProfile?
-        public let replyTo: MessageViewReplyToUnion?
-        public let deleted: Bool?
-        public let badges: [PlaceStreamBadgeDefs.BadgeView]?
+public struct PlaceStreamChatDefs { 
+
+    public static let typeIdentifier = "place.stream.chat.defs"
+        
+public struct MessageView: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "place.stream.chat.defs#messageView"
+            public let uri: ATProtocolURI
+            public let cid: CID
+            public let author: AppBskyActorDefs.ProfileViewBasic
+            public let record: ATProtocolValueContainer
+            public let indexedAt: ATProtocolDate
+            public let chatProfile: PlaceStreamChatProfile?
+            public let replyTo: MessageViewReplyToUnion?
+            public let deleted: Bool?
+            public let badges: [PlaceStreamBadgeDefs.BadgeView]?
 
         public init(
             uri: ATProtocolURI, cid: CID, author: AppBskyActorDefs.ProfileViewBasic, record: ATProtocolValueContainer, indexedAt: ATProtocolDate, chatProfile: PlaceStreamChatProfile?, replyTo: MessageViewReplyToUnion?, deleted: Bool?, badges: [PlaceStreamBadgeDefs.BadgeView]?
@@ -35,66 +39,66 @@ public enum PlaceStreamChatDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
             } catch {
                 LogManager.logError("Decoding error for required property 'uri': \(error)")
                 throw error
             }
             do {
-                cid = try container.decode(CID.self, forKey: .cid)
+                self.cid = try container.decode(CID.self, forKey: .cid)
             } catch {
                 LogManager.logError("Decoding error for required property 'cid': \(error)")
                 throw error
             }
             do {
-                author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .author)
+                self.author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .author)
             } catch {
                 LogManager.logError("Decoding error for required property 'author': \(error)")
                 throw error
             }
             do {
-                record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+                self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
             } catch {
                 LogManager.logError("Decoding error for required property 'record': \(error)")
                 throw error
             }
             do {
-                indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
+                self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'indexedAt': \(error)")
                 throw error
             }
             do {
-                chatProfile = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: .chatProfile)
+                self.chatProfile = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: .chatProfile)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'chatProfile' — degrading to nil: \(error)")
-                chatProfile = nil
+                self.chatProfile = nil
             }
             do {
-                replyTo = try container.decodeIfPresent(MessageViewReplyToUnion.self, forKey: .replyTo)
+                self.replyTo = try container.decodeIfPresent(MessageViewReplyToUnion.self, forKey: .replyTo)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'replyTo' — degrading to nil: \(error)")
-                replyTo = nil
+                self.replyTo = nil
             }
             do {
-                deleted = try container.decodeIfPresent(Bool.self, forKey: .deleted)
+                self.deleted = try container.decodeIfPresent(Bool.self, forKey: .deleted)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'deleted' — degrading to nil: \(error)")
-                deleted = nil
+                self.deleted = nil
             }
             do {
-                badges = try container.decodeIfPresent([PlaceStreamBadgeDefs.BadgeView].self, forKey: .badges)
+                self.badges = try container.decodeIfPresent([PlaceStreamBadgeDefs.BadgeView].self, forKey: .badges)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'badges' — degrading to nil: \(error)")
-                badges = nil
+                self.badges = nil
             }
         }
 
@@ -221,15 +225,15 @@ public enum PlaceStreamChatDefs {
             case badges
         }
     }
-
-    public struct PinnedRecordView: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "place.stream.chat.defs#pinnedRecordView"
-        public let uri: ATProtocolURI
-        public let cid: CID
-        public let record: PlaceStreamChatPinnedRecord
-        public let indexedAt: ATProtocolDate
-        public let pinnedBy: PlaceStreamChatProfile?
-        public let message: MessageView?
+        
+public struct PinnedRecordView: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "place.stream.chat.defs#pinnedRecordView"
+            public let uri: ATProtocolURI
+            public let cid: CID
+            public let record: PlaceStreamChatPinnedRecord
+            public let indexedAt: ATProtocolDate
+            public let pinnedBy: PlaceStreamChatProfile?
+            public let message: MessageView?
 
         public init(
             uri: ATProtocolURI, cid: CID, record: PlaceStreamChatPinnedRecord, indexedAt: ATProtocolDate, pinnedBy: PlaceStreamChatProfile?, message: MessageView?
@@ -245,44 +249,44 @@ public enum PlaceStreamChatDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
             } catch {
                 LogManager.logError("Decoding error for required property 'uri': \(error)")
                 throw error
             }
             do {
-                cid = try container.decode(CID.self, forKey: .cid)
+                self.cid = try container.decode(CID.self, forKey: .cid)
             } catch {
                 LogManager.logError("Decoding error for required property 'cid': \(error)")
                 throw error
             }
             do {
-                record = try container.decode(PlaceStreamChatPinnedRecord.self, forKey: .record)
+                self.record = try container.decode(PlaceStreamChatPinnedRecord.self, forKey: .record)
             } catch {
                 LogManager.logError("Decoding error for required property 'record': \(error)")
                 throw error
             }
             do {
-                indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
+                self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'indexedAt': \(error)")
                 throw error
             }
             do {
-                pinnedBy = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: .pinnedBy)
+                self.pinnedBy = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: .pinnedBy)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'pinnedBy' — degrading to nil: \(error)")
-                pinnedBy = nil
+                self.pinnedBy = nil
             }
             do {
-                message = try container.decodeIfPresent(MessageView.self, forKey: .message)
+                self.message = try container.decodeIfPresent(MessageView.self, forKey: .message)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'message' — degrading to nil: \(error)")
-                message = nil
+                self.message = nil
             }
         }
 
@@ -374,99 +378,106 @@ public enum PlaceStreamChatDefs {
         }
     }
 
-    public indirect enum MessageViewReplyToUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-        case placeStreamChatDefsMessageView(PlaceStreamChatDefs.MessageView)
-        case unexpected(ATProtocolValueContainer)
-        public init(_ value: PlaceStreamChatDefs.MessageView) {
+
+
+
+public indirect enum MessageViewReplyToUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+    case placeStreamChatDefsMessageView(PlaceStreamChatDefs.MessageView)
+    case unexpected(ATProtocolValueContainer)
+    public init(_ value: PlaceStreamChatDefs.MessageView) {
+        self = .placeStreamChatDefsMessageView(value)
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let typeValue = try container.decode(String.self, forKey: .type)
+
+        switch typeValue {
+        case "place.stream.chat.defs#messageView":
+            let value = try PlaceStreamChatDefs.MessageView(from: decoder)
             self = .placeStreamChatDefsMessageView(value)
+        default:
+            let unknownValue = try ATProtocolValueContainer(from: decoder)
+            self = .unexpected(unknownValue)
         }
+    }
 
-        public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let typeValue = try container.decode(String.self, forKey: .type)
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
 
-            switch typeValue {
-            case "place.stream.chat.defs#messageView":
-                let value = try PlaceStreamChatDefs.MessageView(from: decoder)
-                self = .placeStreamChatDefsMessageView(value)
-            default:
-                let unknownValue = try ATProtocolValueContainer(from: decoder)
-                self = .unexpected(unknownValue)
-            }
+        switch self {
+        case .placeStreamChatDefsMessageView(let value):
+            try container.encode("place.stream.chat.defs#messageView", forKey: .type)
+            try value.encode(to: encoder)
+        case .unexpected(let container):
+            try container.encode(to: encoder)
         }
+    }
 
-        public func encode(to encoder: Encoder) throws {
-            var container = encoder.container(keyedBy: CodingKeys.self)
-
-            switch self {
-            case let .placeStreamChatDefsMessageView(value):
-                try container.encode("place.stream.chat.defs#messageView", forKey: .type)
-                try value.encode(to: encoder)
-            case let .unexpected(container):
-                try container.encode(to: encoder)
-            }
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .placeStreamChatDefsMessageView(let value):
+            hasher.combine("place.stream.chat.defs#messageView")
+            hasher.combine(value)
+        case .unexpected(let container):
+            hasher.combine("unexpected")
+            hasher.combine(container)
         }
+    }
 
-        public func hash(into hasher: inout Hasher) {
-            switch self {
-            case let .placeStreamChatDefsMessageView(value):
-                hasher.combine("place.stream.chat.defs#messageView")
-                hasher.combine(value)
-            case let .unexpected(container):
-                hasher.combine("unexpected")
-                hasher.combine(container)
-            }
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+    }
+    
+    public static func == (lhs: MessageViewReplyToUnion, rhs: MessageViewReplyToUnion) -> Bool {
+        switch (lhs, rhs) {
+        case (.placeStreamChatDefsMessageView(let lhsValue),
+              .placeStreamChatDefsMessageView(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+            return lhsValue.isEqual(to: rhsValue)
+        default:
+            return false
         }
+    }
+    
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? MessageViewReplyToUnion else { return false }
+        return self == other
+    }
+    
+    // DAGCBOR encoding with field ordering
+    public func toCBORValue() throws -> Any {
+        // Create an ordered map to maintain field order
+        var map = OrderedCBORMap()
+        
+        switch self {
+        case .placeStreamChatDefsMessageView(let value):
+            map = map.adding(key: "$type", value: "place.stream.chat.defs#messageView")
+            
+            let valueDict = try value.toCBORValue()
 
-        private enum CodingKeys: String, CodingKey {
-            case type = "$type"
-        }
-
-        public static func == (lhs: MessageViewReplyToUnion, rhs: MessageViewReplyToUnion) -> Bool {
-            switch (lhs, rhs) {
-            case let (
-                .placeStreamChatDefsMessageView(lhsValue),
-                .placeStreamChatDefsMessageView(rhsValue)
-            ):
-                return lhsValue == rhsValue
-            case let (.unexpected(lhsValue), .unexpected(rhsValue)):
-                return lhsValue.isEqual(to: rhsValue)
-            default:
-                return false
-            }
-        }
-
-        public func isEqual(to other: any ATProtocolValue) -> Bool {
-            guard let other = other as? MessageViewReplyToUnion else { return false }
-            return self == other
-        }
-
-        /// DAGCBOR encoding with field ordering
-        public func toCBORValue() throws -> Any {
-            // Create an ordered map to maintain field order
-            var map = OrderedCBORMap()
-
-            switch self {
-            case let .placeStreamChatDefsMessageView(value):
-                map = map.adding(key: "$type", value: "place.stream.chat.defs#messageView")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
                 }
-                return map
-            case let .unexpected(container):
-                return try container.toCBORValue()
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
             }
+            return map
+        case .unexpected(let container):
+            return try container.toCBORValue()
         }
     }
 }
+
+
+}
+
+
+                           
+
