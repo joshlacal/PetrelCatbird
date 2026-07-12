@@ -16,6 +16,24 @@ object BlueCatbirdMlsChatCommitGroupChangeDefs {
 }
 
     /**
+     * Signed receipt binding an accepted commit to its conversation, epoch, sequencer term, and sequencer identity.
+     */
+    @Serializable
+    data class BlueCatbirdMlsChatCommitGroupChangeSequencerReceipt(
+/** Stable conversation identifier. */        @SerialName("convoId")
+        val convoId: String,/** Epoch assigned to the accepted commit. */        @SerialName("epoch")
+        val epoch: Int,/** Active sequencer leadership term included in the signed receipt bytes. */        @SerialName("sequencerTerm")
+        val sequencerTerm: Int,/** Cryptographic hash of the accepted MLS commit bytes. */        @SerialName("commitHash")
+        val commitHash: Bytes,/** DID of the sequencer that signed the receipt. */        @SerialName("sequencerDid")
+        val sequencerDid: DID,/** Unix timestamp at which the receipt was issued. */        @SerialName("issuedAt")
+        val issuedAt: Int,/** Signature over the canonical CATBIRD-RECEIPT-V1 payload. */        @SerialName("signature")
+        val signature: Bytes    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdMlsChatCommitGroupChangeSequencerReceipt"
+        }
+    }
+
+    /**
      * Structured 429 response body for External-Commit rate-limit rejections. Wire shape locked with clients so retryAfterSeconds is parseable without scraping the message string. Sent for both per-conversation (30s) and per-(device, group) (60s) limits, distinguished by `scope`.
      */
     @Serializable
@@ -95,7 +113,8 @@ object BlueCatbirdMlsChatCommitGroupChangeDefs {
         val rejoinedAt: ATProtocolDate? = null,// List of pending device additions (for getPendingDeviceAdditions)        @SerialName("pendingAdditions")
         val pendingAdditions: List<BlueCatbirdMlsChatCommitGroupChangePendingDeviceAddition>? = null,// The claimed pending addition (for claimPendingDeviceAddition)        @SerialName("claimedAddition")
         val claimedAddition: BlueCatbirdMlsChatCommitGroupChangePendingDeviceAddition? = null,// confirmation tag of the new canonical tree state.        @SerialName("confirmationTag")
-        val confirmationTag: Bytes? = null    )
+        val confirmationTag: Bytes? = null,// Signed sequencer receipt for an accepted epoch-advancing commit. Absent for legacy servers and non-advancing actions.        @SerialName("receipt")
+        val receipt: BlueCatbirdMlsChatCommitGroupChangeSequencerReceipt? = null    )
 
 sealed class BlueCatbirdMlsChatCommitGroupChangeError(val name: String, val description: String?) {
         object ConvoNotFound: BlueCatbirdMlsChatCommitGroupChangeError("ConvoNotFound", "Conversation not found")
