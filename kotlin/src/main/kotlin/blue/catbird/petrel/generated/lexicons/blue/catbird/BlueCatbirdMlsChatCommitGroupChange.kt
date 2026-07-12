@@ -20,14 +20,28 @@ object BlueCatbirdMlsChatCommitGroupChangeDefs {
      */
     @Serializable
     data class BlueCatbirdMlsChatCommitGroupChangeSequencerReceipt(
-/** Stable conversation identifier. */        @SerialName("convoId")
-        val convoId: String,/** Epoch assigned to the accepted commit. */        @SerialName("epoch")
-        val epoch: Int,/** Active sequencer leadership term included in the signed receipt bytes. */        @SerialName("sequencerTerm")
-        val sequencerTerm: Int,/** Cryptographic hash of the accepted MLS commit bytes. */        @SerialName("commitHash")
-        val commitHash: Bytes,/** DID of the sequencer that signed the receipt. */        @SerialName("sequencerDid")
-        val sequencerDid: DID,/** Unix timestamp at which the receipt was issued. */        @SerialName("issuedAt")
-        val issuedAt: Int,/** Signature over the canonical CATBIRD-RECEIPT-V1 payload. */        @SerialName("signature")
-        val signature: Bytes    ) {
+        /** Stable conversation identifier. */
+        @SerialName("convoId")
+        val convoId: String,
+        /** Epoch assigned to the accepted commit. */
+        @SerialName("epoch")
+        val epoch: Int,
+        /** Active sequencer leadership term included in the signed receipt bytes. */
+        @SerialName("sequencerTerm")
+        val sequencerTerm: Int,
+        /** Cryptographic hash of the accepted MLS commit bytes. */
+        @SerialName("commitHash")
+        val commitHash: Bytes,
+        /** DID of the sequencer that signed the receipt. */
+        @SerialName("sequencerDid")
+        val sequencerDid: DID,
+        /** Unix timestamp at which the receipt was issued. */
+        @SerialName("issuedAt")
+        val issuedAt: Int,
+        /** Signature over the canonical CATBIRD-RECEIPT-V1 payload. */
+        @SerialName("signature")
+        val signature: Bytes
+    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdMlsChatCommitGroupChangeSequencerReceipt"
         }

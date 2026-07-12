@@ -30,4 +30,21 @@ final class CommitGroupChangeReceiptTests: XCTestCase {
         XCTAssertEqual(roundTrip.receipt?.commitHash.data, Data([1, 2, 3]))
         XCTAssertEqual(roundTrip.receipt?.signature.data, Data([4, 5, 6]))
     }
+
+    func testMalformedPresentReceiptsAreRejected() {
+        let malformed = [
+            #"{"success":true,"receipt":{"convoId":"convo-1","epoch":8,"commitHash":{"$bytes":"AQID"},"sequencerDid":"did:web:sequencer.example","issuedAt":1710000000,"signature":{"$bytes":"BAUG"}}}"#,
+            #"{"success":true,"receipt":{"convoId":"convo-1","epoch":8,"sequencerTerm":3,"commitHash":{"$bytes":"AQID"},"sequencerDid":"not-a-did","issuedAt":1710000000,"signature":{"$bytes":"BAUG"}}}"#,
+            #"{"success":true,"receipt":{"convoId":"convo-1","epoch":8,"sequencerTerm":3,"commitHash":{"$bytes":"%%%"},"sequencerDid":"did:web:sequencer.example","issuedAt":1710000000,"signature":{"$bytes":"BAUG"}}}"#,
+            #"{"success":true,"receipt":{"convoId":"convo-1","epoch":"eight","sequencerTerm":3,"commitHash":{"$bytes":"AQID"},"sequencerDid":"did:web:sequencer.example","issuedAt":1710000000,"signature":{"$bytes":"BAUG"}}}"#,
+        ]
+        for fixture in malformed {
+            XCTAssertThrowsError(
+                try JSONDecoder().decode(
+                    BlueCatbirdMlsChatCommitGroupChange.Output.self,
+                    from: Data(fixture.utf8)
+                )
+            )
+        }
+    }
 }

@@ -7,6 +7,7 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertNotNull
+import kotlin.test.assertFails
 
 class CommitGroupChangeReceiptTest {
     private val json = Json { ignoreUnknownKeys = true }
@@ -37,5 +38,20 @@ class CommitGroupChangeReceiptTest {
         assertEquals(3, roundTrip.receipt?.sequencerTerm)
         assertContentEquals(byteArrayOf(1, 2, 3), roundTrip.receipt?.commitHash?.data)
         assertContentEquals(byteArrayOf(4, 5, 6), roundTrip.receipt?.signature?.data)
+    }
+
+    @Test
+    fun malformedPresentReceiptsAreRejected() {
+        val malformed = listOf(
+            """{"success":true,"receipt":{"convoId":"convo-1","epoch":8,"commitHash":{"${'$'}bytes":"AQID"},"sequencerDid":"did:web:sequencer.example","issuedAt":1710000000,"signature":{"${'$'}bytes":"BAUG"}}}""",
+            """{"success":true,"receipt":{"convoId":"convo-1","epoch":8,"sequencerTerm":3,"commitHash":{"${'$'}bytes":"AQID"},"sequencerDid":"not-a-did","issuedAt":1710000000,"signature":{"${'$'}bytes":"BAUG"}}}""",
+            """{"success":true,"receipt":{"convoId":"convo-1","epoch":8,"sequencerTerm":3,"commitHash":{"${'$'}bytes":"%%%"},"sequencerDid":"did:web:sequencer.example","issuedAt":1710000000,"signature":{"${'$'}bytes":"BAUG"}}}""",
+            """{"success":true,"receipt":{"convoId":"convo-1","epoch":"eight","sequencerTerm":3,"commitHash":{"${'$'}bytes":"AQID"},"sequencerDid":"did:web:sequencer.example","issuedAt":1710000000,"signature":{"${'$'}bytes":"BAUG"}}}""",
+        )
+        malformed.forEach { fixture ->
+            assertFails {
+                json.decodeFromString<BlueCatbirdMlsChatCommitGroupChangeOutput>(fixture)
+            }
+        }
     }
 }

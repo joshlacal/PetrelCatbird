@@ -8,6 +8,7 @@ public enum PetrelCatbirdLexicons {
     public static func register() {
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.mlsChat.bootstrapResetGroup#keyPackageHashEntry", as: BlueCatbirdMlsChatBootstrapResetGroup.KeyPackageHashEntry.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.mlsChat.checkBlocks#blockRelationship", as: BlueCatbirdMlsChatCheckBlocks.BlockRelationship.self)
+        ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.mlsChat.commitGroupChange#sequencerReceipt", as: BlueCatbirdMlsChatCommitGroupChange.SequencerReceipt.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.mlsChat.commitGroupChange#rateLimitedBody", as: BlueCatbirdMlsChatCommitGroupChange.RateLimitedBody.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.mlsChat.commitGroupChange#groupFrozenBody", as: BlueCatbirdMlsChatCommitGroupChange.GroupFrozenBody.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.mlsChat.commitGroupChange#keyPackageHashEntry", as: BlueCatbirdMlsChatCommitGroupChange.KeyPackageHashEntry.self)
