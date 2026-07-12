@@ -21,5 +21,9 @@ let package = Package(
             ],
             path: "Sources/PetrelCatbird"
         ),
+        .testTarget(
+            name: "PetrelCatbirdTests",
+            dependencies: ["PetrelCatbird"]
+        ),
     ]
 )
