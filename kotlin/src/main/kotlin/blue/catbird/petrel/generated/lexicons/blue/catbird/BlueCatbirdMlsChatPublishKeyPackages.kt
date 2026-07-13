@@ -20,7 +20,8 @@ object BlueCatbirdMlsChatPublishKeyPackagesDefs {
 /** MLS key package */        @SerialName("keyPackage")
         val keyPackage: Bytes,/** Cipher suite of the key package */        @SerialName("cipherSuite")
         val cipherSuite: String,/** Expiration timestamp (required, max 90 days from now) */        @SerialName("expires")
-        val expires: ATProtocolDate    ) {
+        val expires: ATProtocolDate,/** Whether this is a reusable MLS last-resort key package */        @SerialName("lastResort")
+        val lastResort: Boolean? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdMlsChatPublishKeyPackagesKeyPackageItem"
         }

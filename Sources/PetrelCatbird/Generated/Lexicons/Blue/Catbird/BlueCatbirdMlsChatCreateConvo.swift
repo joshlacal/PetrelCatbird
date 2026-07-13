@@ -1,19 +1,15 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.mlsChat.createConvo
 
-
-public struct BlueCatbirdMlsChatCreateConvo { 
-
+public enum BlueCatbirdMlsChatCreateConvo {
     public static let typeIdentifier = "blue.catbird.mlsChat.createConvo"
-        
-public struct KeyPackageHashEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.mlsChat.createConvo#keyPackageHashEntry"
-            public let did: DID
-            public let hash: String
+
+    public struct KeyPackageHashEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.mlsChat.createConvo#keyPackageHashEntry"
+        public let did: DID
+        public let hash: String
 
         public init(
             did: DID, hash: String
@@ -25,13 +21,13 @@ public struct KeyPackageHashEntry: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.did = try container.decode(DID.self, forKey: .did)
+                did = try container.decode(DID.self, forKey: .did)
             } catch {
                 LogManager.logError("Decoding error for required property 'did': \(error)")
                 throw error
             }
             do {
-                self.hash = try container.decode(String.self, forKey: .hash)
+                hash = try container.decode(String.self, forKey: .hash)
             } catch {
                 LogManager.logError("Decoding error for required property 'hash': \(error)")
                 throw error
@@ -81,11 +77,11 @@ public struct KeyPackageHashEntry: ATProtocolCodable, ATProtocolValue {
             case hash
         }
     }
-        
-public struct InviteAction: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.mlsChat.createConvo#inviteAction"
-            public let action: String
-            public let code: String?
+
+    public struct InviteAction: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.mlsChat.createConvo#inviteAction"
+        public let action: String
+        public let code: String?
 
         public init(
             action: String, code: String?
@@ -97,18 +93,18 @@ public struct InviteAction: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.action = try container.decode(String.self, forKey: .action)
+                action = try container.decode(String.self, forKey: .action)
             } catch {
                 LogManager.logError("Decoding error for required property 'action': \(error)")
                 throw error
             }
             do {
-                self.code = try container.decodeIfPresent(String.self, forKey: .code)
+                code = try container.decodeIfPresent(String.self, forKey: .code)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'code' — degrading to nil: \(error)")
-                self.code = nil
+                code = nil
             }
         }
 
@@ -161,7 +157,8 @@ public struct InviteAction: ATProtocolCodable, ATProtocolValue {
             case code
         }
     }
-public struct Input: ATProtocolCodable {
+
+    public struct Input: ATProtocolCodable {
         public let groupId: String
         public let cipherSuite: String
         public let initialMembers: [DID]?
@@ -182,18 +179,17 @@ public struct Input: ATProtocolCodable {
             self.invite = invite
             self.currentEpoch = currentEpoch
         }
-        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.groupId = try container.decode(String.self, forKey: .groupId)
-            self.cipherSuite = try container.decode(String.self, forKey: .cipherSuite)
-            self.initialMembers = try container.decodeIfPresent([DID].self, forKey: .initialMembers)
-            self.welcomeMessage = try container.decodeIfPresent(Bytes.self, forKey: .welcomeMessage)
-            self.groupInfo = try container.decodeIfPresent(Bytes.self, forKey: .groupInfo)
-            self.keyPackageHashes = try container.decodeIfPresent([KeyPackageHashEntry].self, forKey: .keyPackageHashes)
-            self.invite = try container.decodeIfPresent(InviteAction.self, forKey: .invite)
-            self.currentEpoch = try container.decodeIfPresent(Int.self, forKey: .currentEpoch)
+            groupId = try container.decode(String.self, forKey: .groupId)
+            cipherSuite = try container.decode(String.self, forKey: .cipherSuite)
+            initialMembers = try container.decodeIfPresent([DID].self, forKey: .initialMembers)
+            welcomeMessage = try container.decodeIfPresent(Bytes.self, forKey: .welcomeMessage)
+            groupInfo = try container.decodeIfPresent(Bytes.self, forKey: .groupInfo)
+            keyPackageHashes = try container.decodeIfPresent([KeyPackageHashEntry].self, forKey: .keyPackageHashes)
+            invite = try container.decodeIfPresent(InviteAction.self, forKey: .invite)
+            currentEpoch = try container.decodeIfPresent(Int.self, forKey: .currentEpoch)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -252,178 +248,136 @@ public struct Input: ATProtocolCodable {
             case currentEpoch
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
         public let convo: BlueCatbirdMlsChatDefs.ConvoView
-        
+
         public let inviteCode: String?
-        
+
         public let sequencerDs: DID?
-        
-        
-        
-        // Standard public initializer
+
+        /// Standard public initializer
         public init(
-            
-            
             convo: BlueCatbirdMlsChatDefs.ConvoView,
-            
+
             inviteCode: String? = nil,
-            
+
             sequencerDs: DID? = nil
-            
-            
+
         ) {
-            
-            
             self.convo = convo
-            
+
             self.inviteCode = inviteCode
-            
+
             self.sequencerDs = sequencerDs
-            
-            
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            self.convo = try container.decode(BlueCatbirdMlsChatDefs.ConvoView.self, forKey: .convo)
-            
-            
+
+            convo = try container.decode(BlueCatbirdMlsChatDefs.ConvoView.self, forKey: .convo)
+
             do {
-                self.inviteCode = try container.decodeIfPresent(String.self, forKey: .inviteCode)
+                inviteCode = try container.decodeIfPresent(String.self, forKey: .inviteCode)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'inviteCode' — degrading to nil: \(error)")
-                self.inviteCode = nil
+                inviteCode = nil
             }
-            
-            
+
             do {
-                self.sequencerDs = try container.decodeIfPresent(DID.self, forKey: .sequencerDs)
+                sequencerDs = try container.decodeIfPresent(DID.self, forKey: .sequencerDs)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'sequencerDs' — degrading to nil: \(error)")
-                self.sequencerDs = nil
+                sequencerDs = nil
             }
-            
-            
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(convo, forKey: .convo)
-            
-            
+
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(inviteCode, forKey: .inviteCode)
-            
-            
+
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(sequencerDs, forKey: .sequencerDs)
-            
-            
         }
 
         public func toCBORValue() throws -> Any {
-            
             var map = OrderedCBORMap()
 
-            
-            
             let convoValue = try convo.toCBORValue()
             map = map.adding(key: "convo", value: convoValue)
-            
-            
-            
+
             if let value = inviteCode {
                 // Encode optional property even if it's an empty array for CBOR
                 let inviteCodeValue = try value.toCBORValue()
                 map = map.adding(key: "inviteCode", value: inviteCodeValue)
             }
-            
-            
-            
+
             if let value = sequencerDs {
                 // Encode optional property even if it's an empty array for CBOR
                 let sequencerDsValue = try value.toCBORValue()
                 map = map.adding(key: "sequencerDs", value: sequencerDsValue)
             }
-            
-            
 
             return map
-            
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case convo
             case inviteCode
             case sequencerDs
         }
-        
     }
-        
-public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                case invalidCipherSuite = "InvalidCipherSuite.The specified cipher suite is not supported"
-                case keyPackageNotFound = "KeyPackageNotFound.Key package not found for one or more initial members"
-                case tooManyMembers = "TooManyMembers.Too many initial members specified"
-                case mutualBlockDetected = "MutualBlockDetected.Cannot create conversation with users who have blocked each other"
-                case convoAlreadyExists = "ConvoAlreadyExists.A conversation already exists at this groupId, created by a different DID. The caller lost a first-responder race; fall back to receiving the Welcome from the winner."
-            public var description: String {
-                return self.rawValue
-            }
 
-            public var errorName: String {
-                // Extract just the error name from the raw value
-                let parts = self.rawValue.split(separator: ".")
-                return String(parts.first ?? "")
-            }
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case invalidCipherSuite = "InvalidCipherSuite.The specified cipher suite is not supported"
+        case keyPackageNotFound = "KeyPackageNotFound.Key package not found for one or more initial members"
+        case tooManyMembers = "TooManyMembers.Too many initial members specified"
+        case mutualBlockDetected = "MutualBlockDetected.Cannot create conversation with users who have blocked each other"
+        case convoAlreadyExists = "ConvoAlreadyExists.A conversation already exists at this groupId, created by a different DID. The caller lost a first-responder race; fall back to receiving the Welcome from the winner."
+        public var description: String {
+            return rawValue
         }
 
-
-
+        public var errorName: String {
+            // Extract just the error name from the raw value
+            let parts = rawValue.split(separator: ".")
+            return String(parts.first ?? "")
+        }
+    }
 }
 
-extension ATProtoClient.Blue.Catbird.MlsChat {
+public extension ATProtoClient.Blue.Catbird.MlsChat {
     // MARK: - createConvo
 
-    /// Create a new MLS conversation with optional initial members, metadata, and invite link (consolidates createConvo + createInvite + revokeInvite) Create a new MLS conversation. Optionally adds initial members with a Welcome message and creates an invite link in one atomic operation.
-    /// 
-    /// - Parameter input: The input parameters for the request
-    
-    /// 
+    // Create a new MLS conversation with optional initial members, metadata, and invite link (consolidates createConvo + createInvite + revokeInvite) Create a new MLS conversation. Optionally adds initial members with a Welcome message and creates an invite link in one atomic operation.
+    //
+    // - Parameter input: The input parameters for the request
+
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func createConvo(
-        
+    func createConvo(
         input: BlueCatbirdMlsChatCreateConvo.Input
-        
+
     ) async throws -> (responseCode: Int, data: BlueCatbirdMlsChatCreateConvo.Output?) {
         let endpoint = "blue.catbird.mlsChat.createConvo"
-        
-        var headers: [String: String] = [:]
-        
-        headers["Content-Type"] = "application/json"
-        
-        
-        
-        headers["Accept"] = "application/json"
-        
 
-        
+        var headers: [String: String] = [:]
+
+        headers["Content-Type"] = "application/json"
+
+        headers["Accept"] = "application/json"
+
         let requestData: Data? = try JSONEncoder().encode(input)
-        
-        
+
         let queryItems: [URLQueryItem]? = nil
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -438,12 +392,10 @@ extension ATProtoClient.Blue.Catbird.MlsChat {
         let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-            
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -451,13 +403,11 @@ extension ATProtoClient.Blue.Catbird.MlsChat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
-                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdMlsChatCreateConvo.Output.self, from: responseData)
-                
+
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -468,9 +418,5 @@ extension ATProtoClient.Blue.Catbird.MlsChat {
             // Don't try to decode error responses as success types
             return (responseCode, nil)
         }
-        
     }
-    
 }
-                           
-

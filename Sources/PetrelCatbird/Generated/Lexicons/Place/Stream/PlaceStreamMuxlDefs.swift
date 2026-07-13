@@ -1,23 +1,19 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: place.stream.muxl.defs
 
-
-public struct PlaceStreamMuxlDefs { 
-
+public enum PlaceStreamMuxlDefs {
     public static let typeIdentifier = "place.stream.muxl.defs"
-        
-public struct Track: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "place.stream.muxl.defs#track"
-            public let id: Int
-            public let codec: String
-            public let width: Int?
-            public let height: Int?
-            public let rate: Int?
-            public let channels: Int?
+
+    public struct Track: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "place.stream.muxl.defs#track"
+        public let id: Int
+        public let codec: String
+        public let width: Int?
+        public let height: Int?
+        public let rate: Int?
+        public let channels: Int?
 
         public init(
             id: Int, codec: String, width: Int?, height: Int?, rate: Int?, channels: Int?
@@ -33,48 +29,48 @@ public struct Track: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.id = try container.decode(Int.self, forKey: .id)
+                id = try container.decode(Int.self, forKey: .id)
             } catch {
                 LogManager.logError("Decoding error for required property 'id': \(error)")
                 throw error
             }
             do {
-                self.codec = try container.decode(String.self, forKey: .codec)
+                codec = try container.decode(String.self, forKey: .codec)
             } catch {
                 LogManager.logError("Decoding error for required property 'codec': \(error)")
                 throw error
             }
             do {
-                self.width = try container.decodeIfPresent(Int.self, forKey: .width)
+                width = try container.decodeIfPresent(Int.self, forKey: .width)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'width' — degrading to nil: \(error)")
-                self.width = nil
+                width = nil
             }
             do {
-                self.height = try container.decodeIfPresent(Int.self, forKey: .height)
+                height = try container.decodeIfPresent(Int.self, forKey: .height)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'height' — degrading to nil: \(error)")
-                self.height = nil
+                height = nil
             }
             do {
-                self.rate = try container.decodeIfPresent(Int.self, forKey: .rate)
+                rate = try container.decodeIfPresent(Int.self, forKey: .rate)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'rate' — degrading to nil: \(error)")
-                self.rate = nil
+                rate = nil
             }
             do {
-                self.channels = try container.decodeIfPresent(Int.self, forKey: .channels)
+                channels = try container.decodeIfPresent(Int.self, forKey: .channels)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'channels' — degrading to nil: \(error)")
-                self.channels = nil
+                channels = nil
             }
         }
 
@@ -177,11 +173,4 @@ public struct Track: ATProtocolCodable, ATProtocolValue {
             case channels
         }
     }
-
-
-
 }
-
-
-                           
-

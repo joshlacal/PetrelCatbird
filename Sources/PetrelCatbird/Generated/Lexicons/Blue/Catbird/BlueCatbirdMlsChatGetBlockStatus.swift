@@ -1,21 +1,17 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.mlsChat.getBlockStatus
 
-
-public struct BlueCatbirdMlsChatGetBlockStatus { 
-
+public enum BlueCatbirdMlsChatGetBlockStatus {
     public static let typeIdentifier = "blue.catbird.mlsChat.getBlockStatus"
-        
-public struct BlockRelationship: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.mlsChat.getBlockStatus#blockRelationship"
-            public let blockerDid: DID
-            public let blockedDid: DID
-            public let createdAt: ATProtocolDate
-            public let blockUri: ATProtocolURI?
+
+    public struct BlockRelationship: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.mlsChat.getBlockStatus#blockRelationship"
+        public let blockerDid: DID
+        public let blockedDid: DID
+        public let createdAt: ATProtocolDate
+        public let blockUri: ATProtocolURI?
 
         public init(
             blockerDid: DID, blockedDid: DID, createdAt: ATProtocolDate, blockUri: ATProtocolURI?
@@ -29,30 +25,30 @@ public struct BlockRelationship: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.blockerDid = try container.decode(DID.self, forKey: .blockerDid)
+                blockerDid = try container.decode(DID.self, forKey: .blockerDid)
             } catch {
                 LogManager.logError("Decoding error for required property 'blockerDid': \(error)")
                 throw error
             }
             do {
-                self.blockedDid = try container.decode(DID.self, forKey: .blockedDid)
+                blockedDid = try container.decode(DID.self, forKey: .blockedDid)
             } catch {
                 LogManager.logError("Decoding error for required property 'blockedDid': \(error)")
                 throw error
             }
             do {
-                self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+                createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'createdAt': \(error)")
                 throw error
             }
             do {
-                self.blockUri = try container.decodeIfPresent(ATProtocolURI.self, forKey: .blockUri)
+                blockUri = try container.decodeIfPresent(ATProtocolURI.self, forKey: .blockUri)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'blockUri' — degrading to nil: \(error)")
-                self.blockUri = nil
+                blockUri = nil
             }
         }
 
@@ -121,12 +117,12 @@ public struct BlockRelationship: ATProtocolCodable, ATProtocolValue {
             case blockUri
         }
     }
-        
-public struct ConversationBlockStatus: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.mlsChat.getBlockStatus#conversationBlockStatus"
-            public let convoId: String
-            public let hasConflicts: Bool
-            public let memberCount: Int
+
+    public struct ConversationBlockStatus: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.mlsChat.getBlockStatus#conversationBlockStatus"
+        public let convoId: String
+        public let hasConflicts: Bool
+        public let memberCount: Int
 
         public init(
             convoId: String, hasConflicts: Bool, memberCount: Int
@@ -139,19 +135,19 @@ public struct ConversationBlockStatus: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.convoId = try container.decode(String.self, forKey: .convoId)
+                convoId = try container.decode(String.self, forKey: .convoId)
             } catch {
                 LogManager.logError("Decoding error for required property 'convoId': \(error)")
                 throw error
             }
             do {
-                self.hasConflicts = try container.decode(Bool.self, forKey: .hasConflicts)
+                hasConflicts = try container.decode(Bool.self, forKey: .hasConflicts)
             } catch {
                 LogManager.logError("Decoding error for required property 'hasConflicts': \(error)")
                 throw error
             }
             do {
-                self.memberCount = try container.decode(Int.self, forKey: .memberCount)
+                memberCount = try container.decode(Int.self, forKey: .memberCount)
             } catch {
                 LogManager.logError("Decoding error for required property 'memberCount': \(error)")
                 throw error
@@ -209,18 +205,18 @@ public struct ConversationBlockStatus: ATProtocolCodable, ATProtocolValue {
             case memberCount
         }
     }
-public struct Input: ATProtocolCodable {
+
+    public struct Input: ATProtocolCodable {
         public let convoId: String
 
         /// Standard public initializer
         public init(convoId: String) {
             self.convoId = convoId
         }
-        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.convoId = try container.decode(String.self, forKey: .convoId)
+            convoId = try container.decode(String.self, forKey: .convoId)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -239,155 +235,113 @@ public struct Input: ATProtocolCodable {
             case convoId
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
         public let status: ConversationBlockStatus
-        
+
         public let blocks: [BlockRelationship]
-        
+
         public let checkedAt: ATProtocolDate
-        
-        
-        
-        // Standard public initializer
+
+        /// Standard public initializer
         public init(
-            
-            
             status: ConversationBlockStatus,
-            
+
             blocks: [BlockRelationship],
-            
+
             checkedAt: ATProtocolDate
-            
-            
+
         ) {
-            
-            
             self.status = status
-            
+
             self.blocks = blocks
-            
+
             self.checkedAt = checkedAt
-            
-            
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            self.status = try container.decode(ConversationBlockStatus.self, forKey: .status)
-            
-            
-            self.blocks = try container.decode([BlockRelationship].self, forKey: .blocks)
-            
-            
-            self.checkedAt = try container.decode(ATProtocolDate.self, forKey: .checkedAt)
-            
-            
+
+            status = try container.decode(ConversationBlockStatus.self, forKey: .status)
+
+            blocks = try container.decode([BlockRelationship].self, forKey: .blocks)
+
+            checkedAt = try container.decode(ATProtocolDate.self, forKey: .checkedAt)
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(status, forKey: .status)
-            
-            
+
             try container.encode(blocks, forKey: .blocks)
-            
-            
+
             try container.encode(checkedAt, forKey: .checkedAt)
-            
-            
         }
 
         public func toCBORValue() throws -> Any {
-            
             var map = OrderedCBORMap()
 
-            
-            
             let statusValue = try status.toCBORValue()
             map = map.adding(key: "status", value: statusValue)
-            
-            
-            
+
             let blocksValue = try blocks.toCBORValue()
             map = map.adding(key: "blocks", value: blocksValue)
-            
-            
-            
+
             let checkedAtValue = try checkedAt.toCBORValue()
             map = map.adding(key: "checkedAt", value: checkedAtValue)
-            
-            
 
             return map
-            
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case status
             case blocks
             case checkedAt
         }
-        
     }
-        
-public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                case convoNotFound = "ConvoNotFound.No conversation with the given ID."
-                case notMember = "NotMember.Caller is not a member of this conversation."
-            public var description: String {
-                return self.rawValue
-            }
 
-            public var errorName: String {
-                // Extract just the error name from the raw value
-                let parts = self.rawValue.split(separator: ".")
-                return String(parts.first ?? "")
-            }
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case convoNotFound = "ConvoNotFound.No conversation with the given ID."
+        case notMember = "NotMember.Caller is not a member of this conversation."
+        public var description: String {
+            return rawValue
         }
 
-
-
+        public var errorName: String {
+            // Extract just the error name from the raw value
+            let parts = rawValue.split(separator: ".")
+            return String(parts.first ?? "")
+        }
+    }
 }
 
-extension ATProtoClient.Blue.Catbird.MlsChat {
+public extension ATProtoClient.Blue.Catbird.MlsChat {
     // MARK: - getBlockStatus
 
-    /// Return the current block-edge status for an MLS conversation (which pairs of members block each other). Diagnostic; not used for enforcement.
-    /// 
-    /// - Parameter input: The input parameters for the request
-    
-    /// 
+    // Return the current block-edge status for an MLS conversation (which pairs of members block each other). Diagnostic; not used for enforcement.
+    //
+    // - Parameter input: The input parameters for the request
+
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getBlockStatus(
-        
+    func getBlockStatus(
         input: BlueCatbirdMlsChatGetBlockStatus.Input
-        
+
     ) async throws -> (responseCode: Int, data: BlueCatbirdMlsChatGetBlockStatus.Output?) {
         let endpoint = "blue.catbird.mlsChat.getBlockStatus"
-        
-        var headers: [String: String] = [:]
-        
-        headers["Content-Type"] = "application/json"
-        
-        
-        
-        headers["Accept"] = "application/json"
-        
 
-        
+        var headers: [String: String] = [:]
+
+        headers["Content-Type"] = "application/json"
+
+        headers["Accept"] = "application/json"
+
         let requestData: Data? = try JSONEncoder().encode(input)
-        
-        
+
         let queryItems: [URLQueryItem]? = nil
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -402,12 +356,10 @@ extension ATProtoClient.Blue.Catbird.MlsChat {
         let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-            
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -415,13 +367,11 @@ extension ATProtoClient.Blue.Catbird.MlsChat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
-                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdMlsChatGetBlockStatus.Output.self, from: responseData)
-                
+
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -432,9 +382,5 @@ extension ATProtoClient.Blue.Catbird.MlsChat {
             // Don't try to decode error responses as success types
             return (responseCode, nil)
         }
-        
     }
-    
 }
-                           
-

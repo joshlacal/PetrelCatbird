@@ -1,28 +1,24 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.mlsChat.defs
 
-
-public struct BlueCatbirdMlsChatDefs { 
-
+public enum BlueCatbirdMlsChatDefs {
     public static let typeIdentifier = "blue.catbird.mlsChat.defs"
-        
-public struct ConvoView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.mlsChat.defs#convoView"
-            public let conversationId: String
-            public let groupId: String
-            public let creator: DID
-            public let members: [MemberView]
-            public let epoch: Int
-            public let cipherSuite: String
-            public let createdAt: ATProtocolDate
-            public let lastMessageAt: ATProtocolDate?
-            public let confirmationTag: Bytes?
-            public let resetGeneration: Int?
-            public let sequencerDid: DID?
+
+    public struct ConvoView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.mlsChat.defs#convoView"
+        public let conversationId: String
+        public let groupId: String
+        public let creator: DID
+        public let members: [MemberView]
+        public let epoch: Int
+        public let cipherSuite: String
+        public let createdAt: ATProtocolDate
+        public let lastMessageAt: ATProtocolDate?
+        public let confirmationTag: Bytes?
+        public let resetGeneration: Int?
+        public let sequencerDid: DID?
 
         public init(
             conversationId: String, groupId: String, creator: DID, members: [MemberView], epoch: Int, cipherSuite: String, createdAt: ATProtocolDate, lastMessageAt: ATProtocolDate?, confirmationTag: Bytes?, resetGeneration: Int?, sequencerDid: DID?
@@ -43,78 +39,78 @@ public struct ConvoView: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.conversationId = try container.decode(String.self, forKey: .conversationId)
+                conversationId = try container.decode(String.self, forKey: .conversationId)
             } catch {
                 LogManager.logError("Decoding error for required property 'conversationId': \(error)")
                 throw error
             }
             do {
-                self.groupId = try container.decode(String.self, forKey: .groupId)
+                groupId = try container.decode(String.self, forKey: .groupId)
             } catch {
                 LogManager.logError("Decoding error for required property 'groupId': \(error)")
                 throw error
             }
             do {
-                self.creator = try container.decode(DID.self, forKey: .creator)
+                creator = try container.decode(DID.self, forKey: .creator)
             } catch {
                 LogManager.logError("Decoding error for required property 'creator': \(error)")
                 throw error
             }
             do {
-                self.members = try container.decode([MemberView].self, forKey: .members)
+                members = try container.decode([MemberView].self, forKey: .members)
             } catch {
                 LogManager.logError("Decoding error for required property 'members': \(error)")
                 throw error
             }
             do {
-                self.epoch = try container.decode(Int.self, forKey: .epoch)
+                epoch = try container.decode(Int.self, forKey: .epoch)
             } catch {
                 LogManager.logError("Decoding error for required property 'epoch': \(error)")
                 throw error
             }
             do {
-                self.cipherSuite = try container.decode(String.self, forKey: .cipherSuite)
+                cipherSuite = try container.decode(String.self, forKey: .cipherSuite)
             } catch {
                 LogManager.logError("Decoding error for required property 'cipherSuite': \(error)")
                 throw error
             }
             do {
-                self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+                createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'createdAt': \(error)")
                 throw error
             }
             do {
-                self.lastMessageAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastMessageAt)
+                lastMessageAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastMessageAt)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'lastMessageAt' — degrading to nil: \(error)")
-                self.lastMessageAt = nil
+                lastMessageAt = nil
             }
             do {
-                self.confirmationTag = try container.decodeIfPresent(Bytes.self, forKey: .confirmationTag)
+                confirmationTag = try container.decodeIfPresent(Bytes.self, forKey: .confirmationTag)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'confirmationTag' — degrading to nil: \(error)")
-                self.confirmationTag = nil
+                confirmationTag = nil
             }
             do {
-                self.resetGeneration = try container.decodeIfPresent(Int.self, forKey: .resetGeneration)
+                resetGeneration = try container.decodeIfPresent(Int.self, forKey: .resetGeneration)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'resetGeneration' — degrading to nil: \(error)")
-                self.resetGeneration = nil
+                resetGeneration = nil
             }
             do {
-                self.sequencerDid = try container.decodeIfPresent(DID.self, forKey: .sequencerDid)
+                sequencerDid = try container.decodeIfPresent(DID.self, forKey: .sequencerDid)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'sequencerDid' — degrading to nil: \(error)")
-                self.sequencerDid = nil
+                sequencerDid = nil
             }
         }
 
@@ -257,20 +253,20 @@ public struct ConvoView: ATProtocolCodable, ATProtocolValue {
             case sequencerDid
         }
     }
-        
-public struct MemberView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.mlsChat.defs#memberView"
-            public let did: DID
-            public let userDid: DID
-            public let deviceId: String?
-            public let deviceName: String?
-            public let joinedAt: ATProtocolDate
-            public let isAdmin: Bool
-            public let isModerator: Bool?
-            public let promotedAt: ATProtocolDate?
-            public let promotedBy: DID?
-            public let leafIndex: Int?
-            public let credential: Bytes?
+
+    public struct MemberView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.mlsChat.defs#memberView"
+        public let did: DID
+        public let userDid: DID
+        public let deviceId: String?
+        public let deviceName: String?
+        public let joinedAt: ATProtocolDate
+        public let isAdmin: Bool
+        public let isModerator: Bool?
+        public let promotedAt: ATProtocolDate?
+        public let promotedBy: DID?
+        public let leafIndex: Int?
+        public let credential: Bytes?
 
         public init(
             did: DID, userDid: DID, deviceId: String?, deviceName: String?, joinedAt: ATProtocolDate, isAdmin: Bool, isModerator: Bool?, promotedAt: ATProtocolDate?, promotedBy: DID?, leafIndex: Int?, credential: Bytes?
@@ -291,84 +287,84 @@ public struct MemberView: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.did = try container.decode(DID.self, forKey: .did)
+                did = try container.decode(DID.self, forKey: .did)
             } catch {
                 LogManager.logError("Decoding error for required property 'did': \(error)")
                 throw error
             }
             do {
-                self.userDid = try container.decode(DID.self, forKey: .userDid)
+                userDid = try container.decode(DID.self, forKey: .userDid)
             } catch {
                 LogManager.logError("Decoding error for required property 'userDid': \(error)")
                 throw error
             }
             do {
-                self.deviceId = try container.decodeIfPresent(String.self, forKey: .deviceId)
+                deviceId = try container.decodeIfPresent(String.self, forKey: .deviceId)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'deviceId' — degrading to nil: \(error)")
-                self.deviceId = nil
+                deviceId = nil
             }
             do {
-                self.deviceName = try container.decodeIfPresent(String.self, forKey: .deviceName)
+                deviceName = try container.decodeIfPresent(String.self, forKey: .deviceName)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'deviceName' — degrading to nil: \(error)")
-                self.deviceName = nil
+                deviceName = nil
             }
             do {
-                self.joinedAt = try container.decode(ATProtocolDate.self, forKey: .joinedAt)
+                joinedAt = try container.decode(ATProtocolDate.self, forKey: .joinedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'joinedAt': \(error)")
                 throw error
             }
             do {
-                self.isAdmin = try container.decode(Bool.self, forKey: .isAdmin)
+                isAdmin = try container.decode(Bool.self, forKey: .isAdmin)
             } catch {
                 LogManager.logError("Decoding error for required property 'isAdmin': \(error)")
                 throw error
             }
             do {
-                self.isModerator = try container.decodeIfPresent(Bool.self, forKey: .isModerator)
+                isModerator = try container.decodeIfPresent(Bool.self, forKey: .isModerator)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'isModerator' — degrading to nil: \(error)")
-                self.isModerator = nil
+                isModerator = nil
             }
             do {
-                self.promotedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .promotedAt)
+                promotedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .promotedAt)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'promotedAt' — degrading to nil: \(error)")
-                self.promotedAt = nil
+                promotedAt = nil
             }
             do {
-                self.promotedBy = try container.decodeIfPresent(DID.self, forKey: .promotedBy)
+                promotedBy = try container.decodeIfPresent(DID.self, forKey: .promotedBy)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'promotedBy' — degrading to nil: \(error)")
-                self.promotedBy = nil
+                promotedBy = nil
             }
             do {
-                self.leafIndex = try container.decodeIfPresent(Int.self, forKey: .leafIndex)
+                leafIndex = try container.decodeIfPresent(Int.self, forKey: .leafIndex)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'leafIndex' — degrading to nil: \(error)")
-                self.leafIndex = nil
+                leafIndex = nil
             }
             do {
-                self.credential = try container.decodeIfPresent(Bytes.self, forKey: .credential)
+                credential = try container.decodeIfPresent(Bytes.self, forKey: .credential)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'credential' — degrading to nil: \(error)")
-                self.credential = nil
+                credential = nil
             }
         }
 
@@ -529,16 +525,16 @@ public struct MemberView: ATProtocolCodable, ATProtocolValue {
             case credential
         }
     }
-        
-public struct MessageView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.mlsChat.defs#messageView"
-            public let id: String
-            public let convoId: String
-            public let ciphertext: Bytes
-            public let epoch: Int
-            public let seq: Int
-            public let createdAt: ATProtocolDate
-            public let messageType: String?
+
+    public struct MessageView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.mlsChat.defs#messageView"
+        public let id: String
+        public let convoId: String
+        public let ciphertext: Bytes
+        public let epoch: Int
+        public let seq: Int
+        public let createdAt: ATProtocolDate
+        public let messageType: String?
 
         public init(
             id: String, convoId: String, ciphertext: Bytes, epoch: Int, seq: Int, createdAt: ATProtocolDate, messageType: String?
@@ -555,48 +551,48 @@ public struct MessageView: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.id = try container.decode(String.self, forKey: .id)
+                id = try container.decode(String.self, forKey: .id)
             } catch {
                 LogManager.logError("Decoding error for required property 'id': \(error)")
                 throw error
             }
             do {
-                self.convoId = try container.decode(String.self, forKey: .convoId)
+                convoId = try container.decode(String.self, forKey: .convoId)
             } catch {
                 LogManager.logError("Decoding error for required property 'convoId': \(error)")
                 throw error
             }
             do {
-                self.ciphertext = try container.decode(Bytes.self, forKey: .ciphertext)
+                ciphertext = try container.decode(Bytes.self, forKey: .ciphertext)
             } catch {
                 LogManager.logError("Decoding error for required property 'ciphertext': \(error)")
                 throw error
             }
             do {
-                self.epoch = try container.decode(Int.self, forKey: .epoch)
+                epoch = try container.decode(Int.self, forKey: .epoch)
             } catch {
                 LogManager.logError("Decoding error for required property 'epoch': \(error)")
                 throw error
             }
             do {
-                self.seq = try container.decode(Int.self, forKey: .seq)
+                seq = try container.decode(Int.self, forKey: .seq)
             } catch {
                 LogManager.logError("Decoding error for required property 'seq': \(error)")
                 throw error
             }
             do {
-                self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+                createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'createdAt': \(error)")
                 throw error
             }
             do {
-                self.messageType = try container.decodeIfPresent(String.self, forKey: .messageType)
+                messageType = try container.decodeIfPresent(String.self, forKey: .messageType)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'messageType' — degrading to nil: \(error)")
-                self.messageType = nil
+                messageType = nil
             }
         }
 
@@ -689,13 +685,13 @@ public struct MessageView: ATProtocolCodable, ATProtocolValue {
             case messageType
         }
     }
-        
-public struct KeyPackageRef: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.mlsChat.defs#keyPackageRef"
-            public let did: DID
-            public let keyPackage: Bytes
-            public let keyPackageHash: String?
-            public let cipherSuite: String
+
+    public struct KeyPackageRef: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.mlsChat.defs#keyPackageRef"
+        public let did: DID
+        public let keyPackage: Bytes
+        public let keyPackageHash: String?
+        public let cipherSuite: String
 
         public init(
             did: DID, keyPackage: Bytes, keyPackageHash: String?, cipherSuite: String
@@ -709,27 +705,27 @@ public struct KeyPackageRef: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.did = try container.decode(DID.self, forKey: .did)
+                did = try container.decode(DID.self, forKey: .did)
             } catch {
                 LogManager.logError("Decoding error for required property 'did': \(error)")
                 throw error
             }
             do {
-                self.keyPackage = try container.decode(Bytes.self, forKey: .keyPackage)
+                keyPackage = try container.decode(Bytes.self, forKey: .keyPackage)
             } catch {
                 LogManager.logError("Decoding error for required property 'keyPackage': \(error)")
                 throw error
             }
             do {
-                self.keyPackageHash = try container.decodeIfPresent(String.self, forKey: .keyPackageHash)
+                keyPackageHash = try container.decodeIfPresent(String.self, forKey: .keyPackageHash)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'keyPackageHash' — degrading to nil: \(error)")
-                self.keyPackageHash = nil
+                keyPackageHash = nil
             }
             do {
-                self.cipherSuite = try container.decode(String.self, forKey: .cipherSuite)
+                cipherSuite = try container.decode(String.self, forKey: .cipherSuite)
             } catch {
                 LogManager.logError("Decoding error for required property 'cipherSuite': \(error)")
                 throw error
@@ -801,13 +797,13 @@ public struct KeyPackageRef: ATProtocolCodable, ATProtocolValue {
             case cipherSuite
         }
     }
-        
-public struct WelcomeReissueRequest: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.mlsChat.defs#welcomeReissueRequest"
-            public let convoId: String
-            public let recipientDeviceDid: String
-            public let requestedAt: ATProtocolDate
-            public let requestId: String
+
+    public struct WelcomeReissueRequest: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.mlsChat.defs#welcomeReissueRequest"
+        public let convoId: String
+        public let recipientDeviceDid: String
+        public let requestedAt: ATProtocolDate
+        public let requestId: String
 
         public init(
             convoId: String, recipientDeviceDid: String, requestedAt: ATProtocolDate, requestId: String
@@ -821,25 +817,25 @@ public struct WelcomeReissueRequest: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.convoId = try container.decode(String.self, forKey: .convoId)
+                convoId = try container.decode(String.self, forKey: .convoId)
             } catch {
                 LogManager.logError("Decoding error for required property 'convoId': \(error)")
                 throw error
             }
             do {
-                self.recipientDeviceDid = try container.decode(String.self, forKey: .recipientDeviceDid)
+                recipientDeviceDid = try container.decode(String.self, forKey: .recipientDeviceDid)
             } catch {
                 LogManager.logError("Decoding error for required property 'recipientDeviceDid': \(error)")
                 throw error
             }
             do {
-                self.requestedAt = try container.decode(ATProtocolDate.self, forKey: .requestedAt)
+                requestedAt = try container.decode(ATProtocolDate.self, forKey: .requestedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'requestedAt': \(error)")
                 throw error
             }
             do {
-                self.requestId = try container.decode(String.self, forKey: .requestId)
+                requestId = try container.decode(String.self, forKey: .requestId)
             } catch {
                 LogManager.logError("Decoding error for required property 'requestId': \(error)")
                 throw error
@@ -905,11 +901,4 @@ public struct WelcomeReissueRequest: ATProtocolCodable, ATProtocolValue {
             case requestId
         }
     }
-
-
-
 }
-
-
-                           
-

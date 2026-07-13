@@ -1,125 +1,88 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: place.stream.live.getSegments
 
-
-public struct PlaceStreamLiveGetSegments { 
-
-    public static let typeIdentifier = "place.stream.live.getSegments"    
-public struct Parameters: Parametrizable {
+public enum PlaceStreamLiveGetSegments {
+    public static let typeIdentifier = "place.stream.live.getSegments"
+    public struct Parameters: Parametrizable {
         public let userDID: DID
         public let limit: Int?
         public let before: ATProtocolDate?
-        
+
         public init(
-            userDID: DID, 
-            limit: Int? = nil, 
+            userDID: DID,
+            limit: Int? = nil,
             before: ATProtocolDate? = nil
-            ) {
+        ) {
             self.userDID = userDID
             self.limit = limit
             self.before = before
-            
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
         public let segments: [PlaceStreamSegment.SegmentView]?
-        
-        
-        
-        // Standard public initializer
+
+        /// Standard public initializer
         public init(
-            
-            
             segments: [PlaceStreamSegment.SegmentView]? = nil
-            
-            
+
         ) {
-            
-            
             self.segments = segments
-            
-            
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
+
             do {
-                self.segments = try container.decodeIfPresent([PlaceStreamSegment.SegmentView].self, forKey: .segments)
+                segments = try container.decodeIfPresent([PlaceStreamSegment.SegmentView].self, forKey: .segments)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'segments' — degrading to nil: \(error)")
-                self.segments = nil
+                segments = nil
             }
-            
-            
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(segments, forKey: .segments)
-            
-            
         }
 
         public func toCBORValue() throws -> Any {
-            
             var map = OrderedCBORMap()
 
-            
-            
             if let value = segments {
                 // Encode optional property even if it's an empty array for CBOR
                 let segmentsValue = try value.toCBORValue()
                 map = map.adding(key: "segments", value: segmentsValue)
             }
-            
-            
 
             return map
-            
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case segments
         }
-        
     }
-
-
-
-
 }
 
-
-
-extension ATProtoClient.Place.Stream.Live {
+public extension ATProtoClient.Place.Stream.Live {
     // MARK: - getSegments
 
     /// Get a list of livestream segments for a user
-    /// 
+    ///
     /// - Parameter input: The input parameters for the request
-    /// 
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getSegments(input: PlaceStreamLiveGetSegments.Parameters) async throws -> (responseCode: Int, data: PlaceStreamLiveGetSegments.Output?) {
+    func getSegments(input: PlaceStreamLiveGetSegments.Parameters) async throws -> (responseCode: Int, data: PlaceStreamLiveGetSegments.Output?) {
         let endpoint = "place.stream.live.getSegments"
 
-        
         let queryItems = input.asQueryItems()
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -137,8 +100,7 @@ extension ATProtoClient.Place.Stream.Live {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-            
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -146,13 +108,11 @@ extension ATProtoClient.Place.Stream.Live {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
-                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(PlaceStreamLiveGetSegments.Output.self, from: responseData)
-                
+
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -160,12 +120,9 @@ extension ATProtoClient.Place.Stream.Live {
                 return (responseCode, nil)
             }
         } else {
-            
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
-                           
-
