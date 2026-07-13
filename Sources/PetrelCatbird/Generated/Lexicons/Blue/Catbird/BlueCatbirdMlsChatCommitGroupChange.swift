@@ -10,6 +10,158 @@ public struct BlueCatbirdMlsChatCommitGroupChange {
 
     public static let typeIdentifier = "blue.catbird.mlsChat.commitGroupChange"
         
+public struct SequencerReceipt: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.mlsChat.commitGroupChange#sequencerReceipt"
+            public let convoId: String
+            public let epoch: Int
+            public let sequencerTerm: Int
+            public let commitHash: Bytes
+            public let sequencerDid: DID
+            public let issuedAt: Int
+            public let signature: Bytes
+
+        public init(
+            convoId: String, epoch: Int, sequencerTerm: Int, commitHash: Bytes, sequencerDid: DID, issuedAt: Int, signature: Bytes
+        ) {
+            self.convoId = convoId
+            self.epoch = epoch
+            self.sequencerTerm = sequencerTerm
+            self.commitHash = commitHash
+            self.sequencerDid = sequencerDid
+            self.issuedAt = issuedAt
+            self.signature = signature
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.convoId = try container.decode(String.self, forKey: .convoId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'convoId': \(error)")
+                throw error
+            }
+            do {
+                self.epoch = try container.decode(Int.self, forKey: .epoch)
+            } catch {
+                LogManager.logError("Decoding error for required property 'epoch': \(error)")
+                throw error
+            }
+            do {
+                self.sequencerTerm = try container.decode(Int.self, forKey: .sequencerTerm)
+            } catch {
+                LogManager.logError("Decoding error for required property 'sequencerTerm': \(error)")
+                throw error
+            }
+            do {
+                self.commitHash = try container.decode(Bytes.self, forKey: .commitHash)
+            } catch {
+                LogManager.logError("Decoding error for required property 'commitHash': \(error)")
+                throw error
+            }
+            do {
+                self.sequencerDid = try container.decode(DID.self, forKey: .sequencerDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'sequencerDid': \(error)")
+                throw error
+            }
+            do {
+                self.issuedAt = try container.decode(Int.self, forKey: .issuedAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'issuedAt': \(error)")
+                throw error
+            }
+            do {
+                self.signature = try container.decode(Bytes.self, forKey: .signature)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signature': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(convoId, forKey: .convoId)
+            try container.encode(epoch, forKey: .epoch)
+            try container.encode(sequencerTerm, forKey: .sequencerTerm)
+            try container.encode(commitHash, forKey: .commitHash)
+            try container.encode(sequencerDid, forKey: .sequencerDid)
+            try container.encode(issuedAt, forKey: .issuedAt)
+            try container.encode(signature, forKey: .signature)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(convoId)
+            hasher.combine(epoch)
+            hasher.combine(sequencerTerm)
+            hasher.combine(commitHash)
+            hasher.combine(sequencerDid)
+            hasher.combine(issuedAt)
+            hasher.combine(signature)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if convoId != other.convoId {
+                return false
+            }
+            if epoch != other.epoch {
+                return false
+            }
+            if sequencerTerm != other.sequencerTerm {
+                return false
+            }
+            if commitHash != other.commitHash {
+                return false
+            }
+            if sequencerDid != other.sequencerDid {
+                return false
+            }
+            if issuedAt != other.issuedAt {
+                return false
+            }
+            if signature != other.signature {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let convoIdValue = try convoId.toCBORValue()
+            map = map.adding(key: "convoId", value: convoIdValue)
+            let epochValue = try epoch.toCBORValue()
+            map = map.adding(key: "epoch", value: epochValue)
+            let sequencerTermValue = try sequencerTerm.toCBORValue()
+            map = map.adding(key: "sequencerTerm", value: sequencerTermValue)
+            let commitHashValue = try commitHash.toCBORValue()
+            map = map.adding(key: "commitHash", value: commitHashValue)
+            let sequencerDidValue = try sequencerDid.toCBORValue()
+            map = map.adding(key: "sequencerDid", value: sequencerDidValue)
+            let issuedAtValue = try issuedAt.toCBORValue()
+            map = map.adding(key: "issuedAt", value: issuedAtValue)
+            let signatureValue = try signature.toCBORValue()
+            map = map.adding(key: "signature", value: signatureValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case convoId
+            case epoch
+            case sequencerTerm
+            case commitHash
+            case sequencerDid
+            case issuedAt
+            case signature
+        }
+    }
+        
 public struct RateLimitedBody: ATProtocolCodable, ATProtocolValue {
             public static let typeIdentifier = "blue.catbird.mlsChat.commitGroupChange#rateLimitedBody"
             public let error: String
@@ -616,6 +768,8 @@ public struct Output: ATProtocolCodable {
         
         public let confirmationTag: Bytes?
         
+        public let receipt: SequencerReceipt?
+        
         
         
         // Standard public initializer
@@ -632,7 +786,9 @@ public struct Output: ATProtocolCodable {
             
             claimedAddition: PendingDeviceAddition? = nil,
             
-            confirmationTag: Bytes? = nil
+            confirmationTag: Bytes? = nil,
+            
+            receipt: SequencerReceipt? = nil
             
             
         ) {
@@ -650,6 +806,8 @@ public struct Output: ATProtocolCodable {
             
             self.confirmationTag = confirmationTag
             
+            self.receipt = receipt
+            
             
         }
         
@@ -658,6 +816,7 @@ public struct Output: ATProtocolCodable {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             
             self.success = try container.decode(Bool.self, forKey: .success)
+            
             
             
             do {
@@ -669,6 +828,8 @@ public struct Output: ATProtocolCodable {
             }
             
             
+            
+            
             do {
                 self.rejoinedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .rejoinedAt)
             } catch {
@@ -676,6 +837,8 @@ public struct Output: ATProtocolCodable {
                 LogManager.logWarning("Decoding error for optional property 'rejoinedAt' — degrading to nil: \(error)")
                 self.rejoinedAt = nil
             }
+            
+            
             
             
             do {
@@ -687,6 +850,8 @@ public struct Output: ATProtocolCodable {
             }
             
             
+            
+            
             do {
                 self.claimedAddition = try container.decodeIfPresent(PendingDeviceAddition.self, forKey: .claimedAddition)
             } catch {
@@ -696,6 +861,8 @@ public struct Output: ATProtocolCodable {
             }
             
             
+            
+            
             do {
                 self.confirmationTag = try container.decodeIfPresent(Bytes.self, forKey: .confirmationTag)
             } catch {
@@ -703,6 +870,12 @@ public struct Output: ATProtocolCodable {
                 LogManager.logWarning("Decoding error for optional property 'confirmationTag' — degrading to nil: \(error)")
                 self.confirmationTag = nil
             }
+            
+            
+            
+            
+            self.receipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .receipt)
+            
             
             
         }
@@ -732,6 +905,10 @@ public struct Output: ATProtocolCodable {
             
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(confirmationTag, forKey: .confirmationTag)
+            
+            
+            // Encode optional property even if it's an empty array
+            try container.encodeIfPresent(receipt, forKey: .receipt)
             
             
         }
@@ -786,6 +963,14 @@ public struct Output: ATProtocolCodable {
             }
             
             
+            
+            if let value = receipt {
+                // Encode optional property even if it's an empty array for CBOR
+                let receiptValue = try value.toCBORValue()
+                map = map.adding(key: "receipt", value: receiptValue)
+            }
+            
+            
 
             return map
             
@@ -799,6 +984,7 @@ public struct Output: ATProtocolCodable {
             case pendingAdditions
             case claimedAddition
             case confirmationTag
+            case receipt
         }
         
     }
