@@ -1,25 +1,21 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.mlsChat.listDevices
 
-
-public struct BlueCatbirdMlsChatListDevices { 
-
+public enum BlueCatbirdMlsChatListDevices {
     public static let typeIdentifier = "blue.catbird.mlsChat.listDevices"
-        
-public struct DeviceInfo: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.mlsChat.listDevices#deviceInfo"
-            public let deviceId: String
-            public let deviceName: String
-            public let deviceUUID: String?
-            public let credentialDid: String
-            public let lastSeenAt: ATProtocolDate
-            public let registeredAt: ATProtocolDate
-            public let keyPackageCount: Int
-            public let pushTokenRegistered: Bool?
+
+    public struct DeviceInfo: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.mlsChat.listDevices#deviceInfo"
+        public let deviceId: String
+        public let deviceName: String
+        public let deviceUUID: String?
+        public let credentialDid: String
+        public let lastSeenAt: ATProtocolDate
+        public let registeredAt: ATProtocolDate
+        public let keyPackageCount: Int
+        public let pushTokenRegistered: Bool?
 
         public init(
             deviceId: String, deviceName: String, deviceUUID: String?, credentialDid: String, lastSeenAt: ATProtocolDate, registeredAt: ATProtocolDate, keyPackageCount: Int, pushTokenRegistered: Bool?
@@ -37,56 +33,56 @@ public struct DeviceInfo: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.deviceId = try container.decode(String.self, forKey: .deviceId)
+                deviceId = try container.decode(String.self, forKey: .deviceId)
             } catch {
                 LogManager.logError("Decoding error for required property 'deviceId': \(error)")
                 throw error
             }
             do {
-                self.deviceName = try container.decode(String.self, forKey: .deviceName)
+                deviceName = try container.decode(String.self, forKey: .deviceName)
             } catch {
                 LogManager.logError("Decoding error for required property 'deviceName': \(error)")
                 throw error
             }
             do {
-                self.deviceUUID = try container.decodeIfPresent(String.self, forKey: .deviceUUID)
+                deviceUUID = try container.decodeIfPresent(String.self, forKey: .deviceUUID)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'deviceUUID' — degrading to nil: \(error)")
-                self.deviceUUID = nil
+                deviceUUID = nil
             }
             do {
-                self.credentialDid = try container.decode(String.self, forKey: .credentialDid)
+                credentialDid = try container.decode(String.self, forKey: .credentialDid)
             } catch {
                 LogManager.logError("Decoding error for required property 'credentialDid': \(error)")
                 throw error
             }
             do {
-                self.lastSeenAt = try container.decode(ATProtocolDate.self, forKey: .lastSeenAt)
+                lastSeenAt = try container.decode(ATProtocolDate.self, forKey: .lastSeenAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'lastSeenAt': \(error)")
                 throw error
             }
             do {
-                self.registeredAt = try container.decode(ATProtocolDate.self, forKey: .registeredAt)
+                registeredAt = try container.decode(ATProtocolDate.self, forKey: .registeredAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'registeredAt': \(error)")
                 throw error
             }
             do {
-                self.keyPackageCount = try container.decode(Int.self, forKey: .keyPackageCount)
+                keyPackageCount = try container.decode(Int.self, forKey: .keyPackageCount)
             } catch {
                 LogManager.logError("Decoding error for required property 'keyPackageCount': \(error)")
                 throw error
             }
             do {
-                self.pushTokenRegistered = try container.decodeIfPresent(Bool.self, forKey: .pushTokenRegistered)
+                pushTokenRegistered = try container.decodeIfPresent(Bool.self, forKey: .pushTokenRegistered)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'pushTokenRegistered' — degrading to nil: \(error)")
-                self.pushTokenRegistered = nil
+                pushTokenRegistered = nil
             }
         }
 
@@ -192,102 +188,70 @@ public struct DeviceInfo: ATProtocolCodable, ATProtocolValue {
             case keyPackageCount
             case pushTokenRegistered
         }
-    }    
-public struct Parameters: Parametrizable {
+    }
+
+    public struct Parameters: Parametrizable {
         public let deviceId: String?
-        
+
         public init(
             deviceId: String? = nil
-            ) {
+        ) {
             self.deviceId = deviceId
-            
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
         public let devices: [DeviceInfo]
-        
-        
-        
-        // Standard public initializer
+
+        /// Standard public initializer
         public init(
-            
-            
             devices: [DeviceInfo]
-            
-            
+
         ) {
-            
-            
             self.devices = devices
-            
-            
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            self.devices = try container.decode([DeviceInfo].self, forKey: .devices)
-            
-            
+
+            devices = try container.decode([DeviceInfo].self, forKey: .devices)
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(devices, forKey: .devices)
-            
-            
         }
 
         public func toCBORValue() throws -> Any {
-            
             var map = OrderedCBORMap()
 
-            
-            
             let devicesValue = try devices.toCBORValue()
             map = map.adding(key: "devices", value: devicesValue)
-            
-            
 
             return map
-            
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case devices
         }
-        
     }
-
-
-
-
 }
 
-
-
-extension ATProtoClient.Blue.Catbird.MlsChat {
+public extension ATProtoClient.Blue.Catbird.MlsChat {
     // MARK: - listDevices
 
     /// List and manage registered devices (consolidates listDevices + deleteDevice) List all registered devices for the authenticated user with key package counts and last seen timestamps. To remove a device, use the blue.catbird.mlsChat.registerDevice endpoint with the same deviceUUID (server handles cleanup), or call this endpoint with a DELETE method and deviceId parameter.
-    /// 
+    ///
     /// - Parameter input: The input parameters for the request
-    /// 
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func listDevices(input: BlueCatbirdMlsChatListDevices.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsChatListDevices.Output?) {
+    func listDevices(input: BlueCatbirdMlsChatListDevices.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsChatListDevices.Output?) {
         let endpoint = "blue.catbird.mlsChat.listDevices"
 
-        
         let queryItems = input.asQueryItems()
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -305,8 +269,7 @@ extension ATProtoClient.Blue.Catbird.MlsChat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-            
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -314,13 +277,11 @@ extension ATProtoClient.Blue.Catbird.MlsChat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
-                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdMlsChatListDevices.Output.self, from: responseData)
-                
+
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -328,12 +289,9 @@ extension ATProtoClient.Blue.Catbird.MlsChat {
                 return (responseCode, nil)
             }
         } else {
-            
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
-                           
-

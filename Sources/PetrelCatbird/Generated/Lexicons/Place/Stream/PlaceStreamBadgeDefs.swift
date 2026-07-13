@@ -1,21 +1,17 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: place.stream.badge.defs
 
-
-public struct PlaceStreamBadgeDefs { 
-
+public enum PlaceStreamBadgeDefs {
     public static let typeIdentifier = "place.stream.badge.defs"
-        
-public struct BadgeView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "place.stream.badge.defs#badgeView"
-            public let badgeType: String
-            public let issuer: DID
-            public let recipient: DID
-            public let signature: String?
+
+    public struct BadgeView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "place.stream.badge.defs#badgeView"
+        public let badgeType: String
+        public let issuer: DID
+        public let recipient: DID
+        public let signature: String?
 
         public init(
             badgeType: String, issuer: DID, recipient: DID, signature: String?
@@ -29,30 +25,30 @@ public struct BadgeView: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.badgeType = try container.decode(String.self, forKey: .badgeType)
+                badgeType = try container.decode(String.self, forKey: .badgeType)
             } catch {
                 LogManager.logError("Decoding error for required property 'badgeType': \(error)")
                 throw error
             }
             do {
-                self.issuer = try container.decode(DID.self, forKey: .issuer)
+                issuer = try container.decode(DID.self, forKey: .issuer)
             } catch {
                 LogManager.logError("Decoding error for required property 'issuer': \(error)")
                 throw error
             }
             do {
-                self.recipient = try container.decode(DID.self, forKey: .recipient)
+                recipient = try container.decode(DID.self, forKey: .recipient)
             } catch {
                 LogManager.logError("Decoding error for required property 'recipient': \(error)")
                 throw error
             }
             do {
-                self.signature = try container.decodeIfPresent(String.self, forKey: .signature)
+                signature = try container.decodeIfPresent(String.self, forKey: .signature)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'signature' — degrading to nil: \(error)")
-                self.signature = nil
+                signature = nil
             }
         }
 
@@ -121,11 +117,4 @@ public struct BadgeView: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-
-
-
 }
-
-
-                           
-

@@ -1,15 +1,11 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.mlsChat.reissueWelcome
 
-
-public struct BlueCatbirdMlsChatReissueWelcome { 
-
+public enum BlueCatbirdMlsChatReissueWelcome {
     public static let typeIdentifier = "blue.catbird.mlsChat.reissueWelcome"
-public struct Input: ATProtocolCodable {
+    public struct Input: ATProtocolCodable {
         public let convoId: String
         public let recipientDeviceDid: String
         public let reason: String
@@ -20,13 +16,12 @@ public struct Input: ATProtocolCodable {
             self.recipientDeviceDid = recipientDeviceDid
             self.reason = reason
         }
-        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.convoId = try container.decode(String.self, forKey: .convoId)
-            self.recipientDeviceDid = try container.decode(String.self, forKey: .recipientDeviceDid)
-            self.reason = try container.decode(String.self, forKey: .reason)
+            convoId = try container.decode(String.self, forKey: .convoId)
+            recipientDeviceDid = try container.decode(String.self, forKey: .recipientDeviceDid)
+            reason = try container.decode(String.self, forKey: .reason)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -53,184 +48,138 @@ public struct Input: ATProtocolCodable {
             case reason
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
         public let welcomeRequested: Bool
-        
+
         public let requestId: String
-        
+
         public let requestedAt: ATProtocolDate
-        
+
         public let inviterDevice: String?
-        
-        
-        
-        // Standard public initializer
+
+        /// Standard public initializer
         public init(
-            
-            
             welcomeRequested: Bool,
-            
+
             requestId: String,
-            
+
             requestedAt: ATProtocolDate,
-            
+
             inviterDevice: String? = nil
-            
-            
+
         ) {
-            
-            
             self.welcomeRequested = welcomeRequested
-            
+
             self.requestId = requestId
-            
+
             self.requestedAt = requestedAt
-            
+
             self.inviterDevice = inviterDevice
-            
-            
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            self.welcomeRequested = try container.decode(Bool.self, forKey: .welcomeRequested)
-            
-            
-            self.requestId = try container.decode(String.self, forKey: .requestId)
-            
-            
-            self.requestedAt = try container.decode(ATProtocolDate.self, forKey: .requestedAt)
-            
-            
+
+            welcomeRequested = try container.decode(Bool.self, forKey: .welcomeRequested)
+
+            requestId = try container.decode(String.self, forKey: .requestId)
+
+            requestedAt = try container.decode(ATProtocolDate.self, forKey: .requestedAt)
+
             do {
-                self.inviterDevice = try container.decodeIfPresent(String.self, forKey: .inviterDevice)
+                inviterDevice = try container.decodeIfPresent(String.self, forKey: .inviterDevice)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'inviterDevice' — degrading to nil: \(error)")
-                self.inviterDevice = nil
+                inviterDevice = nil
             }
-            
-            
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(welcomeRequested, forKey: .welcomeRequested)
-            
-            
+
             try container.encode(requestId, forKey: .requestId)
-            
-            
+
             try container.encode(requestedAt, forKey: .requestedAt)
-            
-            
+
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(inviterDevice, forKey: .inviterDevice)
-            
-            
         }
 
         public func toCBORValue() throws -> Any {
-            
             var map = OrderedCBORMap()
 
-            
-            
             let welcomeRequestedValue = try welcomeRequested.toCBORValue()
             map = map.adding(key: "welcomeRequested", value: welcomeRequestedValue)
-            
-            
-            
+
             let requestIdValue = try requestId.toCBORValue()
             map = map.adding(key: "requestId", value: requestIdValue)
-            
-            
-            
+
             let requestedAtValue = try requestedAt.toCBORValue()
             map = map.adding(key: "requestedAt", value: requestedAtValue)
-            
-            
-            
+
             if let value = inviterDevice {
                 // Encode optional property even if it's an empty array for CBOR
                 let inviterDeviceValue = try value.toCBORValue()
                 map = map.adding(key: "inviterDevice", value: inviterDeviceValue)
             }
-            
-            
 
             return map
-            
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case welcomeRequested
             case requestId
             case requestedAt
             case inviterDevice
         }
-        
     }
-        
-public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                case convoNotFound = "ConvoNotFound.Conversation not found."
-                case noAdminToReissue = "NoAdminToReissue.No current admin/inviter exists to ask. Recipient should Surrender."
-                case rateLimited = "RateLimited.Exceeded 3 requests per (convo, recipient) per hour."
-            public var description: String {
-                return self.rawValue
-            }
 
-            public var errorName: String {
-                // Extract just the error name from the raw value
-                let parts = self.rawValue.split(separator: ".")
-                return String(parts.first ?? "")
-            }
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case convoNotFound = "ConvoNotFound.Conversation not found."
+        case noAdminToReissue = "NoAdminToReissue.No current admin/inviter exists to ask. Recipient should Surrender."
+        case rateLimited = "RateLimited.Exceeded 3 requests per (convo, recipient) per hour."
+        public var description: String {
+            return rawValue
         }
 
-
-
+        public var errorName: String {
+            // Extract just the error name from the raw value
+            let parts = rawValue.split(separator: ".")
+            return String(parts.first ?? "")
+        }
+    }
 }
 
-extension ATProtoClient.Blue.Catbird.MlsChat {
+public extension ATProtoClient.Blue.Catbird.MlsChat {
     // MARK: - reissueWelcome
 
-    /// Recipient device cannot decrypt the Welcome on this convo (NoMatchingKeyPackage). Server records the request and pushes a welcomeReissueRequest event to the inviter, who is expected to re-stage a new commit with a fresh KP. The recipient is told to wait. Rate limit: max 3 per (convo, recipient) per hour.
-    /// 
-    /// - Parameter input: The input parameters for the request
-    
-    /// 
+    // Recipient device cannot decrypt the Welcome on this convo (NoMatchingKeyPackage). Server records the request and pushes a welcomeReissueRequest event to the inviter, who is expected to re-stage a new commit with a fresh KP. The recipient is told to wait. Rate limit: max 3 per (convo, recipient) per hour.
+    //
+    // - Parameter input: The input parameters for the request
+
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func reissueWelcome(
-        
+    func reissueWelcome(
         input: BlueCatbirdMlsChatReissueWelcome.Input
-        
+
     ) async throws -> (responseCode: Int, data: BlueCatbirdMlsChatReissueWelcome.Output?) {
         let endpoint = "blue.catbird.mlsChat.reissueWelcome"
-        
-        var headers: [String: String] = [:]
-        
-        headers["Content-Type"] = "application/json"
-        
-        
-        
-        headers["Accept"] = "application/json"
-        
 
-        
+        var headers: [String: String] = [:]
+
+        headers["Content-Type"] = "application/json"
+
+        headers["Accept"] = "application/json"
+
         let requestData: Data? = try JSONEncoder().encode(input)
-        
-        
+
         let queryItems: [URLQueryItem]? = nil
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -245,12 +194,10 @@ extension ATProtoClient.Blue.Catbird.MlsChat {
         let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-            
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -258,13 +205,11 @@ extension ATProtoClient.Blue.Catbird.MlsChat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
-                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdMlsChatReissueWelcome.Output.self, from: responseData)
-                
+
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -275,9 +220,5 @@ extension ATProtoClient.Blue.Catbird.MlsChat {
             // Don't try to decode error responses as success types
             return (responseCode, nil)
         }
-        
     }
-    
 }
-                           
-
