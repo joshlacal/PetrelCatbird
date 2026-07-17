@@ -1,0 +1,227 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.mlsChat.beginTransitionAttestation",
+  "description": "Prepare a single-use, device-signed attestation challenge for a private MLS transition.",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Verify the proposed private MLS transition against one resolved conversation and authorized-device snapshot, then return the exact canonical challenge bytes to sign.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "convoId",
+            "action",
+            "commit",
+            "sourceGroupInfo",
+            "targetGroupInfo",
+            "targetConfirmationTag",
+            "idempotencyKey",
+            "deviceDelta"
+          ],
+          "properties": {
+            "convoId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "description": "Stable printable-ASCII conversation identifier."
+            },
+            "action": {
+              "type": "string",
+              "enum": [
+                "addMembers",
+                "removeMembers",
+                "swapMembers",
+                "commit",
+                "updateMetadata"
+              ],
+              "description": "Closed TransitionAttestationV1 action vocabulary."
+            },
+            "commit": {
+              "type": "bytes",
+              "minLength": 1,
+              "maxLength": 1048576,
+              "description": "Exact nonempty encrypted MLS commit bytes."
+            },
+            "sourceGroupInfo": {
+              "type": "bytes",
+              "minLength": 1,
+              "maxLength": 1048576,
+              "description": "Exact source or pre-merge GroupInfo bytes."
+            },
+            "targetGroupInfo": {
+              "type": "bytes",
+              "minLength": 1,
+              "maxLength": 1048576,
+              "description": "Exact target or post-merge GroupInfo bytes."
+            },
+            "targetConfirmationTag": {
+              "type": "bytes",
+              "minLength": 1,
+              "maxLength": 64,
+              "description": "Target confirmation tag. Its length must match the conversation ciphersuite hash length."
+            },
+            "idempotencyKey": {
+              "type": "string",
+              "minLength": 36,
+              "maxLength": 36,
+              "description": "Client-generated RFC 4122 UUID in canonical hyphenated form."
+            },
+            "deviceDelta": {
+              "type": "ref",
+              "ref": "#transitionDeviceDelta",
+              "description": "Exact device-level roster delta derived from the verified source and target GroupInfos."
+            },
+            "welcome": {
+              "type": "bytes",
+              "minLength": 1,
+              "maxLength": 4194304,
+              "description": "Exact MLS Welcome bytes. Required for addMembers and swapMembers; prohibited for all other actions."
+            },
+            "epochAuthenticator": {
+              "type": "bytes",
+              "minLength": 1,
+              "maxLength": 64,
+              "description": "Optional target epoch authenticator. When present, its length must match the conversation ciphersuite hash length."
+            }
+          },
+          "x-security-action-contract": {
+            "addMembers": {
+              "requiresAdds": true,
+              "requiresRemoves": false,
+              "requiresWelcome": true
+            },
+            "removeMembers": {
+              "requiresAdds": false,
+              "requiresRemoves": true,
+              "requiresWelcome": false
+            },
+            "swapMembers": {
+              "requiresAdds": true,
+              "requiresRemoves": true,
+              "requiresWelcome": true
+            },
+            "commit": {
+              "requiresAdds": false,
+              "requiresRemoves": false,
+              "requiresWelcome": false
+            },
+            "updateMetadata": {
+              "requiresAdds": false,
+              "requiresRemoves": false,
+              "requiresWelcome": false
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "challengeId",
+            "challenge",
+            "expiresAt",
+            "version"
+          ],
+          "properties": {
+            "challengeId": {
+              "type": "string",
+              "minLength": 36,
+              "maxLength": 36,
+              "description": "Server-generated RFC 4122 UUID in canonical hyphenated form."
+            },
+            "challenge": {
+              "type": "bytes",
+              "minLength": 1,
+              "maxLength": 32768,
+              "description": "Exact canonical TransitionAttestationV1 bytes. Sign verbatim without reconstruction or transformation."
+            },
+            "expiresAt": {
+              "type": "string",
+              "format": "datetime",
+              "description": "Challenge expiry. The lifetime is exactly 120 seconds from issuance."
+            },
+            "version": {
+              "type": "integer",
+              "const": 1,
+              "description": "Transition attestation wire version."
+            }
+          }
+        }
+      }
+    },
+    "transitionDeviceDelta": {
+      "type": "object",
+      "description": "Canonical device-level MLS roster delta. Entries are sorted by device credential DID bytes and their action-specific tiebreaker; duplicate credentials are invalid. The combined number of additions and removals must not exceed 50.",
+      "required": [
+        "adds",
+        "removes"
+      ],
+      "properties": {
+        "adds": {
+          "type": "array",
+          "maxLength": 50,
+          "items": {
+            "type": "ref",
+            "ref": "#transitionDeviceAdd"
+          }
+        },
+        "removes": {
+          "type": "array",
+          "maxLength": 50,
+          "items": {
+            "type": "ref",
+            "ref": "#transitionDeviceRemove"
+          }
+        }
+      },
+      "x-security-max-total-items": 50
+    },
+    "transitionDeviceAdd": {
+      "type": "object",
+      "description": "One device addition, sorted by credential DID bytes then KeyPackage hash bytes.",
+      "required": [
+        "deviceCredentialDid",
+        "keyPackageHash"
+      ],
+      "properties": {
+        "deviceCredentialDid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 320,
+          "description": "Canonical ASCII base DID with exactly one nonempty device fragment."
+        },
+        "keyPackageHash": {
+          "type": "bytes",
+          "minLength": 32,
+          "maxLength": 32,
+          "description": "SHA-256 of the exact KeyPackage bytes."
+        }
+      }
+    },
+    "transitionDeviceRemove": {
+      "type": "object",
+      "description": "One device removal, sorted by credential DID bytes then prior leaf index.",
+      "required": [
+        "deviceCredentialDid",
+        "priorLeafIndex"
+      ],
+      "properties": {
+        "deviceCredentialDid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 320,
+          "description": "Canonical ASCII base DID with exactly one nonempty device fragment."
+        },
+        "priorLeafIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295,
+          "description": "Leaf index in the verified source GroupInfo."
+        }
+      }
+    }
+  }
+}

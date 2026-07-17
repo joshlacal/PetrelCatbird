@@ -16,12 +16,23 @@ object PlaceStreamServerListWebhooksDefs {
 }
 
 @Serializable
+enum class PlaceStreamServerListWebhooksParametersEvent {
+    @SerialName("chat")
+    value_chat,
+    @SerialName("livestream")
+    value_livestream,
+    @SerialName("follow")
+    value_follow,
+    @SerialName("mention")
+    value_mention}
+
+@Serializable
     data class PlaceStreamServerListWebhooksParameters(
 // The number of webhooks to return.        @SerialName("limit")
         val limit: Int? = null,// An optional cursor for pagination.        @SerialName("cursor")
         val cursor: String? = null,// Filter webhooks by active status.        @SerialName("active")
         val active: Boolean? = null,// Filter webhooks that handle this event type.        @SerialName("event")
-        val event: String? = null    )
+        val event: PlaceStreamServerListWebhooksParametersEvent? = null    )
 
     @Serializable
     data class PlaceStreamServerListWebhooksOutput(

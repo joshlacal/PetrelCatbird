@@ -1,0 +1,83 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.mlsChat.finalizeGroupChange",
+  "description": "Finalize an accepted private MLS transition after the client durably authenticates its sequencer receipt.",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Install the exact verified target GroupInfo for an accepted TransitionAttestationV1 challenge.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "convoId",
+            "challengeId",
+            "targetGroupInfo",
+            "receipt"
+          ],
+          "properties": {
+            "convoId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "description": "Stable printable-ASCII conversation identifier."
+            },
+            "challengeId": {
+              "type": "string",
+              "minLength": 36,
+              "maxLength": 36,
+              "description": "Accepted transition challenge RFC 4122 UUID in canonical hyphenated form."
+            },
+            "targetGroupInfo": {
+              "type": "bytes",
+              "minLength": 1,
+              "maxLength": 1048576,
+              "description": "Exact target GroupInfo bytes previously verified and bound by the challenge."
+            },
+            "receipt": {
+              "type": "ref",
+              "ref": "blue.catbird.mlsChat.commitGroupChange#sequencerReceipt",
+              "x-security-strict-decode": true,
+              "description": "Strictly decoded ADR-017 receipt returned by the accepted commit. Unknown or missing receipt fields fail closed."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "success",
+            "epoch",
+            "groupInfoHash",
+            "finalizedAt"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "description": "Whether the exact accepted target was finalized."
+            },
+            "epoch": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Finalized MLS epoch."
+            },
+            "groupInfoHash": {
+              "type": "bytes",
+              "minLength": 32,
+              "maxLength": 32,
+              "description": "SHA-256 of the exact finalized GroupInfo bytes."
+            },
+            "finalizedAt": {
+              "type": "string",
+              "format": "datetime",
+              "description": "Server timestamp at which the target GroupInfo became current."
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -15,10 +15,20 @@ object PlaceStreamSegmentDefs {
     const val TYPE_IDENTIFIER = "place.stream.segment"
 }
 
+@Serializable
+enum class PlaceStreamSegmentAudioCodec {
+    @SerialName("opus")
+    value_opus}
+
+@Serializable
+enum class PlaceStreamSegmentVideoCodec {
+    @SerialName("h264")
+    value_h264}
+
     @Serializable
     data class PlaceStreamSegmentAudio(
         @SerialName("codec")
-        val codec: String,        @SerialName("rate")
+        val codec: PlaceStreamSegmentAudioCodec,        @SerialName("rate")
         val rate: Int,        @SerialName("channels")
         val channels: Int    ) {
         companion object {
@@ -29,7 +39,7 @@ object PlaceStreamSegmentDefs {
     @Serializable
     data class PlaceStreamSegmentVideo(
         @SerialName("codec")
-        val codec: String,        @SerialName("width")
+        val codec: PlaceStreamSegmentVideoCodec,        @SerialName("width")
         val width: Int,        @SerialName("height")
         val height: Int,        @SerialName("framerate")
         val framerate: PlaceStreamSegmentFramerate? = null,        @SerialName("bframes")

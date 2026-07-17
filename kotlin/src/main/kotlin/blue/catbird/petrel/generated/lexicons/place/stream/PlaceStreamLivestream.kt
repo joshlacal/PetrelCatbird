@@ -160,6 +160,15 @@ object PlaceStreamLivestreamStreamplaceAnythingLivestreamUnionSerializer : kotli
     }
 }
 
+@Serializable
+enum class PlaceStreamLivestreamTeleportCanceledReason {
+    @SerialName("deleted")
+    value_deleted,
+    @SerialName("denied")
+    value_denied,
+    @SerialName("expired")
+    value_expired}
+
     @Serializable
     data class PlaceStreamLivestreamNotificationSettings(
 /** Whether this livestream should trigger a push notification to followers. */        @SerialName("pushNotification")
@@ -209,7 +218,7 @@ object PlaceStreamLivestreamStreamplaceAnythingLivestreamUnionSerializer : kotli
     data class PlaceStreamLivestreamTeleportCanceled(
 /** The URI of the teleport record that was canceled */        @SerialName("teleportUri")
         val teleportUri: ATProtocolURI,/** Why this teleport was canceled */        @SerialName("reason")
-        val reason: String    ) {
+        val reason: PlaceStreamLivestreamTeleportCanceledReason    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#placeStreamLivestreamTeleportCanceled"
         }

@@ -15,6 +15,17 @@ object PlaceStreamMultistreamDefsDefs {
     const val TYPE_IDENTIFIER = "place.stream.multistream.defs"
 }
 
+@Serializable
+enum class PlaceStreamMultistreamDefsEventStatus {
+    @SerialName("inactive")
+    value_inactive,
+    @SerialName("pending")
+    value_pending,
+    @SerialName("active")
+    value_active,
+    @SerialName("error")
+    value_error}
+
     @Serializable
     data class PlaceStreamMultistreamDefsTargetView(
         @SerialName("uri")
@@ -31,7 +42,7 @@ object PlaceStreamMultistreamDefsDefs {
     data class PlaceStreamMultistreamDefsEvent(
         @SerialName("message")
         val message: String,        @SerialName("status")
-        val status: String,        @SerialName("createdAt")
+        val status: PlaceStreamMultistreamDefsEventStatus,        @SerialName("createdAt")
         val createdAt: ATProtocolDate    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#placeStreamMultistreamDefsEvent"

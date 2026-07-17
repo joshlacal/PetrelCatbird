@@ -15,6 +15,17 @@ object PlaceStreamServerDefsDefs {
     const val TYPE_IDENTIFIER = "place.stream.server.defs"
 }
 
+@Serializable
+enum class PlaceStreamServerDefsWebhookEvents {
+    @SerialName("chat")
+    value_chat,
+    @SerialName("livestream")
+    value_livestream,
+    @SerialName("follow")
+    value_follow,
+    @SerialName("mention")
+    value_mention}
+
     /**
      * A webhook configuration for receiving Streamplace events.
      */
@@ -23,7 +34,7 @@ object PlaceStreamServerDefsDefs {
 /** Unique identifier for this webhook. */        @SerialName("id")
         val id: String,/** The webhook URL where events will be sent. */        @SerialName("url")
         val url: URI,/** The types of events this webhook should receive. */        @SerialName("events")
-        val events: List<String>,/** Whether this webhook is currently active. */        @SerialName("active")
+        val events: List<PlaceStreamServerDefsWebhookEvents>,/** Whether this webhook is currently active. */        @SerialName("active")
         val active: Boolean,/** Text to prepend to webhook messages. */        @SerialName("prefix")
         val prefix: String? = null,/** Text to append to webhook messages. */        @SerialName("suffix")
         val suffix: String? = null,/** Text replacement rules for webhook messages. */        @SerialName("rewrite")

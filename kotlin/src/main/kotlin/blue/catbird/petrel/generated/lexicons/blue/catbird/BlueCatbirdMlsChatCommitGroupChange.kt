@@ -15,6 +15,56 @@ object BlueCatbirdMlsChatCommitGroupChangeDefs {
     const val TYPE_IDENTIFIER = "blue.catbird.mlsChat.commitGroupChange"
 }
 
+@OptIn(ExperimentalSerializationApi::class)
+private object BlueCatbirdMlsChatCommitGroupChangeOutputReceiptStrictReferenceSerializer : KSerializer<BlueCatbirdMlsChatCommitGroupChangeSequencerReceipt?> {
+    private val delegate = BlueCatbirdMlsChatCommitGroupChangeSequencerReceipt.serializer()
+    private const val expectedTypeIdentifier = "blue.catbird.mlsChat.commitGroupChange#sequencerReceipt"
+    override val descriptor = delegate.descriptor
+
+    override fun serialize(
+        encoder: kotlinx.serialization.encoding.Encoder,
+        value: BlueCatbirdMlsChatCommitGroupChangeSequencerReceipt?,
+    ) {
+        if (value == null) {
+            val jsonEncoder = encoder as? JsonEncoder
+                ?: throw SerializationException("Strict reference requires JSON encoding")
+            jsonEncoder.encodeJsonElement(JsonNull)
+        } else {
+            delegate.serialize(encoder, value)
+        }
+    }
+
+    override fun deserialize(
+        decoder: kotlinx.serialization.encoding.Decoder,
+    ): BlueCatbirdMlsChatCommitGroupChangeSequencerReceipt? {
+        val jsonDecoder = decoder as? JsonDecoder
+            ?: throw SerializationException("Strict reference requires JSON decoding")
+        val element = jsonDecoder.decodeJsonElement()
+        if (element is JsonNull) return null
+        val objectValue = element as? JsonObject
+            ?: throw SerializationException("Strict reference must be a JSON object")
+        val allowedKeys = setOf("commitHash", "convoId", "epoch", "issuedAt", "sequencerDid", "sequencerTerm", "signature", "\$type")
+        val unknownKeys = objectValue.keys - allowedKeys
+        if (unknownKeys.isNotEmpty()) {
+            throw SerializationException(
+                "Strict reference contains unknown keys: ${unknownKeys.sorted()}"
+            )
+        }
+        objectValue["\$type"]?.let { discriminator ->
+            val actualTypeIdentifier = (discriminator as? JsonPrimitive)
+                ?.takeIf(JsonPrimitive::isString)
+                ?.content
+                ?: throw SerializationException(
+                    "Strict reference discriminator must be a string"
+                )
+            if (actualTypeIdentifier != expectedTypeIdentifier) {
+                throw SerializationException("Strict reference discriminator mismatch")
+            }
+        }
+        return jsonDecoder.json.decodeFromJsonElement(delegate, element)
+    }
+}
+
     /**
      * Signed receipt binding an accepted commit to its conversation, epoch, sequencer term, and sequencer identity.
      */
@@ -117,7 +167,9 @@ object BlueCatbirdMlsChatCommitGroupChangeDefs {
         val pendingAdditionId: String? = null,// Client-generated UUID for idempotent retries        @SerialName("idempotencyKey")
         val idempotencyKey: String? = null,// MLS confirmation tag from the client's post-commit group state.        @SerialName("confirmationTag")
         val confirmationTag: Bytes? = null,// Hex-encoded epoch_authenticator (RFC 9420 §8.7) for the post-commit epoch. Optional. When present on an epoch-advancing action (addMembers, processExternalCommit, rejoin, commit, updateMetadata), the server records it in the epoch_authenticators table and uses it to validate future reportRecoveryFailure votes for quorum auto-reset (see ADR-002).        @SerialName("epochAuthenticator")
-        val epochAuthenticator: String? = null    )
+        val epochAuthenticator: String? = null,// Optional TransitionAttestationV1 challenge UUID. Must be present if and only if transitionSignature is present.        @SerialName("transitionChallengeId")
+        val transitionChallengeId: String? = null,// Ed25519 signature over the exact challenge bytes. Must be present if and only if transitionChallengeId is present.        @SerialName("transitionSignature")
+        val transitionSignature: Bytes? = null    )
 
     @Serializable
     data class BlueCatbirdMlsChatCommitGroupChangeOutput(
@@ -127,7 +179,9 @@ object BlueCatbirdMlsChatCommitGroupChangeDefs {
         val rejoinedAt: ATProtocolDate? = null,// List of pending device additions (for getPendingDeviceAdditions)        @SerialName("pendingAdditions")
         val pendingAdditions: List<BlueCatbirdMlsChatCommitGroupChangePendingDeviceAddition>? = null,// The claimed pending addition (for claimPendingDeviceAddition)        @SerialName("claimedAddition")
         val claimedAddition: BlueCatbirdMlsChatCommitGroupChangePendingDeviceAddition? = null,// confirmation tag of the new canonical tree state.        @SerialName("confirmationTag")
-        val confirmationTag: Bytes? = null,// Signed sequencer receipt for an accepted epoch-advancing commit. Absent for legacy servers and non-advancing actions.        @SerialName("receipt")
+        val confirmationTag: Bytes? = null,// Signed sequencer receipt for an accepted epoch-advancing commit. Absent for legacy servers and non-advancing actions.
+                @Serializable(with = BlueCatbirdMlsChatCommitGroupChangeOutputReceiptStrictReferenceSerializer::class)
+        @SerialName("receipt")
         val receipt: BlueCatbirdMlsChatCommitGroupChangeSequencerReceipt? = null    )
 
 sealed class BlueCatbirdMlsChatCommitGroupChangeError(val name: String, val description: String?) {

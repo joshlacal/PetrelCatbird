@@ -15,6 +15,13 @@ object BlueCatbirdMlsChatDefsDefs {
     const val TYPE_IDENTIFIER = "blue.catbird.mlsChat.defs"
 }
 
+@Serializable
+enum class BlueCatbirdMlsChatDefsMessageViewMessageType {
+    @SerialName("app")
+    value_app,
+    @SerialName("commit")
+    value_commit}
+
     /**
      * View of an MLS conversation with member and epoch information
      */
@@ -71,7 +78,7 @@ object BlueCatbirdMlsChatDefsDefs {
         val epoch: Int,/** Monotonically increasing sequence number within conversation. Server assigns sequentially starting from 1. Gaps may occur when members are removed from the conversation, but seq values are never reused. */        @SerialName("seq")
         val seq: Int,/** Message creation timestamp (bucketed to 2-second intervals for traffic analysis protection) */        @SerialName("createdAt")
         val createdAt: ATProtocolDate,/** Message type discriminator: 'app' for application messages (user content), 'commit' for MLS protocol control messages (epoch changes, membership updates). Clients should process both types for MLS state tracking but only display 'app' messages in the UI. */        @SerialName("messageType")
-        val messageType: String? = null    ) {
+        val messageType: BlueCatbirdMlsChatDefsMessageViewMessageType? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdMlsChatDefsMessageView"
         }

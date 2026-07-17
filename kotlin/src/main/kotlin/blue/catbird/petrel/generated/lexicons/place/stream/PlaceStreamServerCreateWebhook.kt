@@ -16,10 +16,21 @@ object PlaceStreamServerCreateWebhookDefs {
 }
 
 @Serializable
+enum class PlaceStreamServerCreateWebhookInputEvents {
+    @SerialName("chat")
+    value_chat,
+    @SerialName("livestream")
+    value_livestream,
+    @SerialName("follow")
+    value_follow,
+    @SerialName("mention")
+    value_mention}
+
+@Serializable
     data class PlaceStreamServerCreateWebhookInput(
 // The webhook URL where events will be sent.        @SerialName("url")
         val url: URI,// The types of events this webhook should receive.        @SerialName("events")
-        val events: List<String>,// Whether this webhook should be active upon creation.        @SerialName("active")
+        val events: List<PlaceStreamServerCreateWebhookInputEvents>,// Whether this webhook should be active upon creation.        @SerialName("active")
         val active: Boolean? = null,// Text to prepend to webhook messages.        @SerialName("prefix")
         val prefix: String? = null,// Text to append to webhook messages.        @SerialName("suffix")
         val suffix: String? = null,// Text replacement rules for webhook messages.        @SerialName("rewrite")

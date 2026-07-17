@@ -2,7 +2,8 @@
   "$comment": "Overlay manifest for Catbird-private lexicons (blue.catbird.*, place.stream.*). Run from the Petrel repo root: python3 run.py --manifest ../PetrelCatbird/manifests/petrel-catbird.json --language swift",
   "package": {
     "kind": "overlay",
-    "name": "PetrelCatbird"
+    "name": "PetrelCatbird",
+    "core_namespace_roots": ["blue"]
   },
   "lexicons": {
     "emit": ["../PetrelCatbird/lexicons"],

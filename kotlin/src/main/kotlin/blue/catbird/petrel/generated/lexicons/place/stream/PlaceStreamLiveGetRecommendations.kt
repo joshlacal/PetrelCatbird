@@ -64,11 +64,20 @@ object PlaceStreamLiveGetRecommendationsOutputRecommendationsUnionSerializer : k
     }
 }
 
+@Serializable
+enum class PlaceStreamLiveGetRecommendationsLivestreamRecommendationSource {
+    @SerialName("streamer")
+    value_streamer,
+    @SerialName("follows")
+    value_follows,
+    @SerialName("host")
+    value_host}
+
     @Serializable
     data class PlaceStreamLiveGetRecommendationsLivestreamRecommendation(
 /** The DID of the recommended streamer */        @SerialName("did")
         val did: DID,/** Source of the recommendation */        @SerialName("source")
-        val source: String    ) {
+        val source: PlaceStreamLiveGetRecommendationsLivestreamRecommendationSource    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#placeStreamLiveGetRecommendationsLivestreamRecommendation"
         }
