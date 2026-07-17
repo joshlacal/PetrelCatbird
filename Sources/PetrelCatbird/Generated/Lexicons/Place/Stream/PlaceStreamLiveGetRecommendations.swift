@@ -200,10 +200,8 @@ public enum PlaceStreamLiveGetRecommendations {
 
         public static func == (lhs: OutputRecommendationsUnion, rhs: OutputRecommendationsUnion) -> Bool {
             switch (lhs, rhs) {
-            case let (
-                .placeStreamLiveGetRecommendationsLivestreamRecommendation(lhsValue),
-                .placeStreamLiveGetRecommendationsLivestreamRecommendation(rhsValue)
-            ):
+            case let (.placeStreamLiveGetRecommendationsLivestreamRecommendation(lhsValue),
+                      .placeStreamLiveGetRecommendationsLivestreamRecommendation(rhsValue)):
                 return lhsValue == rhsValue
             case let (.unexpected(lhsValue), .unexpected(rhsValue)):
                 return lhsValue.isEqual(to: rhsValue)

@@ -944,13 +944,13 @@ public enum BlueCatbirdMlsChatCommitGroupChange {
                 self.stringValue = stringValue
             }
 
-            init?(intValue: Int) {
+            init?(intValue _: Int) {
                 return nil
             }
         }
 
         private static func decodeStrictReference<T: Codable>(
-            _ type: T.Type,
+            _: T.Type,
             from container: KeyedDecodingContainer<CodingKeys>,
             forKey key: CodingKeys,
             allowedKeys: Set<String>,
