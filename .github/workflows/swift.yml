@@ -3,6 +3,7 @@ name: Swift
 on:
   push:
     branches: [main]
+    tags: ['*.*.*']
   pull_request:
 
 concurrency:
@@ -21,3 +22,20 @@ jobs:
         run: swift build
       - name: Test
         run: swift test
+
+  release-manifest:
+    name: Tagged manifest resolves for consumers
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject local path dependencies
+        run: |
+          set -euo pipefail
+          # Day-to-day work switches this manifest to .package(path: "../Petrel")
+          # so the overlay can be developed against a local core. Publishing that
+          # form breaks resolution for every consumer, and nothing else checks it.
+          if grep -nE '\.package\(path:' Package.swift; then
+            echo "::error file=Package.swift::Tagged releases must declare dependencies by URL; path dependencies do not resolve for consumers." >&2
+            exit 1
+          fi
