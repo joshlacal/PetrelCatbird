@@ -11,7 +11,7 @@ let package = Package(
         .library(name: "PetrelCatbird", targets: ["PetrelCatbird"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/joshlacal/Petrel.git", exact: "1.0.4"),
+        .package(url: "https://github.com/joshlacal/Petrel.git", exact: "1.0.7"),
     ],
     targets: [
         .target(
