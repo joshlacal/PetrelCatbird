@@ -48,6 +48,8 @@ public enum PlaceStreamLiveSubscribeSegments {
             }
         }
     }
+
+    public typealias Segment = Bytes
 }
 
 // Subscribe to a stream's new segments as they come in!

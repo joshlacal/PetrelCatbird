@@ -26,6 +26,17 @@ public extension ATProtoClient.Blue {
             }
         }
 
+        public var chat: Chat {
+            Chat(networkService: networkService)
+        }
+
+        public struct Chat: Sendable {
+            public let networkService: NetworkService
+            public init(networkService: NetworkService) {
+                self.networkService = networkService
+            }
+        }
+
         public var mlsChat: MlsChat {
             MlsChat(networkService: networkService)
         }

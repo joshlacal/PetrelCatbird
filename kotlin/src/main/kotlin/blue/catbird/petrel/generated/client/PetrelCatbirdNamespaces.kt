@@ -13,11 +13,15 @@ class BlueNamespace(val client: ATProtoClient) {
 
 class BlueCatbirdNamespace(val client: ATProtoClient) {
     val bskychat: BlueCatbirdBskychatNamespace get() = BlueCatbirdBskychatNamespace(client)
+    val chat: BlueCatbirdChatNamespace get() = BlueCatbirdChatNamespace(client)
     val mlsChat: BlueCatbirdMlsChatNamespace get() = BlueCatbirdMlsChatNamespace(client)
     val mlsDS: BlueCatbirdMlsDSNamespace get() = BlueCatbirdMlsDSNamespace(client)
 }
 
 class BlueCatbirdBskychatNamespace(val client: ATProtoClient) {
+}
+
+class BlueCatbirdChatNamespace(val client: ATProtoClient) {
 }
 
 class BlueCatbirdMlsChatNamespace(val client: ATProtoClient) {
