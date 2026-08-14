@@ -52,6 +52,11 @@ object PlaceStreamLiveSubscribeSegmentsMessageUnionSerializer : kotlinx.serializ
     }
 }
 
+    /**
+     * MP4 file of a user's signed livestream segment
+     */
+    typealias PlaceStreamLiveSubscribeSegmentsSegment = Bytes
+
 @Serializable
     data class PlaceStreamLiveSubscribeSegmentsParameters(
 // The DID of the streamer to subscribe to        @SerialName("streamer")

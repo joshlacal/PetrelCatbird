@@ -21,8 +21,7 @@ object BlueCatbirdChatSubscribeEventsDefs {
         val ticket: String,        @SerialName("cursor")
         val cursor: String    )
 
-    @Serializable
-    class BlueCatbirdChatSubscribeEventsMessage
+typealias BlueCatbirdChatSubscribeEventsMessage = BlueCatbirdChatDefsSubscriptionMessage
 
 sealed class BlueCatbirdChatSubscribeEventsError(val name: String, val description: String?) {
         object CursorExpired: BlueCatbirdChatSubscribeEventsError("CursorExpired", "")
@@ -31,6 +30,17 @@ sealed class BlueCatbirdChatSubscribeEventsError(val name: String, val descripti
         object DeviceRevoked: BlueCatbirdChatSubscribeEventsError("DeviceRevoked", "")
         object InvalidTicket: BlueCatbirdChatSubscribeEventsError("InvalidTicket", "")
     }
+
+/**
+ * Synthetic variants augmenting the generated BlueCatbirdChatDefsSubscriptionMessage sealed interface.
+ *
+ * `Error` surfaces ATProto `op == -1` server error frames; `Unexpected` wraps
+ * frames whose header tag did not match any known variant (e.g. new event types
+ * added server-side before client regen). Kept as extensions so the lexicon-
+ * driven sealed interface stays mechanically faithful to the schema.
+ */
+data class BlueCatbirdChatDefsSubscriptionMessageError(val name: String, val message: String?) : BlueCatbirdChatDefsSubscriptionMessage
+data class BlueCatbirdChatDefsSubscriptionMessageUnexpected(val type: String, val payload: kotlinx.serialization.json.JsonObject) : BlueCatbirdChatDefsSubscriptionMessage
 
 /**
  * The sole non-DPoP endpoint: browser WebSocket upgrade authentication uses only the one-use short-lived getSubscriptionTicket token. cursor must byte-equal the cursor bound into the DID/device/JKT/authGeneration/path-bound ticket, which is consumed atomically before upgrade; mismatch, reuse, or expiry rejects. Streams durable entitlement-filtered envelopes plus uncursored best-effort typing variants. For durable envelopes previousCursor is the immediately preceding visible audience cursor and the first continues the ticket cursor. Typing events never alter this chain.
@@ -52,21 +62,35 @@ hostOverride: String? = null,
     val queryItems = parameters?.toQueryItems().orEmpty()
 
     client.openSubscription(endpoint, queryItems, hostOverride, websocketClient) { frame ->
-        // Message schema is not a union; the generated `BlueCatbirdChatSubscribeEventsMessage` type
-        // carries no variant information, so we emit a single best-effort decode
-        // of every binary frame's payload. Subscriptions without union schemas
-        // are rare in practice — see docs/plans/2026-04-19-kotlin-subscription-codegen.md.
-        when (frame) {
+        val decoded: BlueCatbirdChatSubscribeEventsMessage = when (frame) {
+            is blue.catbird.petrel.runtime.subscription.CborFrame.Error ->
+                BlueCatbirdChatDefsSubscriptionMessageError(frame.name, frame.message)
             is blue.catbird.petrel.runtime.subscription.CborFrame.Message -> {
-                // Non-union subscription: surface the raw payload to consumers
-                // via kotlinx.serialization.json.JsonObject under a placeholder.
-                emit(BlueCatbirdChatSubscribeEventsMessage())
-            }
-            is blue.catbird.petrel.runtime.subscription.CborFrame.Error -> {
-                throw io.ktor.utils.io.errors.IOException(
-                    "Subscription error frame: ${frame.name}: ${frame.message ?: "(no detail)"}"
-                )
+                val json = kotlinx.serialization.json.Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                }
+                try {
+                    when (frame.header.t) {
+                        "#eventEnvelope" -> BlueCatbirdChatDefsSubscriptionMessage.EventEnvelope(
+                            json.decodeFromJsonElement(
+                                blue.catbird.petrel.generated.BlueCatbirdChatDefsEventEnvelope.serializer(),
+                                frame.payload
+                            )
+                        )
+                        "#typingEvent" -> BlueCatbirdChatDefsSubscriptionMessage.TypingEvent(
+                            json.decodeFromJsonElement(
+                                blue.catbird.petrel.generated.BlueCatbirdChatDefsTypingEvent.serializer(),
+                                frame.payload
+                            )
+                        )
+                        else -> BlueCatbirdChatDefsSubscriptionMessageUnexpected(frame.header.t, frame.payload)
+                    }
+                } catch (e: Throwable) {
+                    BlueCatbirdChatDefsSubscriptionMessageUnexpected(frame.header.t, frame.payload)
+                }
             }
         }
+        emit(decoded)
     }
 }

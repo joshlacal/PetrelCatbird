@@ -15,6 +15,626 @@ object BlueCatbirdChatDefsDefs {
     const val TYPE_IDENTIFIER = "blue.catbird.chat.defs"
 }
 
+@Serializable(with = BlueCatbirdChatDefsParticipantChangeSerializer::class)
+sealed interface BlueCatbirdChatDefsParticipantChange {
+    @Serializable
+    data class AddParticipant(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsAddParticipant) : BlueCatbirdChatDefsParticipantChange
+
+    @Serializable
+    data class RemoveParticipant(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsRemoveParticipant) : BlueCatbirdChatDefsParticipantChange
+
+    @Serializable
+    data class ChangeParticipantRole(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsChangeParticipantRole) : BlueCatbirdChatDefsParticipantChange
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsParticipantChange
+}
+
+object BlueCatbirdChatDefsParticipantChangeSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsParticipantChange> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsParticipantChange")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsParticipantChange) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsParticipantChange.AddParticipant -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsAddParticipant.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#addParticipant")
+                })
+            }
+            is BlueCatbirdChatDefsParticipantChange.RemoveParticipant -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRemoveParticipant.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#removeParticipant")
+                })
+            }
+            is BlueCatbirdChatDefsParticipantChange.ChangeParticipantRole -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsChangeParticipantRole.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#changeParticipantRole")
+                })
+            }
+            is BlueCatbirdChatDefsParticipantChange.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsParticipantChange {
+        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element.jsonObject
+        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+
+        return when (type) {
+            "blue.catbird.chat.defs#addParticipant" -> BlueCatbirdChatDefsParticipantChange.AddParticipant(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsAddParticipant.serializer(), element)
+            )
+            "blue.catbird.chat.defs#removeParticipant" -> BlueCatbirdChatDefsParticipantChange.RemoveParticipant(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRemoveParticipant.serializer(), element)
+            )
+            "blue.catbird.chat.defs#changeParticipantRole" -> BlueCatbirdChatDefsParticipantChange.ChangeParticipantRole(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsChangeParticipantRole.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsParticipantChange.Unexpected(element)
+        }
+    }
+}
+
+@Serializable(with = BlueCatbirdChatDefsLeafChangeSerializer::class)
+sealed interface BlueCatbirdChatDefsLeafChange {
+    @Serializable
+    data class AddLeafByRecovery(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsAddLeafByRecovery) : BlueCatbirdChatDefsLeafChange
+
+    @Serializable
+    data class RemoveLeaf(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsRemoveLeaf) : BlueCatbirdChatDefsLeafChange
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsLeafChange
+}
+
+object BlueCatbirdChatDefsLeafChangeSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsLeafChange> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsLeafChange")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsLeafChange) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsLeafChange.AddLeafByRecovery -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsAddLeafByRecovery.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#addLeafByRecovery")
+                })
+            }
+            is BlueCatbirdChatDefsLeafChange.RemoveLeaf -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRemoveLeaf.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#removeLeaf")
+                })
+            }
+            is BlueCatbirdChatDefsLeafChange.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsLeafChange {
+        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element.jsonObject
+        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+
+        return when (type) {
+            "blue.catbird.chat.defs#addLeafByRecovery" -> BlueCatbirdChatDefsLeafChange.AddLeafByRecovery(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsAddLeafByRecovery.serializer(), element)
+            )
+            "blue.catbird.chat.defs#removeLeaf" -> BlueCatbirdChatDefsLeafChange.RemoveLeaf(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRemoveLeaf.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsLeafChange.Unexpected(element)
+        }
+    }
+}
+
+@Serializable(with = BlueCatbirdChatDefsApplicationEmbedSerializer::class)
+sealed interface BlueCatbirdChatDefsApplicationEmbed {
+    @Serializable
+    data class EncryptedImageEmbedVariant(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsEncryptedImageEmbedVariant) : BlueCatbirdChatDefsApplicationEmbed
+
+    @Serializable
+    data class EncryptedAudioEmbedVariant(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsEncryptedAudioEmbedVariant) : BlueCatbirdChatDefsApplicationEmbed
+
+    @Serializable
+    data class AtprotoRecordEmbedVariant(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsAtprotoRecordEmbedVariant) : BlueCatbirdChatDefsApplicationEmbed
+
+    @Serializable
+    data class ExternalLinkEmbedVariant(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsExternalLinkEmbedVariant) : BlueCatbirdChatDefsApplicationEmbed
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsApplicationEmbed
+}
+
+object BlueCatbirdChatDefsApplicationEmbedSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsApplicationEmbed> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsApplicationEmbed")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsApplicationEmbed) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsApplicationEmbed.EncryptedImageEmbedVariant -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsEncryptedImageEmbedVariant.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#encryptedImageEmbedVariant")
+                })
+            }
+            is BlueCatbirdChatDefsApplicationEmbed.EncryptedAudioEmbedVariant -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsEncryptedAudioEmbedVariant.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#encryptedAudioEmbedVariant")
+                })
+            }
+            is BlueCatbirdChatDefsApplicationEmbed.AtprotoRecordEmbedVariant -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsAtprotoRecordEmbedVariant.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#atprotoRecordEmbedVariant")
+                })
+            }
+            is BlueCatbirdChatDefsApplicationEmbed.ExternalLinkEmbedVariant -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsExternalLinkEmbedVariant.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#externalLinkEmbedVariant")
+                })
+            }
+            is BlueCatbirdChatDefsApplicationEmbed.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsApplicationEmbed {
+        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element.jsonObject
+        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+
+        return when (type) {
+            "blue.catbird.chat.defs#encryptedImageEmbedVariant" -> BlueCatbirdChatDefsApplicationEmbed.EncryptedImageEmbedVariant(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsEncryptedImageEmbedVariant.serializer(), element)
+            )
+            "blue.catbird.chat.defs#encryptedAudioEmbedVariant" -> BlueCatbirdChatDefsApplicationEmbed.EncryptedAudioEmbedVariant(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsEncryptedAudioEmbedVariant.serializer(), element)
+            )
+            "blue.catbird.chat.defs#atprotoRecordEmbedVariant" -> BlueCatbirdChatDefsApplicationEmbed.AtprotoRecordEmbedVariant(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsAtprotoRecordEmbedVariant.serializer(), element)
+            )
+            "blue.catbird.chat.defs#externalLinkEmbedVariant" -> BlueCatbirdChatDefsApplicationEmbed.ExternalLinkEmbedVariant(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsExternalLinkEmbedVariant.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsApplicationEmbed.Unexpected(element)
+        }
+    }
+}
+
+@Serializable(with = BlueCatbirdChatDefsApplicationFrameBodySerializer::class)
+sealed interface BlueCatbirdChatDefsApplicationFrameBody {
+    @Serializable
+    data class MessageFrameVariant(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsMessageFrameVariant) : BlueCatbirdChatDefsApplicationFrameBody
+
+    @Serializable
+    data class ReactionFrameVariant(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsReactionFrameVariant) : BlueCatbirdChatDefsApplicationFrameBody
+
+    @Serializable
+    data class EditFrameVariant(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsEditFrameVariant) : BlueCatbirdChatDefsApplicationFrameBody
+
+    @Serializable
+    data class TombstoneFrameVariant(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsTombstoneFrameVariant) : BlueCatbirdChatDefsApplicationFrameBody
+
+    @Serializable
+    data class ReadStateFrameVariant(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsReadStateFrameVariant) : BlueCatbirdChatDefsApplicationFrameBody
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsApplicationFrameBody
+}
+
+object BlueCatbirdChatDefsApplicationFrameBodySerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsApplicationFrameBody> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsApplicationFrameBody")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsApplicationFrameBody) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsApplicationFrameBody.MessageFrameVariant -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsMessageFrameVariant.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#messageFrameVariant")
+                })
+            }
+            is BlueCatbirdChatDefsApplicationFrameBody.ReactionFrameVariant -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsReactionFrameVariant.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#reactionFrameVariant")
+                })
+            }
+            is BlueCatbirdChatDefsApplicationFrameBody.EditFrameVariant -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsEditFrameVariant.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#editFrameVariant")
+                })
+            }
+            is BlueCatbirdChatDefsApplicationFrameBody.TombstoneFrameVariant -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsTombstoneFrameVariant.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#tombstoneFrameVariant")
+                })
+            }
+            is BlueCatbirdChatDefsApplicationFrameBody.ReadStateFrameVariant -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsReadStateFrameVariant.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#readStateFrameVariant")
+                })
+            }
+            is BlueCatbirdChatDefsApplicationFrameBody.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsApplicationFrameBody {
+        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element.jsonObject
+        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+
+        return when (type) {
+            "blue.catbird.chat.defs#messageFrameVariant" -> BlueCatbirdChatDefsApplicationFrameBody.MessageFrameVariant(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsMessageFrameVariant.serializer(), element)
+            )
+            "blue.catbird.chat.defs#reactionFrameVariant" -> BlueCatbirdChatDefsApplicationFrameBody.ReactionFrameVariant(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsReactionFrameVariant.serializer(), element)
+            )
+            "blue.catbird.chat.defs#editFrameVariant" -> BlueCatbirdChatDefsApplicationFrameBody.EditFrameVariant(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsEditFrameVariant.serializer(), element)
+            )
+            "blue.catbird.chat.defs#tombstoneFrameVariant" -> BlueCatbirdChatDefsApplicationFrameBody.TombstoneFrameVariant(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsTombstoneFrameVariant.serializer(), element)
+            )
+            "blue.catbird.chat.defs#readStateFrameVariant" -> BlueCatbirdChatDefsApplicationFrameBody.ReadStateFrameVariant(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsReadStateFrameVariant.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsApplicationFrameBody.Unexpected(element)
+        }
+    }
+}
+
+@Serializable(with = BlueCatbirdChatDefsRecoveryWorkViewSerializer::class)
+sealed interface BlueCatbirdChatDefsRecoveryWorkView {
+    @Serializable
+    data class RecoveryWorkPendingView(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkPendingView) : BlueCatbirdChatDefsRecoveryWorkView
+
+    @Serializable
+    data class RecoveryWorkCompletedByTransitionView(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkCompletedByTransitionView) : BlueCatbirdChatDefsRecoveryWorkView
+
+    @Serializable
+    data class RecoveryWorkSupersededByTransitionView(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByTransitionView) : BlueCatbirdChatDefsRecoveryWorkView
+
+    @Serializable
+    data class RecoveryWorkSupersededByRevocationView(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByRevocationView) : BlueCatbirdChatDefsRecoveryWorkView
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsRecoveryWorkView
+}
+
+object BlueCatbirdChatDefsRecoveryWorkViewSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsRecoveryWorkView> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsRecoveryWorkView")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsRecoveryWorkView) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsRecoveryWorkView.RecoveryWorkPendingView -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkPendingView.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkPendingView")
+                })
+            }
+            is BlueCatbirdChatDefsRecoveryWorkView.RecoveryWorkCompletedByTransitionView -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkCompletedByTransitionView.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView")
+                })
+            }
+            is BlueCatbirdChatDefsRecoveryWorkView.RecoveryWorkSupersededByTransitionView -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByTransitionView.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView")
+                })
+            }
+            is BlueCatbirdChatDefsRecoveryWorkView.RecoveryWorkSupersededByRevocationView -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByRevocationView.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView")
+                })
+            }
+            is BlueCatbirdChatDefsRecoveryWorkView.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsRecoveryWorkView {
+        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element.jsonObject
+        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+
+        return when (type) {
+            "blue.catbird.chat.defs#recoveryWorkPendingView" -> BlueCatbirdChatDefsRecoveryWorkView.RecoveryWorkPendingView(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkPendingView.serializer(), element)
+            )
+            "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView" -> BlueCatbirdChatDefsRecoveryWorkView.RecoveryWorkCompletedByTransitionView(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkCompletedByTransitionView.serializer(), element)
+            )
+            "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView" -> BlueCatbirdChatDefsRecoveryWorkView.RecoveryWorkSupersededByTransitionView(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByTransitionView.serializer(), element)
+            )
+            "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView" -> BlueCatbirdChatDefsRecoveryWorkView.RecoveryWorkSupersededByRevocationView(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByRevocationView.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsRecoveryWorkView.Unexpected(element)
+        }
+    }
+}
+
+@Serializable(with = BlueCatbirdChatDefsLeafRecoveryInboxItemSerializer::class)
+sealed interface BlueCatbirdChatDefsLeafRecoveryInboxItem {
+    @Serializable
+    data class LeafRecoveryView(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryView) : BlueCatbirdChatDefsLeafRecoveryInboxItem
+
+    @Serializable
+    data class RecoveryWorkPendingView(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkPendingView) : BlueCatbirdChatDefsLeafRecoveryInboxItem
+
+    @Serializable
+    data class RecoveryWorkCompletedByTransitionView(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkCompletedByTransitionView) : BlueCatbirdChatDefsLeafRecoveryInboxItem
+
+    @Serializable
+    data class RecoveryWorkSupersededByTransitionView(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByTransitionView) : BlueCatbirdChatDefsLeafRecoveryInboxItem
+
+    @Serializable
+    data class RecoveryWorkSupersededByRevocationView(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByRevocationView) : BlueCatbirdChatDefsLeafRecoveryInboxItem
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsLeafRecoveryInboxItem
+}
+
+object BlueCatbirdChatDefsLeafRecoveryInboxItemSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsLeafRecoveryInboxItem> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsLeafRecoveryInboxItem")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsLeafRecoveryInboxItem) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsLeafRecoveryInboxItem.LeafRecoveryView -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryView.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leafRecoveryView")
+                })
+            }
+            is BlueCatbirdChatDefsLeafRecoveryInboxItem.RecoveryWorkPendingView -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkPendingView.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkPendingView")
+                })
+            }
+            is BlueCatbirdChatDefsLeafRecoveryInboxItem.RecoveryWorkCompletedByTransitionView -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkCompletedByTransitionView.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView")
+                })
+            }
+            is BlueCatbirdChatDefsLeafRecoveryInboxItem.RecoveryWorkSupersededByTransitionView -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByTransitionView.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView")
+                })
+            }
+            is BlueCatbirdChatDefsLeafRecoveryInboxItem.RecoveryWorkSupersededByRevocationView -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByRevocationView.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView")
+                })
+            }
+            is BlueCatbirdChatDefsLeafRecoveryInboxItem.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsLeafRecoveryInboxItem {
+        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element.jsonObject
+        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+
+        return when (type) {
+            "blue.catbird.chat.defs#leafRecoveryView" -> BlueCatbirdChatDefsLeafRecoveryInboxItem.LeafRecoveryView(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryView.serializer(), element)
+            )
+            "blue.catbird.chat.defs#recoveryWorkPendingView" -> BlueCatbirdChatDefsLeafRecoveryInboxItem.RecoveryWorkPendingView(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkPendingView.serializer(), element)
+            )
+            "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView" -> BlueCatbirdChatDefsLeafRecoveryInboxItem.RecoveryWorkCompletedByTransitionView(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkCompletedByTransitionView.serializer(), element)
+            )
+            "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView" -> BlueCatbirdChatDefsLeafRecoveryInboxItem.RecoveryWorkSupersededByTransitionView(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByTransitionView.serializer(), element)
+            )
+            "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView" -> BlueCatbirdChatDefsLeafRecoveryInboxItem.RecoveryWorkSupersededByRevocationView(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByRevocationView.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsLeafRecoveryInboxItem.Unexpected(element)
+        }
+    }
+}
+
+@Serializable(with = BlueCatbirdChatDefsLeaveOperationResultSerializer::class)
+sealed interface BlueCatbirdChatDefsLeaveOperationResult {
+    @Serializable
+    data class DurableLeaveRequestResult(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsDurableLeaveRequestResult) : BlueCatbirdChatDefsLeaveOperationResult
+
+    @Serializable
+    data class ZeroLeafLeaveResult(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsZeroLeafLeaveResult) : BlueCatbirdChatDefsLeaveOperationResult
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsLeaveOperationResult
+}
+
+object BlueCatbirdChatDefsLeaveOperationResultSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsLeaveOperationResult> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsLeaveOperationResult")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsLeaveOperationResult) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsLeaveOperationResult.DurableLeaveRequestResult -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDurableLeaveRequestResult.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#durableLeaveRequestResult")
+                })
+            }
+            is BlueCatbirdChatDefsLeaveOperationResult.ZeroLeafLeaveResult -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsZeroLeafLeaveResult.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#zeroLeafLeaveResult")
+                })
+            }
+            is BlueCatbirdChatDefsLeaveOperationResult.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsLeaveOperationResult {
+        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element.jsonObject
+        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+
+        return when (type) {
+            "blue.catbird.chat.defs#durableLeaveRequestResult" -> BlueCatbirdChatDefsLeaveOperationResult.DurableLeaveRequestResult(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDurableLeaveRequestResult.serializer(), element)
+            )
+            "blue.catbird.chat.defs#zeroLeafLeaveResult" -> BlueCatbirdChatDefsLeaveOperationResult.ZeroLeafLeaveResult(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsZeroLeafLeaveResult.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsLeaveOperationResult.Unexpected(element)
+        }
+    }
+}
+
+@Serializable(with = BlueCatbirdChatDefsConversationCreationResultSerializer::class)
+sealed interface BlueCatbirdChatDefsConversationCreationResult {
+    @Serializable
+    data class ConversationCreatedResult(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCreatedResult) : BlueCatbirdChatDefsConversationCreationResult
+
+    @Serializable
+    data class ExistingDirectConversationResult(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsExistingDirectConversationResult) : BlueCatbirdChatDefsConversationCreationResult
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsConversationCreationResult
+}
+
+object BlueCatbirdChatDefsConversationCreationResultSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsConversationCreationResult> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsConversationCreationResult")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsConversationCreationResult) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsConversationCreationResult.ConversationCreatedResult -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCreatedResult.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationCreatedResult")
+                })
+            }
+            is BlueCatbirdChatDefsConversationCreationResult.ExistingDirectConversationResult -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsExistingDirectConversationResult.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#existingDirectConversationResult")
+                })
+            }
+            is BlueCatbirdChatDefsConversationCreationResult.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsConversationCreationResult {
+        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element.jsonObject
+        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+
+        return when (type) {
+            "blue.catbird.chat.defs#conversationCreatedResult" -> BlueCatbirdChatDefsConversationCreationResult.ConversationCreatedResult(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCreatedResult.serializer(), element)
+            )
+            "blue.catbird.chat.defs#existingDirectConversationResult" -> BlueCatbirdChatDefsConversationCreationResult.ExistingDirectConversationResult(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsExistingDirectConversationResult.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsConversationCreationResult.Unexpected(element)
+        }
+    }
+}
+
 @Serializable(with = BlueCatbirdChatDefsSignedDeviceEnrollmentBodyUnionSerializer::class)
 sealed interface BlueCatbirdChatDefsSignedDeviceEnrollmentBodyUnion {
     @Serializable
@@ -1044,6 +1664,67 @@ object BlueCatbirdChatDefsSignedZeroLeafLeaveBodyUnionSerializer : kotlinx.seria
     }
 }
 
+@Serializable(with = BlueCatbirdChatDefsSignedLeaveOperationSerializer::class)
+sealed interface BlueCatbirdChatDefsSignedLeaveOperation {
+    @Serializable
+    data class SignedLeaveRequest(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedLeaveRequest) : BlueCatbirdChatDefsSignedLeaveOperation
+
+    @Serializable
+    data class SignedZeroLeafLeave(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedZeroLeafLeave) : BlueCatbirdChatDefsSignedLeaveOperation
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsSignedLeaveOperation
+}
+
+object BlueCatbirdChatDefsSignedLeaveOperationSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsSignedLeaveOperation> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedLeaveOperation")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedLeaveOperation) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsSignedLeaveOperation.SignedLeaveRequest -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedLeaveRequest.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedLeaveRequest")
+                })
+            }
+            is BlueCatbirdChatDefsSignedLeaveOperation.SignedZeroLeafLeave -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedZeroLeafLeave.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedZeroLeafLeave")
+                })
+            }
+            is BlueCatbirdChatDefsSignedLeaveOperation.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedLeaveOperation {
+        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element.jsonObject
+        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+
+        return when (type) {
+            "blue.catbird.chat.defs#signedLeaveRequest" -> BlueCatbirdChatDefsSignedLeaveOperation.SignedLeaveRequest(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedLeaveRequest.serializer(), element)
+            )
+            "blue.catbird.chat.defs#signedZeroLeafLeave" -> BlueCatbirdChatDefsSignedLeaveOperation.SignedZeroLeafLeave(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedZeroLeafLeave.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsSignedLeaveOperation.Unexpected(element)
+        }
+    }
+}
+
 @Serializable(with = BlueCatbirdChatDefsSignedLeaveCancellationBodyUnionSerializer::class)
 sealed interface BlueCatbirdChatDefsSignedLeaveCancellationBodyUnion {
     @Serializable
@@ -1236,6 +1917,599 @@ object BlueCatbirdChatDefsSignedWelcomeRejectionBodyUnionSerializer : kotlinx.se
                 jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeRejectionBody.serializer(), element)
             )
             else -> BlueCatbirdChatDefsSignedWelcomeRejectionBodyUnion.Unexpected(element)
+        }
+    }
+}
+
+@Serializable(with = BlueCatbirdChatDefsSignedTransitionSerializer::class)
+sealed interface BlueCatbirdChatDefsSignedTransition {
+    @Serializable
+    data class SignedCommitTransition(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedCommitTransition) : BlueCatbirdChatDefsSignedTransition
+
+    @Serializable
+    data class SignedPolicyTransition(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedPolicyTransition) : BlueCatbirdChatDefsSignedTransition
+
+    @Serializable
+    data class SignedLeafRecoveryFulfillment(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedLeafRecoveryFulfillment) : BlueCatbirdChatDefsSignedTransition
+
+    @Serializable
+    data class SignedMetadataTransition(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedMetadataTransition) : BlueCatbirdChatDefsSignedTransition
+
+    @Serializable
+    data class SignedLeaveCommitFulfillment(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedLeaveCommitFulfillment) : BlueCatbirdChatDefsSignedTransition
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsSignedTransition
+}
+
+object BlueCatbirdChatDefsSignedTransitionSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsSignedTransition> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedTransition")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedTransition) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsSignedTransition.SignedCommitTransition -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedCommitTransition.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedCommitTransition")
+                })
+            }
+            is BlueCatbirdChatDefsSignedTransition.SignedPolicyTransition -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedPolicyTransition.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedPolicyTransition")
+                })
+            }
+            is BlueCatbirdChatDefsSignedTransition.SignedLeafRecoveryFulfillment -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedLeafRecoveryFulfillment.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedLeafRecoveryFulfillment")
+                })
+            }
+            is BlueCatbirdChatDefsSignedTransition.SignedMetadataTransition -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedMetadataTransition.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedMetadataTransition")
+                })
+            }
+            is BlueCatbirdChatDefsSignedTransition.SignedLeaveCommitFulfillment -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedLeaveCommitFulfillment.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedLeaveCommitFulfillment")
+                })
+            }
+            is BlueCatbirdChatDefsSignedTransition.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedTransition {
+        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element.jsonObject
+        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+
+        return when (type) {
+            "blue.catbird.chat.defs#signedCommitTransition" -> BlueCatbirdChatDefsSignedTransition.SignedCommitTransition(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedCommitTransition.serializer(), element)
+            )
+            "blue.catbird.chat.defs#signedPolicyTransition" -> BlueCatbirdChatDefsSignedTransition.SignedPolicyTransition(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedPolicyTransition.serializer(), element)
+            )
+            "blue.catbird.chat.defs#signedLeafRecoveryFulfillment" -> BlueCatbirdChatDefsSignedTransition.SignedLeafRecoveryFulfillment(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedLeafRecoveryFulfillment.serializer(), element)
+            )
+            "blue.catbird.chat.defs#signedMetadataTransition" -> BlueCatbirdChatDefsSignedTransition.SignedMetadataTransition(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedMetadataTransition.serializer(), element)
+            )
+            "blue.catbird.chat.defs#signedLeaveCommitFulfillment" -> BlueCatbirdChatDefsSignedTransition.SignedLeaveCommitFulfillment(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedLeaveCommitFulfillment.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsSignedTransition.Unexpected(element)
+        }
+    }
+}
+
+@Serializable(with = BlueCatbirdChatDefsConversationInventoryItemSerializer::class)
+sealed interface BlueCatbirdChatDefsConversationInventoryItem {
+    @Serializable
+    data class ConversationInventoryState(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationInventoryState) : BlueCatbirdChatDefsConversationInventoryItem
+
+    @Serializable
+    data class ConversationRemovalTombstone(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationRemovalTombstone) : BlueCatbirdChatDefsConversationInventoryItem
+
+    @Serializable
+    data class ConversationCloseTombstone(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCloseTombstone) : BlueCatbirdChatDefsConversationInventoryItem
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsConversationInventoryItem
+}
+
+object BlueCatbirdChatDefsConversationInventoryItemSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsConversationInventoryItem> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsConversationInventoryItem")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsConversationInventoryItem) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsConversationInventoryItem.ConversationInventoryState -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationInventoryState.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationInventoryState")
+                })
+            }
+            is BlueCatbirdChatDefsConversationInventoryItem.ConversationRemovalTombstone -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationRemovalTombstone.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationRemovalTombstone")
+                })
+            }
+            is BlueCatbirdChatDefsConversationInventoryItem.ConversationCloseTombstone -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCloseTombstone.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationCloseTombstone")
+                })
+            }
+            is BlueCatbirdChatDefsConversationInventoryItem.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsConversationInventoryItem {
+        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element.jsonObject
+        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+
+        return when (type) {
+            "blue.catbird.chat.defs#conversationInventoryState" -> BlueCatbirdChatDefsConversationInventoryItem.ConversationInventoryState(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationInventoryState.serializer(), element)
+            )
+            "blue.catbird.chat.defs#conversationRemovalTombstone" -> BlueCatbirdChatDefsConversationInventoryItem.ConversationRemovalTombstone(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationRemovalTombstone.serializer(), element)
+            )
+            "blue.catbird.chat.defs#conversationCloseTombstone" -> BlueCatbirdChatDefsConversationInventoryItem.ConversationCloseTombstone(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCloseTombstone.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsConversationInventoryItem.Unexpected(element)
+        }
+    }
+}
+
+@Serializable(with = BlueCatbirdChatDefsConversationEntrySerializer::class)
+sealed interface BlueCatbirdChatDefsConversationEntry {
+    @Serializable
+    data class ApplicationEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsApplicationEntry) : BlueCatbirdChatDefsConversationEntry
+
+    @Serializable
+    data class CommitEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsCommitEntry) : BlueCatbirdChatDefsConversationEntry
+
+    @Serializable
+    data class PolicyEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsPolicyEntry) : BlueCatbirdChatDefsConversationEntry
+
+    @Serializable
+    data class MetadataEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsMetadataEntry) : BlueCatbirdChatDefsConversationEntry
+
+    @Serializable
+    data class CreationEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsCreationEntry) : BlueCatbirdChatDefsConversationEntry
+
+    @Serializable
+    data class ParticipantAcceptanceEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsParticipantAcceptanceEntry) : BlueCatbirdChatDefsConversationEntry
+
+    @Serializable
+    data class ConversationCloseEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCloseEntry) : BlueCatbirdChatDefsConversationEntry
+
+    @Serializable
+    data class ResetRequestEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsResetRequestEntry) : BlueCatbirdChatDefsConversationEntry
+
+    @Serializable
+    data class ResetActivationEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsResetActivationEntry) : BlueCatbirdChatDefsConversationEntry
+
+    @Serializable
+    data class LeafRecoveryFulfillmentEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryFulfillmentEntry) : BlueCatbirdChatDefsConversationEntry
+
+    @Serializable
+    data class LeaveRequestEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveRequestEntry) : BlueCatbirdChatDefsConversationEntry
+
+    @Serializable
+    data class ZeroLeafLeaveEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsZeroLeafLeaveEntry) : BlueCatbirdChatDefsConversationEntry
+
+    @Serializable
+    data class LeaveCancellationEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveCancellationEntry) : BlueCatbirdChatDefsConversationEntry
+
+    @Serializable
+    data class LeaveCommitFulfillmentEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveCommitFulfillmentEntry) : BlueCatbirdChatDefsConversationEntry
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsConversationEntry
+}
+
+object BlueCatbirdChatDefsConversationEntrySerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsConversationEntry> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsConversationEntry")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsConversationEntry) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsConversationEntry.ApplicationEntry -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsApplicationEntry.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#applicationEntry")
+                })
+            }
+            is BlueCatbirdChatDefsConversationEntry.CommitEntry -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsCommitEntry.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#commitEntry")
+                })
+            }
+            is BlueCatbirdChatDefsConversationEntry.PolicyEntry -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsPolicyEntry.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#policyEntry")
+                })
+            }
+            is BlueCatbirdChatDefsConversationEntry.MetadataEntry -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsMetadataEntry.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#metadataEntry")
+                })
+            }
+            is BlueCatbirdChatDefsConversationEntry.CreationEntry -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsCreationEntry.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#creationEntry")
+                })
+            }
+            is BlueCatbirdChatDefsConversationEntry.ParticipantAcceptanceEntry -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsParticipantAcceptanceEntry.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#participantAcceptanceEntry")
+                })
+            }
+            is BlueCatbirdChatDefsConversationEntry.ConversationCloseEntry -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCloseEntry.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationCloseEntry")
+                })
+            }
+            is BlueCatbirdChatDefsConversationEntry.ResetRequestEntry -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsResetRequestEntry.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#resetRequestEntry")
+                })
+            }
+            is BlueCatbirdChatDefsConversationEntry.ResetActivationEntry -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsResetActivationEntry.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#resetActivationEntry")
+                })
+            }
+            is BlueCatbirdChatDefsConversationEntry.LeafRecoveryFulfillmentEntry -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryFulfillmentEntry.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leafRecoveryFulfillmentEntry")
+                })
+            }
+            is BlueCatbirdChatDefsConversationEntry.LeaveRequestEntry -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveRequestEntry.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveRequestEntry")
+                })
+            }
+            is BlueCatbirdChatDefsConversationEntry.ZeroLeafLeaveEntry -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsZeroLeafLeaveEntry.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#zeroLeafLeaveEntry")
+                })
+            }
+            is BlueCatbirdChatDefsConversationEntry.LeaveCancellationEntry -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveCancellationEntry.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveCancellationEntry")
+                })
+            }
+            is BlueCatbirdChatDefsConversationEntry.LeaveCommitFulfillmentEntry -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveCommitFulfillmentEntry.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveCommitFulfillmentEntry")
+                })
+            }
+            is BlueCatbirdChatDefsConversationEntry.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsConversationEntry {
+        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element.jsonObject
+        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+
+        return when (type) {
+            "blue.catbird.chat.defs#applicationEntry" -> BlueCatbirdChatDefsConversationEntry.ApplicationEntry(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsApplicationEntry.serializer(), element)
+            )
+            "blue.catbird.chat.defs#commitEntry" -> BlueCatbirdChatDefsConversationEntry.CommitEntry(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsCommitEntry.serializer(), element)
+            )
+            "blue.catbird.chat.defs#policyEntry" -> BlueCatbirdChatDefsConversationEntry.PolicyEntry(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsPolicyEntry.serializer(), element)
+            )
+            "blue.catbird.chat.defs#metadataEntry" -> BlueCatbirdChatDefsConversationEntry.MetadataEntry(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsMetadataEntry.serializer(), element)
+            )
+            "blue.catbird.chat.defs#creationEntry" -> BlueCatbirdChatDefsConversationEntry.CreationEntry(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsCreationEntry.serializer(), element)
+            )
+            "blue.catbird.chat.defs#participantAcceptanceEntry" -> BlueCatbirdChatDefsConversationEntry.ParticipantAcceptanceEntry(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsParticipantAcceptanceEntry.serializer(), element)
+            )
+            "blue.catbird.chat.defs#conversationCloseEntry" -> BlueCatbirdChatDefsConversationEntry.ConversationCloseEntry(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCloseEntry.serializer(), element)
+            )
+            "blue.catbird.chat.defs#resetRequestEntry" -> BlueCatbirdChatDefsConversationEntry.ResetRequestEntry(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsResetRequestEntry.serializer(), element)
+            )
+            "blue.catbird.chat.defs#resetActivationEntry" -> BlueCatbirdChatDefsConversationEntry.ResetActivationEntry(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsResetActivationEntry.serializer(), element)
+            )
+            "blue.catbird.chat.defs#leafRecoveryFulfillmentEntry" -> BlueCatbirdChatDefsConversationEntry.LeafRecoveryFulfillmentEntry(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryFulfillmentEntry.serializer(), element)
+            )
+            "blue.catbird.chat.defs#leaveRequestEntry" -> BlueCatbirdChatDefsConversationEntry.LeaveRequestEntry(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveRequestEntry.serializer(), element)
+            )
+            "blue.catbird.chat.defs#zeroLeafLeaveEntry" -> BlueCatbirdChatDefsConversationEntry.ZeroLeafLeaveEntry(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsZeroLeafLeaveEntry.serializer(), element)
+            )
+            "blue.catbird.chat.defs#leaveCancellationEntry" -> BlueCatbirdChatDefsConversationEntry.LeaveCancellationEntry(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveCancellationEntry.serializer(), element)
+            )
+            "blue.catbird.chat.defs#leaveCommitFulfillmentEntry" -> BlueCatbirdChatDefsConversationEntry.LeaveCommitFulfillmentEntry(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveCommitFulfillmentEntry.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsConversationEntry.Unexpected(element)
+        }
+    }
+}
+
+@Serializable(with = BlueCatbirdChatDefsProtocolEventPayloadSerializer::class)
+sealed interface BlueCatbirdChatDefsProtocolEventPayload {
+    @Serializable
+    data class ConversationChangedEvent(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationChangedEvent) : BlueCatbirdChatDefsProtocolEventPayload
+
+    @Serializable
+    data class ConversationClosedEvent(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationClosedEvent) : BlueCatbirdChatDefsProtocolEventPayload
+
+    @Serializable
+    data class MessageAvailableEvent(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsMessageAvailableEvent) : BlueCatbirdChatDefsProtocolEventPayload
+
+    @Serializable
+    data class WelcomeAvailableEvent(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeAvailableEvent) : BlueCatbirdChatDefsProtocolEventPayload
+
+    @Serializable
+    data class WelcomeDispositionEvent(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeDispositionEvent) : BlueCatbirdChatDefsProtocolEventPayload
+
+    @Serializable
+    data class ResetRequestedEvent(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsResetRequestedEvent) : BlueCatbirdChatDefsProtocolEventPayload
+
+    @Serializable
+    data class LeafRecoveryEvent(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryEvent) : BlueCatbirdChatDefsProtocolEventPayload
+
+    @Serializable
+    data class LeaveRequestEvent(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveRequestEvent) : BlueCatbirdChatDefsProtocolEventPayload
+
+    @Serializable
+    data class AccessEndedEvent(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsAccessEndedEvent) : BlueCatbirdChatDefsProtocolEventPayload
+
+    @Serializable
+    data class WatermarkEvent(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsWatermarkEvent) : BlueCatbirdChatDefsProtocolEventPayload
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsProtocolEventPayload
+}
+
+object BlueCatbirdChatDefsProtocolEventPayloadSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsProtocolEventPayload> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsProtocolEventPayload")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsProtocolEventPayload) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsProtocolEventPayload.ConversationChangedEvent -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationChangedEvent.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationChangedEvent")
+                })
+            }
+            is BlueCatbirdChatDefsProtocolEventPayload.ConversationClosedEvent -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationClosedEvent.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationClosedEvent")
+                })
+            }
+            is BlueCatbirdChatDefsProtocolEventPayload.MessageAvailableEvent -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsMessageAvailableEvent.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#messageAvailableEvent")
+                })
+            }
+            is BlueCatbirdChatDefsProtocolEventPayload.WelcomeAvailableEvent -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeAvailableEvent.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#welcomeAvailableEvent")
+                })
+            }
+            is BlueCatbirdChatDefsProtocolEventPayload.WelcomeDispositionEvent -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeDispositionEvent.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#welcomeDispositionEvent")
+                })
+            }
+            is BlueCatbirdChatDefsProtocolEventPayload.ResetRequestedEvent -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsResetRequestedEvent.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#resetRequestedEvent")
+                })
+            }
+            is BlueCatbirdChatDefsProtocolEventPayload.LeafRecoveryEvent -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryEvent.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leafRecoveryEvent")
+                })
+            }
+            is BlueCatbirdChatDefsProtocolEventPayload.LeaveRequestEvent -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveRequestEvent.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveRequestEvent")
+                })
+            }
+            is BlueCatbirdChatDefsProtocolEventPayload.AccessEndedEvent -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsAccessEndedEvent.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#accessEndedEvent")
+                })
+            }
+            is BlueCatbirdChatDefsProtocolEventPayload.WatermarkEvent -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsWatermarkEvent.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#watermarkEvent")
+                })
+            }
+            is BlueCatbirdChatDefsProtocolEventPayload.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsProtocolEventPayload {
+        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element.jsonObject
+        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+
+        return when (type) {
+            "blue.catbird.chat.defs#conversationChangedEvent" -> BlueCatbirdChatDefsProtocolEventPayload.ConversationChangedEvent(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationChangedEvent.serializer(), element)
+            )
+            "blue.catbird.chat.defs#conversationClosedEvent" -> BlueCatbirdChatDefsProtocolEventPayload.ConversationClosedEvent(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationClosedEvent.serializer(), element)
+            )
+            "blue.catbird.chat.defs#messageAvailableEvent" -> BlueCatbirdChatDefsProtocolEventPayload.MessageAvailableEvent(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsMessageAvailableEvent.serializer(), element)
+            )
+            "blue.catbird.chat.defs#welcomeAvailableEvent" -> BlueCatbirdChatDefsProtocolEventPayload.WelcomeAvailableEvent(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeAvailableEvent.serializer(), element)
+            )
+            "blue.catbird.chat.defs#welcomeDispositionEvent" -> BlueCatbirdChatDefsProtocolEventPayload.WelcomeDispositionEvent(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeDispositionEvent.serializer(), element)
+            )
+            "blue.catbird.chat.defs#resetRequestedEvent" -> BlueCatbirdChatDefsProtocolEventPayload.ResetRequestedEvent(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsResetRequestedEvent.serializer(), element)
+            )
+            "blue.catbird.chat.defs#leafRecoveryEvent" -> BlueCatbirdChatDefsProtocolEventPayload.LeafRecoveryEvent(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryEvent.serializer(), element)
+            )
+            "blue.catbird.chat.defs#leaveRequestEvent" -> BlueCatbirdChatDefsProtocolEventPayload.LeaveRequestEvent(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveRequestEvent.serializer(), element)
+            )
+            "blue.catbird.chat.defs#accessEndedEvent" -> BlueCatbirdChatDefsProtocolEventPayload.AccessEndedEvent(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsAccessEndedEvent.serializer(), element)
+            )
+            "blue.catbird.chat.defs#watermarkEvent" -> BlueCatbirdChatDefsProtocolEventPayload.WatermarkEvent(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsWatermarkEvent.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsProtocolEventPayload.Unexpected(element)
+        }
+    }
+}
+
+@Serializable(with = BlueCatbirdChatDefsSubscriptionMessageSerializer::class)
+sealed interface BlueCatbirdChatDefsSubscriptionMessage {
+    @Serializable
+    data class EventEnvelope(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsEventEnvelope) : BlueCatbirdChatDefsSubscriptionMessage
+
+    @Serializable
+    data class TypingEvent(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsTypingEvent) : BlueCatbirdChatDefsSubscriptionMessage
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsSubscriptionMessage
+}
+
+object BlueCatbirdChatDefsSubscriptionMessageSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsSubscriptionMessage> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSubscriptionMessage")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSubscriptionMessage) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsSubscriptionMessage.EventEnvelope -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsEventEnvelope.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#eventEnvelope")
+                })
+            }
+            is BlueCatbirdChatDefsSubscriptionMessage.TypingEvent -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsTypingEvent.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#typingEvent")
+                })
+            }
+            is BlueCatbirdChatDefsSubscriptionMessage.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSubscriptionMessage {
+        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element.jsonObject
+        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+
+        return when (type) {
+            "blue.catbird.chat.defs#eventEnvelope" -> BlueCatbirdChatDefsSubscriptionMessage.EventEnvelope(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsEventEnvelope.serializer(), element)
+            )
+            "blue.catbird.chat.defs#typingEvent" -> BlueCatbirdChatDefsSubscriptionMessage.TypingEvent(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsTypingEvent.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsSubscriptionMessage.Unexpected(element)
         }
     }
 }
@@ -1471,6 +2745,31 @@ enum class BlueCatbirdChatDefsResetRequestViewStatus {
     @SerialName("expired")
     value_expired}
 
+    /**
+     * Exact UTC grammar YYYY-MM-DDTHH:MM:SS.sssZ; offsets, lowercase, leap seconds, and variable fractions are invalid.
+     */
+    typealias BlueCatbirdChatDefsCanonicalDatetime = ATProtocolDate
+
+    /**
+     * Canonical lowercase hyphenated UUIDv4 with RFC 4122 variant.
+     */
+    typealias BlueCatbirdChatDefsDeviceId = String
+
+    /**
+     * Canonical lowercase hyphenated UUIDv4 for every client-generated conversation, transition, reset, recovery, Welcome, message, blob, and idempotency identifier.
+     */
+    typealias BlueCatbirdChatDefsOperationId = String
+
+    /**
+     * Production ATProto bare DID only: did:plc followed by exactly 24 lowercase base32 [a-z2-7] characters, or hostname-level did:web followed by a normalized lowercase handle-shaped ASCII hostname of 1-253 bytes with at least two dot-separated labels, each 1-63 bytes, alphanumeric endpoints, and a nonnumeric-leading TLD. Production rejects TLDs alt, arpa, example, internal, invalid, local, localhost, onion, and test. did:web path DIDs, ports, percent escapes, IP literals, single-label names including localhost, trailing dots, queries, fragments, Unicode hostnames, and other methods are forbidden. The exact semantic length is 12-261 bytes; actorDid#deviceId BasicCredential identity is 49-298 bytes. Equality with token DID, BasicCredential identity, signer, roster, and ordering uses exact UTF-8 bytes.
+     */
+    typealias BlueCatbirdChatDefsBareDid = DID
+
+    /**
+     * Base64url without padding SHA-256 thumbprint of the exact raw 32-byte Ed25519 public key.
+     */
+    typealias BlueCatbirdChatDefsKeyId = String
+
     @Serializable
     data class BlueCatbirdChatDefsConversationCoordinates(
         @SerialName("conversationId")
@@ -1535,6 +2834,8 @@ enum class BlueCatbirdChatDefsResetRequestViewStatus {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsMlsAadPriorContext"
         }
     }
+
+    typealias BlueCatbirdChatDefsArtifactHash = Bytes
 
     /**
      * Exactly one MLS 1.0 MLSMessage wire-format 5 wrapper. KeyPackageRef is RefHash over the exact inner KeyPackage TLS bytes, never the wrapper or a plain SHA-256.
@@ -2228,6 +3529,11 @@ enum class BlueCatbirdChatDefsResetRequestViewStatus {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsApplicationSendBody"
         }
     }
+
+    /**
+     * Exact 16 UUID bytes corresponding to the canonical outer UUIDv4 text.
+     */
+    typealias BlueCatbirdChatDefsIdentifierBytes = Bytes
 
     /**
      * Both fields identify one exact earlier original message-body entry in the same conversation and inside the reducer's application interval. A reaction, edit, tombstone, readState, or other mutation is never a target. Reducers never fetch outside the interval. An unavailable reply becomes a stub; unavailable reaction/edit/tombstone becomes an UnavailableTarget no-op/rejection while seq still advances.
