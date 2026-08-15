@@ -2743,7 +2743,9 @@ enum class BlueCatbirdChatDefsResetRequestViewStatus {
     @SerialName("consumed")
     value_consumed,
     @SerialName("expired")
-    value_expired}
+    value_expired,
+    @SerialName("revoked")
+    value_revoked}
 
     /**
      * Exact UTC grammar YYYY-MM-DDTHH:MM:SS.sssZ; offsets, lowercase, leap seconds, and variable fractions are invalid.

@@ -21368,6 +21368,7 @@ public enum BlueCatbirdChatDefs {
         case value_stale = "stale"
         case value_consumed = "consumed"
         case value_expired = "expired"
+        case value_revoked = "revoked"
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let otherValue = other as? ResetRequestViewStatus else { return false }
