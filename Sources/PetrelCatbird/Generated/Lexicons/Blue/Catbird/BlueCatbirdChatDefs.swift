@@ -10587,12 +10587,14 @@ public enum BlueCatbirdChatDefs {
         public let prior: ConversationCoordinates
         public let ciphertextSha256: Bytes
         public let ciphertextSize: Int
+        public let mediaType: String
+        public let plaintextSize: Int
         public let purpose: DefsBlobPurpose
         public let idempotencyKey: OperationId
         public let signedAt: CanonicalDatetime
 
         public init(
-            signatureDomain: String, blobId: OperationId, conversationId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, ciphertextSha256: Bytes, ciphertextSize: Int, purpose: DefsBlobPurpose, idempotencyKey: OperationId, signedAt: CanonicalDatetime
+            signatureDomain: String, blobId: OperationId, conversationId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, ciphertextSha256: Bytes, ciphertextSize: Int, mediaType: String, plaintextSize: Int, purpose: DefsBlobPurpose, idempotencyKey: OperationId, signedAt: CanonicalDatetime
         ) {
             self.signatureDomain = signatureDomain
             self.blobId = blobId
@@ -10604,6 +10606,8 @@ public enum BlueCatbirdChatDefs {
             self.prior = prior
             self.ciphertextSha256 = ciphertextSha256
             self.ciphertextSize = ciphertextSize
+            self.mediaType = mediaType
+            self.plaintextSize = plaintextSize
             self.purpose = purpose
             self.idempotencyKey = idempotencyKey
             self.signedAt = signedAt
@@ -10672,6 +10676,18 @@ public enum BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                mediaType = try container.decode(String.self, forKey: .mediaType)
+            } catch {
+                LogManager.logError("Decoding error for required property 'mediaType': \(error)")
+                throw error
+            }
+            do {
+                plaintextSize = try container.decode(Int.self, forKey: .plaintextSize)
+            } catch {
+                LogManager.logError("Decoding error for required property 'plaintextSize': \(error)")
+                throw error
+            }
+            do {
                 purpose = try container.decode(DefsBlobPurpose.self, forKey: .purpose)
             } catch {
                 LogManager.logError("Decoding error for required property 'purpose': \(error)")
@@ -10704,6 +10720,8 @@ public enum BlueCatbirdChatDefs {
             try container.encode(prior, forKey: .prior)
             try container.encode(ciphertextSha256, forKey: .ciphertextSha256)
             try container.encode(ciphertextSize, forKey: .ciphertextSize)
+            try container.encode(mediaType, forKey: .mediaType)
+            try container.encode(plaintextSize, forKey: .plaintextSize)
             try container.encode(purpose, forKey: .purpose)
             try container.encode(idempotencyKey, forKey: .idempotencyKey)
             try container.encode(signedAt, forKey: .signedAt)
@@ -10720,6 +10738,8 @@ public enum BlueCatbirdChatDefs {
             hasher.combine(prior)
             hasher.combine(ciphertextSha256)
             hasher.combine(ciphertextSize)
+            hasher.combine(mediaType)
+            hasher.combine(plaintextSize)
             hasher.combine(purpose)
             hasher.combine(idempotencyKey)
             hasher.combine(signedAt)
@@ -10755,6 +10775,12 @@ public enum BlueCatbirdChatDefs {
                 return false
             }
             if ciphertextSize != other.ciphertextSize {
+                return false
+            }
+            if mediaType != other.mediaType {
+                return false
+            }
+            if plaintextSize != other.plaintextSize {
                 return false
             }
             if purpose != other.purpose {
@@ -10796,6 +10822,10 @@ public enum BlueCatbirdChatDefs {
             map = map.adding(key: "ciphertextSha256", value: ciphertextSha256Value)
             let ciphertextSizeValue = try ciphertextSize.toCBORValue()
             map = map.adding(key: "ciphertextSize", value: ciphertextSizeValue)
+            let mediaTypeValue = try mediaType.toCBORValue()
+            map = map.adding(key: "mediaType", value: mediaTypeValue)
+            let plaintextSizeValue = try plaintextSize.toCBORValue()
+            map = map.adding(key: "plaintextSize", value: plaintextSizeValue)
             let purposeValue = try purpose.toCBORValue()
             map = map.adding(key: "purpose", value: purposeValue)
             let idempotencyKeyValue = try idempotencyKey.toCBORValue()
@@ -10817,6 +10847,8 @@ public enum BlueCatbirdChatDefs {
             case prior
             case ciphertextSha256
             case ciphertextSize
+            case mediaType
+            case plaintextSize
             case purpose
             case idempotencyKey
             case signedAt

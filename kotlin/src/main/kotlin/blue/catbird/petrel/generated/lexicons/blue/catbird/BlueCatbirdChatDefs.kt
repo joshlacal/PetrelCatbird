@@ -4041,7 +4041,9 @@ enum class BlueCatbirdChatDefsResetRequestViewStatus {
         val authGeneration: Int,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("ciphertextSha256")
         val ciphertextSha256: BlueCatbirdChatDefsArtifactHash,        @SerialName("ciphertextSize")
-        val ciphertextSize: Int,        @SerialName("purpose")
+        val ciphertextSize: Int,        @SerialName("mediaType")
+        val mediaType: String,        @SerialName("plaintextSize")
+        val plaintextSize: Int,        @SerialName("purpose")
         val purpose: BlueCatbirdChatDefsDefsBlobPurpose,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
