@@ -37,17 +37,6 @@ public extension ATProtoClient.Blue {
             }
         }
 
-        public var mlsChat: MlsChat {
-            MlsChat(networkService: networkService)
-        }
-
-        public struct MlsChat: Sendable {
-            public let networkService: NetworkService
-            public init(networkService: NetworkService) {
-                self.networkService = networkService
-            }
-        }
-
         public var mlsDS: MlsDS {
             MlsDS(networkService: networkService)
         }
