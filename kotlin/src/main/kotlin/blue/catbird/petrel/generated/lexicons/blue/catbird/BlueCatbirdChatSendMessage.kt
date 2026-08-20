@@ -37,7 +37,6 @@ sealed class BlueCatbirdChatSendMessageError(val name: String, val description: 
         object DeviceRevoked: BlueCatbirdChatSendMessageError("DeviceRevoked", "")
         object IdempotencyConflict: BlueCatbirdChatSendMessageError("IdempotencyConflict", "")
         object InvalidApplicationMessage: BlueCatbirdChatSendMessageError("InvalidApplicationMessage", "")
-        object InvalidDPoP: BlueCatbirdChatSendMessageError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatSendMessageError("InvalidRequest", "")
         object InvalidSignature: BlueCatbirdChatSendMessageError("InvalidSignature", "")
         object NotMember: BlueCatbirdChatSendMessageError("NotMember", "")
@@ -45,6 +44,11 @@ sealed class BlueCatbirdChatSendMessageError(val name: String, val description: 
         object RelationshipPolicyUnavailable: BlueCatbirdChatSendMessageError("RelationshipPolicyUnavailable", "")
         object StaleCoordinates: BlueCatbirdChatSendMessageError("StaleCoordinates", "")
         object UnsupportedMlsProfile: BlueCatbirdChatSendMessageError("UnsupportedMlsProfile", "")
+        object AccountSessionExpired: BlueCatbirdChatSendMessageError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatSendMessageError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatSendMessageError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatSendMessageError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatSendMessageError("RateLimited", "")
     }
 
 /**

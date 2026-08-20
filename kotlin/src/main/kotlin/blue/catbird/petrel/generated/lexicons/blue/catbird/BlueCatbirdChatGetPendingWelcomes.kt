@@ -17,7 +17,8 @@ object BlueCatbirdChatGetPendingWelcomesDefs {
 
 @Serializable
     data class BlueCatbirdChatGetPendingWelcomesParameters(
-        @SerialName("inventorySessionId")
+// Canonical lowercase hyphenated RFC 4122-variant UUIDv4 device ID; strict runtime validation rejects every other spelling, version, or variant.        @SerialName("actorDeviceId")
+        val actorDeviceId: String,        @SerialName("inventorySessionId")
         val inventorySessionId: String,        @SerialName("pageCursor")
         val pageCursor: String? = null,        @SerialName("limit")
         val limit: Int    )
@@ -37,10 +38,14 @@ sealed class BlueCatbirdChatGetPendingWelcomesError(val name: String, val descri
         object CutoverRequired: BlueCatbirdChatGetPendingWelcomesError("CutoverRequired", "")
         object DeviceNotRegistered: BlueCatbirdChatGetPendingWelcomesError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatGetPendingWelcomesError("DeviceRevoked", "")
-        object InvalidDPoP: BlueCatbirdChatGetPendingWelcomesError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatGetPendingWelcomesError("InvalidRequest", "")
         object InventorySessionExpired: BlueCatbirdChatGetPendingWelcomesError("InventorySessionExpired", "")
         object InventorySessionMismatch: BlueCatbirdChatGetPendingWelcomesError("InventorySessionMismatch", "")
+        object AccountSessionExpired: BlueCatbirdChatGetPendingWelcomesError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatGetPendingWelcomesError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatGetPendingWelcomesError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatGetPendingWelcomesError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatGetPendingWelcomesError("RateLimited", "")
     }
 
 /**

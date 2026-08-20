@@ -2,31 +2,39 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.chat.uploadBlob
 
-public enum BlueCatbirdChatUploadBlob {
-    public static let typeIdentifier = "blue.catbird.chat.uploadBlob"
-    public struct Parameters: Parametrizable {
-        public let uploadTicket: String
 
+public struct BlueCatbirdChatUploadBlob { 
+
+    public static let typeIdentifier = "blue.catbird.chat.uploadBlob"    
+public struct Parameters: Parametrizable {
+        public let actorDeviceId: String
+        public let uploadTicket: String
+        
         public init(
+            actorDeviceId: String, 
             uploadTicket: String
-        ) {
+            ) {
+            self.actorDeviceId = actorDeviceId
             self.uploadTicket = uploadTicket
+            
         }
     }
-
-    public struct Input: ATProtocolCodable {
+public struct Input: ATProtocolCodable {
         public let data: Data
 
         /// Standard public initializer
         public init(data: Data) {
             self.data = data
         }
+        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            data = try container.decode(Data.self, forKey: .data)
+            self.data = try container.decode(Data.self, forKey: .data)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -45,104 +53,149 @@ public enum BlueCatbirdChatUploadBlob {
             case data
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let binding: BlueCatbirdChatDefs.UploadedBlobBinding
-
+        
         public let uploadedAt: BlueCatbirdChatDefs.CanonicalDatetime
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             binding: BlueCatbirdChatDefs.UploadedBlobBinding,
-
+            
             uploadedAt: BlueCatbirdChatDefs.CanonicalDatetime
-
+            
+            
         ) {
+            
+            
             self.binding = binding
-
+            
             self.uploadedAt = uploadedAt
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            binding = try container.decode(BlueCatbirdChatDefs.UploadedBlobBinding.self, forKey: .binding)
-
-            uploadedAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .uploadedAt)
+            
+            
+            self.binding = try container.decode(BlueCatbirdChatDefs.UploadedBlobBinding.self, forKey: .binding)
+            
+            
+            
+            
+            self.uploadedAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .uploadedAt)
+            
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(binding, forKey: .binding)
-
+            
+            
             try container.encode(uploadedAt, forKey: .uploadedAt)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let bindingValue = try binding.toCBORValue()
             map = map.adding(key: "binding", value: bindingValue)
-
+            
+            
+            
             let uploadedAtValue = try uploadedAt.toCBORValue()
             map = map.adding(key: "uploadedAt", value: uploadedAtValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case binding
             case uploadedAt
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case blobConflict = "BlobConflict"
+                case blobHashMismatch = "BlobHashMismatch"
+                case blobSizeMismatch = "BlobSizeMismatch"
+                case cutoverRequired = "CutoverRequired"
+                case invalidRequest = "InvalidRequest"
+                case uploadTicketExpired = "UploadTicketExpired"
+                case uploadTicketNotFound = "UploadTicketNotFound"
+                case accountSessionExpired = "AccountSessionExpired"
+                case notAuthorized = "NotAuthorized"
+                case deviceBindingMismatch = "DeviceBindingMismatch"
+                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+                case rateLimited = "RateLimited"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case blobConflict = "BlobConflict"
-        case blobHashMismatch = "BlobHashMismatch"
-        case blobSizeMismatch = "BlobSizeMismatch"
-        case cutoverRequired = "CutoverRequired"
-        case invalidDPoP = "InvalidDPoP"
-        case invalidRequest = "InvalidRequest"
-        case uploadTicketExpired = "UploadTicketExpired"
-        case uploadTicketNotFound = "UploadTicketNotFound"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                return self.rawValue
+            }
         }
 
-        public var errorName: String {
-            return rawValue
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - uploadBlob
 
     /// Consume one opaque upload ticket with exact raw ciphertext bytes. Exact hash/size and ticket owner are enforced; same bytes replay succeeds and any changed bytes conflict. The upload remains immutable and unbound until an accepted message or metadata transition binds it. Its uploadedBlobBinding result reports the prepared attachment or metadata purpose but is upload-result transport only and cannot inhabit either signed projection.
-    ///
+    /// 
     /// - Parameter data: The binary data to upload
     /// - Parameter params: The query parameters for the request
-    ///
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func uploadBlob(
+    public func uploadBlob(
+        
         data: Data,
         params: BlueCatbirdChatUploadBlob.Parameters
-
+        
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatUploadBlob.Output?) {
         let endpoint = "blue.catbird.chat.uploadBlob"
-
+        
         let dataToUpload = data
         var headers: [String: String] = [
             "Content-Type": "application/octet-stream",
-            "Content-Length": "\(dataToUpload.count)",
+            "Content-Length": "\(dataToUpload.count)"
         ]
-
+        
+        
         headers["Accept"] = "application/json"
+        
 
+        
+        
         let queryItems = params.asQueryItems()
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -157,10 +210,12 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
+        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -168,11 +223,13 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatUploadBlob.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -188,9 +245,13 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-
+            
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+        
     }
+    
 }
+                           
+

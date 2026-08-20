@@ -31,11 +31,14 @@ sealed class BlueCatbirdChatCancelLeafRecoveryError(val name: String, val descri
         object DeviceNotRegistered: BlueCatbirdChatCancelLeafRecoveryError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatCancelLeafRecoveryError("DeviceRevoked", "")
         object IdempotencyConflict: BlueCatbirdChatCancelLeafRecoveryError("IdempotencyConflict", "")
-        object InvalidDPoP: BlueCatbirdChatCancelLeafRecoveryError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatCancelLeafRecoveryError("InvalidRequest", "")
         object InvalidSignature: BlueCatbirdChatCancelLeafRecoveryError("InvalidSignature", "")
         object LeafRecoveryNotFound: BlueCatbirdChatCancelLeafRecoveryError("LeafRecoveryNotFound", "")
         object NotAuthorized: BlueCatbirdChatCancelLeafRecoveryError("NotAuthorized", "")
+        object AccountSessionExpired: BlueCatbirdChatCancelLeafRecoveryError("AccountSessionExpired", "")
+        object DeviceBindingMismatch: BlueCatbirdChatCancelLeafRecoveryError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatCancelLeafRecoveryError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatCancelLeafRecoveryError("RateLimited", "")
     }
 
 /**

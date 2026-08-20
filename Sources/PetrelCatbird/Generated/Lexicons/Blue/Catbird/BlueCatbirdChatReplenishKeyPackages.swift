@@ -2,21 +2,26 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.chat.replenishKeyPackages
 
-public enum BlueCatbirdChatReplenishKeyPackages {
+
+public struct BlueCatbirdChatReplenishKeyPackages { 
+
     public static let typeIdentifier = "blue.catbird.chat.replenishKeyPackages"
-    public struct Input: ATProtocolCodable {
+public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedKeyPackageReplenishment
 
         /// Standard public initializer
         public init(signedRequest: BlueCatbirdChatDefs.SignedKeyPackageReplenishment) {
             self.signedRequest = signedRequest
         }
+        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedKeyPackageReplenishment.self, forKey: .signedRequest)
+            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedKeyPackageReplenishment.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -35,92 +40,131 @@ public enum BlueCatbirdChatReplenishKeyPackages {
             case signedRequest
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let device: BlueCatbirdChatDefs.DeviceView
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             device: BlueCatbirdChatDefs.DeviceView
-
+            
+            
         ) {
+            
+            
             self.device = device
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            device = try container.decode(BlueCatbirdChatDefs.DeviceView.self, forKey: .device)
+            
+            
+            self.device = try container.decode(BlueCatbirdChatDefs.DeviceView.self, forKey: .device)
+            
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(device, forKey: .device)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let deviceValue = try device.toCBORValue()
             map = map.adding(key: "device", value: deviceValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case device
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case authenticationGenerationConflict = "AuthenticationGenerationConflict"
+                case cutoverRequired = "CutoverRequired"
+                case deviceNotRegistered = "DeviceNotRegistered"
+                case deviceRevoked = "DeviceRevoked"
+                case idempotencyConflict = "IdempotencyConflict"
+                case invalidKeyPackage = "InvalidKeyPackage"
+                case invalidRequest = "InvalidRequest"
+                case invalidSignature = "InvalidSignature"
+                case keyPackageInventoryLimitReached = "KeyPackageInventoryLimitReached"
+                case notAuthorized = "NotAuthorized"
+                case accountSessionExpired = "AccountSessionExpired"
+                case deviceBindingMismatch = "DeviceBindingMismatch"
+                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+                case rateLimited = "RateLimited"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case authenticationGenerationConflict = "AuthenticationGenerationConflict"
-        case cutoverRequired = "CutoverRequired"
-        case deviceNotRegistered = "DeviceNotRegistered"
-        case deviceRevoked = "DeviceRevoked"
-        case idempotencyConflict = "IdempotencyConflict"
-        case invalidDPoP = "InvalidDPoP"
-        case invalidKeyPackage = "InvalidKeyPackage"
-        case invalidRequest = "InvalidRequest"
-        case invalidSignature = "InvalidSignature"
-        case keyPackageInventoryLimitReached = "KeyPackageInventoryLimitReached"
-        case notAuthorized = "NotAuthorized"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                return self.rawValue
+            }
         }
 
-        public var errorName: String {
-            return rawValue
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - replenishKeyPackages
 
-    // Publish a whole-or-nothing batch for the exact active device binding. Stored immutable key, submitted key/keyId, auth generation, signed JKT, token claims, and DPoP proof are rechecked under the mutation lock; package-only replenishment does not change auth generation.
-    //
-    // - Parameter input: The input parameters for the request
-
-    ///
+    /// Publish a whole-or-nothing package batch for the exact active device. The authenticated account, stored immutable key, submitted keyId, auth generation, canonical Ed25519 signature, and package credentials are rechecked under the mutation lock; replenishment does not change auth generation.
+    /// 
+    /// - Parameter input: The input parameters for the request
+    
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func replenishKeyPackages(
+    public func replenishKeyPackages(
+        
         input: BlueCatbirdChatReplenishKeyPackages.Input
-
+        
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatReplenishKeyPackages.Output?) {
         let endpoint = "blue.catbird.chat.replenishKeyPackages"
-
+        
         var headers: [String: String] = [:]
-
+        
         headers["Content-Type"] = "application/json"
-
+        
+        
+        
         headers["Accept"] = "application/json"
+        
 
+        
         let requestData: Data? = try JSONEncoder().encode(input)
-
+        
+        
         let queryItems: [URLQueryItem]? = nil
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -135,10 +179,12 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
+        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -146,11 +192,13 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatReplenishKeyPackages.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -166,9 +214,13 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-
+            
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+        
     }
+    
 }
+                           
+

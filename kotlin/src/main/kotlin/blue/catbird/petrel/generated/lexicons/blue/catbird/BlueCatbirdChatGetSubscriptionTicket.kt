@@ -1,5 +1,5 @@
 // Lexicon: 1, ID: blue.catbird.chat.getSubscriptionTicket
-// After conversations, pending Welcomes, and recovery inbox have all reached hasMore=false for one inventorySession, a fresh DPoP-authenticated call atomically marks that barrier complete and mints a one-use short-lived ticket. The ticket binds effective DID, device, JKT, authGeneration, inventorySessionId, exact event cursor, and subscription path. The first durable envelope's previousCursor equals that cursor.
+// After conversations, pending Welcomes, and recovery inbox have all reached hasMore=false for one inventorySession, a service-authenticated call atomically marks that barrier complete and mints a one-use short-lived ticket. The ticket binds the authenticated DID, actorDeviceId, authGeneration, inventorySessionId, exact event cursor, and subscription path. The first durable envelope's previousCursor equals that cursor.
 package blue.catbird.petrel.generated
 
 import kotlinx.serialization.*
@@ -17,7 +17,8 @@ object BlueCatbirdChatGetSubscriptionTicketDefs {
 
 @Serializable
     data class BlueCatbirdChatGetSubscriptionTicketInput(
-        @SerialName("inventorySessionId")
+// Canonical lowercase hyphenated RFC 4122-variant UUIDv4 device ID; strict runtime validation rejects every other spelling, version, or variant.        @SerialName("actorDeviceId")
+        val actorDeviceId: String,        @SerialName("inventorySessionId")
         val inventorySessionId: String,        @SerialName("eventCursor")
         val eventCursor: String    )
 
@@ -33,15 +34,19 @@ sealed class BlueCatbirdChatGetSubscriptionTicketError(val name: String, val des
         object CutoverRequired: BlueCatbirdChatGetSubscriptionTicketError("CutoverRequired", "")
         object DeviceNotRegistered: BlueCatbirdChatGetSubscriptionTicketError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatGetSubscriptionTicketError("DeviceRevoked", "")
-        object InvalidDPoP: BlueCatbirdChatGetSubscriptionTicketError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatGetSubscriptionTicketError("InvalidRequest", "")
         object InventoryIncomplete: BlueCatbirdChatGetSubscriptionTicketError("InventoryIncomplete", "")
         object InventorySessionExpired: BlueCatbirdChatGetSubscriptionTicketError("InventorySessionExpired", "")
         object InventorySessionMismatch: BlueCatbirdChatGetSubscriptionTicketError("InventorySessionMismatch", "")
+        object AccountSessionExpired: BlueCatbirdChatGetSubscriptionTicketError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatGetSubscriptionTicketError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatGetSubscriptionTicketError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatGetSubscriptionTicketError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatGetSubscriptionTicketError("RateLimited", "")
     }
 
 /**
- * After conversations, pending Welcomes, and recovery inbox have all reached hasMore=false for one inventorySession, a fresh DPoP-authenticated call atomically marks that barrier complete and mints a one-use short-lived ticket. The ticket binds effective DID, device, JKT, authGeneration, inventorySessionId, exact event cursor, and subscription path. The first durable envelope's previousCursor equals that cursor.
+ * After conversations, pending Welcomes, and recovery inbox have all reached hasMore=false for one inventorySession, a service-authenticated call atomically marks that barrier complete and mints a one-use short-lived ticket. The ticket binds the authenticated DID, actorDeviceId, authGeneration, inventorySessionId, exact event cursor, and subscription path. The first durable envelope's previousCursor equals that cursor.
  *
  * Endpoint: blue.catbird.chat.getSubscriptionTicket
  */

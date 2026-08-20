@@ -36,7 +36,6 @@ sealed class BlueCatbirdChatAcceptConversationError(val name: String, val descri
         object DeviceRevoked: BlueCatbirdChatAcceptConversationError("DeviceRevoked", "")
         object GroupInvitesDisabled: BlueCatbirdChatAcceptConversationError("GroupInvitesDisabled", "")
         object IdempotencyConflict: BlueCatbirdChatAcceptConversationError("IdempotencyConflict", "")
-        object InvalidDPoP: BlueCatbirdChatAcceptConversationError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatAcceptConversationError("InvalidRequest", "")
         object InvalidSignature: BlueCatbirdChatAcceptConversationError("InvalidSignature", "")
         object InvitationNotFound: BlueCatbirdChatAcceptConversationError("InvitationNotFound", "")
@@ -48,6 +47,11 @@ sealed class BlueCatbirdChatAcceptConversationError(val name: String, val descri
         object NotParticipant: BlueCatbirdChatAcceptConversationError("NotParticipant", "")
         object RelationshipPolicyUnavailable: BlueCatbirdChatAcceptConversationError("RelationshipPolicyUnavailable", "")
         object StaleCoordinates: BlueCatbirdChatAcceptConversationError("StaleCoordinates", "")
+        object AccountSessionExpired: BlueCatbirdChatAcceptConversationError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatAcceptConversationError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatAcceptConversationError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatAcceptConversationError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatAcceptConversationError("RateLimited", "")
     }
 
 /**

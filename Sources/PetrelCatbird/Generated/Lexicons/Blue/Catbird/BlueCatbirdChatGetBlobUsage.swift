@@ -2,80 +2,128 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.chat.getBlobUsage
 
-public enum BlueCatbirdChatGetBlobUsage {
-    public static let typeIdentifier = "blue.catbird.chat.getBlobUsage"
-    public struct Parameters: Parametrizable {
-        public init() {}
-    }
 
-    public struct Output: ATProtocolCodable {
-        public let usage: BlueCatbirdChatDefs.BlobUsageView
+public struct BlueCatbirdChatGetBlobUsage { 
 
-        /// Standard public initializer
+    public static let typeIdentifier = "blue.catbird.chat.getBlobUsage"    
+public struct Parameters: Parametrizable {
+        public let actorDeviceId: String
+        
         public init(
+            actorDeviceId: String
+            ) {
+            self.actorDeviceId = actorDeviceId
+            
+        }
+    }
+    
+public struct Output: ATProtocolCodable {
+        
+        
+        public let usage: BlueCatbirdChatDefs.BlobUsageView
+        
+        
+        
+        // Standard public initializer
+        public init(
+            
+            
             usage: BlueCatbirdChatDefs.BlobUsageView
-
+            
+            
         ) {
+            
+            
             self.usage = usage
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            usage = try container.decode(BlueCatbirdChatDefs.BlobUsageView.self, forKey: .usage)
+            
+            
+            self.usage = try container.decode(BlueCatbirdChatDefs.BlobUsageView.self, forKey: .usage)
+            
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(usage, forKey: .usage)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let usageValue = try usage.toCBORValue()
             map = map.adding(key: "usage", value: usageValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case usage
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case cutoverRequired = "CutoverRequired"
+                case deviceNotRegistered = "DeviceNotRegistered"
+                case deviceRevoked = "DeviceRevoked"
+                case accountSessionExpired = "AccountSessionExpired"
+                case notAuthorized = "NotAuthorized"
+                case deviceBindingMismatch = "DeviceBindingMismatch"
+                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+                case rateLimited = "RateLimited"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case cutoverRequired = "CutoverRequired"
-        case deviceNotRegistered = "DeviceNotRegistered"
-        case deviceRevoked = "DeviceRevoked"
-        case invalidDPoP = "InvalidDPoP"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                return self.rawValue
+            }
         }
 
-        public var errorName: String {
-            return rawValue
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+
+
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - getBlobUsage
 
     /// Return auth-derived aggregate opaque-blob usage and reserved quota for the verified bare DID; no caller-selected principal is accepted.
-    ///
+    /// 
     /// - Parameter input: The input parameters for the request
-    ///
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getBlobUsage(input: BlueCatbirdChatGetBlobUsage.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetBlobUsage.Output?) {
+    public func getBlobUsage(input: BlueCatbirdChatGetBlobUsage.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetBlobUsage.Output?) {
         let endpoint = "blue.catbird.chat.getBlobUsage"
 
+        
         let queryItems = input.asQueryItems()
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -93,7 +141,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -101,6 +150,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
                 let decoder = JSONDecoder()
@@ -121,10 +171,12 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-
+            
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
+                           
+

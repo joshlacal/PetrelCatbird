@@ -1,5 +1,5 @@
 {
-  "originHash" : "71c21b8852f98dc97c6a5f9f8e8154834df62cdde1fc72cc8d6837154cb10e10",
+  "originHash" : "be2eda9966bb3545f5242c146d18565ebbf3da769e909e0394b65dfd3b59c5b8",
   "pins" : [
     {
       "identity" : "cryptoswift",
@@ -17,15 +17,6 @@
       "state" : {
         "revision" : "b7d3ef55660fefd045641293bc95d4cdc07a15d8",
         "version" : "6.0.4"
-      }
-    },
-    {
-      "identity" : "petrel",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/joshlacal/Petrel.git",
-      "state" : {
-        "revision" : "c6554b0c777e629dcf9f5a7f2d0c602c6faa606a",
-        "version" : "1.0.7"
       }
     },
     {
@@ -60,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-certificates.git",
       "state" : {
-        "revision" : "89fbc3714264cce8db8e4ec51b64e01c3e28c6c5",
-        "version" : "1.19.3"
+        "revision" : "449dbbecd0f31e82b510ada227ca152caa8b5e98",
+        "version" : "1.19.4"
       }
     },
     {
@@ -78,8 +69,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "a878e7f8f46cfc0e1125e565b5c08e7d5272dc9a",
-        "version" : "1.14.0"
+        "revision" : "3ffafb9722d5d918c614feb496c8789a3b59d222",
+        "version" : "1.15.0"
       }
     },
     {

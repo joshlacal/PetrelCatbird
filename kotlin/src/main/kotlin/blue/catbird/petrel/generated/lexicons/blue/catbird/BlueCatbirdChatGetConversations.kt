@@ -17,7 +17,8 @@ object BlueCatbirdChatGetConversationsDefs {
 
 @Serializable
     data class BlueCatbirdChatGetConversationsParameters(
-        @SerialName("pageCursor")
+// Canonical lowercase hyphenated RFC 4122-variant UUIDv4 device ID; strict runtime validation rejects every other spelling, version, or variant.        @SerialName("actorDeviceId")
+        val actorDeviceId: String,        @SerialName("pageCursor")
         val pageCursor: String? = null,        @SerialName("limit")
         val limit: Int    )
 
@@ -36,8 +37,12 @@ sealed class BlueCatbirdChatGetConversationsError(val name: String, val descript
         object CutoverRequired: BlueCatbirdChatGetConversationsError("CutoverRequired", "")
         object DeviceNotRegistered: BlueCatbirdChatGetConversationsError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatGetConversationsError("DeviceRevoked", "")
-        object InvalidDPoP: BlueCatbirdChatGetConversationsError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatGetConversationsError("InvalidRequest", "")
+        object AccountSessionExpired: BlueCatbirdChatGetConversationsError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatGetConversationsError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatGetConversationsError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatGetConversationsError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatGetConversationsError("RateLimited", "")
     }
 
 /**

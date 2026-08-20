@@ -32,12 +32,16 @@ sealed class BlueCatbirdChatRequestResetError(val name: String, val description:
         object DeviceNotRegistered: BlueCatbirdChatRequestResetError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatRequestResetError("DeviceRevoked", "")
         object IdempotencyConflict: BlueCatbirdChatRequestResetError("IdempotencyConflict", "")
-        object InvalidDPoP: BlueCatbirdChatRequestResetError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatRequestResetError("InvalidRequest", "")
         object InvalidSignature: BlueCatbirdChatRequestResetError("InvalidSignature", "")
         object NotMember: BlueCatbirdChatRequestResetError("NotMember", "")
         object ResetAlreadyPending: BlueCatbirdChatRequestResetError("ResetAlreadyPending", "")
         object StaleCoordinates: BlueCatbirdChatRequestResetError("StaleCoordinates", "")
+        object AccountSessionExpired: BlueCatbirdChatRequestResetError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatRequestResetError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatRequestResetError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatRequestResetError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatRequestResetError("RateLimited", "")
     }
 
 /**

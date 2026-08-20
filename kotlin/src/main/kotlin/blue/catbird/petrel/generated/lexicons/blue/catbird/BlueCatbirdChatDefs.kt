@@ -1,5 +1,5 @@
 // Lexicon: 1, ID: blue.catbird.chat.defs
-// Closed clean-cutover protocol types. Runtime validators reject duplicate keys, null, unknown fields, unknown union tags, noncanonical identifiers/timestamps/order, and all size/depth/count overflow before DTO deserialization. For each request the server captures one trusted instant T. First execution of every signed mutation requires canonical signedAt in [T-300 seconds,T+60 seconds] and otherwise returns InvalidRequest; only an exact already-completed idempotent replay with the identical stored transcript digest and separate 64-byte signature may bypass signedAt age, and it still requires fresh valid DPoP/JTI. The canonical request digest is raw 32-byte SHA-256 of the exact domain-prefixed canonical Ed25519 signing transcript, never raw JSON, generated DTO bytes, or a signature-containing wrapper. Idempotency identity is endpoint NSID plus authenticated principal plus signed idempotencyKey, except sendMessage uses messageId; exact digest and exact signature must both match or the request conflicts. Durable pending-work expiry derives from server receivedAt, never signedAt; typing TTL and every server timestamp derive from T. Nest is the trusted token exchanger/gateway and sends only issuer-signed clean JWTs of at most 120 seconds using Authorization DPoP. Exact required claims are iss, sub, aud, lxm, iat, exp, jti, cnf.jkt, device_id, and chat_instance. Token/grant jti, device_id, and chat_instance are canonical lowercase UUIDv4 strings; token/grant jti is consumed once in the configured issuer token namespace. Proof jti is canonical base64url without padding decoding to 12-32 bytes and replay uniqueness is exactly (JKT,decoded jti bytes) in a separate namespace; htu and htm remain validated audit claims and never widen that key. Token cnf.jkt, proof RFC7638 JKT, and signed-body or stored JKT must match, except rebind bootstrap authenticates signed newDpopJkt and the immutable stored Ed25519 key before CAS. First enrollment additionally requires a one-use fresh-auth grant from an enrollment-purpose-bound OAuth authorization_code flow. Nest creates fresh evidence only after successful callback/code exchange and issuer, subject, scope, and DPoP validation; restore, refresh, cookie exchange, or an existing session alone never creates evidence. Callback completion opens one encrypted enrollment capability through auth_time + 300 seconds, and auth_time is Nest callback-completion time, not upstream auth_time. Capability states are unpinned, pinned/pending, and terminal-success. Before pinning, Nest performs strict canonical decode, bounds, and capability/body binding checks and verifies the body's Ed25519 signature under its supplied immutable signing key. A malformed, out-of-bounds, binding-invalid, or signature-invalid attempt neither pins nor burns the capability. The first body that passes all of those checks transitions unpinned to pinned/pending and atomically pins its exact canonical request digest, signature, DID, device ID, DPoP JKT, key ID, signing-key digest, and enrollment-transcript digest. While pinned/pending and Nest has not durably recorded downstream success, including ambiguous response loss after delivery-service commit, the same exact body may mint another downstream grant; each attempt retains original auth_time but gets fresh token/proof JTIs and auth_txn, and delivery-service exact idempotent replay returns its stored result. auth_txn is a server-generated per-grant canonical lowercase UUIDv4 distinct from provider state and client input. Changed body cannot reuse the capability. Once Nest durably records success it stores the terminal result/binding, transitions to terminal-success, and closes the capability; exact client retry is then answered from that Nest-stored terminal result without a new downstream grant. Expiry before terminal success requires a new purpose-bound code flow. prompt=login and an ephemeral browser are best-effort only; neither is a server security predicate, fresh authorization-code completion does not attest credential entry or user presence, and the protocol does not claim user reauthentication. Exact additional grant claims are key_id, signing_key_sha256, enrollment_transcript_sha256, auth_time, and auth_txn. Enrollment grant exp = min(iat + 120, auth_time + 300) using checked NumericDate arithmetic; ordinary tokens require exp <= iat + 120. The delivery service independently accepts the Nest issuer attestation only when 0 <= T-auth_time <= 300 seconds. DPoP htu uses only a configured trusted external base, never Host, Forwarded, or X-Forwarded headers: scheme is https, host is lowercase ASCII/IDNA A-label form with no userinfo or trailing dot, the base has no path/query/fragment, port 443 is omitted, only an explicitly allowed nondefault port is retained, and htu is that base plus exact /xrpc/{NSID} with the request query and fragment excluded.
+// Closed MLS v2 AppView protocol types. Every authenticated XRPC uses standard ATProto inter-service authentication: issuer is the account DID, audience is the exact MLS service reference, lxm is the endpoint NSID, and jti is one-use. Signed mutations additionally bind actor DID, client-generated device UUIDv4, immutable Ed25519 keyId, and authGeneration to the locked active device row. Runtime validators reject duplicate keys, null, unknown fields or union tags, noncanonical identifiers and timestamps, and every size, depth, count, ordering, signature, and generation violation before effects. First execution requires signedAt in [T-300 seconds,T+60 seconds]; exact completed idempotent replay preserves the stored request digest and signature. MLS BasicCredential identity is exactly actorDid#deviceId.
 package blue.catbird.petrel.generated
 
 import kotlinx.serialization.*
@@ -729,55 +729,6 @@ object BlueCatbirdChatDefsSignedKeyPackageReplenishmentBodyUnionSerializer : kot
                 jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsKeyPackageReplenishmentBody.serializer(), element)
             )
             else -> BlueCatbirdChatDefsSignedKeyPackageReplenishmentBodyUnion.Unexpected(element)
-        }
-    }
-}
-
-@Serializable(with = BlueCatbirdChatDefsSignedDeviceAuthenticationRebindBodyUnionSerializer::class)
-sealed interface BlueCatbirdChatDefsSignedDeviceAuthenticationRebindBodyUnion {
-    @Serializable
-    data class DeviceAuthenticationRebindBody(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsDeviceAuthenticationRebindBody) : BlueCatbirdChatDefsSignedDeviceAuthenticationRebindBodyUnion
-
-    @Serializable
-    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsSignedDeviceAuthenticationRebindBodyUnion
-}
-
-object BlueCatbirdChatDefsSignedDeviceAuthenticationRebindBodyUnionSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsSignedDeviceAuthenticationRebindBodyUnion> {
-    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
-        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedDeviceAuthenticationRebindBodyUnion")
-
-    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedDeviceAuthenticationRebindBodyUnion) {
-        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
-        val element = when (value) {
-            is BlueCatbirdChatDefsSignedDeviceAuthenticationRebindBodyUnion.DeviceAuthenticationRebindBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDeviceAuthenticationRebindBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#deviceAuthenticationRebindBody")
-                })
-            }
-            is BlueCatbirdChatDefsSignedDeviceAuthenticationRebindBodyUnion.Unexpected -> value.value
-            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
-            // subscription codegen) are runtime-only sentinels; JSON round-trip
-            // serialises them as an empty object tagged with the variant class
-            // name. Consumers should filter these before JSON serialisation.
-            else -> kotlinx.serialization.json.buildJsonObject {
-                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
-            }
-        }
-        jsonEncoder.encodeJsonElement(element)
-    }
-
-    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedDeviceAuthenticationRebindBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
-        val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
-
-        return when (type) {
-            "blue.catbird.chat.defs#deviceAuthenticationRebindBody" -> BlueCatbirdChatDefsSignedDeviceAuthenticationRebindBodyUnion.DeviceAuthenticationRebindBody(
-                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDeviceAuthenticationRebindBody.serializer(), element)
-            )
-            else -> BlueCatbirdChatDefsSignedDeviceAuthenticationRebindBodyUnion.Unexpected(element)
         }
     }
 }
@@ -2931,8 +2882,7 @@ enum class BlueCatbirdChatDefsResetRequestViewStatus {
         val deviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("signaturePublicKey")
         val signaturePublicKey: Bytes,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("dpopJkt")
-        val dpopJkt: String,        @SerialName("status")
+        val authGeneration: Int,        @SerialName("status")
         val status: BlueCatbirdChatDefsDefsDeviceStatus,        @SerialName("createdAt")
         val createdAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("updatedAt")
         val updatedAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("availablePackageCount")
@@ -3334,7 +3284,7 @@ enum class BlueCatbirdChatDefsResetRequestViewStatus {
     }
 
     /**
-     * First enrollment requires a one-use at-most-120-second Nest fresh-auth grant from an enrollment-purpose-bound OAuth authorization_code flow. Nest creates evidence only after successful callback/code exchange and issuer, subject, scope, and DPoP validation; restore, refresh, cookie exchange, or an existing session alone never creates evidence. Callback completion opens one encrypted capability through auth_time + 300 seconds, with auth_time equal to Nest callback-completion time and not upstream auth_time. Capability states are unpinned, pinned/pending, and terminal-success. Before pinning, Nest performs strict canonical decode, bounds, and capability/body binding checks and verifies the body's Ed25519 signature under its supplied immutable signing key. A malformed, out-of-bounds, binding-invalid, or signature-invalid attempt neither pins nor burns the capability. The first body that passes all of those checks transitions unpinned to pinned/pending and atomically pins the exact canonical request digest, separate signature, DID, device ID, DPoP JKT, key ID, signing-key digest, and enrollment-transcript digest. While pinned/pending and Nest has not durably recorded downstream success, including ambiguous response loss after delivery-service commit, the same exact body may mint another downstream grant. Each such attempt retains original auth_time but gets fresh token/proof JTIs and a server-generated per-grant canonical lowercase UUIDv4 auth_txn distinct from provider state and client input; delivery-service exact idempotent replay returns its stored result. Changed body cannot reuse the capability. Once Nest durably records success it stores the terminal result/binding, transitions to terminal-success, and closes the capability; exact client retry is then answered from that Nest-stored terminal result without a new downstream grant. Expiry before terminal success requires a new code flow. Besides common claims iss, sub, aud, lxm, iat, exp, jti, cnf.jkt, device_id, and chat_instance, exact additional claims are key_id, signing_key_sha256, enrollment_transcript_sha256, auth_time, and auth_txn. Enrollment grant exp = min(iat + 120, auth_time + 300) using checked NumericDate arithmetic; ordinary tokens require exp <= iat + 120. The delivery service independently accepts the Nest issuer attestation only when 0 <= T-auth_time <= 300 seconds. prompt=login and an ephemeral browser are best-effort only; neither is a security predicate, fresh authorization-code completion does not attest credential entry or user presence, and the protocol does not claim user reauthentication. Subject, endpoint, device ID, key ID, SHA-256(signaturePublicKey), dpopJkt through cnf.jkt, and raw SHA-256 of this exact canonical signing transcript must match; grant cnf.jkt, proof RFC7638 JKT, and body dpopJkt are byte-equal before device lookup. A generic bearer/session token is invalid. keyPackages are strictly increasing and duplicate-free by computed raw KeyPackageRef. Every package lifetime is checked against one captured Unix second T: not_before < T < not_after, not_after - T >= 600, and not_after - not_before <= 2595600, with checked arithmetic and underflow rejection. The whole batch is rejected rather than sorted.
+     * First enrollment is authorized by standard ATProto service auth for actorDid and an Ed25519-signed canonical body. It requires an absent device row and tombstone, expectedAuthGeneration zero, a client-generated canonical UUIDv4 deviceId, keyId matching signaturePublicKey, and one or more strictly ordered valid MLS KeyPackages whose BasicCredential identity is exactly actorDid#deviceId. Packages are strictly ordered by computed raw KeyPackageRef and checked at one trusted instant T with not_before < T < not_after and a total lifetime of at most 2595600 seconds. The transaction atomically persists the device, immutable signing key, packages, and exact idempotent response.
      */
     @Serializable
     data class BlueCatbirdChatDefsDeviceEnrollmentBody(
@@ -3344,8 +3294,7 @@ enum class BlueCatbirdChatDefsResetRequestViewStatus {
         val deviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("deviceName")
         val deviceName: String,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("signaturePublicKey")
-        val signaturePublicKey: Bytes,        @SerialName("dpopJkt")
-        val dpopJkt: String,        @SerialName("expectedAuthGeneration")
+        val signaturePublicKey: Bytes,        @SerialName("expectedAuthGeneration")
         val expectedAuthGeneration: Int,        @SerialName("capability")
         val capability: BlueCatbirdChatDefsDeviceCapability,        @SerialName("keyPackages")
         val keyPackages: List<BlueCatbirdChatDefsKeyPackageArtifact>,        @SerialName("idempotencyKey")
@@ -3366,34 +3315,13 @@ enum class BlueCatbirdChatDefsResetRequestViewStatus {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("dpopJkt")
-        val dpopJkt: String,        @SerialName("signaturePublicKey")
+        val authGeneration: Int,        @SerialName("signaturePublicKey")
         val signaturePublicKey: Bytes,        @SerialName("keyPackages")
         val keyPackages: List<BlueCatbirdChatDefsKeyPackageArtifact>,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsKeyPackageReplenishmentBody"
-        }
-    }
-
-    /**
-     * Rebind is an explicit bootstrap exception for loss of the old DPoP key. First execution uses a valid Nest token/proof bound to newDpopJkt, looks up exact (actorDid,actorDeviceId), CASes signed currentDpopJkt plus expectedAuthGeneration, verifies this body with the immutable stored Ed25519 key, then installs proofJKT = newDpopJkt and increments generation. If the Ed25519 key is lost, enroll a new device and revoke the old. Exact completed replay requires the stored transcript digest/signature and fresh token/proof under only the recorded new JKT.
-     */
-    @Serializable
-    data class BlueCatbirdChatDefsDeviceAuthenticationRebindBody(
-        @SerialName("signatureDomain")
-        val signatureDomain: String,        @SerialName("actorDid")
-        val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
-        val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
-        val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("expectedAuthGeneration")
-        val expectedAuthGeneration: Int,        @SerialName("currentDpopJkt")
-        val currentDpopJkt: String,        @SerialName("newDpopJkt")
-        val newDpopJkt: String,        @SerialName("idempotencyKey")
-        val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
-        val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
-        companion object {
-            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDeviceAuthenticationRebindBody"
         }
     }
 
@@ -4520,16 +4448,6 @@ enum class BlueCatbirdChatDefsResetRequestViewStatus {
         val signature: Bytes    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsSignedKeyPackageReplenishment"
-        }
-    }
-
-    @Serializable
-    data class BlueCatbirdChatDefsSignedDeviceAuthenticationRebind(
-        @SerialName("body")
-        val body: BlueCatbirdChatDefsSignedDeviceAuthenticationRebindBodyUnion,        @SerialName("signature")
-        val signature: Bytes    ) {
-        companion object {
-            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsSignedDeviceAuthenticationRebind"
         }
     }
 

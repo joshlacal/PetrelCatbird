@@ -2,86 +2,124 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: place.stream.server.getWebhook
 
-public enum PlaceStreamServerGetWebhook {
-    public static let typeIdentifier = "place.stream.server.getWebhook"
-    public struct Parameters: Parametrizable {
-        public let id: String
 
+public struct PlaceStreamServerGetWebhook { 
+
+    public static let typeIdentifier = "place.stream.server.getWebhook"    
+public struct Parameters: Parametrizable {
+        public let id: String
+        
         public init(
             id: String
-        ) {
+            ) {
             self.id = id
+            
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let webhook: PlaceStreamServerDefs.Webhook
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             webhook: PlaceStreamServerDefs.Webhook
-
+            
+            
         ) {
+            
+            
             self.webhook = webhook
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            webhook = try container.decode(PlaceStreamServerDefs.Webhook.self, forKey: .webhook)
+            
+            
+            self.webhook = try container.decode(PlaceStreamServerDefs.Webhook.self, forKey: .webhook)
+            
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(webhook, forKey: .webhook)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let webhookValue = try webhook.toCBORValue()
             map = map.adding(key: "webhook", value: webhookValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case webhook
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                /// The specified webhook was not found.
+                case webhookNotFound = "WebhookNotFound"
+                /// The authenticated user does not have access to this webhook.
+                case unauthorized = "Unauthorized"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        /// The specified webhook was not found.
-        case webhookNotFound = "WebhookNotFound"
-        /// The authenticated user does not have access to this webhook.
-        case unauthorized = "Unauthorized"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                return self.rawValue
+            }
         }
 
-        public var errorName: String {
-            return rawValue
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Place.Stream.Server {
+
+
+extension ATProtoClient.Place.Stream.Server {
     // MARK: - getWebhook
 
     /// Get details for a specific webhook.
-    ///
+    /// 
     /// - Parameter input: The input parameters for the request
-    ///
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getWebhook(input: PlaceStreamServerGetWebhook.Parameters) async throws -> (responseCode: Int, data: PlaceStreamServerGetWebhook.Output?) {
+    public func getWebhook(input: PlaceStreamServerGetWebhook.Parameters) async throws -> (responseCode: Int, data: PlaceStreamServerGetWebhook.Output?) {
         let endpoint = "place.stream.server.getWebhook"
 
+        
         let queryItems = input.asQueryItems()
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -99,7 +137,8 @@ public extension ATProtoClient.Place.Stream.Server {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -107,6 +146,7 @@ public extension ATProtoClient.Place.Stream.Server {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
                 let decoder = JSONDecoder()
@@ -127,10 +167,12 @@ public extension ATProtoClient.Place.Stream.Server {
             ) {
                 throw atprotoError
             }
-
+            
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
+                           
+

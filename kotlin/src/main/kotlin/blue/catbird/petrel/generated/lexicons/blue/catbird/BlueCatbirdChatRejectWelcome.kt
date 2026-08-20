@@ -30,13 +30,17 @@ sealed class BlueCatbirdChatRejectWelcomeError(val name: String, val description
         object CutoverRequired: BlueCatbirdChatRejectWelcomeError("CutoverRequired", "")
         object DeviceNotRegistered: BlueCatbirdChatRejectWelcomeError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatRejectWelcomeError("DeviceRevoked", "")
-        object InvalidDPoP: BlueCatbirdChatRejectWelcomeError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatRejectWelcomeError("InvalidRequest", "")
         object InvalidSignature: BlueCatbirdChatRejectWelcomeError("InvalidSignature", "")
         object RejectionConflict: BlueCatbirdChatRejectWelcomeError("RejectionConflict", "")
         object WelcomeExpired: BlueCatbirdChatRejectWelcomeError("WelcomeExpired", "")
         object WelcomeNotFound: BlueCatbirdChatRejectWelcomeError("WelcomeNotFound", "")
         object WelcomeSuperseded: BlueCatbirdChatRejectWelcomeError("WelcomeSuperseded", "")
+        object AccountSessionExpired: BlueCatbirdChatRejectWelcomeError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatRejectWelcomeError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatRejectWelcomeError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatRejectWelcomeError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatRejectWelcomeError("RateLimited", "")
     }
 
 /**

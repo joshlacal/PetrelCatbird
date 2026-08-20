@@ -2,21 +2,26 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.chat.requestLeave
 
-public enum BlueCatbirdChatRequestLeave {
+
+public struct BlueCatbirdChatRequestLeave { 
+
     public static let typeIdentifier = "blue.catbird.chat.requestLeave"
-    public struct Input: ATProtocolCodable {
+public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedLeaveOperation
 
         /// Standard public initializer
         public init(signedRequest: BlueCatbirdChatDefs.SignedLeaveOperation) {
             self.signedRequest = signedRequest
         }
+        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedLeaveOperation.self, forKey: .signedRequest)
+            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedLeaveOperation.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -35,95 +40,135 @@ public enum BlueCatbirdChatRequestLeave {
             case signedRequest
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let result: BlueCatbirdChatDefs.LeaveOperationResult
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             result: BlueCatbirdChatDefs.LeaveOperationResult
-
+            
+            
         ) {
+            
+            
             self.result = result
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            result = try container.decode(BlueCatbirdChatDefs.LeaveOperationResult.self, forKey: .result)
+            
+            
+            self.result = try container.decode(BlueCatbirdChatDefs.LeaveOperationResult.self, forKey: .result)
+            
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(result, forKey: .result)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let resultValue = try result.toCBORValue()
             map = map.adding(key: "result", value: resultValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case result
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case conversationNotFound = "ConversationNotFound"
+                case coordinateOverflow = "CoordinateOverflow"
+                case cutoverRequired = "CutoverRequired"
+                case deviceNotRegistered = "DeviceNotRegistered"
+                case deviceRevoked = "DeviceRevoked"
+                case directParticipantMutationForbidden = "DirectParticipantMutationForbidden"
+                case idempotencyConflict = "IdempotencyConflict"
+                case invalidRequest = "InvalidRequest"
+                case invalidSignature = "InvalidSignature"
+                case lastAdminRequired = "LastAdminRequired"
+                case leaveAlreadyPending = "LeaveAlreadyPending"
+                case notMember = "NotMember"
+                case staleCoordinates = "StaleCoordinates"
+                case accountSessionExpired = "AccountSessionExpired"
+                case notAuthorized = "NotAuthorized"
+                case deviceBindingMismatch = "DeviceBindingMismatch"
+                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+                case rateLimited = "RateLimited"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case conversationNotFound = "ConversationNotFound"
-        case coordinateOverflow = "CoordinateOverflow"
-        case cutoverRequired = "CutoverRequired"
-        case deviceNotRegistered = "DeviceNotRegistered"
-        case deviceRevoked = "DeviceRevoked"
-        case directParticipantMutationForbidden = "DirectParticipantMutationForbidden"
-        case idempotencyConflict = "IdempotencyConflict"
-        case invalidDPoP = "InvalidDPoP"
-        case invalidRequest = "InvalidRequest"
-        case invalidSignature = "InvalidSignature"
-        case lastAdminRequired = "LastAdminRequired"
-        case leaveAlreadyPending = "LeaveAlreadyPending"
-        case notMember = "NotMember"
-        case staleCoordinates = "StaleCoordinates"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                return self.rawValue
+            }
         }
 
-        public var errorName: String {
-            return rawValue
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - requestLeave
 
-    // Group-only self-leave. A pending or active zero-leaf participant signs immediate stateVersion-plus-one self-removal. An active participant with leaves signs durable 24-hour consent for a different-DID current leaf to remove every requester leaf and the participant by Commit. Neither path can remove the last active admin. Relationship blocks or policy unavailability never deny self-exit. Direct participants use closeConversation instead.
-    //
-    // - Parameter input: The input parameters for the request
-
-    ///
+    /// Group-only self-leave. A pending or active zero-leaf participant signs immediate stateVersion-plus-one self-removal. An active participant with leaves signs durable 24-hour consent for a different-DID current leaf to remove every requester leaf and the participant by Commit. Neither path can remove the last active admin. Relationship blocks or policy unavailability never deny self-exit. Direct participants use closeConversation instead.
+    /// 
+    /// - Parameter input: The input parameters for the request
+    
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func requestLeave(
+    public func requestLeave(
+        
         input: BlueCatbirdChatRequestLeave.Input
-
+        
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatRequestLeave.Output?) {
         let endpoint = "blue.catbird.chat.requestLeave"
-
+        
         var headers: [String: String] = [:]
-
+        
         headers["Content-Type"] = "application/json"
-
+        
+        
+        
         headers["Accept"] = "application/json"
+        
 
+        
         let requestData: Data? = try JSONEncoder().encode(input)
-
+        
+        
         let queryItems: [URLQueryItem]? = nil
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -138,10 +183,12 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
+        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -149,11 +196,13 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatRequestLeave.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -169,9 +218,13 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-
+            
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+        
     }
+    
 }
+                           
+

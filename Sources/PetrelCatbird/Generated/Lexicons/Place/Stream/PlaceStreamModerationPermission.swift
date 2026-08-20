@@ -2,114 +2,126 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: place.stream.moderation.permission
 
-public struct PlaceStreamModerationPermission: ATProtocolCodable, ATProtocolValue {
+
+public struct PlaceStreamModerationPermission: ATProtocolCodable, ATProtocolValue { 
+
     public static let typeIdentifier = "place.stream.moderation.permission"
-    public let moderator: DID
-    public let permissions: [PlaceStreamModerationPermissionPermissions]
-    public let createdAt: ATProtocolDate
-    public let expirationTime: ATProtocolDate?
+        public let moderator: DID
+        public let permissions: [PlaceStreamModerationPermissionPermissions]
+        public let createdAt: ATProtocolDate
+        public let expirationTime: ATProtocolDate?
 
-    public init(moderator: DID, permissions: [PlaceStreamModerationPermissionPermissions], createdAt: ATProtocolDate, expirationTime: ATProtocolDate?) {
-        self.moderator = moderator
-        self.permissions = permissions
-        self.createdAt = createdAt
-        self.expirationTime = expirationTime
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        moderator = try container.decode(DID.self, forKey: .moderator)
-        permissions = try container.decode([PlaceStreamModerationPermissionPermissions].self, forKey: .permissions)
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
-        do {
-            expirationTime = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expirationTime)
-        } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'expirationTime' — degrading to nil: \(error)")
-            expirationTime = nil
+        public init(moderator: DID, permissions: [PlaceStreamModerationPermissionPermissions], createdAt: ATProtocolDate, expirationTime: ATProtocolDate?) {
+            self.moderator = moderator
+            self.permissions = permissions
+            self.createdAt = createdAt
+            self.expirationTime = expirationTime
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(moderator, forKey: .moderator)
-        try container.encode(permissions, forKey: .permissions)
-        try container.encode(createdAt, forKey: .createdAt)
-        try container.encodeIfPresent(expirationTime, forKey: .expirationTime)
-    }
-
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
-    }
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if moderator != other.moderator {
-            return false
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.moderator = try container.decode(DID.self, forKey: .moderator)
+            self.permissions = try container.decode([PlaceStreamModerationPermissionPermissions].self, forKey: .permissions)
+            self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+            do {
+                self.expirationTime = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expirationTime)
+            } catch {
+                // Forward compatibility: a malformed optional field must not fail the whole record.
+                LogManager.logWarning("Decoding error for optional property 'expirationTime' — degrading to nil: \(error)")
+                self.expirationTime = nil
+            }
         }
-        if permissions != other.permissions {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        if expirationTime != other.expirationTime {
-            return false
-        }
-        return true
-    }
 
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(moderator)
-        hasher.combine(permissions)
-        hasher.combine(createdAt)
-        if let value = expirationTime {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(moderator, forKey: .moderator)
+            try container.encode(permissions, forKey: .permissions)
+            try container.encode(createdAt, forKey: .createdAt)
+            try container.encodeIfPresent(expirationTime, forKey: .expirationTime)
         }
-    }
 
-    public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
-        map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let moderatorValue = try moderator.toCBORValue()
-        map = map.adding(key: "moderator", value: moderatorValue)
-        let permissionsValue = try permissions.toCBORValue()
-        map = map.adding(key: "permissions", value: permissionsValue)
-        let createdAtValue = try createdAt.toCBORValue()
-        map = map.adding(key: "createdAt", value: createdAtValue)
-        if let value = expirationTime {
-            let expirationTimeValue = try value.toCBORValue()
-            map = map.adding(key: "expirationTime", value: expirationTimeValue)
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
         }
-        return map
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case typeIdentifier = "$type"
-        case moderator
-        case permissions
-        case createdAt
-        case expirationTime
-    }
-
-    public enum PlaceStreamModerationPermissionPermissions: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-        case value_ban = "ban"
-        case value_hide = "hide"
-        case value_livestream_u2e_manage = "livestream.manage"
-        case value_message_u2e_pin = "message.pin"
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
-            guard let otherValue = other as? PlaceStreamModerationPermissionPermissions else { return false }
-            return self == otherValue
+            guard let other = other as? Self else { return false }
+            if moderator != other.moderator {
+                return false
+            }
+            if permissions != other.permissions {
+                return false
+            }
+            if createdAt != other.createdAt {
+                return false
+            }
+            if expirationTime != other.expirationTime {
+                return false
+            }
+            return true
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(moderator)
+            hasher.combine(permissions)
+            hasher.combine(createdAt)
+            if let value = expirationTime {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
         }
 
         public func toCBORValue() throws -> Any {
-            return rawValue
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let moderatorValue = try moderator.toCBORValue()
+            map = map.adding(key: "moderator", value: moderatorValue)
+            let permissionsValue = try permissions.toCBORValue()
+            map = map.adding(key: "permissions", value: permissionsValue)
+            let createdAtValue = try createdAt.toCBORValue()
+            map = map.adding(key: "createdAt", value: createdAtValue)
+            if let value = expirationTime {
+                let expirationTimeValue = try value.toCBORValue()
+                map = map.adding(key: "expirationTime", value: expirationTimeValue)
+            }
+            return map
         }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case moderator
+            case permissions
+            case createdAt
+            case expirationTime
+        }
+
+
+
+public enum PlaceStreamModerationPermissionPermissions: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+    case value_ban = "ban"
+    case value_hide = "hide"
+    case value_livestream_u2e_manage = "livestream.manage"
+    case value_message_u2e_pin = "message.pin"
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let otherValue = other as? PlaceStreamModerationPermissionPermissions else { return false }
+        return self == otherValue
+    }
+
+    public func toCBORValue() throws -> Any {
+        return rawValue
     }
 }
+
+
+}
+
+
+                           
+

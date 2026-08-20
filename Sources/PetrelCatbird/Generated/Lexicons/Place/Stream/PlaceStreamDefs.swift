@@ -2,18 +2,22 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: place.stream.defs
 
-public enum PlaceStreamDefs {
-    public static let typeIdentifier = "place.stream.defs"
 
-    public struct BlockView: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "place.stream.defs#blockView"
-        public let uri: ATProtocolURI
-        public let cid: CID
-        public let blocker: AppBskyActorDefs.ProfileViewBasic
-        public let record: AppBskyGraphBlock
-        public let indexedAt: ATProtocolDate
+public struct PlaceStreamDefs { 
+
+    public static let typeIdentifier = "place.stream.defs"
+        
+public struct BlockView: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "place.stream.defs#blockView"
+            public let uri: ATProtocolURI
+            public let cid: CID
+            public let blocker: AppBskyActorDefs.ProfileViewBasic
+            public let record: AppBskyGraphBlock
+            public let indexedAt: ATProtocolDate
 
         public init(
             uri: ATProtocolURI, cid: CID, blocker: AppBskyActorDefs.ProfileViewBasic, record: AppBskyGraphBlock, indexedAt: ATProtocolDate
@@ -28,31 +32,31 @@ public enum PlaceStreamDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
             } catch {
                 LogManager.logError("Decoding error for required property 'uri': \(error)")
                 throw error
             }
             do {
-                cid = try container.decode(CID.self, forKey: .cid)
+                self.cid = try container.decode(CID.self, forKey: .cid)
             } catch {
                 LogManager.logError("Decoding error for required property 'cid': \(error)")
                 throw error
             }
             do {
-                blocker = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .blocker)
+                self.blocker = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .blocker)
             } catch {
                 LogManager.logError("Decoding error for required property 'blocker': \(error)")
                 throw error
             }
             do {
-                record = try container.decode(AppBskyGraphBlock.self, forKey: .record)
+                self.record = try container.decode(AppBskyGraphBlock.self, forKey: .record)
             } catch {
                 LogManager.logError("Decoding error for required property 'record': \(error)")
                 throw error
             }
             do {
-                indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
+                self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'indexedAt': \(error)")
                 throw error
@@ -126,10 +130,10 @@ public enum PlaceStreamDefs {
             case indexedAt
         }
     }
-
-    public struct Renditions: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "place.stream.defs#renditions"
-        public let renditions: [Rendition]
+        
+public struct Renditions: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "place.stream.defs#renditions"
+            public let renditions: [Rendition]
 
         public init(
             renditions: [Rendition]
@@ -140,7 +144,7 @@ public enum PlaceStreamDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                renditions = try container.decode([Rendition].self, forKey: .renditions)
+                self.renditions = try container.decode([Rendition].self, forKey: .renditions)
             } catch {
                 LogManager.logError("Decoding error for required property 'renditions': \(error)")
                 throw error
@@ -182,10 +186,10 @@ public enum PlaceStreamDefs {
             case renditions
         }
     }
-
-    public struct Rendition: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "place.stream.defs#rendition"
-        public let name: String
+        
+public struct Rendition: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "place.stream.defs#rendition"
+            public let name: String
 
         public init(
             name: String
@@ -196,7 +200,7 @@ public enum PlaceStreamDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                name = try container.decode(String.self, forKey: .name)
+                self.name = try container.decode(String.self, forKey: .name)
             } catch {
                 LogManager.logError("Decoding error for required property 'name': \(error)")
                 throw error
@@ -238,4 +242,11 @@ public enum PlaceStreamDefs {
             case name
         }
     }
+
+
+
 }
+
+
+                           
+

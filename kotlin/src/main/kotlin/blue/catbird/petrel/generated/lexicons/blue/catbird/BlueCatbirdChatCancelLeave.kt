@@ -32,11 +32,14 @@ sealed class BlueCatbirdChatCancelLeaveError(val name: String, val description: 
         object DeviceNotRegistered: BlueCatbirdChatCancelLeaveError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatCancelLeaveError("DeviceRevoked", "")
         object IdempotencyConflict: BlueCatbirdChatCancelLeaveError("IdempotencyConflict", "")
-        object InvalidDPoP: BlueCatbirdChatCancelLeaveError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatCancelLeaveError("InvalidRequest", "")
         object InvalidSignature: BlueCatbirdChatCancelLeaveError("InvalidSignature", "")
         object LeaveRequestNotFound: BlueCatbirdChatCancelLeaveError("LeaveRequestNotFound", "")
         object NotAuthorized: BlueCatbirdChatCancelLeaveError("NotAuthorized", "")
+        object AccountSessionExpired: BlueCatbirdChatCancelLeaveError("AccountSessionExpired", "")
+        object DeviceBindingMismatch: BlueCatbirdChatCancelLeaveError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatCancelLeaveError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatCancelLeaveError("RateLimited", "")
     }
 
 /**

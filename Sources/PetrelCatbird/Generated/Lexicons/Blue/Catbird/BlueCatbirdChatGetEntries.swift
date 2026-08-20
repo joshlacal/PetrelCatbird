@@ -2,124 +2,181 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.chat.getEntries
 
-public enum BlueCatbirdChatGetEntries {
-    public static let typeIdentifier = "blue.catbird.chat.getEntries"
-    public struct Parameters: Parametrizable {
+
+public struct BlueCatbirdChatGetEntries { 
+
+    public static let typeIdentifier = "blue.catbird.chat.getEntries"    
+public struct Parameters: Parametrizable {
+        public let actorDeviceId: String
         public let conversationId: String
         public let afterSeq: Int
         public let limit: Int
-
+        
         public init(
-            conversationId: String,
-            afterSeq: Int,
+            actorDeviceId: String, 
+            conversationId: String, 
+            afterSeq: Int, 
             limit: Int
-        ) {
+            ) {
+            self.actorDeviceId = actorDeviceId
             self.conversationId = conversationId
             self.afterSeq = afterSeq
             self.limit = limit
+            
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let entries: [BlueCatbirdChatDefs.ConversationEntry]
-
+        
         public let nextAfterSeq: Int
-
+        
         public let hasMore: Bool
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             entries: [BlueCatbirdChatDefs.ConversationEntry],
-
+            
             nextAfterSeq: Int,
-
+            
             hasMore: Bool
-
+            
+            
         ) {
+            
+            
             self.entries = entries
-
+            
             self.nextAfterSeq = nextAfterSeq
-
+            
             self.hasMore = hasMore
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            entries = try container.decode([BlueCatbirdChatDefs.ConversationEntry].self, forKey: .entries)
-
-            nextAfterSeq = try container.decode(Int.self, forKey: .nextAfterSeq)
-
-            hasMore = try container.decode(Bool.self, forKey: .hasMore)
+            
+            
+            self.entries = try container.decode([BlueCatbirdChatDefs.ConversationEntry].self, forKey: .entries)
+            
+            
+            
+            
+            self.nextAfterSeq = try container.decode(Int.self, forKey: .nextAfterSeq)
+            
+            
+            
+            
+            self.hasMore = try container.decode(Bool.self, forKey: .hasMore)
+            
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(entries, forKey: .entries)
-
+            
+            
             try container.encode(nextAfterSeq, forKey: .nextAfterSeq)
-
+            
+            
             try container.encode(hasMore, forKey: .hasMore)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let entriesValue = try entries.toCBORValue()
             map = map.adding(key: "entries", value: entriesValue)
-
+            
+            
+            
             let nextAfterSeqValue = try nextAfterSeq.toCBORValue()
             map = map.adding(key: "nextAfterSeq", value: nextAfterSeqValue)
-
+            
+            
+            
             let hasMoreValue = try hasMore.toCBORValue()
             map = map.adding(key: "hasMore", value: hasMoreValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case entries
             case nextAfterSeq
             case hasMore
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case accessOutsideMembershipInterval = "AccessOutsideMembershipInterval"
+                case conversationNotFound = "ConversationNotFound"
+                case cutoverRequired = "CutoverRequired"
+                case deviceNotRegistered = "DeviceNotRegistered"
+                case deviceRevoked = "DeviceRevoked"
+                case invalidRequest = "InvalidRequest"
+                case notEntitled = "NotEntitled"
+                case accountSessionExpired = "AccountSessionExpired"
+                case notAuthorized = "NotAuthorized"
+                case deviceBindingMismatch = "DeviceBindingMismatch"
+                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+                case rateLimited = "RateLimited"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case accessOutsideMembershipInterval = "AccessOutsideMembershipInterval"
-        case conversationNotFound = "ConversationNotFound"
-        case cutoverRequired = "CutoverRequired"
-        case deviceNotRegistered = "DeviceNotRegistered"
-        case deviceRevoked = "DeviceRevoked"
-        case invalidDPoP = "InvalidDPoP"
-        case invalidRequest = "InvalidRequest"
-        case notEntitled = "NotEntitled"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                return self.rawValue
+            }
         }
 
-        public var errorName: String {
-            return rawValue
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+
+
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - getEntries
 
     /// Reads entries visible to the exact authenticated (DID,deviceId), strictly after global scan position afterSeq. Application intervals are per concrete MLS leaf: creation opens the genesis device at creation seq, Add opens only that device at its Welcome-producing transition seq, and that device's own Remove or reset closes it inclusively. Reset opens only the activator device at the same seq. Sibling, roster-only, and zero-leaf devices inherit no application ciphertext; re-Add opens a new interval without backfill. afterSeq need not lie in an interval. The server skips inaccessible gaps and never returns their entries. nextAfterSeq is afterSeq when entries is empty, otherwise the greatest returned seq; hasMore is true exactly when another caller-visible application or separately entitled control entry has seq greater than nextAfterSeq. AccessOutsideMembershipInterval means the caller has neither a concrete leaf interval nor separate control entitlement, not that afterSeq lies in a gap. Clients never fetch a gap to resolve targets.
-    ///
+    /// 
     /// - Parameter input: The input parameters for the request
-    ///
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getEntries(input: BlueCatbirdChatGetEntries.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetEntries.Output?) {
+    public func getEntries(input: BlueCatbirdChatGetEntries.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetEntries.Output?) {
         let endpoint = "blue.catbird.chat.getEntries"
 
+        
         let queryItems = input.asQueryItems()
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -137,7 +194,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -145,6 +203,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
                 let decoder = JSONDecoder()
@@ -165,10 +224,12 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-
+            
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
+                           
+

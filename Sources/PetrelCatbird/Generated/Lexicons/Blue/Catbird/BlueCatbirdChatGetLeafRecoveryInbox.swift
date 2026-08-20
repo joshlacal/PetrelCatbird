@@ -2,133 +2,197 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.chat.getLeafRecoveryInbox
 
-public enum BlueCatbirdChatGetLeafRecoveryInbox {
-    public static let typeIdentifier = "blue.catbird.chat.getLeafRecoveryInbox"
-    public struct Parameters: Parametrizable {
+
+public struct BlueCatbirdChatGetLeafRecoveryInbox { 
+
+    public static let typeIdentifier = "blue.catbird.chat.getLeafRecoveryInbox"    
+public struct Parameters: Parametrizable {
+        public let actorDeviceId: String
         public let inventorySessionId: String
         public let pageCursor: String?
         public let limit: Int
-
+        
         public init(
-            inventorySessionId: String,
-            pageCursor: String? = nil,
+            actorDeviceId: String, 
+            inventorySessionId: String, 
+            pageCursor: String? = nil, 
             limit: Int
-        ) {
+            ) {
+            self.actorDeviceId = actorDeviceId
             self.inventorySessionId = inventorySessionId
             self.pageCursor = pageCursor
             self.limit = limit
+            
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let items: [BlueCatbirdChatDefs.LeafRecoveryInboxItem]
-
+        
         public let inventorySessionId: String
-
+        
         public let snapshotEventCursor: String
-
+        
         public let nextPageCursor: String?
-
+        
         public let hasMore: Bool
-
+        
         public let snapshotExpiresAt: BlueCatbirdChatDefs.CanonicalDatetime
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             items: [BlueCatbirdChatDefs.LeafRecoveryInboxItem],
-
+            
             inventorySessionId: String,
-
+            
             snapshotEventCursor: String,
-
+            
             nextPageCursor: String? = nil,
-
+            
             hasMore: Bool,
-
+            
             snapshotExpiresAt: BlueCatbirdChatDefs.CanonicalDatetime
-
+            
+            
         ) {
+            
+            
             self.items = items
-
+            
             self.inventorySessionId = inventorySessionId
-
+            
             self.snapshotEventCursor = snapshotEventCursor
-
+            
             self.nextPageCursor = nextPageCursor
-
+            
             self.hasMore = hasMore
-
+            
             self.snapshotExpiresAt = snapshotExpiresAt
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            items = try container.decode([BlueCatbirdChatDefs.LeafRecoveryInboxItem].self, forKey: .items)
-
-            inventorySessionId = try container.decode(String.self, forKey: .inventorySessionId)
-
-            snapshotEventCursor = try container.decode(String.self, forKey: .snapshotEventCursor)
-
+            
+            
+            self.items = try container.decode([BlueCatbirdChatDefs.LeafRecoveryInboxItem].self, forKey: .items)
+            
+            
+            
+            
+            self.inventorySessionId = try container.decode(String.self, forKey: .inventorySessionId)
+            
+            
+            
+            
+            self.snapshotEventCursor = try container.decode(String.self, forKey: .snapshotEventCursor)
+            
+            
+            
+            
             do {
-                nextPageCursor = try container.decodeIfPresent(String.self, forKey: .nextPageCursor)
+                self.nextPageCursor = try container.decodeIfPresent(String.self, forKey: .nextPageCursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'nextPageCursor' — degrading to nil: \(error)")
-                nextPageCursor = nil
+                self.nextPageCursor = nil
             }
-
-            hasMore = try container.decode(Bool.self, forKey: .hasMore)
-
-            snapshotExpiresAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .snapshotExpiresAt)
+            
+            
+            
+            
+            self.hasMore = try container.decode(Bool.self, forKey: .hasMore)
+            
+            
+            
+            
+            self.snapshotExpiresAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .snapshotExpiresAt)
+            
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(items, forKey: .items)
-
+            
+            
             try container.encode(inventorySessionId, forKey: .inventorySessionId)
-
+            
+            
             try container.encode(snapshotEventCursor, forKey: .snapshotEventCursor)
-
+            
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(nextPageCursor, forKey: .nextPageCursor)
-
+            
+            
             try container.encode(hasMore, forKey: .hasMore)
-
+            
+            
             try container.encode(snapshotExpiresAt, forKey: .snapshotExpiresAt)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let itemsValue = try items.toCBORValue()
             map = map.adding(key: "items", value: itemsValue)
-
+            
+            
+            
             let inventorySessionIdValue = try inventorySessionId.toCBORValue()
             map = map.adding(key: "inventorySessionId", value: inventorySessionIdValue)
-
+            
+            
+            
             let snapshotEventCursorValue = try snapshotEventCursor.toCBORValue()
             map = map.adding(key: "snapshotEventCursor", value: snapshotEventCursorValue)
-
+            
+            
+            
             if let value = nextPageCursor {
                 // Encode optional property even if it's an empty array for CBOR
                 let nextPageCursorValue = try value.toCBORValue()
                 map = map.adding(key: "nextPageCursor", value: nextPageCursorValue)
             }
-
+            
+            
+            
             let hasMoreValue = try hasMore.toCBORValue()
             map = map.adding(key: "hasMore", value: hasMoreValue)
-
+            
+            
+            
             let snapshotExpiresAtValue = try snapshotExpiresAt.toCBORValue()
             map = map.adding(key: "snapshotExpiresAt", value: snapshotExpiresAtValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case items
             case inventorySessionId
@@ -137,41 +201,52 @@ public enum BlueCatbirdChatGetLeafRecoveryInbox {
             case hasMore
             case snapshotExpiresAt
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case cursorExpired = "CursorExpired"
+                case cutoverRequired = "CutoverRequired"
+                case deviceNotRegistered = "DeviceNotRegistered"
+                case deviceRevoked = "DeviceRevoked"
+                case invalidRequest = "InvalidRequest"
+                case inventorySessionExpired = "InventorySessionExpired"
+                case inventorySessionMismatch = "InventorySessionMismatch"
+                case accountSessionExpired = "AccountSessionExpired"
+                case notAuthorized = "NotAuthorized"
+                case deviceBindingMismatch = "DeviceBindingMismatch"
+                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+                case rateLimited = "RateLimited"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case cursorExpired = "CursorExpired"
-        case cutoverRequired = "CutoverRequired"
-        case deviceNotRegistered = "DeviceNotRegistered"
-        case deviceRevoked = "DeviceRevoked"
-        case invalidDPoP = "InvalidDPoP"
-        case invalidRequest = "InvalidRequest"
-        case inventorySessionExpired = "InventorySessionExpired"
-        case inventorySessionMismatch = "InventorySessionMismatch"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                return self.rawValue
+            }
         }
 
-        public var errorName: String {
-            return rawValue
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+
+
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - getLeafRecoveryInbox
 
     /// Returns the flat closed exact-device recovery inbox from the retained inventorySession created by getConversations: the unchanged target-device-signed leafRecoveryView and the four concrete non-authorizing recoveryWorkView-family variants sourced only from retained expired or rejected Welcomes. Every union ref is a concrete object. inventorySessionId is always required; pageCursor is an opaque recovery-domain cursor bound to the same device, session, audience, fence, and expiry. Every response echoes the exact session event cursor and expiry; nextPageCursor is absent after the final page.
-    ///
+    /// 
     /// - Parameter input: The input parameters for the request
-    ///
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getLeafRecoveryInbox(input: BlueCatbirdChatGetLeafRecoveryInbox.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetLeafRecoveryInbox.Output?) {
+    public func getLeafRecoveryInbox(input: BlueCatbirdChatGetLeafRecoveryInbox.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetLeafRecoveryInbox.Output?) {
         let endpoint = "blue.catbird.chat.getLeafRecoveryInbox"
 
+        
         let queryItems = input.asQueryItems()
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -189,7 +264,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -197,6 +273,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
                 let decoder = JSONDecoder()
@@ -217,10 +294,12 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-
+            
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
+                           
+

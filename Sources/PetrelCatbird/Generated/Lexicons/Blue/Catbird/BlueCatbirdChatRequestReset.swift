@@ -2,21 +2,26 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.chat.requestReset
 
-public enum BlueCatbirdChatRequestReset {
+
+public struct BlueCatbirdChatRequestReset { 
+
     public static let typeIdentifier = "blue.catbird.chat.requestReset"
-    public struct Input: ATProtocolCodable {
+public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedResetRequest
 
         /// Standard public initializer
         public init(signedRequest: BlueCatbirdChatDefs.SignedResetRequest) {
             self.signedRequest = signedRequest
         }
+        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedResetRequest.self, forKey: .signedRequest)
+            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedResetRequest.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -35,106 +40,152 @@ public enum BlueCatbirdChatRequestReset {
             case signedRequest
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let resetRequest: BlueCatbirdChatDefs.ResetRequestView
-
+        
         public let entry: BlueCatbirdChatDefs.ResetRequestEntry
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             resetRequest: BlueCatbirdChatDefs.ResetRequestView,
-
+            
             entry: BlueCatbirdChatDefs.ResetRequestEntry
-
+            
+            
         ) {
+            
+            
             self.resetRequest = resetRequest
-
+            
             self.entry = entry
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            resetRequest = try container.decode(BlueCatbirdChatDefs.ResetRequestView.self, forKey: .resetRequest)
-
-            entry = try container.decode(BlueCatbirdChatDefs.ResetRequestEntry.self, forKey: .entry)
+            
+            
+            self.resetRequest = try container.decode(BlueCatbirdChatDefs.ResetRequestView.self, forKey: .resetRequest)
+            
+            
+            
+            
+            self.entry = try container.decode(BlueCatbirdChatDefs.ResetRequestEntry.self, forKey: .entry)
+            
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(resetRequest, forKey: .resetRequest)
-
+            
+            
             try container.encode(entry, forKey: .entry)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let resetRequestValue = try resetRequest.toCBORValue()
             map = map.adding(key: "resetRequest", value: resetRequestValue)
-
+            
+            
+            
             let entryValue = try entry.toCBORValue()
             map = map.adding(key: "entry", value: entryValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case resetRequest
             case entry
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case conversationNotFound = "ConversationNotFound"
+                case cutoverRequired = "CutoverRequired"
+                case deviceNotRegistered = "DeviceNotRegistered"
+                case deviceRevoked = "DeviceRevoked"
+                case idempotencyConflict = "IdempotencyConflict"
+                case invalidRequest = "InvalidRequest"
+                case invalidSignature = "InvalidSignature"
+                case notMember = "NotMember"
+                case resetAlreadyPending = "ResetAlreadyPending"
+                case staleCoordinates = "StaleCoordinates"
+                case accountSessionExpired = "AccountSessionExpired"
+                case notAuthorized = "NotAuthorized"
+                case deviceBindingMismatch = "DeviceBindingMismatch"
+                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+                case rateLimited = "RateLimited"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case conversationNotFound = "ConversationNotFound"
-        case cutoverRequired = "CutoverRequired"
-        case deviceNotRegistered = "DeviceNotRegistered"
-        case deviceRevoked = "DeviceRevoked"
-        case idempotencyConflict = "IdempotencyConflict"
-        case invalidDPoP = "InvalidDPoP"
-        case invalidRequest = "InvalidRequest"
-        case invalidSignature = "InvalidSignature"
-        case notMember = "NotMember"
-        case resetAlreadyPending = "ResetAlreadyPending"
-        case staleCoordinates = "StaleCoordinates"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                return self.rawValue
+            }
         }
 
-        public var errorName: String {
-            return rawValue
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - requestReset
 
-    // Durably records an idempotent signed reset request at the exact prior coordinate from any active registered device of an active logical participant; the device need not be an MLS leaf. Pending participants may accept or close but cannot request reset. The request expires after exactly 24 hours and any coordinate change makes it stale. This does not itself mutate or retire the MLS group.
-    //
-    // - Parameter input: The input parameters for the request
-
-    ///
+    /// Durably records an idempotent signed reset request at the exact prior coordinate from any active registered device of an active logical participant; the device need not be an MLS leaf. Pending participants may accept or close but cannot request reset. The request expires after exactly 24 hours and any coordinate change makes it stale. This does not itself mutate or retire the MLS group.
+    /// 
+    /// - Parameter input: The input parameters for the request
+    
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func requestReset(
+    public func requestReset(
+        
         input: BlueCatbirdChatRequestReset.Input
-
+        
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatRequestReset.Output?) {
         let endpoint = "blue.catbird.chat.requestReset"
-
+        
         var headers: [String: String] = [:]
-
+        
         headers["Content-Type"] = "application/json"
-
+        
+        
+        
         headers["Accept"] = "application/json"
+        
 
+        
         let requestData: Data? = try JSONEncoder().encode(input)
-
+        
+        
         let queryItems: [URLQueryItem]? = nil
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -149,10 +200,12 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
+        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -160,11 +213,13 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatRequestReset.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -180,9 +235,13 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-
+            
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+        
     }
+    
 }
+                           
+

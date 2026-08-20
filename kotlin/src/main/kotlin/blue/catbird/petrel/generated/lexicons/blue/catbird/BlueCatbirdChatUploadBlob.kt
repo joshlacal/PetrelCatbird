@@ -17,7 +17,8 @@ object BlueCatbirdChatUploadBlobDefs {
 
 @Serializable
     data class BlueCatbirdChatUploadBlobParameters(
-        @SerialName("uploadTicket")
+// Canonical lowercase hyphenated RFC 4122-variant UUIDv4 device ID; strict runtime validation rejects every other spelling, version, or variant.        @SerialName("actorDeviceId")
+        val actorDeviceId: String,        @SerialName("uploadTicket")
         val uploadTicket: String    )
 
 @Serializable
@@ -36,10 +37,14 @@ sealed class BlueCatbirdChatUploadBlobError(val name: String, val description: S
         object BlobHashMismatch: BlueCatbirdChatUploadBlobError("BlobHashMismatch", "")
         object BlobSizeMismatch: BlueCatbirdChatUploadBlobError("BlobSizeMismatch", "")
         object CutoverRequired: BlueCatbirdChatUploadBlobError("CutoverRequired", "")
-        object InvalidDPoP: BlueCatbirdChatUploadBlobError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatUploadBlobError("InvalidRequest", "")
         object UploadTicketExpired: BlueCatbirdChatUploadBlobError("UploadTicketExpired", "")
         object UploadTicketNotFound: BlueCatbirdChatUploadBlobError("UploadTicketNotFound", "")
+        object AccountSessionExpired: BlueCatbirdChatUploadBlobError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatUploadBlobError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatUploadBlobError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatUploadBlobError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatUploadBlobError("RateLimited", "")
     }
 
 /**

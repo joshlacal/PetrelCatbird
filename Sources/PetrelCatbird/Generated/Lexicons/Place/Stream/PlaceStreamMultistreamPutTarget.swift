@@ -2,11 +2,15 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: place.stream.multistream.putTarget
 
-public enum PlaceStreamMultistreamPutTarget {
+
+public struct PlaceStreamMultistreamPutTarget { 
+
     public static let typeIdentifier = "place.stream.multistream.putTarget"
-    public struct Input: ATProtocolCodable {
+public struct Input: ATProtocolCodable {
         public let multistreamTarget: PlaceStreamMultistreamTarget
         public let rkey: RecordKey?
 
@@ -15,11 +19,12 @@ public enum PlaceStreamMultistreamPutTarget {
             self.multistreamTarget = multistreamTarget
             self.rkey = rkey
         }
+        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            multistreamTarget = try container.decode(PlaceStreamMultistreamTarget.self, forKey: .multistreamTarget)
-            rkey = try container.decodeIfPresent(RecordKey.self, forKey: .rkey)
+            self.multistreamTarget = try container.decode(PlaceStreamMultistreamTarget.self, forKey: .multistreamTarget)
+            self.rkey = try container.decodeIfPresent(RecordKey.self, forKey: .rkey)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -44,48 +49,56 @@ public enum PlaceStreamMultistreamPutTarget {
             case rkey
         }
     }
-
     public typealias Output = PlaceStreamMultistreamDefs.TargetView
+            
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                /// The provided target URL is invalid or unreachable.
+                case invalidTargetUrl = "InvalidTargetUrl"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        /// The provided target URL is invalid or unreachable.
-        case invalidTargetUrl = "InvalidTargetUrl"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                return self.rawValue
+            }
         }
 
-        public var errorName: String {
-            return rawValue
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Place.Stream.Multistream {
+extension ATProtoClient.Place.Stream.Multistream {
     // MARK: - putTarget
 
-    // Update an existing target for rebroadcasting a Streamplace stream.
-    //
-    // - Parameter input: The input parameters for the request
-
-    ///
+    /// Update an existing target for rebroadcasting a Streamplace stream.
+    /// 
+    /// - Parameter input: The input parameters for the request
+    
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func putTarget(
+    public func putTarget(
+        
         input: PlaceStreamMultistreamPutTarget.Input
-
+        
     ) async throws -> (responseCode: Int, data: PlaceStreamMultistreamPutTarget.Output?) {
         let endpoint = "place.stream.multistream.putTarget"
-
+        
         var headers: [String: String] = [:]
-
+        
         headers["Content-Type"] = "application/json"
-
+        
+        
+        
         headers["Accept"] = "application/json"
+        
 
+        
         let requestData: Data? = try JSONEncoder().encode(input)
-
+        
+        
         let queryItems: [URLQueryItem]? = nil
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -100,10 +113,12 @@ public extension ATProtoClient.Place.Stream.Multistream {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
+        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -111,11 +126,13 @@ public extension ATProtoClient.Place.Stream.Multistream {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(PlaceStreamMultistreamPutTarget.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -131,9 +148,13 @@ public extension ATProtoClient.Place.Stream.Multistream {
             ) {
                 throw atprotoError
             }
-
+            
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+        
     }
+    
 }
+                           
+

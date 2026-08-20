@@ -34,13 +34,16 @@ sealed class BlueCatbirdChatPublishTypingError(val name: String, val description
         object DeviceNotRegistered: BlueCatbirdChatPublishTypingError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatPublishTypingError("DeviceRevoked", "")
         object IdempotencyConflict: BlueCatbirdChatPublishTypingError("IdempotencyConflict", "")
-        object InvalidDPoP: BlueCatbirdChatPublishTypingError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatPublishTypingError("InvalidRequest", "")
         object InvalidSignature: BlueCatbirdChatPublishTypingError("InvalidSignature", "")
         object RateLimited: BlueCatbirdChatPublishTypingError("RateLimited", "")
         object RecipientNotReady: BlueCatbirdChatPublishTypingError("RecipientNotReady", "")
         object RelationshipPolicyUnavailable: BlueCatbirdChatPublishTypingError("RelationshipPolicyUnavailable", "")
         object StaleCoordinates: BlueCatbirdChatPublishTypingError("StaleCoordinates", "")
+        object AccountSessionExpired: BlueCatbirdChatPublishTypingError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatPublishTypingError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatPublishTypingError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatPublishTypingError("ProtocolUpgradeRequired", "")
     }
 
 /**

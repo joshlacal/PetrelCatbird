@@ -2,21 +2,26 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.chat.enrollDevice
 
-public enum BlueCatbirdChatEnrollDevice {
+
+public struct BlueCatbirdChatEnrollDevice { 
+
     public static let typeIdentifier = "blue.catbird.chat.enrollDevice"
-    public struct Input: ATProtocolCodable {
+public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedDeviceEnrollment
 
         /// Standard public initializer
         public init(signedRequest: BlueCatbirdChatDefs.SignedDeviceEnrollment) {
             self.signedRequest = signedRequest
         }
+        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedDeviceEnrollment.self, forKey: .signedRequest)
+            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedDeviceEnrollment.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -35,93 +40,132 @@ public enum BlueCatbirdChatEnrollDevice {
             case signedRequest
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let device: BlueCatbirdChatDefs.DeviceView
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             device: BlueCatbirdChatDefs.DeviceView
-
+            
+            
         ) {
+            
+            
             self.device = device
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            device = try container.decode(BlueCatbirdChatDefs.DeviceView.self, forKey: .device)
+            
+            
+            self.device = try container.decode(BlueCatbirdChatDefs.DeviceView.self, forKey: .device)
+            
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(device, forKey: .device)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let deviceValue = try device.toCBORValue()
             map = map.adding(key: "device", value: deviceValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case device
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case authenticationGenerationConflict = "AuthenticationGenerationConflict"
+                case cutoverRequired = "CutoverRequired"
+                case deviceAlreadyExists = "DeviceAlreadyExists"
+                case deviceLimitReached = "DeviceLimitReached"
+                case deviceTombstoned = "DeviceTombstoned"
+                case idempotencyConflict = "IdempotencyConflict"
+                case invalidKeyPackage = "InvalidKeyPackage"
+                case invalidRequest = "InvalidRequest"
+                case invalidSignature = "InvalidSignature"
+                case keyPackageInventoryLimitReached = "KeyPackageInventoryLimitReached"
+                case notAuthorized = "NotAuthorized"
+                case accountSessionExpired = "AccountSessionExpired"
+                case deviceBindingMismatch = "DeviceBindingMismatch"
+                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+                case rateLimited = "RateLimited"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case authenticationGenerationConflict = "AuthenticationGenerationConflict"
-        case cutoverRequired = "CutoverRequired"
-        case deviceAlreadyExists = "DeviceAlreadyExists"
-        case deviceLimitReached = "DeviceLimitReached"
-        case deviceTombstoned = "DeviceTombstoned"
-        case idempotencyConflict = "IdempotencyConflict"
-        case invalidDPoP = "InvalidDPoP"
-        case invalidKeyPackage = "InvalidKeyPackage"
-        case invalidRequest = "InvalidRequest"
-        case invalidSignature = "InvalidSignature"
-        case keyPackageInventoryLimitReached = "KeyPackageInventoryLimitReached"
-        case notAuthorized = "NotAuthorized"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                return self.rawValue
+            }
         }
 
-        public var errorName: String {
-            return rawValue
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - enrollDevice
 
-    // First enrollment only. Requires a one-use at-most-120-second Nest fresh-auth enrollment grant from an enrollment-purpose-bound OAuth authorization_code flow. Nest creates evidence only after successful callback/code exchange and issuer/subject/scope/DPoP validation; restore, refresh, cookie exchange, or an existing session alone never creates evidence. Callback completion opens one encrypted capability through auth_time + 300 seconds, with auth_time equal to Nest callback-completion time and not upstream auth_time. Capability states are unpinned, pinned/pending, and terminal-success. Before pinning, Nest performs strict canonical decode, bounds, and capability/body binding checks and verifies the body's Ed25519 signature under its supplied immutable signing key; malformed, out-of-bounds, binding-invalid, or signature-invalid attempts neither pin nor burn it. The first body that passes all checks transitions unpinned to pinned/pending and atomically pins exact canonical digest, separate signature, DID, device, DPoP JKT, key ID, signing-key digest, and enrollment-transcript digest. While pinned/pending and Nest has not durably recorded downstream success, including ambiguous response loss after delivery-service commit, the same exact body may mint another downstream grant; each such attempt retains original auth_time but gets fresh token/proof JTIs and a server-generated per-attempt canonical lowercase UUIDv4 auth_txn distinct from provider state and client input. Changed body cannot reuse the capability. Once Nest durably records success it stores the terminal result/binding, transitions to terminal-success, and closes the capability; exact client retry is then answered from that Nest-stored result without a new downstream grant. Expiry before terminal success requires a new code flow. Besides exact common claims iss, sub, aud, lxm, iat, exp, jti, cnf.jkt, device_id, and chat_instance, the grant carries key_id, signing_key_sha256, enrollment_transcript_sha256, auth_time, and auth_txn and sets exp = min(iat + 120, auth_time + 300) using checked NumericDate arithmetic; ordinary tokens require exp <= iat + 120. At trusted instant T, the delivery service independently requires 0 <= T-auth_time <= 300 seconds. prompt=login and an ephemeral browser are best-effort only; neither is a security predicate, fresh authorization-code completion does not attest credential entry or user presence, and no user reauthentication is claimed. Exact subject, endpoint, device, key ID, SHA-256 Ed25519 key, dpopJkt through cnf.jkt, and raw SHA-256 of the canonical enrollment signing transcript must match; grant cnf.jkt, proof RFC7638 JKT, and signed body dpopJkt match before lookup. A generic bearer/session token is forbidden. Requires row/tombstone absence, generation zero, and Ed25519 proof. While Nest remains pinned/pending, a delivery-service exact completed replay under a fresh grant, auth_txn, token/proof JTIs, and token/proof bound to the recorded JKT returns the stored result and never reexecutes. After terminal-success, Nest answers an exact client retry from its stored terminal result/binding and issues no downstream grant.
-    //
-    // - Parameter input: The input parameters for the request
-
-    ///
+    /// Enroll one client-generated MLS device through a standard ATProto service-authenticated AppView request. The canonical Ed25519-signed body binds the authenticated actor DID, device UUID, immutable signing key, generation-zero absence claim, and initial key packages. Existing login is sufficient when its OAuth scope permits this RPC.
+    /// 
+    /// - Parameter input: The input parameters for the request
+    
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func enrollDevice(
+    public func enrollDevice(
+        
         input: BlueCatbirdChatEnrollDevice.Input
-
+        
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatEnrollDevice.Output?) {
         let endpoint = "blue.catbird.chat.enrollDevice"
-
+        
         var headers: [String: String] = [:]
-
+        
         headers["Content-Type"] = "application/json"
-
+        
+        
+        
         headers["Accept"] = "application/json"
+        
 
+        
         let requestData: Data? = try JSONEncoder().encode(input)
-
+        
+        
         let queryItems: [URLQueryItem]? = nil
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -136,10 +180,12 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
+        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -147,11 +193,13 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatEnrollDevice.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -167,9 +215,13 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-
+            
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+        
     }
+    
 }
+                           
+

@@ -34,11 +34,14 @@ sealed class BlueCatbirdChatPrepareBlobUploadError(val name: String, val descrip
         object DeviceNotRegistered: BlueCatbirdChatPrepareBlobUploadError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatPrepareBlobUploadError("DeviceRevoked", "")
         object IdempotencyConflict: BlueCatbirdChatPrepareBlobUploadError("IdempotencyConflict", "")
-        object InvalidDPoP: BlueCatbirdChatPrepareBlobUploadError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatPrepareBlobUploadError("InvalidRequest", "")
         object InvalidSignature: BlueCatbirdChatPrepareBlobUploadError("InvalidSignature", "")
         object NotAuthorized: BlueCatbirdChatPrepareBlobUploadError("NotAuthorized", "")
         object StaleCoordinates: BlueCatbirdChatPrepareBlobUploadError("StaleCoordinates", "")
+        object AccountSessionExpired: BlueCatbirdChatPrepareBlobUploadError("AccountSessionExpired", "")
+        object DeviceBindingMismatch: BlueCatbirdChatPrepareBlobUploadError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatPrepareBlobUploadError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatPrepareBlobUploadError("RateLimited", "")
     }
 
 /**

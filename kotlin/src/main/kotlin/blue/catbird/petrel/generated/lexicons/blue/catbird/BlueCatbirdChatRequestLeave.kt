@@ -33,13 +33,17 @@ sealed class BlueCatbirdChatRequestLeaveError(val name: String, val description:
         object DeviceRevoked: BlueCatbirdChatRequestLeaveError("DeviceRevoked", "")
         object DirectParticipantMutationForbidden: BlueCatbirdChatRequestLeaveError("DirectParticipantMutationForbidden", "")
         object IdempotencyConflict: BlueCatbirdChatRequestLeaveError("IdempotencyConflict", "")
-        object InvalidDPoP: BlueCatbirdChatRequestLeaveError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatRequestLeaveError("InvalidRequest", "")
         object InvalidSignature: BlueCatbirdChatRequestLeaveError("InvalidSignature", "")
         object LastAdminRequired: BlueCatbirdChatRequestLeaveError("LastAdminRequired", "")
         object LeaveAlreadyPending: BlueCatbirdChatRequestLeaveError("LeaveAlreadyPending", "")
         object NotMember: BlueCatbirdChatRequestLeaveError("NotMember", "")
         object StaleCoordinates: BlueCatbirdChatRequestLeaveError("StaleCoordinates", "")
+        object AccountSessionExpired: BlueCatbirdChatRequestLeaveError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatRequestLeaveError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatRequestLeaveError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatRequestLeaveError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatRequestLeaveError("RateLimited", "")
     }
 
 /**

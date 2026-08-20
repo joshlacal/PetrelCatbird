@@ -2,118 +2,175 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.chat.getConversationState
 
-public enum BlueCatbirdChatGetConversationState {
-    public static let typeIdentifier = "blue.catbird.chat.getConversationState"
-    public struct Parameters: Parametrizable {
-        public let conversationId: String
 
+public struct BlueCatbirdChatGetConversationState { 
+
+    public static let typeIdentifier = "blue.catbird.chat.getConversationState"    
+public struct Parameters: Parametrizable {
+        public let actorDeviceId: String
+        public let conversationId: String
+        
         public init(
+            actorDeviceId: String, 
             conversationId: String
-        ) {
+            ) {
+            self.actorDeviceId = actorDeviceId
             self.conversationId = conversationId
+            
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let state: BlueCatbirdChatDefs.ConversationState
-
+        
         public let pendingResetRequests: [BlueCatbirdChatDefs.ResetRequestView]
-
+        
         public let pendingLeaveRequests: [BlueCatbirdChatDefs.LeaveRequestView]
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             state: BlueCatbirdChatDefs.ConversationState,
-
+            
             pendingResetRequests: [BlueCatbirdChatDefs.ResetRequestView],
-
+            
             pendingLeaveRequests: [BlueCatbirdChatDefs.LeaveRequestView]
-
+            
+            
         ) {
+            
+            
             self.state = state
-
+            
             self.pendingResetRequests = pendingResetRequests
-
+            
             self.pendingLeaveRequests = pendingLeaveRequests
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            state = try container.decode(BlueCatbirdChatDefs.ConversationState.self, forKey: .state)
-
-            pendingResetRequests = try container.decode([BlueCatbirdChatDefs.ResetRequestView].self, forKey: .pendingResetRequests)
-
-            pendingLeaveRequests = try container.decode([BlueCatbirdChatDefs.LeaveRequestView].self, forKey: .pendingLeaveRequests)
+            
+            
+            self.state = try container.decode(BlueCatbirdChatDefs.ConversationState.self, forKey: .state)
+            
+            
+            
+            
+            self.pendingResetRequests = try container.decode([BlueCatbirdChatDefs.ResetRequestView].self, forKey: .pendingResetRequests)
+            
+            
+            
+            
+            self.pendingLeaveRequests = try container.decode([BlueCatbirdChatDefs.LeaveRequestView].self, forKey: .pendingLeaveRequests)
+            
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(state, forKey: .state)
-
+            
+            
             try container.encode(pendingResetRequests, forKey: .pendingResetRequests)
-
+            
+            
             try container.encode(pendingLeaveRequests, forKey: .pendingLeaveRequests)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let stateValue = try state.toCBORValue()
             map = map.adding(key: "state", value: stateValue)
-
+            
+            
+            
             let pendingResetRequestsValue = try pendingResetRequests.toCBORValue()
             map = map.adding(key: "pendingResetRequests", value: pendingResetRequestsValue)
-
+            
+            
+            
             let pendingLeaveRequestsValue = try pendingLeaveRequests.toCBORValue()
             map = map.adding(key: "pendingLeaveRequests", value: pendingLeaveRequestsValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case state
             case pendingResetRequests
             case pendingLeaveRequests
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case accessOutsideMembershipInterval = "AccessOutsideMembershipInterval"
+                case conversationNotFound = "ConversationNotFound"
+                case cutoverRequired = "CutoverRequired"
+                case deviceNotRegistered = "DeviceNotRegistered"
+                case deviceRevoked = "DeviceRevoked"
+                case invalidRequest = "InvalidRequest"
+                case notEntitled = "NotEntitled"
+                case accountSessionExpired = "AccountSessionExpired"
+                case notAuthorized = "NotAuthorized"
+                case deviceBindingMismatch = "DeviceBindingMismatch"
+                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+                case rateLimited = "RateLimited"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case accessOutsideMembershipInterval = "AccessOutsideMembershipInterval"
-        case conversationNotFound = "ConversationNotFound"
-        case cutoverRequired = "CutoverRequired"
-        case deviceNotRegistered = "DeviceNotRegistered"
-        case deviceRevoked = "DeviceRevoked"
-        case invalidDPoP = "InvalidDPoP"
-        case invalidRequest = "InvalidRequest"
-        case notEntitled = "NotEntitled"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                return self.rawValue
+            }
         }
 
-        public var errorName: String {
-            return rawValue
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+
+
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - getConversationState
 
     /// Returns public state and visible pending reset/leave work under separate control-plane entitlement. state.snapshotSeq is the greatest committed conversation seq included in this transactionally observed state; it is not a getEntries afterSeq or an application-visibility grant. A logical participant with zero leaves may receive bounded inventory/reset/recovery/leave visibility needed to join or leave, but roster status and sibling-device membership grant no application ciphertext. A former concrete device leaf is bounded by its own inclusive terminalSeq and cannot inherit another device's interval.
-    ///
+    /// 
     /// - Parameter input: The input parameters for the request
-    ///
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getConversationState(input: BlueCatbirdChatGetConversationState.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetConversationState.Output?) {
+    public func getConversationState(input: BlueCatbirdChatGetConversationState.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetConversationState.Output?) {
         let endpoint = "blue.catbird.chat.getConversationState"
 
+        
         let queryItems = input.asQueryItems()
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -131,7 +188,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -139,6 +197,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
                 let decoder = JSONDecoder()
@@ -159,10 +218,12 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-
+            
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
+                           
+

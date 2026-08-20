@@ -1,5 +1,5 @@
 // Lexicon: 1, ID: blue.catbird.chat.subscribeEvents
-// The sole non-DPoP endpoint: browser WebSocket upgrade authentication uses only the one-use short-lived getSubscriptionTicket token. cursor must byte-equal the cursor bound into the DID/device/JKT/authGeneration/path-bound ticket, which is consumed atomically before upgrade; mismatch, reuse, or expiry rejects. Streams durable entitlement-filtered envelopes plus uncursored best-effort typing variants. For durable envelopes previousCursor is the immediately preceding visible audience cursor and the first continues the ticket cursor. Typing events never alter this chain.
+// The direct WebSocket upgrade authenticates only with the one-use short-lived getSubscriptionTicket token. cursor must byte-equal the cursor bound into the DID/device/authGeneration/path-bound ticket, which is consumed atomically before upgrade; mismatch, reuse, or expiry rejects. Streams durable entitlement-filtered envelopes plus uncursored best-effort typing variants. For durable envelopes previousCursor is the immediately preceding visible audience cursor and the first continues the ticket cursor. Typing events never alter this chain.
 package blue.catbird.petrel.generated
 
 import kotlinx.serialization.*
@@ -29,6 +29,11 @@ sealed class BlueCatbirdChatSubscribeEventsError(val name: String, val descripti
         object DeviceNotRegistered: BlueCatbirdChatSubscribeEventsError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatSubscribeEventsError("DeviceRevoked", "")
         object InvalidTicket: BlueCatbirdChatSubscribeEventsError("InvalidTicket", "")
+        object AccountSessionExpired: BlueCatbirdChatSubscribeEventsError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatSubscribeEventsError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatSubscribeEventsError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatSubscribeEventsError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatSubscribeEventsError("RateLimited", "")
     }
 
 /**
@@ -43,7 +48,7 @@ data class BlueCatbirdChatDefsSubscriptionMessageError(val name: String, val mes
 data class BlueCatbirdChatDefsSubscriptionMessageUnexpected(val type: String, val payload: kotlinx.serialization.json.JsonObject) : BlueCatbirdChatDefsSubscriptionMessage
 
 /**
- * The sole non-DPoP endpoint: browser WebSocket upgrade authentication uses only the one-use short-lived getSubscriptionTicket token. cursor must byte-equal the cursor bound into the DID/device/JKT/authGeneration/path-bound ticket, which is consumed atomically before upgrade; mismatch, reuse, or expiry rejects. Streams durable entitlement-filtered envelopes plus uncursored best-effort typing variants. For durable envelopes previousCursor is the immediately preceding visible audience cursor and the first continues the ticket cursor. Typing events never alter this chain.
+ * The direct WebSocket upgrade authenticates only with the one-use short-lived getSubscriptionTicket token. cursor must byte-equal the cursor bound into the DID/device/authGeneration/path-bound ticket, which is consumed atomically before upgrade; mismatch, reuse, or expiry rejects. Streams durable entitlement-filtered envelopes plus uncursored best-effort typing variants. For durable envelopes previousCursor is the immediately preceding visible audience cursor and the first continues the ticket cursor. Typing events never alter this chain.
  *
  * Endpoint: blue.catbird.chat.subscribeEvents
  *

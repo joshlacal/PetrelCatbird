@@ -17,7 +17,8 @@ object BlueCatbirdChatGetEntriesDefs {
 
 @Serializable
     data class BlueCatbirdChatGetEntriesParameters(
-// Canonical lowercase hyphenated RFC 4122-variant UUIDv4 conversation ID; strict runtime validation rejects every other spelling/version/variant.        @SerialName("conversationId")
+// Canonical lowercase hyphenated RFC 4122-variant UUIDv4 device ID; strict runtime validation rejects every other spelling, version, or variant.        @SerialName("actorDeviceId")
+        val actorDeviceId: String,// Canonical lowercase hyphenated RFC 4122-variant UUIDv4 conversation ID; strict runtime validation rejects every other spelling/version/variant.        @SerialName("conversationId")
         val conversationId: String,        @SerialName("afterSeq")
         val afterSeq: Int,        @SerialName("limit")
         val limit: Int    )
@@ -35,9 +36,13 @@ sealed class BlueCatbirdChatGetEntriesError(val name: String, val description: S
         object CutoverRequired: BlueCatbirdChatGetEntriesError("CutoverRequired", "")
         object DeviceNotRegistered: BlueCatbirdChatGetEntriesError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatGetEntriesError("DeviceRevoked", "")
-        object InvalidDPoP: BlueCatbirdChatGetEntriesError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatGetEntriesError("InvalidRequest", "")
         object NotEntitled: BlueCatbirdChatGetEntriesError("NotEntitled", "")
+        object AccountSessionExpired: BlueCatbirdChatGetEntriesError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatGetEntriesError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatGetEntriesError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatGetEntriesError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatGetEntriesError("RateLimited", "")
     }
 
 /**

@@ -2,149 +2,195 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: place.stream.server.listWebhooks
 
-public enum PlaceStreamServerListWebhooks {
-    public static let typeIdentifier = "place.stream.server.listWebhooks"
-    public struct Parameters: Parametrizable {
+
+public struct PlaceStreamServerListWebhooks { 
+
+    public static let typeIdentifier = "place.stream.server.listWebhooks"    
+public struct Parameters: Parametrizable {
         public let limit: Int?
         public let cursor: String?
         public let active: Bool?
         public let event: ParametersEvent?
-
+        
         public init(
-            limit: Int? = nil,
-            cursor: String? = nil,
-            active: Bool? = nil,
+            limit: Int? = nil, 
+            cursor: String? = nil, 
+            active: Bool? = nil, 
             event: ParametersEvent? = nil
-        ) {
+            ) {
             self.limit = limit
             self.cursor = cursor
             self.active = active
             self.event = event
+            
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let webhooks: [PlaceStreamServerDefs.Webhook]
-
+        
         public let cursor: String?
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             webhooks: [PlaceStreamServerDefs.Webhook],
-
+            
             cursor: String? = nil
-
+            
+            
         ) {
+            
+            
             self.webhooks = webhooks
-
+            
             self.cursor = cursor
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            webhooks = try container.decode([PlaceStreamServerDefs.Webhook].self, forKey: .webhooks)
-
+            
+            
+            self.webhooks = try container.decode([PlaceStreamServerDefs.Webhook].self, forKey: .webhooks)
+            
+            
+            
+            
             do {
-                cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
+                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
-                cursor = nil
+                self.cursor = nil
             }
+            
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(webhooks, forKey: .webhooks)
-
+            
+            
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(cursor, forKey: .cursor)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let webhooksValue = try webhooks.toCBORValue()
             map = map.adding(key: "webhooks", value: webhooksValue)
-
+            
+            
+            
             if let value = cursor {
                 // Encode optional property even if it's an empty array for CBOR
                 let cursorValue = try value.toCBORValue()
                 map = map.adding(key: "cursor", value: cursorValue)
             }
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case webhooks
             case cursor
         }
+        
+    }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                /// The provided cursor is invalid or expired.
+                case invalidCursor = "InvalidCursor"
+            public var description: String {
+                return self.rawValue
+            }
+
+            public var errorName: String {
+                return self.rawValue
+            }
+        }
+
+
+
+public enum ParametersEvent: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+    case value_chat = "chat"
+    case value_livestream = "livestream"
+    case value_follow = "follow"
+    case value_mention = "mention"
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let otherValue = other as? ParametersEvent else { return false }
+        return self == otherValue
     }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        /// The provided cursor is invalid or expired.
-        case invalidCursor = "InvalidCursor"
-        public var description: String {
-            return rawValue
-        }
-
-        public var errorName: String {
-            return rawValue
-        }
-    }
-
-    public enum ParametersEvent: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-        case value_chat = "chat"
-        case value_livestream = "livestream"
-        case value_follow = "follow"
-        case value_mention = "mention"
-
-        public func isEqual(to other: any ATProtocolValue) -> Bool {
-            guard let otherValue = other as? ParametersEvent else { return false }
-            return self == otherValue
-        }
-
-        public func toCBORValue() throws -> Any {
-            return rawValue
-        }
-    }
-
-    public enum EventEvent: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-        case value_chat = "chat"
-        case value_livestream = "livestream"
-        case value_follow = "follow"
-        case value_mention = "mention"
-
-        public func isEqual(to other: any ATProtocolValue) -> Bool {
-            guard let otherValue = other as? EventEvent else { return false }
-            return self == otherValue
-        }
-
-        public func toCBORValue() throws -> Any {
-            return rawValue
-        }
+    public func toCBORValue() throws -> Any {
+        return rawValue
     }
 }
 
-public extension ATProtoClient.Place.Stream.Server {
+
+public enum EventEvent: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+    case value_chat = "chat"
+    case value_livestream = "livestream"
+    case value_follow = "follow"
+    case value_mention = "mention"
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let otherValue = other as? EventEvent else { return false }
+        return self == otherValue
+    }
+
+    public func toCBORValue() throws -> Any {
+        return rawValue
+    }
+}
+
+
+}
+
+
+
+extension ATProtoClient.Place.Stream.Server {
     // MARK: - listWebhooks
 
     /// List webhooks for the authenticated user.
-    ///
+    /// 
     /// - Parameter input: The input parameters for the request
-    ///
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func listWebhooks(input: PlaceStreamServerListWebhooks.Parameters) async throws -> (responseCode: Int, data: PlaceStreamServerListWebhooks.Output?) {
+    public func listWebhooks(input: PlaceStreamServerListWebhooks.Parameters) async throws -> (responseCode: Int, data: PlaceStreamServerListWebhooks.Output?) {
         let endpoint = "place.stream.server.listWebhooks"
 
+        
         let queryItems = input.asQueryItems()
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -162,7 +208,8 @@ public extension ATProtoClient.Place.Stream.Server {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -170,6 +217,7 @@ public extension ATProtoClient.Place.Stream.Server {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
                 let decoder = JSONDecoder()
@@ -190,10 +238,12 @@ public extension ATProtoClient.Place.Stream.Server {
             ) {
                 throw atprotoError
             }
-
+            
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
+                           
+

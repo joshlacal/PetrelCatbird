@@ -32,7 +32,6 @@ sealed class BlueCatbirdChatRequestLeafRecoveryError(val name: String, val descr
         object DeviceNotRegistered: BlueCatbirdChatRequestLeafRecoveryError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatRequestLeafRecoveryError("DeviceRevoked", "")
         object IdempotencyConflict: BlueCatbirdChatRequestLeafRecoveryError("IdempotencyConflict", "")
-        object InvalidDPoP: BlueCatbirdChatRequestLeafRecoveryError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatRequestLeafRecoveryError("InvalidRequest", "")
         object InvalidSignature: BlueCatbirdChatRequestLeafRecoveryError("InvalidSignature", "")
         object KeyPackageUnavailable: BlueCatbirdChatRequestLeafRecoveryError("KeyPackageUnavailable", "")
@@ -40,6 +39,11 @@ sealed class BlueCatbirdChatRequestLeafRecoveryError(val name: String, val descr
         object NotParticipant: BlueCatbirdChatRequestLeafRecoveryError("NotParticipant", "")
         object RelationshipPolicyUnavailable: BlueCatbirdChatRequestLeafRecoveryError("RelationshipPolicyUnavailable", "")
         object StaleCoordinates: BlueCatbirdChatRequestLeafRecoveryError("StaleCoordinates", "")
+        object AccountSessionExpired: BlueCatbirdChatRequestLeafRecoveryError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatRequestLeafRecoveryError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatRequestLeafRecoveryError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatRequestLeafRecoveryError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatRequestLeafRecoveryError("RateLimited", "")
     }
 
 /**

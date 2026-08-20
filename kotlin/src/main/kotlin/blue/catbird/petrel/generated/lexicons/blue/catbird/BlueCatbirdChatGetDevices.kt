@@ -1,5 +1,5 @@
 // Lexicon: 1, ID: blue.catbird.chat.getDevices
-// Return the complete active addressable-device set for one to five strictly ordered, duplicate-free bare DIDs. At most 20 active devices exist per DID, so the bounded response is never truncated. Output devices are strictly ordered by (userDid exact UTF-8 bytes, deviceId raw UUID bytes). Device scope is never caller-selected for authentication; all calls still require a verified active clean device and fresh DPoP proof.
+// Return the complete active addressable-device set for one to five strictly ordered, duplicate-free bare DIDs. At most 20 active devices exist per DID, so the bounded response is never truncated. Output devices are strictly ordered by (userDid exact UTF-8 bytes, deviceId raw UUID bytes). actorDeviceId identifies the authenticated caller's active device and is validated against the service-authenticated DID.
 package blue.catbird.petrel.generated
 
 import kotlinx.serialization.*
@@ -17,7 +17,8 @@ object BlueCatbirdChatGetDevicesDefs {
 
 @Serializable
     data class BlueCatbirdChatGetDevicesParameters(
-        @SerialName("userDids")
+// Canonical lowercase hyphenated RFC 4122-variant UUIDv4 device ID; strict runtime validation rejects every other spelling, version, or variant.        @SerialName("actorDeviceId")
+        val actorDeviceId: String,        @SerialName("userDids")
         val userDids: List<DID>    )
 
     @Serializable
@@ -29,12 +30,16 @@ sealed class BlueCatbirdChatGetDevicesError(val name: String, val description: S
         object CutoverRequired: BlueCatbirdChatGetDevicesError("CutoverRequired", "")
         object DeviceNotRegistered: BlueCatbirdChatGetDevicesError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatGetDevicesError("DeviceRevoked", "")
-        object InvalidDPoP: BlueCatbirdChatGetDevicesError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatGetDevicesError("InvalidRequest", "")
+        object AccountSessionExpired: BlueCatbirdChatGetDevicesError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatGetDevicesError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatGetDevicesError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatGetDevicesError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatGetDevicesError("RateLimited", "")
     }
 
 /**
- * Return the complete active addressable-device set for one to five strictly ordered, duplicate-free bare DIDs. At most 20 active devices exist per DID, so the bounded response is never truncated. Output devices are strictly ordered by (userDid exact UTF-8 bytes, deviceId raw UUID bytes). Device scope is never caller-selected for authentication; all calls still require a verified active clean device and fresh DPoP proof.
+ * Return the complete active addressable-device set for one to five strictly ordered, duplicate-free bare DIDs. At most 20 active devices exist per DID, so the bounded response is never truncated. Output devices are strictly ordered by (userDid exact UTF-8 bytes, deviceId raw UUID bytes). actorDeviceId identifies the authenticated caller's active device and is validated against the service-authenticated DID.
  *
  * Endpoint: blue.catbird.chat.getDevices
  */

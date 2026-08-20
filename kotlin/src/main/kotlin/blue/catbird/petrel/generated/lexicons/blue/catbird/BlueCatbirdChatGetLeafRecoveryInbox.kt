@@ -17,7 +17,8 @@ object BlueCatbirdChatGetLeafRecoveryInboxDefs {
 
 @Serializable
     data class BlueCatbirdChatGetLeafRecoveryInboxParameters(
-        @SerialName("inventorySessionId")
+// Canonical lowercase hyphenated RFC 4122-variant UUIDv4 device ID; strict runtime validation rejects every other spelling, version, or variant.        @SerialName("actorDeviceId")
+        val actorDeviceId: String,        @SerialName("inventorySessionId")
         val inventorySessionId: String,        @SerialName("pageCursor")
         val pageCursor: String? = null,        @SerialName("limit")
         val limit: Int    )
@@ -37,10 +38,14 @@ sealed class BlueCatbirdChatGetLeafRecoveryInboxError(val name: String, val desc
         object CutoverRequired: BlueCatbirdChatGetLeafRecoveryInboxError("CutoverRequired", "")
         object DeviceNotRegistered: BlueCatbirdChatGetLeafRecoveryInboxError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatGetLeafRecoveryInboxError("DeviceRevoked", "")
-        object InvalidDPoP: BlueCatbirdChatGetLeafRecoveryInboxError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatGetLeafRecoveryInboxError("InvalidRequest", "")
         object InventorySessionExpired: BlueCatbirdChatGetLeafRecoveryInboxError("InventorySessionExpired", "")
         object InventorySessionMismatch: BlueCatbirdChatGetLeafRecoveryInboxError("InventorySessionMismatch", "")
+        object AccountSessionExpired: BlueCatbirdChatGetLeafRecoveryInboxError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatGetLeafRecoveryInboxError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatGetLeafRecoveryInboxError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatGetLeafRecoveryInboxError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatGetLeafRecoveryInboxError("RateLimited", "")
     }
 
 /**

@@ -2,59 +2,76 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.chat.subscribeEvents
 
-public enum BlueCatbirdChatSubscribeEvents {
-    public static let typeIdentifier = "blue.catbird.chat.subscribeEvents"
-    public struct Parameters: Parametrizable {
+
+public struct BlueCatbirdChatSubscribeEvents { 
+
+    public static let typeIdentifier = "blue.catbird.chat.subscribeEvents"    
+public struct Parameters: Parametrizable {
         public let ticket: String
         public let cursor: String
-
+        
         public init(
-            ticket: String,
+            ticket: String, 
             cursor: String
-        ) {
+            ) {
             self.ticket = ticket
             self.cursor = cursor
+            
         }
     }
-
     public typealias Message = BlueCatbirdChatDefs.SubscriptionMessage
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case cursorExpired = "CursorExpired"
+                case cutoverRequired = "CutoverRequired"
+                case deviceNotRegistered = "DeviceNotRegistered"
+                case deviceRevoked = "DeviceRevoked"
+                case invalidTicket = "InvalidTicket"
+                case accountSessionExpired = "AccountSessionExpired"
+                case notAuthorized = "NotAuthorized"
+                case deviceBindingMismatch = "DeviceBindingMismatch"
+                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+                case rateLimited = "RateLimited"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case cursorExpired = "CursorExpired"
-        case cutoverRequired = "CutoverRequired"
-        case deviceNotRegistered = "DeviceNotRegistered"
-        case deviceRevoked = "DeviceRevoked"
-        case invalidTicket = "InvalidTicket"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                return self.rawValue
+            }
         }
 
-        public var errorName: String {
-            return rawValue
-        }
-    }
+
+
 }
 
-// The sole non-DPoP endpoint: browser WebSocket upgrade authentication uses only the one-use short-lived getSubscriptionTicket token. cursor must byte-equal the cursor bound into the DID/device/JKT/authGeneration/path-bound ticket, which is consumed atomically before upgrade; mismatch, reuse, or expiry rejects. Streams durable entitlement-filtered envelopes plus uncursored best-effort typing variants. For durable envelopes previousCursor is the immediately preceding visible audience cursor and the first continues the ticket cursor. Typing events never alter this chain.
 
-public extension ATProtoClient.Blue.Catbird.Chat {
-    func subscribeEvents(
+                           
+
+/// The direct WebSocket upgrade authenticates only with the one-use short-lived getSubscriptionTicket token. cursor must byte-equal the cursor bound into the DID/device/authGeneration/path-bound ticket, which is consumed atomically before upgrade; mismatch, reuse, or expiry rejects. Streams durable entitlement-filtered envelopes plus uncursored best-effort typing variants. For durable envelopes previousCursor is the immediately preceding visible audience cursor and the first continues the ticket cursor. Typing events never alter this chain.
+
+extension ATProtoClient.Blue.Catbird.Chat {
+    
+    public func subscribeEvents(
         ticket: String, cursor: String
     ) async throws -> AsyncThrowingStream<BlueCatbirdChatSubscribeEvents.Message, Error> {
         let params = BlueCatbirdChatSubscribeEvents.Parameters(ticket: ticket, cursor: cursor)
-        return try await networkService.subscribe(
+        return try await self.networkService.subscribe(
             endpoint: "blue.catbird.chat.subscribeEvents",
             parameters: params
         )
     }
 
     /// Alternative signature accepting input struct
-    func subscribeEvents(input: BlueCatbirdChatSubscribeEvents.Parameters) async throws -> AsyncThrowingStream<BlueCatbirdChatSubscribeEvents.Message, Error> {
-        return try await networkService.subscribe(
+    public func subscribeEvents(input: BlueCatbirdChatSubscribeEvents.Parameters) async throws -> AsyncThrowingStream<BlueCatbirdChatSubscribeEvents.Message, Error> {
+        return try await self.networkService.subscribe(
             endpoint: "blue.catbird.chat.subscribeEvents",
             parameters: input
         )
     }
+    
 }

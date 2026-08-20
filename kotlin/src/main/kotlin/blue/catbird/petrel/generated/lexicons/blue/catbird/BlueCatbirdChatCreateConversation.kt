@@ -33,7 +33,6 @@ sealed class BlueCatbirdChatCreateConversationError(val name: String, val descri
         object DeviceRevoked: BlueCatbirdChatCreateConversationError("DeviceRevoked", "")
         object GroupInvitesDisabled: BlueCatbirdChatCreateConversationError("GroupInvitesDisabled", "")
         object IdempotencyConflict: BlueCatbirdChatCreateConversationError("IdempotencyConflict", "")
-        object InvalidDPoP: BlueCatbirdChatCreateConversationError("InvalidDPoP", "")
         object InvalidGenesisGroupInfo: BlueCatbirdChatCreateConversationError("InvalidGenesisGroupInfo", "")
         object InvalidMetadataSnapshot: BlueCatbirdChatCreateConversationError("InvalidMetadataSnapshot", "")
         object InvalidMlsArtifact: BlueCatbirdChatCreateConversationError("InvalidMlsArtifact", "")
@@ -46,6 +45,10 @@ sealed class BlueCatbirdChatCreateConversationError(val name: String, val descri
         object NotFollowedByRecipient: BlueCatbirdChatCreateConversationError("NotFollowedByRecipient", "")
         object RelationshipPolicyUnavailable: BlueCatbirdChatCreateConversationError("RelationshipPolicyUnavailable", "")
         object UnsupportedMlsProfile: BlueCatbirdChatCreateConversationError("UnsupportedMlsProfile", "")
+        object AccountSessionExpired: BlueCatbirdChatCreateConversationError("AccountSessionExpired", "")
+        object DeviceBindingMismatch: BlueCatbirdChatCreateConversationError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatCreateConversationError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatCreateConversationError("RateLimited", "")
     }
 
 /**

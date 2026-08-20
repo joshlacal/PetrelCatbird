@@ -35,7 +35,6 @@ sealed class BlueCatbirdChatActivateResetError(val name: String, val description
         object DeviceNotRegistered: BlueCatbirdChatActivateResetError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatActivateResetError("DeviceRevoked", "")
         object IdempotencyConflict: BlueCatbirdChatActivateResetError("IdempotencyConflict", "")
-        object InvalidDPoP: BlueCatbirdChatActivateResetError("InvalidDPoP", "")
         object InvalidGenesisGroupInfo: BlueCatbirdChatActivateResetError("InvalidGenesisGroupInfo", "")
         object InvalidMetadataSnapshot: BlueCatbirdChatActivateResetError("InvalidMetadataSnapshot", "")
         object InvalidMlsArtifact: BlueCatbirdChatActivateResetError("InvalidMlsArtifact", "")
@@ -48,6 +47,10 @@ sealed class BlueCatbirdChatActivateResetError(val name: String, val description
         object ResetRequestStale: BlueCatbirdChatActivateResetError("ResetRequestStale", "")
         object StaleCoordinates: BlueCatbirdChatActivateResetError("StaleCoordinates", "")
         object UnsupportedMlsProfile: BlueCatbirdChatActivateResetError("UnsupportedMlsProfile", "")
+        object AccountSessionExpired: BlueCatbirdChatActivateResetError("AccountSessionExpired", "")
+        object DeviceBindingMismatch: BlueCatbirdChatActivateResetError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatActivateResetError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatActivateResetError("RateLimited", "")
     }
 
 /**

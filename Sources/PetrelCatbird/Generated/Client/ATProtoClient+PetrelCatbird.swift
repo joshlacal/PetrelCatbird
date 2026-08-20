@@ -5,65 +5,58 @@ import Petrel
 // Generated namespace extensions for the PetrelCatbird overlay package.
 
 public extension ATProtoClient.Blue {
-    var catbird: Catbird {
-        Catbird(networkService: networkService)
-    }
+    var catbird: Catbird { Catbird(networkService: networkService) }
 
-    struct Catbird: Sendable {
+    public struct Catbird: Sendable {
         public let networkService: NetworkService
         public init(networkService: NetworkService) {
             self.networkService = networkService
         }
 
-        public var bskychat: Bskychat {
-            Bskychat(networkService: networkService)
-        }
+        public var bskychat: Bskychat { Bskychat(networkService: networkService) }
 
         public struct Bskychat: Sendable {
             public let networkService: NetworkService
             public init(networkService: NetworkService) {
                 self.networkService = networkService
             }
+
         }
 
-        public var chat: Chat {
-            Chat(networkService: networkService)
-        }
+        public var chat: Chat { Chat(networkService: networkService) }
 
         public struct Chat: Sendable {
             public let networkService: NetworkService
             public init(networkService: NetworkService) {
                 self.networkService = networkService
             }
+
         }
 
-        public var mlsDS: MlsDS {
-            MlsDS(networkService: networkService)
-        }
+        public var mlsDS: MlsDS { MlsDS(networkService: networkService) }
 
         public struct MlsDS: Sendable {
             public let networkService: NetworkService
             public init(networkService: NetworkService) {
                 self.networkService = networkService
             }
+
         }
+
     }
+
 }
 
 public extension ATProtoClient {
-    var place: Place {
-        Place(networkService: networkService)
-    }
+    var place: Place { Place(networkService: networkService) }
 
-    struct Place: Sendable {
+    public struct Place: Sendable {
         public let networkService: NetworkService
         public init(networkService: NetworkService) {
             self.networkService = networkService
         }
 
-        public var stream: Stream {
-            Stream(networkService: networkService)
-        }
+        public var stream: Stream { Stream(networkService: networkService) }
 
         public struct Stream: Sendable {
             public let networkService: NetworkService
@@ -71,225 +64,209 @@ public extension ATProtoClient {
                 self.networkService = networkService
             }
 
-            public var defs: Defs {
-                Defs(networkService: networkService)
-            }
+            public var defs: Defs { Defs(networkService: networkService) }
 
             public struct Defs: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var key: Key {
-                Key(networkService: networkService)
-            }
+            public var key: Key { Key(networkService: networkService) }
 
             public struct Key: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var livestream: Livestream {
-                Livestream(networkService: networkService)
-            }
+            public var livestream: Livestream { Livestream(networkService: networkService) }
 
             public struct Livestream: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var segment: Segment {
-                Segment(networkService: networkService)
-            }
+            public var segment: Segment { Segment(networkService: networkService) }
 
             public struct Segment: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var video: Video {
-                Video(networkService: networkService)
-            }
+            public var video: Video { Video(networkService: networkService) }
 
             public struct Video: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var badge: Badge {
-                Badge(networkService: networkService)
-            }
+            public var badge: Badge { Badge(networkService: networkService) }
 
             public struct Badge: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var branding: Branding {
-                Branding(networkService: networkService)
-            }
+            public var branding: Branding { Branding(networkService: networkService) }
 
             public struct Branding: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var broadcast: Broadcast {
-                Broadcast(networkService: networkService)
-            }
+            public var broadcast: Broadcast { Broadcast(networkService: networkService) }
 
             public struct Broadcast: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var chat: Chat {
-                Chat(networkService: networkService)
-            }
+            public var chat: Chat { Chat(networkService: networkService) }
 
             public struct Chat: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var config: Config {
-                Config(networkService: networkService)
-            }
+            public var config: Config { Config(networkService: networkService) }
 
             public struct Config: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var graph: Graph {
-                Graph(networkService: networkService)
-            }
+            public var graph: Graph { Graph(networkService: networkService) }
 
             public struct Graph: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var ingest: Ingest {
-                Ingest(networkService: networkService)
-            }
+            public var ingest: Ingest { Ingest(networkService: networkService) }
 
             public struct Ingest: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var live: Live {
-                Live(networkService: networkService)
-            }
+            public var live: Live { Live(networkService: networkService) }
 
             public struct Live: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var metadata: Metadata {
-                Metadata(networkService: networkService)
-            }
+            public var metadata: Metadata { Metadata(networkService: networkService) }
 
             public struct Metadata: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var moderation: Moderation {
-                Moderation(networkService: networkService)
-            }
+            public var moderation: Moderation { Moderation(networkService: networkService) }
 
             public struct Moderation: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var multistream: Multistream {
-                Multistream(networkService: networkService)
-            }
+            public var multistream: Multistream { Multistream(networkService: networkService) }
 
             public struct Multistream: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var muxl: Muxl {
-                Muxl(networkService: networkService)
-            }
+            public var muxl: Muxl { Muxl(networkService: networkService) }
 
             public struct Muxl: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var playback: Playback {
-                Playback(networkService: networkService)
-            }
+            public var playback: Playback { Playback(networkService: networkService) }
 
             public struct Playback: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var richtext: Richtext {
-                Richtext(networkService: networkService)
-            }
+            public var richtext: Richtext { Richtext(networkService: networkService) }
 
             public struct Richtext: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
 
-            public var server: Server {
-                Server(networkService: networkService)
-            }
+            public var server: Server { Server(networkService: networkService) }
 
             public struct Server: Sendable {
                 public let networkService: NetworkService
                 public init(networkService: NetworkService) {
                     self.networkService = networkService
                 }
+
             }
+
         }
+
     }
+
 }
+

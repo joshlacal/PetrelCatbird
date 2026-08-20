@@ -2,21 +2,26 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.chat.publishTyping
 
-public enum BlueCatbirdChatPublishTyping {
+
+public struct BlueCatbirdChatPublishTyping { 
+
     public static let typeIdentifier = "blue.catbird.chat.publishTyping"
-    public struct Input: ATProtocolCodable {
+public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedTyping
 
         /// Standard public initializer
         public init(signedRequest: BlueCatbirdChatDefs.SignedTyping) {
             self.signedRequest = signedRequest
         }
+        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedTyping.self, forKey: .signedRequest)
+            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedTyping.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -35,96 +40,135 @@ public enum BlueCatbirdChatPublishTyping {
             case signedRequest
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let typing: BlueCatbirdChatDefs.TypingEvent
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             typing: BlueCatbirdChatDefs.TypingEvent
-
+            
+            
         ) {
+            
+            
             self.typing = typing
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            typing = try container.decode(BlueCatbirdChatDefs.TypingEvent.self, forKey: .typing)
+            
+            
+            self.typing = try container.decode(BlueCatbirdChatDefs.TypingEvent.self, forKey: .typing)
+            
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(typing, forKey: .typing)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let typingValue = try typing.toCBORValue()
             map = map.adding(key: "typing", value: typingValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case typing
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case blockedRelationship = "BlockedRelationship"
+                case conversationNotAccepted = "ConversationNotAccepted"
+                case conversationNotFound = "ConversationNotFound"
+                case cutoverRequired = "CutoverRequired"
+                case deviceNotLeaf = "DeviceNotLeaf"
+                case deviceNotRegistered = "DeviceNotRegistered"
+                case deviceRevoked = "DeviceRevoked"
+                case idempotencyConflict = "IdempotencyConflict"
+                case invalidRequest = "InvalidRequest"
+                case invalidSignature = "InvalidSignature"
+                case rateLimited = "RateLimited"
+                case recipientNotReady = "RecipientNotReady"
+                case relationshipPolicyUnavailable = "RelationshipPolicyUnavailable"
+                case staleCoordinates = "StaleCoordinates"
+                case accountSessionExpired = "AccountSessionExpired"
+                case notAuthorized = "NotAuthorized"
+                case deviceBindingMismatch = "DeviceBindingMismatch"
+                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case blockedRelationship = "BlockedRelationship"
-        case conversationNotAccepted = "ConversationNotAccepted"
-        case conversationNotFound = "ConversationNotFound"
-        case cutoverRequired = "CutoverRequired"
-        case deviceNotLeaf = "DeviceNotLeaf"
-        case deviceNotRegistered = "DeviceNotRegistered"
-        case deviceRevoked = "DeviceRevoked"
-        case idempotencyConflict = "IdempotencyConflict"
-        case invalidDPoP = "InvalidDPoP"
-        case invalidRequest = "InvalidRequest"
-        case invalidSignature = "InvalidSignature"
-        case rateLimited = "RateLimited"
-        case recipientNotReady = "RecipientNotReady"
-        case relationshipPolicyUnavailable = "RelationshipPolicyUnavailable"
-        case staleCoordinates = "StaleCoordinates"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                return self.rawValue
+            }
         }
 
-        public var errorName: String {
-            return rawValue
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - publishTyping
 
-    // Publish signed clear ephemeral typing state from a current active MLS leaf. A complete at-most-60-second relationship projection between the actor DID and every current active participant DID is required; any actor-involving direct/list block denies and incomplete or stale policy fails closed. Direct additionally requires both exact participants active and each represented by at least one current MLS leaf; group traffic may continue for remaining leaves. The server derives an eight-second TTL, rate-limits and coalesces it, and emits only an uncursored best-effort typing variant with no database append or MLS secret-tree effect.
-    //
-    // - Parameter input: The input parameters for the request
-
-    ///
+    /// Publish signed clear ephemeral typing state from a current active MLS leaf. A complete at-most-60-second relationship projection between the actor DID and every current active participant DID is required; any actor-involving direct/list block denies and incomplete or stale policy fails closed. Direct additionally requires both exact participants active and each represented by at least one current MLS leaf; group traffic may continue for remaining leaves. The server derives an eight-second TTL, rate-limits and coalesces it, and emits only an uncursored best-effort typing variant with no database append or MLS secret-tree effect.
+    /// 
+    /// - Parameter input: The input parameters for the request
+    
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func publishTyping(
+    public func publishTyping(
+        
         input: BlueCatbirdChatPublishTyping.Input
-
+        
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatPublishTyping.Output?) {
         let endpoint = "blue.catbird.chat.publishTyping"
-
+        
         var headers: [String: String] = [:]
-
+        
         headers["Content-Type"] = "application/json"
-
+        
+        
+        
         headers["Accept"] = "application/json"
+        
 
+        
         let requestData: Data? = try JSONEncoder().encode(input)
-
+        
+        
         let queryItems: [URLQueryItem]? = nil
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -139,10 +183,12 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
+        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -150,11 +196,13 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatPublishTyping.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -170,9 +218,13 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-
+            
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+        
     }
+    
 }
+                           
+

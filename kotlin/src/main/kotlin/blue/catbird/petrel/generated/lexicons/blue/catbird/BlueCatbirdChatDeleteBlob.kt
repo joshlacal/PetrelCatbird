@@ -33,10 +33,13 @@ sealed class BlueCatbirdChatDeleteBlobError(val name: String, val description: S
         object DeviceNotRegistered: BlueCatbirdChatDeleteBlobError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatDeleteBlobError("DeviceRevoked", "")
         object IdempotencyConflict: BlueCatbirdChatDeleteBlobError("IdempotencyConflict", "")
-        object InvalidDPoP: BlueCatbirdChatDeleteBlobError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatDeleteBlobError("InvalidRequest", "")
         object InvalidSignature: BlueCatbirdChatDeleteBlobError("InvalidSignature", "")
         object NotAuthorized: BlueCatbirdChatDeleteBlobError("NotAuthorized", "")
+        object AccountSessionExpired: BlueCatbirdChatDeleteBlobError("AccountSessionExpired", "")
+        object DeviceBindingMismatch: BlueCatbirdChatDeleteBlobError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatDeleteBlobError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatDeleteBlobError("RateLimited", "")
     }
 
 /**

@@ -1,5 +1,5 @@
 // Lexicon: 1, ID: blue.catbird.chat.replenishKeyPackages
-// Publish a whole-or-nothing batch for the exact active device binding. Stored immutable key, submitted key/keyId, auth generation, signed JKT, token claims, and DPoP proof are rechecked under the mutation lock; package-only replenishment does not change auth generation.
+// Publish a whole-or-nothing package batch for the exact active device. The authenticated account, stored immutable key, submitted keyId, auth generation, canonical Ed25519 signature, and package credentials are rechecked under the mutation lock; replenishment does not change auth generation.
 package blue.catbird.petrel.generated
 
 import kotlinx.serialization.*
@@ -31,16 +31,19 @@ sealed class BlueCatbirdChatReplenishKeyPackagesError(val name: String, val desc
         object DeviceNotRegistered: BlueCatbirdChatReplenishKeyPackagesError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatReplenishKeyPackagesError("DeviceRevoked", "")
         object IdempotencyConflict: BlueCatbirdChatReplenishKeyPackagesError("IdempotencyConflict", "")
-        object InvalidDPoP: BlueCatbirdChatReplenishKeyPackagesError("InvalidDPoP", "")
         object InvalidKeyPackage: BlueCatbirdChatReplenishKeyPackagesError("InvalidKeyPackage", "")
         object InvalidRequest: BlueCatbirdChatReplenishKeyPackagesError("InvalidRequest", "")
         object InvalidSignature: BlueCatbirdChatReplenishKeyPackagesError("InvalidSignature", "")
         object KeyPackageInventoryLimitReached: BlueCatbirdChatReplenishKeyPackagesError("KeyPackageInventoryLimitReached", "")
         object NotAuthorized: BlueCatbirdChatReplenishKeyPackagesError("NotAuthorized", "")
+        object AccountSessionExpired: BlueCatbirdChatReplenishKeyPackagesError("AccountSessionExpired", "")
+        object DeviceBindingMismatch: BlueCatbirdChatReplenishKeyPackagesError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatReplenishKeyPackagesError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatReplenishKeyPackagesError("RateLimited", "")
     }
 
 /**
- * Publish a whole-or-nothing batch for the exact active device binding. Stored immutable key, submitted key/keyId, auth generation, signed JKT, token claims, and DPoP proof are rechecked under the mutation lock; package-only replenishment does not change auth generation.
+ * Publish a whole-or-nothing package batch for the exact active device. The authenticated account, stored immutable key, submitted keyId, auth generation, canonical Ed25519 signature, and package credentials are rechecked under the mutation lock; replenishment does not change auth generation.
  *
  * Endpoint: blue.catbird.chat.replenishKeyPackages
  */

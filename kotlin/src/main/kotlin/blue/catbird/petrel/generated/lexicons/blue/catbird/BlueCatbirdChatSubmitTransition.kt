@@ -44,7 +44,6 @@ sealed class BlueCatbirdChatSubmitTransitionError(val name: String, val descript
         object GroupInvitesDisabled: BlueCatbirdChatSubmitTransitionError("GroupInvitesDisabled", "")
         object IdempotencyConflict: BlueCatbirdChatSubmitTransitionError("IdempotencyConflict", "")
         object InvalidCommit: BlueCatbirdChatSubmitTransitionError("InvalidCommit", "")
-        object InvalidDPoP: BlueCatbirdChatSubmitTransitionError("InvalidDPoP", "")
         object InvalidLeaveManifest: BlueCatbirdChatSubmitTransitionError("InvalidLeaveManifest", "")
         object InvalidMetadataSnapshot: BlueCatbirdChatSubmitTransitionError("InvalidMetadataSnapshot", "")
         object InvalidRequest: BlueCatbirdChatSubmitTransitionError("InvalidRequest", "")
@@ -70,6 +69,10 @@ sealed class BlueCatbirdChatSubmitTransitionError(val name: String, val descript
         object StaleCoordinates: BlueCatbirdChatSubmitTransitionError("StaleCoordinates", "")
         object StandaloneProposalForbidden: BlueCatbirdChatSubmitTransitionError("StandaloneProposalForbidden", "")
         object UnsupportedMlsProfile: BlueCatbirdChatSubmitTransitionError("UnsupportedMlsProfile", "")
+        object AccountSessionExpired: BlueCatbirdChatSubmitTransitionError("AccountSessionExpired", "")
+        object DeviceBindingMismatch: BlueCatbirdChatSubmitTransitionError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatSubmitTransitionError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatSubmitTransitionError("RateLimited", "")
     }
 
 /**

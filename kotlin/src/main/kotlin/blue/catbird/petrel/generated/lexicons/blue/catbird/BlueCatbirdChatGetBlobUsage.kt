@@ -16,7 +16,9 @@ object BlueCatbirdChatGetBlobUsageDefs {
 }
 
 @Serializable
-    class BlueCatbirdChatGetBlobUsageParameters
+    data class BlueCatbirdChatGetBlobUsageParameters(
+// Canonical lowercase hyphenated RFC 4122-variant UUIDv4 device ID; strict runtime validation rejects every other spelling, version, or variant.        @SerialName("actorDeviceId")
+        val actorDeviceId: String    )
 
     @Serializable
     data class BlueCatbirdChatGetBlobUsageOutput(
@@ -27,7 +29,11 @@ sealed class BlueCatbirdChatGetBlobUsageError(val name: String, val description:
         object CutoverRequired: BlueCatbirdChatGetBlobUsageError("CutoverRequired", "")
         object DeviceNotRegistered: BlueCatbirdChatGetBlobUsageError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatGetBlobUsageError("DeviceRevoked", "")
-        object InvalidDPoP: BlueCatbirdChatGetBlobUsageError("InvalidDPoP", "")
+        object AccountSessionExpired: BlueCatbirdChatGetBlobUsageError("AccountSessionExpired", "")
+        object NotAuthorized: BlueCatbirdChatGetBlobUsageError("NotAuthorized", "")
+        object DeviceBindingMismatch: BlueCatbirdChatGetBlobUsageError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatGetBlobUsageError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatGetBlobUsageError("RateLimited", "")
     }
 
 /**

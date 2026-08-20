@@ -1,5 +1,5 @@
 // Lexicon: 1, ID: blue.catbird.chat.revokeDevice
-// Signed lost-device or self revocation using authoritative own-device inventory CAS fields. Revocation releases packages/reservations/recovery requests but does not forge MLS leaf removal or logical participant removal. For exact completed self-revoke response-loss replay only, the bearer DID and a fresh proof under the historical JKT recorded by that operation plus the same canonical request digest/signature return the stored response before active-device checks; it never reexecutes.
+// Signed lost-device or self revocation using authoritative own-device inventory CAS fields. Revocation releases packages, reservations, and recovery requests but does not forge MLS leaf removal or logical participant removal. Exact completed response-loss replay requires the same authenticated DID, canonical request digest, and signature; it returns the stored response without reexecuting the revocation.
 package blue.catbird.petrel.generated
 
 import kotlinx.serialization.*
@@ -32,14 +32,17 @@ sealed class BlueCatbirdChatRevokeDeviceError(val name: String, val description:
         object DeviceNotRegistered: BlueCatbirdChatRevokeDeviceError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatRevokeDeviceError("DeviceRevoked", "")
         object IdempotencyConflict: BlueCatbirdChatRevokeDeviceError("IdempotencyConflict", "")
-        object InvalidDPoP: BlueCatbirdChatRevokeDeviceError("InvalidDPoP", "")
         object InvalidRequest: BlueCatbirdChatRevokeDeviceError("InvalidRequest", "")
         object InvalidSignature: BlueCatbirdChatRevokeDeviceError("InvalidSignature", "")
         object NotAuthorized: BlueCatbirdChatRevokeDeviceError("NotAuthorized", "")
+        object AccountSessionExpired: BlueCatbirdChatRevokeDeviceError("AccountSessionExpired", "")
+        object DeviceBindingMismatch: BlueCatbirdChatRevokeDeviceError("DeviceBindingMismatch", "")
+        object ProtocolUpgradeRequired: BlueCatbirdChatRevokeDeviceError("ProtocolUpgradeRequired", "")
+        object RateLimited: BlueCatbirdChatRevokeDeviceError("RateLimited", "")
     }
 
 /**
- * Signed lost-device or self revocation using authoritative own-device inventory CAS fields. Revocation releases packages/reservations/recovery requests but does not forge MLS leaf removal or logical participant removal. For exact completed self-revoke response-loss replay only, the bearer DID and a fresh proof under the historical JKT recorded by that operation plus the same canonical request digest/signature return the stored response before active-device checks; it never reexecutes.
+ * Signed lost-device or self revocation using authoritative own-device inventory CAS fields. Revocation releases packages, reservations, and recovery requests but does not forge MLS leaf removal or logical participant removal. Exact completed response-loss replay requires the same authenticated DID, canonical request digest, and signature; it returns the stored response without reexecuting the revocation.
  *
  * Endpoint: blue.catbird.chat.revokeDevice
  */

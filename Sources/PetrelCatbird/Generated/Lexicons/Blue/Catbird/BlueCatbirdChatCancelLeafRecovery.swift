@@ -2,21 +2,26 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.chat.cancelLeafRecovery
 
-public enum BlueCatbirdChatCancelLeafRecovery {
+
+public struct BlueCatbirdChatCancelLeafRecovery { 
+
     public static let typeIdentifier = "blue.catbird.chat.cancelLeafRecovery"
-    public struct Input: ATProtocolCodable {
+public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedLeafRecoveryCancellation
 
         /// Standard public initializer
         public init(signedRequest: BlueCatbirdChatDefs.SignedLeafRecoveryCancellation) {
             self.signedRequest = signedRequest
         }
+        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedLeafRecoveryCancellation.self, forKey: .signedRequest)
+            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedLeafRecoveryCancellation.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -35,91 +40,130 @@ public enum BlueCatbirdChatCancelLeafRecovery {
             case signedRequest
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let recovery: BlueCatbirdChatDefs.LeafRecoveryView
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             recovery: BlueCatbirdChatDefs.LeafRecoveryView
-
+            
+            
         ) {
+            
+            
             self.recovery = recovery
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            recovery = try container.decode(BlueCatbirdChatDefs.LeafRecoveryView.self, forKey: .recovery)
+            
+            
+            self.recovery = try container.decode(BlueCatbirdChatDefs.LeafRecoveryView.self, forKey: .recovery)
+            
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(recovery, forKey: .recovery)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let recoveryValue = try recovery.toCBORValue()
             map = map.adding(key: "recovery", value: recoveryValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case recovery
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case cancellationConflict = "CancellationConflict"
+                case cutoverRequired = "CutoverRequired"
+                case deviceNotRegistered = "DeviceNotRegistered"
+                case deviceRevoked = "DeviceRevoked"
+                case idempotencyConflict = "IdempotencyConflict"
+                case invalidRequest = "InvalidRequest"
+                case invalidSignature = "InvalidSignature"
+                case leafRecoveryNotFound = "LeafRecoveryNotFound"
+                case notAuthorized = "NotAuthorized"
+                case accountSessionExpired = "AccountSessionExpired"
+                case deviceBindingMismatch = "DeviceBindingMismatch"
+                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+                case rateLimited = "RateLimited"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case cancellationConflict = "CancellationConflict"
-        case cutoverRequired = "CutoverRequired"
-        case deviceNotRegistered = "DeviceNotRegistered"
-        case deviceRevoked = "DeviceRevoked"
-        case idempotencyConflict = "IdempotencyConflict"
-        case invalidDPoP = "InvalidDPoP"
-        case invalidRequest = "InvalidRequest"
-        case invalidSignature = "InvalidSignature"
-        case leafRecoveryNotFound = "LeafRecoveryNotFound"
-        case notAuthorized = "NotAuthorized"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                return self.rawValue
+            }
         }
 
-        public var errorName: String {
-            return rawValue
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - cancelLeafRecovery
 
-    // Idempotently cancels an open leaf-recovery request owned by the signing device and releases its unconsumed KeyPackage reservation. No conversation coordinate is required because cancellation does not mutate MLS state.
-    //
-    // - Parameter input: The input parameters for the request
-
-    ///
+    /// Idempotently cancels an open leaf-recovery request owned by the signing device and releases its unconsumed KeyPackage reservation. No conversation coordinate is required because cancellation does not mutate MLS state.
+    /// 
+    /// - Parameter input: The input parameters for the request
+    
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func cancelLeafRecovery(
+    public func cancelLeafRecovery(
+        
         input: BlueCatbirdChatCancelLeafRecovery.Input
-
+        
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatCancelLeafRecovery.Output?) {
         let endpoint = "blue.catbird.chat.cancelLeafRecovery"
-
+        
         var headers: [String: String] = [:]
-
+        
         headers["Content-Type"] = "application/json"
-
+        
+        
+        
         headers["Accept"] = "application/json"
+        
 
+        
         let requestData: Data? = try JSONEncoder().encode(input)
-
+        
+        
         let queryItems: [URLQueryItem]? = nil
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -134,10 +178,12 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
+        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -145,11 +191,13 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatCancelLeafRecovery.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -165,9 +213,13 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-
+            
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+        
     }
+    
 }
+                           
+

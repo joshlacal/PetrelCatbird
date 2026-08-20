@@ -58,7 +58,7 @@ final class TransitionAttestationContractTests: XCTestCase {
         XCTAssertEqual(roundTrip.coordinates.epoch, output.coordinates.epoch)
     }
 
-    func testDeviceEnrollmentAndRebindErrorsRemainAvailable() {
+    func testStandardAppViewEnrollmentErrorsRemainAvailable() {
         XCTAssertEqual(
             BlueCatbirdChatEnrollDevice.Error.authenticationGenerationConflict.errorName,
             "AuthenticationGenerationConflict"
@@ -71,13 +71,8 @@ final class TransitionAttestationContractTests: XCTestCase {
             BlueCatbirdChatEnrollDevice.Error.invalidSignature.errorName,
             "InvalidSignature"
         )
-        XCTAssertEqual(
-            BlueCatbirdChatRebindDeviceAuthentication.Error.deviceNotRegistered.errorName,
-            "DeviceNotRegistered"
-        )
-        XCTAssertEqual(
-            BlueCatbirdChatRebindDeviceAuthentication.Error.invalidDPoP.errorName,
-            "InvalidDPoP"
-        )
+        XCTAssertEqual(BlueCatbirdChatEnrollDevice.Error.accountSessionExpired.errorName, "AccountSessionExpired")
+        XCTAssertEqual(BlueCatbirdChatEnrollDevice.Error.deviceBindingMismatch.errorName, "DeviceBindingMismatch")
+        XCTAssertEqual(BlueCatbirdChatEnrollDevice.Error.protocolUpgradeRequired.errorName, "ProtocolUpgradeRequired")
     }
 }
