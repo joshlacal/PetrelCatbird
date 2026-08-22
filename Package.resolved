@@ -1,5 +1,5 @@
 {
-  "originHash" : "be2eda9966bb3545f5242c146d18565ebbf3da769e909e0394b65dfd3b59c5b8",
+  "originHash" : "8d2ecb26e385726bccb192b950f824aa96a88a721a7c4da1d68c93c7423fe42a",
   "pins" : [
     {
       "identity" : "cryptoswift",
@@ -17,6 +17,14 @@
       "state" : {
         "revision" : "b7d3ef55660fefd045641293bc95d4cdc07a15d8",
         "version" : "6.0.4"
+      }
+    },
+    {
+      "identity" : "petrel",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/joshlacal/Petrel.git",
+      "state" : {
+        "revision" : "64c7574ebfb5e46b260aa1dd808802635ca38851"
       }
     },
     {
