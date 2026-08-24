@@ -7,6 +7,7 @@ import Petrel
 /// Call once at app startup, before decoding any responses containing these types.
 public enum PetrelCatbirdLexicons {
     public static func register() {
+        ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.declaration", as: BlueCatbirdChatDeclaration.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#conversationCoordinates", as: BlueCatbirdChatDefs.ConversationCoordinates.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#applicationFrameContext", as: BlueCatbirdChatDefs.ApplicationFrameContext.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#metadataCryptoContext", as: BlueCatbirdChatDefs.MetadataCryptoContext.self)
@@ -178,6 +179,7 @@ public enum PetrelCatbirdLexicons {
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#protocolEventPayload", as: BlueCatbirdChatDefs.ProtocolEventPayload.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#eventEnvelope", as: BlueCatbirdChatDefs.EventEnvelope.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#subscriptionMessage", as: BlueCatbirdChatDefs.SubscriptionMessage.self)
+        ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.device", as: BlueCatbirdChatDevice.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.mlsDS.deliverMessage#deliveryAck", as: BlueCatbirdMlsDSDeliverMessage.DeliveryAck.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.mlsDS.getConvoEvents#convoEventEntry", as: BlueCatbirdMlsDSGetConvoEvents.ConvoEventEntry.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.mlsDS.getFederationPeers#peerRecord", as: BlueCatbirdMlsDSGetFederationPeers.PeerRecord.self)

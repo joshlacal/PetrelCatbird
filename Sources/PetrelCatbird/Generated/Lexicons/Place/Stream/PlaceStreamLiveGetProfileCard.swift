@@ -151,6 +151,7 @@ extension ATProtoClient.Place.Stream.Live {
                 throw atprotoError
             }
             
+            
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)

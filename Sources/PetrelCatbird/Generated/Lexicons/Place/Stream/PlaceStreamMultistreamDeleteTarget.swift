@@ -156,6 +156,7 @@ extension ATProtoClient.Place.Stream.Multistream {
             }
         } else {
             
+            
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }

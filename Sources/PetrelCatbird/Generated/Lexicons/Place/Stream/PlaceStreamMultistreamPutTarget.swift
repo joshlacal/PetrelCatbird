@@ -149,6 +149,7 @@ extension ATProtoClient.Place.Stream.Multistream {
                 throw atprotoError
             }
             
+            
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }

@@ -147,6 +147,7 @@ extension ATProtoClient.Place.Stream.Badge {
             }
         } else {
             
+            
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
