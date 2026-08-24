@@ -1,0 +1,31 @@
+// Lexicon: 1, ID: blue.catbird.chat.declaration
+// A declaration of a Catbird secure chat account.
+package blue.catbird.petrel.generated
+
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import blue.catbird.petrel.core.types.*
+import blue.catbird.petrel.core.*
+import blue.catbird.petrel.client.*
+import blue.catbird.petrel.network.*
+import blue.catbird.petrel.runtime.subscription.openSubscription
+import kotlinx.coroutines.flow.*
+
+object BlueCatbirdChatDeclarationDefs {
+    const val TYPE_IDENTIFIER = "blue.catbird.chat.declaration"
+}
+
+    /**
+     * A declaration of a Catbird secure chat account.
+     */
+    @Serializable
+    data class BlueCatbirdChatDeclaration(
+/** Incoming message consent policy: 'all', 'following', or 'none'. */        @SerialName("allowIncoming")
+        val allowIncoming: String,/** DID of the delivery service that serves this actor (e.g. did:web:chat.catbird.blue). */        @SerialName("deliveryService")
+        val deliveryService: DID,/** Secure chat protocol version. */        @SerialName("protocolVersion")
+        val protocolVersion: String,/** Timestamp when this declaration record was created. */        @SerialName("createdAt")
+        val createdAt: ATProtocolDate    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = ""
+        }
+    }
