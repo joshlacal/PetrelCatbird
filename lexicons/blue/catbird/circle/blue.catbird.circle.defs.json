@@ -21,7 +21,7 @@
       "type": "object",
       "required": ["id", "status"],
       "properties": {
-        "id": { "type": "string" },
+        "id": { "type": "string", "minLength": 36, "maxLength": 36, "description": "Canonical lowercase hyphenated RFC 4122 UUID." },
         "status": { "type": "string", "enum": ["pending", "complete", "failed"] },
         "space": { "type": "string", "format": "space-ref" },
         "error": { "type": "string" }
@@ -39,7 +39,7 @@
       "type": "object",
       "required": ["id", "reason", "actor", "indexedAt", "circle"],
       "properties": {
-        "id": { "type": "string" },
+        "id": { "type": "string", "minLength": 36, "maxLength": 36, "description": "Canonical lowercase hyphenated RFC 4122 UUID." },
         "reason": { "type": "string", "enum": ["reply", "like", "invite"] },
         "actor": { "type": "ref", "ref": "app.bsky.actor.defs#profileViewBasic" },
         "subject": { "type": "string", "format": "at-uri" },

@@ -34,7 +34,7 @@ enum class BlueCatbirdCircleReportRecordInputReason {
 
     @Serializable
     data class BlueCatbirdCircleReportRecordOutput(
-        @SerialName("id")
+// Canonical lowercase hyphenated RFC 4122 UUID.        @SerialName("id")
         val id: String    )
 
 sealed class BlueCatbirdCircleReportRecordError(val name: String, val description: String?) {

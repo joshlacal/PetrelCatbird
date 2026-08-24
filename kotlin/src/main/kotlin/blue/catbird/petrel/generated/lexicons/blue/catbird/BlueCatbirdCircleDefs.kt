@@ -44,8 +44,6 @@ enum class BlueCatbirdCircleDefsNotificationReason {
     @SerialName("invite")
     value_invite}
 
-    typealias BlueCatbirdCircleDefsAccessState = BlueCatbirdCircleDefsDefsAccessState
-
     @Serializable
     data class BlueCatbirdCircleDefsCircleSummary(
         @SerialName("uri")
@@ -61,7 +59,7 @@ enum class BlueCatbirdCircleDefsNotificationReason {
 
     @Serializable
     data class BlueCatbirdCircleDefsOperation(
-        @SerialName("id")
+/** Canonical lowercase hyphenated RFC 4122 UUID. */        @SerialName("id")
         val id: String,        @SerialName("status")
         val status: BlueCatbirdCircleDefsOperationStatus,        @SerialName("space")
         val space: SpaceRef? = null,        @SerialName("error")
@@ -83,7 +81,7 @@ enum class BlueCatbirdCircleDefsNotificationReason {
 
     @Serializable
     data class BlueCatbirdCircleDefsNotification(
-        @SerialName("id")
+/** Canonical lowercase hyphenated RFC 4122 UUID. */        @SerialName("id")
         val id: String,        @SerialName("reason")
         val reason: BlueCatbirdCircleDefsNotificationReason,        @SerialName("actor")
         val actor: AppBskyActorDefsProfileViewBasic,        @SerialName("subject")

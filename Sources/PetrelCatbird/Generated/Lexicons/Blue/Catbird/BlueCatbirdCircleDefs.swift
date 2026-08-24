@@ -493,8 +493,6 @@ public enum DefsAccessState: String, Codable, ATProtocolCodable, ATProtocolValue
     }
 }
 
-public typealias AccessState = DefsAccessState
-
 
 public enum OperationStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
     case value_pending = "pending"

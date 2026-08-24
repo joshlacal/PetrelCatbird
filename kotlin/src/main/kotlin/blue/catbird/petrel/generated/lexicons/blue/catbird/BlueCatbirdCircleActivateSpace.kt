@@ -23,7 +23,7 @@ object BlueCatbirdCircleActivateSpaceDefs {
     @Serializable
     data class BlueCatbirdCircleActivateSpaceOutput(
         @SerialName("accessState")
-        val accessState: BlueCatbirdCircleDefsAccessState,        @SerialName("expiresAt")
+        val accessState: BlueCatbirdCircleDefsDefsAccessState,        @SerialName("expiresAt")
         val expiresAt: ATProtocolDate? = null    )
 
 sealed class BlueCatbirdCircleActivateSpaceError(val name: String, val description: String?) {

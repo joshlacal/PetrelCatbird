@@ -20018,8 +20018,6 @@ public enum DefsProtocolVersion: String, Codable, ATProtocolCodable, ATProtocolV
     }
 }
 
-public typealias ProtocolVersion = DefsProtocolVersion
-
 
 public enum DefsCipherSuite: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
     case value_MLS_u5f_256_u5f_XWING_u5f_CHACHA20POLY1305_u5f_SHA256_u5f_Ed25519 = "MLS_256_XWING_CHACHA20POLY1305_SHA256_Ed25519"
@@ -20033,8 +20031,6 @@ public enum DefsCipherSuite: String, Codable, ATProtocolCodable, ATProtocolValue
         return rawValue
     }
 }
-
-public typealias CipherSuite = DefsCipherSuite
 
 public typealias CanonicalDatetime = ATProtocolDate
 
@@ -20061,8 +20057,6 @@ public enum DefsLifecycle: String, Codable, ATProtocolCodable, ATProtocolValue, 
     }
 }
 
-public typealias Lifecycle = DefsLifecycle
-
 
 public enum DefsConversationKind: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
     case value_direct = "direct"
@@ -20077,8 +20071,6 @@ public enum DefsConversationKind: String, Codable, ATProtocolCodable, ATProtocol
         return rawValue
     }
 }
-
-public typealias ConversationKind = DefsConversationKind
 
 
 public enum DefsMemberRole: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
@@ -20095,8 +20087,6 @@ public enum DefsMemberRole: String, Codable, ATProtocolCodable, ATProtocolValue,
     }
 }
 
-public typealias MemberRole = DefsMemberRole
-
 
 public enum DefsParticipantStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
     case value_pending = "pending"
@@ -20111,8 +20101,6 @@ public enum DefsParticipantStatus: String, Codable, ATProtocolCodable, ATProtoco
         return rawValue
     }
 }
-
-public typealias ParticipantStatus = DefsParticipantStatus
 
 
 public enum DefsIncomingConsentPolicy: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
@@ -20130,8 +20118,6 @@ public enum DefsIncomingConsentPolicy: String, Codable, ATProtocolCodable, ATPro
     }
 }
 
-public typealias IncomingConsentPolicy = DefsIncomingConsentPolicy
-
 
 public enum DefsDeviceStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
     case value_active = "active"
@@ -20146,8 +20132,6 @@ public enum DefsDeviceStatus: String, Codable, ATProtocolCodable, ATProtocolValu
         return rawValue
     }
 }
-
-public typealias DeviceStatus = DefsDeviceStatus
 
 
 public enum DefsPackageStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
@@ -20167,8 +20151,6 @@ public enum DefsPackageStatus: String, Codable, ATProtocolCodable, ATProtocolVal
     }
 }
 
-public typealias PackageStatus = DefsPackageStatus
-
 
 public enum DefsReservationStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
     case value_active = "active"
@@ -20185,8 +20167,6 @@ public enum DefsReservationStatus: String, Codable, ATProtocolCodable, ATProtoco
         return rawValue
     }
 }
-
-public typealias ReservationStatus = DefsReservationStatus
 
 
 public enum DefsWelcomeStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
@@ -20206,8 +20186,6 @@ public enum DefsWelcomeStatus: String, Codable, ATProtocolCodable, ATProtocolVal
     }
 }
 
-public typealias WelcomeStatus = DefsWelcomeStatus
-
 
 public enum DefsWelcomeRejectionReason: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
     case value_noMatchingKeyPackage = "noMatchingKeyPackage"
@@ -20225,8 +20203,6 @@ public enum DefsWelcomeRejectionReason: String, Codable, ATProtocolCodable, ATPr
         return rawValue
     }
 }
-
-public typealias WelcomeRejectionReason = DefsWelcomeRejectionReason
 
 
 public enum DefsLeafRecoveryStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
@@ -20246,8 +20222,6 @@ public enum DefsLeafRecoveryStatus: String, Codable, ATProtocolCodable, ATProtoc
     }
 }
 
-public typealias LeafRecoveryStatus = DefsLeafRecoveryStatus
-
 
 public enum DefsRecoveryWorkSourceKind: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
     case value_welcomeExpired = "welcomeExpired"
@@ -20262,8 +20236,6 @@ public enum DefsRecoveryWorkSourceKind: String, Codable, ATProtocolCodable, ATPr
         return rawValue
     }
 }
-
-public typealias RecoveryWorkSourceKind = DefsRecoveryWorkSourceKind
 
 
 public enum DefsRecoveryWorkStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
@@ -20280,8 +20252,6 @@ public enum DefsRecoveryWorkStatus: String, Codable, ATProtocolCodable, ATProtoc
         return rawValue
     }
 }
-
-public typealias RecoveryWorkStatus = DefsRecoveryWorkStatus
 
 
 public enum DefsLeaveRequestStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
@@ -20301,8 +20271,6 @@ public enum DefsLeaveRequestStatus: String, Codable, ATProtocolCodable, ATProtoc
     }
 }
 
-public typealias LeaveRequestStatus = DefsLeaveRequestStatus
-
 
 public enum DefsLeafRecoveryKind: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
     case value_add = "add"
@@ -20318,8 +20286,6 @@ public enum DefsLeafRecoveryKind: String, Codable, ATProtocolCodable, ATProtocol
     }
 }
 
-public typealias LeafRecoveryKind = DefsLeafRecoveryKind
-
 
 public enum DefsLeafOrigin: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
     case value_genesis = "genesis"
@@ -20334,8 +20300,6 @@ public enum DefsLeafOrigin: String, Codable, ATProtocolCodable, ATProtocolValue,
         return rawValue
     }
 }
-
-public typealias LeafOrigin = DefsLeafOrigin
 
 
 public enum DefsResetReason: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
@@ -20354,8 +20318,6 @@ public enum DefsResetReason: String, Codable, ATProtocolCodable, ATProtocolValue
     }
 }
 
-public typealias ResetReason = DefsResetReason
-
 
 public enum DefsBlobPurpose: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
     case value_attachment = "attachment"
@@ -20370,8 +20332,6 @@ public enum DefsBlobPurpose: String, Codable, ATProtocolCodable, ATProtocolValue
         return rawValue
     }
 }
-
-public typealias BlobPurpose = DefsBlobPurpose
 
 public typealias ArtifactHash = Bytes
 

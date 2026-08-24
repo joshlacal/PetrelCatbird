@@ -44,7 +44,7 @@ public struct Input: ATProtocolCodable {
 public struct Output: ATProtocolCodable {
         
         
-        public let accessState: BlueCatbirdCircleDefs.AccessState
+        public let accessState: BlueCatbirdCircleDefs.DefsAccessState
         
         public let expiresAt: ATProtocolDate?
         
@@ -54,7 +54,7 @@ public struct Output: ATProtocolCodable {
         public init(
             
             
-            accessState: BlueCatbirdCircleDefs.AccessState,
+            accessState: BlueCatbirdCircleDefs.DefsAccessState,
             
             expiresAt: ATProtocolDate? = nil
             
@@ -74,7 +74,7 @@ public struct Output: ATProtocolCodable {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             
             
-            self.accessState = try container.decode(BlueCatbirdCircleDefs.AccessState.self, forKey: .accessState)
+            self.accessState = try container.decode(BlueCatbirdCircleDefs.DefsAccessState.self, forKey: .accessState)
             
             
             
