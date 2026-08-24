@@ -2698,6 +2698,10 @@ enum class BlueCatbirdChatDefsResetRequestViewStatus {
     @SerialName("revoked")
     value_revoked}
 
+    typealias BlueCatbirdChatDefsProtocolVersion = BlueCatbirdChatDefsDefsProtocolVersion
+
+    typealias BlueCatbirdChatDefsCipherSuite = BlueCatbirdChatDefsDefsCipherSuite
+
     /**
      * Exact UTC grammar YYYY-MM-DDTHH:MM:SS.sssZ; offsets, lowercase, leap seconds, and variable fractions are invalid.
      */
@@ -2722,6 +2726,42 @@ enum class BlueCatbirdChatDefsResetRequestViewStatus {
      * Base64url without padding SHA-256 thumbprint of the exact raw 32-byte Ed25519 public key.
      */
     typealias BlueCatbirdChatDefsKeyId = String
+
+    typealias BlueCatbirdChatDefsLifecycle = BlueCatbirdChatDefsDefsLifecycle
+
+    typealias BlueCatbirdChatDefsConversationKind = BlueCatbirdChatDefsDefsConversationKind
+
+    typealias BlueCatbirdChatDefsMemberRole = BlueCatbirdChatDefsDefsMemberRole
+
+    typealias BlueCatbirdChatDefsParticipantStatus = BlueCatbirdChatDefsDefsParticipantStatus
+
+    typealias BlueCatbirdChatDefsIncomingConsentPolicy = BlueCatbirdChatDefsDefsIncomingConsentPolicy
+
+    typealias BlueCatbirdChatDefsDeviceStatus = BlueCatbirdChatDefsDefsDeviceStatus
+
+    typealias BlueCatbirdChatDefsPackageStatus = BlueCatbirdChatDefsDefsPackageStatus
+
+    typealias BlueCatbirdChatDefsReservationStatus = BlueCatbirdChatDefsDefsReservationStatus
+
+    typealias BlueCatbirdChatDefsWelcomeStatus = BlueCatbirdChatDefsDefsWelcomeStatus
+
+    typealias BlueCatbirdChatDefsWelcomeRejectionReason = BlueCatbirdChatDefsDefsWelcomeRejectionReason
+
+    typealias BlueCatbirdChatDefsLeafRecoveryStatus = BlueCatbirdChatDefsDefsLeafRecoveryStatus
+
+    typealias BlueCatbirdChatDefsRecoveryWorkSourceKind = BlueCatbirdChatDefsDefsRecoveryWorkSourceKind
+
+    typealias BlueCatbirdChatDefsRecoveryWorkStatus = BlueCatbirdChatDefsDefsRecoveryWorkStatus
+
+    typealias BlueCatbirdChatDefsLeaveRequestStatus = BlueCatbirdChatDefsDefsLeaveRequestStatus
+
+    typealias BlueCatbirdChatDefsLeafRecoveryKind = BlueCatbirdChatDefsDefsLeafRecoveryKind
+
+    typealias BlueCatbirdChatDefsLeafOrigin = BlueCatbirdChatDefsDefsLeafOrigin
+
+    typealias BlueCatbirdChatDefsResetReason = BlueCatbirdChatDefsDefsResetReason
+
+    typealias BlueCatbirdChatDefsBlobPurpose = BlueCatbirdChatDefsDefsBlobPurpose
 
     @Serializable
     data class BlueCatbirdChatDefsConversationCoordinates(

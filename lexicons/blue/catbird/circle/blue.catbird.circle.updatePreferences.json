@@ -1,0 +1,38 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.circle.updatePreferences",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update user preferences for a Circle Space",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["space", "muted"],
+          "properties": {
+            "space": { "type": "string", "format": "space-ref" },
+            "muted": { "type": "boolean" }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["muted"],
+          "properties": {
+            "muted": { "type": "boolean" }
+          }
+        }
+      },
+      "errors": [
+        { "name": "AuthRequired" },
+        { "name": "AccessRemoved" },
+        { "name": "UnsupportedPDS" },
+        { "name": "ProtocolRevisionMismatch" },
+        { "name": "UpstreamUnavailable" }
+      ]
+    }
+  }
+}

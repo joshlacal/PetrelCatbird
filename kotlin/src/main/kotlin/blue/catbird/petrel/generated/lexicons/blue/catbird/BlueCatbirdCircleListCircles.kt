@@ -1,0 +1,58 @@
+// Lexicon: 1, ID: blue.catbird.circle.listCircles
+// List Circle Spaces accessible to the caller
+package blue.catbird.petrel.generated
+
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import blue.catbird.petrel.core.types.*
+import blue.catbird.petrel.core.*
+import blue.catbird.petrel.client.*
+import blue.catbird.petrel.network.*
+import blue.catbird.petrel.runtime.subscription.openSubscription
+import kotlinx.coroutines.flow.*
+
+object BlueCatbirdCircleListCirclesDefs {
+    const val TYPE_IDENTIFIER = "blue.catbird.circle.listCircles"
+}
+
+@Serializable
+    data class BlueCatbirdCircleListCirclesParameters(
+        @SerialName("limit")
+        val limit: Int? = null,        @SerialName("cursor")
+        val cursor: String? = null    )
+
+    @Serializable
+    data class BlueCatbirdCircleListCirclesOutput(
+        @SerialName("circles")
+        val circles: List<BlueCatbirdCircleDefsCircleSummary>,        @SerialName("cursor")
+        val cursor: String? = null    )
+
+sealed class BlueCatbirdCircleListCirclesError(val name: String, val description: String?) {
+        object AuthRequired: BlueCatbirdCircleListCirclesError("AuthRequired", "")
+        object AccessRemoved: BlueCatbirdCircleListCirclesError("AccessRemoved", "")
+        object UnsupportedPDS: BlueCatbirdCircleListCirclesError("UnsupportedPDS", "")
+        object ProtocolRevisionMismatch: BlueCatbirdCircleListCirclesError("ProtocolRevisionMismatch", "")
+        object UpstreamUnavailable: BlueCatbirdCircleListCirclesError("UpstreamUnavailable", "")
+    }
+
+/**
+ * List Circle Spaces accessible to the caller
+ *
+ * Endpoint: blue.catbird.circle.listCircles
+ */
+suspend fun BlueCatbirdCircleNamespace.listCircles(
+parameters: BlueCatbirdCircleListCirclesParameters): ATProtoResponse<BlueCatbirdCircleListCirclesOutput> {
+    val endpoint = "blue.catbird.circle.listCircles"
+
+    // List<Pair<String, String>> preserves repeated keys, which ATProto
+    // array-valued query params rely on (e.g. `?actors=a&actors=b`).
+    val queryItems = parameters.toQueryItems()
+
+    return client.networkService.performRequest(
+        method = "GET",
+        endpoint = endpoint,
+        queryItems = queryItems,
+        headers = mapOf("Accept" to "application/json"),
+        body = null
+    )
+}
