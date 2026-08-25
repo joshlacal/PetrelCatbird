@@ -18,15 +18,17 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
             public let owner: DID
             public let accessState: DefsAccessState
             public let muted: Bool?
+            public let members: [DID]?
 
         public init(
-            uri: SpaceRef, name: String, owner: DID, accessState: DefsAccessState, muted: Bool?
+            uri: SpaceRef, name: String, owner: DID, accessState: DefsAccessState, muted: Bool?, members: [DID]?
         ) {
             self.uri = uri
             self.name = name
             self.owner = owner
             self.accessState = accessState
             self.muted = muted
+            self.members = members
         }
 
         public init(from decoder: Decoder) throws {
@@ -63,6 +65,14 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
                 LogManager.logWarning("Decoding error for optional property 'muted' — degrading to nil: \(error)")
                 self.muted = nil
             }
+            do {
+                self.members = try container.decodeIfPresent([DID].self, forKey: .members)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'members' — degrading to nil: \(error)")
+                self.members = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -73,6 +83,7 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
             try container.encode(owner, forKey: .owner)
             try container.encode(accessState, forKey: .accessState)
             try container.encodeIfPresent(muted, forKey: .muted)
+            try container.encodeIfPresent(members, forKey: .members)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -81,6 +92,11 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
             hasher.combine(owner)
             hasher.combine(accessState)
             if let value = muted {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = members {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
@@ -102,6 +118,9 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
                 return false
             }
             if muted != other.muted {
+                return false
+            }
+            if members != other.members {
                 return false
             }
             return true
@@ -126,6 +145,10 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
                 let mutedValue = try value.toCBORValue()
                 map = map.adding(key: "muted", value: mutedValue)
             }
+            if let value = members {
+                let membersValue = try value.toCBORValue()
+                map = map.adding(key: "members", value: membersValue)
+            }
             return map
         }
 
@@ -136,6 +159,7 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
             case owner
             case accessState
             case muted
+            case members
         }
     }
         

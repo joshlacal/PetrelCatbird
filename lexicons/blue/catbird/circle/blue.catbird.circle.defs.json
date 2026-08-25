@@ -14,7 +14,11 @@
         "name": { "type": "string", "minLength": 1, "maxLength": 64 },
         "owner": { "type": "string", "format": "did" },
         "accessState": { "type": "ref", "ref": "#accessState" },
-        "muted": { "type": "boolean" }
+        "muted": { "type": "boolean" },
+        "members": {
+          "type": "array",
+          "items": { "type": "string", "format": "did" }
+        }
       }
     },
     "operation": {

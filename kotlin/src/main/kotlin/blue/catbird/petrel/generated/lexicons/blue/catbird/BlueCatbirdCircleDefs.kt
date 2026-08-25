@@ -51,7 +51,8 @@ enum class BlueCatbirdCircleDefsNotificationReason {
         val name: String,        @SerialName("owner")
         val owner: DID,        @SerialName("accessState")
         val accessState: BlueCatbirdCircleDefsDefsAccessState,        @SerialName("muted")
-        val muted: Boolean? = null    ) {
+        val muted: Boolean? = null,        @SerialName("members")
+        val members: List<DID>? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdCircleDefsCircleSummary"
         }
