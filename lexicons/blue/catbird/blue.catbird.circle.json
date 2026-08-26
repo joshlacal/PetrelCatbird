@@ -1,0 +1,17 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.circle",
+  "defs": {
+    "main": {
+      "type": "space",
+      "key": "tid",
+      "name": "Catbird Circle",
+      "description": "An author-owned private posting audience",
+      "collections": [
+        "blue.catbird.circle.metadata",
+        "app.bsky.feed.post",
+        "app.bsky.feed.like"
+      ]
+    }
+  }
+}

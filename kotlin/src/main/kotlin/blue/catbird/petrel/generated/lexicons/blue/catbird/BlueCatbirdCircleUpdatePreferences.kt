@@ -1,0 +1,62 @@
+// Lexicon: 1, ID: blue.catbird.circle.updatePreferences
+// Update user preferences for a Circle Space
+package blue.catbird.petrel.generated
+
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import blue.catbird.petrel.core.types.*
+import blue.catbird.petrel.core.*
+import blue.catbird.petrel.client.*
+import blue.catbird.petrel.network.*
+import blue.catbird.petrel.runtime.subscription.openSubscription
+import kotlinx.coroutines.flow.*
+
+object BlueCatbirdCircleUpdatePreferencesDefs {
+    const val TYPE_IDENTIFIER = "blue.catbird.circle.updatePreferences"
+}
+
+@Serializable
+    data class BlueCatbirdCircleUpdatePreferencesInput(
+        @SerialName("space")
+        val space: SpaceRef,        @SerialName("muted")
+        val muted: Boolean    )
+
+    @Serializable
+    data class BlueCatbirdCircleUpdatePreferencesOutput(
+        @SerialName("muted")
+        val muted: Boolean    )
+
+sealed class BlueCatbirdCircleUpdatePreferencesError(val name: String, val description: String?) {
+        object AuthRequired: BlueCatbirdCircleUpdatePreferencesError("AuthRequired", "")
+        object AccessRemoved: BlueCatbirdCircleUpdatePreferencesError("AccessRemoved", "")
+        object UnsupportedPDS: BlueCatbirdCircleUpdatePreferencesError("UnsupportedPDS", "")
+        object ProtocolRevisionMismatch: BlueCatbirdCircleUpdatePreferencesError("ProtocolRevisionMismatch", "")
+        object UpstreamUnavailable: BlueCatbirdCircleUpdatePreferencesError("UpstreamUnavailable", "")
+    }
+
+/**
+ * Update user preferences for a Circle Space
+ *
+ * Endpoint: blue.catbird.circle.updatePreferences
+ */
+suspend fun BlueCatbirdCircleNamespace.updatePreferences(
+input: BlueCatbirdCircleUpdatePreferencesInput): ATProtoResponse<BlueCatbirdCircleUpdatePreferencesOutput> {
+    val endpoint = "blue.catbird.circle.updatePreferences"
+
+    // JSON serialization
+    val body = Json.encodeToString(input)
+    val contentType = "application/json"
+
+    val queryItems: List<Pair<String, String>>? = null
+
+    return client.networkService.performRequest(
+        method = "POST",
+        endpoint = endpoint,
+        queryItems = queryItems,
+        headers = mapOf(
+            "Content-Type" to contentType,
+            "Accept" to "application/json"
+        ),
+        body = body
+    )
+}

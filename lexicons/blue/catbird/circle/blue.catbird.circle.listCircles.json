@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.circle.listCircles",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List Circle Spaces accessible to the caller",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50
+          },
+          "cursor": { "type": "string" }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["circles"],
+          "properties": {
+            "circles": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.circle.defs#circleSummary"
+              }
+            },
+            "cursor": { "type": "string" }
+          }
+        }
+      },
+      "errors": [
+        { "name": "AuthRequired" },
+        { "name": "AccessRemoved" },
+        { "name": "UnsupportedPDS" },
+        { "name": "ProtocolRevisionMismatch" },
+        { "name": "UpstreamUnavailable" }
+      ]
+    }
+  }
+}

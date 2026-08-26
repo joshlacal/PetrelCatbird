@@ -1,0 +1,38 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.circle.getMedia",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get media associated with a post in a Circle Space",
+      "parameters": {
+        "type": "params",
+        "required": ["space", "did", "cid"],
+        "properties": {
+          "space": {
+            "type": "string",
+            "format": "space-ref"
+          },
+          "did": {
+            "type": "string",
+            "format": "did"
+          },
+          "cid": {
+            "type": "string",
+            "format": "cid"
+          }
+        }
+      },
+      "output": {
+        "encoding": "*/*"
+      },
+      "errors": [
+        { "name": "AuthRequired" },
+        { "name": "AccessRemoved" },
+        { "name": "UnsupportedPDS" },
+        { "name": "ProtocolRevisionMismatch" },
+        { "name": "UpstreamUnavailable" }
+      ]
+    }
+  }
+}

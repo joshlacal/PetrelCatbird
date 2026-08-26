@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.circle.reportRecord",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Report a record in a Circle Space",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["space", "uri", "reason"],
+          "properties": {
+            "space": { "type": "string", "format": "space-ref" },
+            "uri": { "type": "string", "format": "at-uri" },
+            "reason": { "type": "string", "enum": ["spam", "abuse", "other"] },
+            "details": { "type": "string", "maxLength": 500 }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["id"],
+          "properties": {
+            "id": { "type": "string", "minLength": 36, "maxLength": 36, "description": "Canonical lowercase hyphenated RFC 4122 UUID." }
+          }
+        }
+      },
+      "errors": [
+        { "name": "AuthRequired" },
+        { "name": "AccessRemoved" },
+        { "name": "UnsupportedPDS" },
+        { "name": "ProtocolRevisionMismatch" },
+        { "name": "UpstreamUnavailable" }
+      ]
+    }
+  }
+}

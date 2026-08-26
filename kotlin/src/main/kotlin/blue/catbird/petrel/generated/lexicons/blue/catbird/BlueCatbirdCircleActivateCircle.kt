@@ -1,0 +1,63 @@
+// Lexicon: 1, ID: blue.catbird.circle.activateCircle
+// Ask this service to begin indexing a Circle Space. The service verifies the Space independently against the owner's PDS; it does not trust the caller's claim that the Space exists. Idempotent: activating an already-active Circle returns its current summary.
+package blue.catbird.petrel.generated
+
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import blue.catbird.petrel.core.types.*
+import blue.catbird.petrel.core.*
+import blue.catbird.petrel.client.*
+import blue.catbird.petrel.network.*
+import blue.catbird.petrel.runtime.subscription.openSubscription
+import kotlinx.coroutines.flow.*
+
+object BlueCatbirdCircleActivateCircleDefs {
+    const val TYPE_IDENTIFIER = "blue.catbird.circle.activateCircle"
+}
+
+@Serializable
+    data class BlueCatbirdCircleActivateCircleInput(
+        @SerialName("space")
+        val space: SpaceRef    )
+
+    @Serializable
+    data class BlueCatbirdCircleActivateCircleOutput(
+        @SerialName("circle")
+        val circle: BlueCatbirdCircleDefsCircleSummary    )
+
+sealed class BlueCatbirdCircleActivateCircleError(val name: String, val description: String?) {
+        object AuthorizationRequired: BlueCatbirdCircleActivateCircleError("AuthorizationRequired", "This service holds no usable OAuth grant for a participant of the Space, so it cannot obtain a Space credential.")
+        object NotAuthorized: BlueCatbirdCircleActivateCircleError("NotAuthorized", "The caller is not on the Space's member list.")
+        object SpaceNotFound: BlueCatbirdCircleActivateCircleError("SpaceNotFound", "")
+        object SpaceNotEligible: BlueCatbirdCircleActivateCircleError("SpaceNotEligible", "The Space exists but is not a usable Circle: its app access does not name this service, or its metadata record is absent.")
+        object UnsupportedPDS: BlueCatbirdCircleActivateCircleError("UnsupportedPDS", "")
+        object ProtocolRevisionMismatch: BlueCatbirdCircleActivateCircleError("ProtocolRevisionMismatch", "")
+        object UpstreamUnavailable: BlueCatbirdCircleActivateCircleError("UpstreamUnavailable", "")
+    }
+
+/**
+ * Ask this service to begin indexing a Circle Space. The service verifies the Space independently against the owner's PDS; it does not trust the caller's claim that the Space exists. Idempotent: activating an already-active Circle returns its current summary.
+ *
+ * Endpoint: blue.catbird.circle.activateCircle
+ */
+suspend fun BlueCatbirdCircleNamespace.activateCircle(
+input: BlueCatbirdCircleActivateCircleInput): ATProtoResponse<BlueCatbirdCircleActivateCircleOutput> {
+    val endpoint = "blue.catbird.circle.activateCircle"
+
+    // JSON serialization
+    val body = Json.encodeToString(input)
+    val contentType = "application/json"
+
+    val queryItems: List<Pair<String, String>>? = null
+
+    return client.networkService.performRequest(
+        method = "POST",
+        endpoint = endpoint,
+        queryItems = queryItems,
+        headers = mapOf(
+            "Content-Type" to contentType,
+            "Accept" to "application/json"
+        ),
+        body = body
+    )
+}

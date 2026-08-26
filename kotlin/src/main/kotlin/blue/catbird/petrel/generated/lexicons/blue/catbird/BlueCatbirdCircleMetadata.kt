@@ -1,0 +1,32 @@
+// Lexicon: 1, ID: blue.catbird.circle.metadata
+// Circle metadata, authored by the Space authority into its own permissioned repo. The only Catbird-specific record type in a Circle; posts and likes are unmodified Bluesky records.
+package blue.catbird.petrel.generated
+
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import blue.catbird.petrel.core.types.*
+import blue.catbird.petrel.core.*
+import blue.catbird.petrel.client.*
+import blue.catbird.petrel.network.*
+import blue.catbird.petrel.runtime.subscription.openSubscription
+import kotlinx.coroutines.flow.*
+
+object BlueCatbirdCircleMetadataDefs {
+    const val TYPE_IDENTIFIER = "blue.catbird.circle.metadata"
+}
+
+    /**
+     * Circle metadata, authored by the Space authority into its own permissioned repo. The only Catbird-specific record type in a Circle; posts and likes are unmodified Bluesky records.
+     */
+    @Serializable
+    data class BlueCatbirdCircleMetadata(
+/** Stable Circle identity, independent of the Space key. Survives migration to a different Space, which is the only identifier that does. */        @SerialName("circleId")
+        val circleId: String,        @SerialName("name")
+        val name: String,        @SerialName("createdAt")
+        val createdAt: ATProtocolDate,/** The Space this Circle's content was migrated from, if any. */        @SerialName("migratedFrom")
+        val migratedFrom: SpaceRef? = null,/** The Space this Circle's content was migrated to, if any. Set when the Circle has moved and this Space is retained read-only. */        @SerialName("migratedTo")
+        val migratedTo: SpaceRef? = null    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = ""
+        }
+    }

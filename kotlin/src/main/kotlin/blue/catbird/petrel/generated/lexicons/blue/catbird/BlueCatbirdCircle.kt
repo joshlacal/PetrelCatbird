@@ -1,0 +1,28 @@
+// Lexicon: 1, ID: blue.catbird.circle
+// An author-owned private posting audience
+package blue.catbird.petrel.generated
+
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import blue.catbird.petrel.core.types.*
+import blue.catbird.petrel.core.*
+import blue.catbird.petrel.client.*
+import blue.catbird.petrel.network.*
+import blue.catbird.petrel.runtime.subscription.openSubscription
+import kotlinx.coroutines.flow.*
+
+object BlueCatbirdCircleDefs {
+    const val TYPE_IDENTIFIER = "blue.catbird.circle"
+}
+
+data class SpaceDeclarationDescriptor(
+    val nsid: String,
+    val keyType: String,
+    val name: String,
+    val collections: List<String>,
+)
+
+val spaceDeclaration = SpaceDeclarationDescriptor(
+    nsid = "blue.catbird.circle", keyType = "tid",
+    name = "Catbird Circle", collections = listOf("blue.catbird.circle.metadata", "app.bsky.feed.post", "app.bsky.feed.like"),
+)
