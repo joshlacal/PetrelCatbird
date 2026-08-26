@@ -25,11 +25,15 @@ class GetConvoEventsContractTest {
             "createdAt": "2026-08-21T00:00:00.000Z",
             "entryId": "00112233-4455-4677-8899-aabbccddeeff",
             "entryKind": "blue.catbird.chat.defs#creationEntry",
-            "acceptedPayloadSha256": {"${"$"}bytes": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="},
+            "acceptedPayloadSha256": {"${"$"}bytes": "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyA="},
             "signedRequest": {"${"$"}bytes": "AQ=="},
-            "outerFingerprint": {"${"$"}bytes": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="}
+            "outerFingerprint": {"${"$"}bytes": "oaKjpKWmp6ipqqusra6vsLGys7S1tre4ubq7vL2+v8A="}
         }
         """.trimIndent()
+
+        val expectedSha = ByteArray(32) { (it + 1).toByte() }
+        val expectedSignedRequest = byteArrayOf(0x01)
+        val expectedFingerprint = ByteArray(32) { (0xa1 + it).toByte() }
 
         val entry = json.decodeFromString<BlueCatbirdMlsDSGetConvoEventsConvoEventEntry>(cleanJSON)
         assertEquals(1, entry.seq)
@@ -38,17 +42,17 @@ class GetConvoEventsContractTest {
         assertEquals("app", entry.messageType)
         assertEquals("00112233-4455-4677-8899-aabbccddeeff", entry.entryId)
         assertEquals("blue.catbird.chat.defs#creationEntry", entry.entryKind)
-        assertEquals(32, entry.acceptedPayloadSha256?.data?.size)
-        assertTrue(byteArrayOf(0x01).contentEquals(entry.signedRequest?.data ?: ByteArray(0)))
-        assertEquals(32, entry.outerFingerprint?.data?.size)
+        assertTrue(expectedSha.contentEquals(entry.acceptedPayloadSha256?.data ?: ByteArray(0)))
+        assertTrue(expectedSignedRequest.contentEquals(entry.signedRequest?.data ?: ByteArray(0)))
+        assertTrue(expectedFingerprint.contentEquals(entry.outerFingerprint?.data ?: ByteArray(0)))
 
         val reencoded = json.encodeToString(entry)
         val roundTrip = json.decodeFromString<BlueCatbirdMlsDSGetConvoEventsConvoEventEntry>(reencoded)
         assertEquals(entry.entryId, roundTrip.entryId)
         assertEquals(entry.entryKind, roundTrip.entryKind)
-        assertTrue(entry.acceptedPayloadSha256?.data?.contentEquals(roundTrip.acceptedPayloadSha256?.data ?: ByteArray(0)) == true)
-        assertTrue(entry.signedRequest?.data?.contentEquals(roundTrip.signedRequest?.data ?: ByteArray(0)) == true)
-        assertTrue(entry.outerFingerprint?.data?.contentEquals(roundTrip.outerFingerprint?.data ?: ByteArray(0)) == true)
+        assertTrue(expectedSha.contentEquals(roundTrip.acceptedPayloadSha256?.data ?: ByteArray(0)))
+        assertTrue(expectedSignedRequest.contentEquals(roundTrip.signedRequest?.data ?: ByteArray(0)))
+        assertTrue(expectedFingerprint.contentEquals(roundTrip.outerFingerprint?.data ?: ByteArray(0)))
     }
 
     @Test
