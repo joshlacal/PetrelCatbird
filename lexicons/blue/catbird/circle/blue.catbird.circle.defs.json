@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.circle.defs",
+  "defs": {
+    "circleSummary": {
+      "type": "object",
+      "required": ["uri", "circleId", "name", "owner"],
+      "properties": {
+        "uri": { "type": "string", "format": "space-ref" },
+        "circleId": {
+          "type": "string",
+          "format": "tid",
+          "description": "Stable Circle identity, independent of the Space key, so a Circle remains recognizable across a Space migration."
+        },
+        "name": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "owner": { "type": "string", "format": "did" },
+        "memberCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of members on the owner's PDS member list. The member list itself is owner-only and is read from the owner's PDS, not from this service."
+        },
+        "muted": { "type": "boolean" }
+      }
+    },
+    "feedItem": {
+      "type": "object",
+      "required": ["post", "circle"],
+      "properties": {
+        "post": { "type": "ref", "ref": "app.bsky.feed.defs#feedViewPost" },
+        "circle": { "type": "ref", "ref": "#circleSummary" }
+      }
+    },
+    "notification": {
+      "type": "object",
+      "required": ["id", "reason", "actor", "indexedAt", "circle"],
+      "properties": {
+        "id": { "type": "string", "minLength": 36, "maxLength": 36, "description": "Canonical lowercase hyphenated RFC 4122 UUID." },
+        "reason": { "type": "string", "enum": ["reply", "like", "invite"] },
+        "actor": { "type": "ref", "ref": "app.bsky.actor.defs#profileViewBasic" },
+        "subject": { "type": "string", "format": "at-uri" },
+        "indexedAt": { "type": "string", "format": "datetime" },
+        "circle": { "type": "ref", "ref": "#circleSummary" }
+      }
+    }
+  }
+}

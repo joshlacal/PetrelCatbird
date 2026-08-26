@@ -1,0 +1,34 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.circle.metadata",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Circle metadata, authored by the Space authority into its own permissioned repo. The only Catbird-specific record type in a Circle; posts and likes are unmodified Bluesky records.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": ["circleId", "name", "createdAt"],
+        "properties": {
+          "circleId": {
+            "type": "string",
+            "format": "tid",
+            "description": "Stable Circle identity, independent of the Space key. Survives migration to a different Space, which is the only identifier that does."
+          },
+          "name": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "createdAt": { "type": "string", "format": "datetime" },
+          "migratedFrom": {
+            "type": "string",
+            "format": "space-ref",
+            "description": "The Space this Circle's content was migrated from, if any."
+          },
+          "migratedTo": {
+            "type": "string",
+            "format": "space-ref",
+            "description": "The Space this Circle's content was migrated to, if any. Set when the Circle has moved and this Space is retained read-only."
+          }
+        }
+      }
+    }
+  }
+}

@@ -13,6 +13,16 @@ public extension ATProtoClient.Blue {
             self.networkService = networkService
         }
 
+        public var circle: Circle { Circle(networkService: networkService) }
+
+        public struct Circle: Sendable {
+            public let networkService: NetworkService
+            public init(networkService: NetworkService) {
+                self.networkService = networkService
+            }
+
+        }
+
         public var bskychat: Bskychat { Bskychat(networkService: networkService) }
 
         public struct Bskychat: Sendable {

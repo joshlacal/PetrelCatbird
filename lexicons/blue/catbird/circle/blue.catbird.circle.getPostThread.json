@@ -1,0 +1,54 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.circle.getPostThread",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a thread of posts within a Circle Space",
+      "parameters": {
+        "type": "params",
+        "required": ["uri", "space"],
+        "properties": {
+          "uri": { "type": "string", "format": "at-uri" },
+          "space": { "type": "string", "format": "space-ref" },
+          "depth": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "default": 6
+          },
+          "parentHeight": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "default": 80
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["thread", "circle"],
+          "properties": {
+            "thread": {
+              "type": "ref",
+              "ref": "app.bsky.feed.defs#threadViewPost"
+            },
+            "circle": {
+              "type": "ref",
+              "ref": "blue.catbird.circle.defs#circleSummary"
+            }
+          }
+        }
+      },
+      "errors": [
+        { "name": "AuthRequired" },
+        { "name": "AccessRemoved" },
+        { "name": "UnsupportedPDS" },
+        { "name": "ProtocolRevisionMismatch" },
+        { "name": "UpstreamUnavailable" }
+      ]
+    }
+  }
+}

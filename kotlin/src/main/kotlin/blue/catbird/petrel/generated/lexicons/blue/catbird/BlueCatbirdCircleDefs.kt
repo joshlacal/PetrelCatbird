@@ -1,0 +1,63 @@
+// Lexicon: 1, ID: blue.catbird.circle.defs
+
+package blue.catbird.petrel.generated
+
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import blue.catbird.petrel.core.types.*
+import blue.catbird.petrel.core.*
+import blue.catbird.petrel.client.*
+import blue.catbird.petrel.network.*
+import blue.catbird.petrel.runtime.subscription.openSubscription
+import kotlinx.coroutines.flow.*
+
+object BlueCatbirdCircleDefsDefs {
+    const val TYPE_IDENTIFIER = "blue.catbird.circle.defs"
+}
+
+@Serializable
+enum class BlueCatbirdCircleDefsNotificationReason {
+    @SerialName("reply")
+    value_reply,
+    @SerialName("like")
+    value_like,
+    @SerialName("invite")
+    value_invite}
+
+    @Serializable
+    data class BlueCatbirdCircleDefsCircleSummary(
+        @SerialName("uri")
+        val uri: SpaceRef,/** Stable Circle identity, independent of the Space key, so a Circle remains recognizable across a Space migration. */        @SerialName("circleId")
+        val circleId: String,        @SerialName("name")
+        val name: String,        @SerialName("owner")
+        val owner: DID,/** Number of members on the owner's PDS member list. The member list itself is owner-only and is read from the owner's PDS, not from this service. */        @SerialName("memberCount")
+        val memberCount: Int? = null,        @SerialName("muted")
+        val muted: Boolean? = null    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdCircleDefsCircleSummary"
+        }
+    }
+
+    @Serializable
+    data class BlueCatbirdCircleDefsFeedItem(
+        @SerialName("post")
+        val post: AppBskyFeedDefsFeedViewPost,        @SerialName("circle")
+        val circle: BlueCatbirdCircleDefsCircleSummary    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdCircleDefsFeedItem"
+        }
+    }
+
+    @Serializable
+    data class BlueCatbirdCircleDefsNotification(
+/** Canonical lowercase hyphenated RFC 4122 UUID. */        @SerialName("id")
+        val id: String,        @SerialName("reason")
+        val reason: BlueCatbirdCircleDefsNotificationReason,        @SerialName("actor")
+        val actor: AppBskyActorDefsProfileViewBasic,        @SerialName("subject")
+        val subject: ATProtocolURI? = null,        @SerialName("indexedAt")
+        val indexedAt: ATProtocolDate,        @SerialName("circle")
+        val circle: BlueCatbirdCircleDefsCircleSummary    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdCircleDefsNotification"
+        }
+    }

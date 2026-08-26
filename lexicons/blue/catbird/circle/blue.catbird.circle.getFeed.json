@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.circle.getFeed",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get feed items from one Circle Space or unified Circles feed",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "space": { "type": "string", "format": "space-ref" },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50
+          },
+          "cursor": { "type": "string" }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["feed"],
+          "properties": {
+            "feed": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.circle.defs#feedItem"
+              }
+            },
+            "cursor": { "type": "string" }
+          }
+        }
+      },
+      "errors": [
+        { "name": "AuthRequired" },
+        { "name": "AccessRemoved" },
+        { "name": "UnsupportedPDS" },
+        { "name": "ProtocolRevisionMismatch" },
+        { "name": "UpstreamUnavailable" }
+      ]
+    }
+  }
+}
