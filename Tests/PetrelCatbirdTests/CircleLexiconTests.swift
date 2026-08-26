@@ -5,56 +5,67 @@ import Testing
 
 @Suite("Circle Lexicon Tests")
 struct CircleLexiconTests {
-    @Test func circleSummaryDecodesSpaceIdentity() throws {
-        let data = #"{"uri":"at://did:plc:owner/space/blue.catbird.circle/3abc","name":"Family","owner":"did:plc:owner","accessState":"active"}"#.data(using: .utf8)!
+    /// TIDs are 13 characters; a short literal like "3abc" is not a valid TID.
+    private static let circleId = "3l7revaaaaaaa"
+
+    @Test func circleSummaryCarriesSpaceIdentityAndCircleId() throws {
+        let data = """
+        {"uri":"at://did:plc:owner/space/blue.catbird.circle/3abc",\
+        "circleId":"\(Self.circleId)","name":"Family","owner":"did:plc:owner","memberCount":3}
+        """.data(using: .utf8)!
         let summary = try JSONDecoder().decode(BlueCatbirdCircleDefs.CircleSummary.self, from: data)
         #expect(summary.name == "Family")
         #expect(summary.uri.description == "at://did:plc:owner/space/blue.catbird.circle/3abc")
+        #expect(summary.circleId.description == Self.circleId)
+        #expect(summary.memberCount == 3)
     }
 
-    @Test func circleOperationDecodesCanonicalUUID() throws {
-        let uuid = "12345678-1234-4234-8234-123456789abc"
+    /// `memberCount` and `muted` are optional; absence must decode as nil rather
+    /// than defaulting to a value that would misreport Circle size or mute state.
+    @Test func circleSummaryOmitsOptionalFieldsWhenAbsent() throws {
         let data = """
-        {"id":"\(uuid)","status":"complete","space":"at://did:plc:owner/space/blue.catbird.circle/3abc"}
+        {"uri":"at://did:plc:owner/space/blue.catbird.circle/3abc",\
+        "circleId":"\(Self.circleId)","name":"Family","owner":"did:plc:owner"}
         """.data(using: .utf8)!
-        let op = try JSONDecoder().decode(BlueCatbirdCircleDefs.Operation.self, from: data)
-        #expect(op.id.count == 36)
-        #expect(op.id == uuid)
-        #expect(op.status == .value_complete)
+        let summary = try JSONDecoder().decode(BlueCatbirdCircleDefs.CircleSummary.self, from: data)
+        #expect(summary.memberCount == nil)
+        #expect(summary.muted == nil)
     }
 
-    @Test func circleSummaryDecodesMembersWhenPresentAndOmitsWhenAbsent() throws {
-        let withMembersData = #"{"uri":"at://did:plc:owner/space/blue.catbird.circle/3abc","name":"Family","owner":"did:plc:owner","accessState":"active","members":["did:plc:alice","did:plc:bob"]}"#.data(using: .utf8)!
-        let summaryWithMembers = try JSONDecoder().decode(BlueCatbirdCircleDefs.CircleSummary.self, from: withMembersData)
-        #expect(summaryWithMembers.members?.count == 2)
-        #expect(summaryWithMembers.members?[0].didString() == "did:plc:alice")
-
-        let withoutMembersData = #"{"uri":"at://did:plc:owner/space/blue.catbird.circle/3abc","name":"Family","owner":"did:plc:owner","accessState":"active"}"#.data(using: .utf8)!
-        let summaryWithoutMembers = try JSONDecoder().decode(BlueCatbirdCircleDefs.CircleSummary.self, from: withoutMembersData)
-        #expect(summaryWithoutMembers.members == nil)
+    /// `circleId` is required, so a summary lacking it must not decode. This is what
+    /// lets a client follow a Circle across a Space migration.
+    @Test func circleSummaryRequiresCircleId() throws {
+        let data = """
+        {"uri":"at://did:plc:owner/space/blue.catbird.circle/3abc","name":"Family","owner":"did:plc:owner"}
+        """.data(using: .utf8)!
+        #expect(throws: (any Swift.Error).self) {
+            _ = try JSONDecoder().decode(BlueCatbirdCircleDefs.CircleSummary.self, from: data)
+        }
     }
 
-    @Test func getOperationAndRetryOperationDecode() throws {
-        let uuid = "12345678-1234-4234-8234-123456789abc"
-        let getOpData = """
-        {"id":"\(uuid)","status":"pending","space":"at://did:plc:owner/space/blue.catbird.circle/3abc"}
+    @Test func metadataCarriesCircleIdAndMigrationPointers() throws {
+        let data = """
+        {"$type":"blue.catbird.circle.metadata","circleId":"\(Self.circleId)","name":"Family",\
+        "createdAt":"2026-08-26T00:00:00Z",\
+        "migratedFrom":"at://did:plc:owner/space/blue.catbird.circle/3old"}
         """.data(using: .utf8)!
-        let getOpOutput = try JSONDecoder().decode(BlueCatbirdCircleGetOperation.Output.self, from: getOpData)
-        #expect(getOpOutput.id == uuid)
-        #expect(getOpOutput.status == .value_pending)
-
-        let retryOpData = """
-        {"id":"\(uuid)","status":"failed","error":"UpstreamUnavailable"}
-        """.data(using: .utf8)!
-        let retryOpOutput = try JSONDecoder().decode(BlueCatbirdCircleRetryOperation.Output.self, from: retryOpData)
-        #expect(retryOpOutput.id == uuid)
-        #expect(retryOpOutput.status == .value_failed)
-        #expect(retryOpOutput.error == "UpstreamUnavailable")
+        let record = try JSONDecoder().decode(BlueCatbirdCircleMetadata.self, from: data)
+        #expect(record.circleId.description == Self.circleId)
+        #expect(record.name == "Family")
+        #expect(record.migratedFrom?.description == "at://did:plc:owner/space/blue.catbird.circle/3old")
+        #expect(record.migratedTo == nil)
     }
 
-    @Test func activateSpaceDecodesClosedEnum() throws {
-        let data = #"{"accessState":"active"}"#.data(using: .utf8)!
-        let output = try JSONDecoder().decode(BlueCatbirdCircleActivateSpace.Output.self, from: data)
-        #expect(output.accessState == .value_active)
+    /// Activation returns a refreshed summary rather than an access-state enum, so a
+    /// client needs no second round trip after creating a Circle.
+    @Test func activateCircleReturnsRefreshedSummary() throws {
+        let data = """
+        {"circle":{"uri":"at://did:plc:owner/space/blue.catbird.circle/3abc",\
+        "circleId":"\(Self.circleId)","name":"Family","owner":"did:plc:owner","memberCount":2}}
+        """.data(using: .utf8)!
+        let output = try JSONDecoder().decode(BlueCatbirdCircleActivateCircle.Output.self, from: data)
+        #expect(output.circle.name == "Family")
+        #expect(output.circle.circleId.description == Self.circleId)
+        #expect(output.circle.memberCount == 2)
     }
 }
