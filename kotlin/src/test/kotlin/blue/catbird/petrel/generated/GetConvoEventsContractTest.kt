@@ -5,9 +5,9 @@ import blue.catbird.petrel.core.types.Bytes
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 class GetConvoEventsContractTest {
     private val json = Json { ignoreUnknownKeys = true }
@@ -42,17 +42,17 @@ class GetConvoEventsContractTest {
         assertEquals("app", entry.messageType)
         assertEquals("00112233-4455-4677-8899-aabbccddeeff", entry.entryId)
         assertEquals("blue.catbird.chat.defs#creationEntry", entry.entryKind)
-        assertTrue(expectedSha.contentEquals(entry.acceptedPayloadSha256?.data ?: ByteArray(0)))
-        assertTrue(expectedSignedRequest.contentEquals(entry.signedRequest?.data ?: ByteArray(0)))
-        assertTrue(expectedFingerprint.contentEquals(entry.outerFingerprint?.data ?: ByteArray(0)))
+        assertContentEquals(expectedSha, entry.acceptedPayloadSha256?.data)
+        assertContentEquals(expectedSignedRequest, entry.signedRequest?.data)
+        assertContentEquals(expectedFingerprint, entry.outerFingerprint?.data)
 
         val reencoded = json.encodeToString(entry)
         val roundTrip = json.decodeFromString<BlueCatbirdMlsDSGetConvoEventsConvoEventEntry>(reencoded)
         assertEquals(entry.entryId, roundTrip.entryId)
         assertEquals(entry.entryKind, roundTrip.entryKind)
-        assertTrue(expectedSha.contentEquals(roundTrip.acceptedPayloadSha256?.data ?: ByteArray(0)))
-        assertTrue(expectedSignedRequest.contentEquals(roundTrip.signedRequest?.data ?: ByteArray(0)))
-        assertTrue(expectedFingerprint.contentEquals(roundTrip.outerFingerprint?.data ?: ByteArray(0)))
+        assertContentEquals(expectedSha, roundTrip.acceptedPayloadSha256?.data)
+        assertContentEquals(expectedSignedRequest, roundTrip.signedRequest?.data)
+        assertContentEquals(expectedFingerprint, roundTrip.outerFingerprint?.data)
     }
 
     @Test
