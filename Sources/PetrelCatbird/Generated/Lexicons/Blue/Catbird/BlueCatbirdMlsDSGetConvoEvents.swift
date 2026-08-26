@@ -20,9 +20,14 @@ public struct ConvoEventEntry: ATProtocolCodable, ATProtocolValue {
             public let ciphertext: Bytes
             public let paddedSize: Int
             public let createdAt: ATProtocolDate
+            public let entryId: String?
+            public let entryKind: String?
+            public let acceptedPayloadSha256: Bytes?
+            public let signedRequest: Bytes?
+            public let outerFingerprint: Bytes?
 
         public init(
-            seq: Int, epoch: Int, msgId: String, messageType: String, ciphertext: Bytes, paddedSize: Int, createdAt: ATProtocolDate
+            seq: Int, epoch: Int, msgId: String, messageType: String, ciphertext: Bytes, paddedSize: Int, createdAt: ATProtocolDate, entryId: String?, entryKind: String?, acceptedPayloadSha256: Bytes?, signedRequest: Bytes?, outerFingerprint: Bytes?
         ) {
             self.seq = seq
             self.epoch = epoch
@@ -31,6 +36,11 @@ public struct ConvoEventEntry: ATProtocolCodable, ATProtocolValue {
             self.ciphertext = ciphertext
             self.paddedSize = paddedSize
             self.createdAt = createdAt
+            self.entryId = entryId
+            self.entryKind = entryKind
+            self.acceptedPayloadSha256 = acceptedPayloadSha256
+            self.signedRequest = signedRequest
+            self.outerFingerprint = outerFingerprint
         }
 
         public init(from decoder: Decoder) throws {
@@ -77,6 +87,46 @@ public struct ConvoEventEntry: ATProtocolCodable, ATProtocolValue {
                 LogManager.logError("Decoding error for required property 'createdAt': \(error)")
                 throw error
             }
+            do {
+                self.entryId = try container.decodeIfPresent(String.self, forKey: .entryId)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'entryId' — degrading to nil: \(error)")
+                self.entryId = nil
+            }
+            do {
+                self.entryKind = try container.decodeIfPresent(String.self, forKey: .entryKind)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'entryKind' — degrading to nil: \(error)")
+                self.entryKind = nil
+            }
+            do {
+                self.acceptedPayloadSha256 = try container.decodeIfPresent(Bytes.self, forKey: .acceptedPayloadSha256)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'acceptedPayloadSha256' — degrading to nil: \(error)")
+                self.acceptedPayloadSha256 = nil
+            }
+            do {
+                self.signedRequest = try container.decodeIfPresent(Bytes.self, forKey: .signedRequest)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'signedRequest' — degrading to nil: \(error)")
+                self.signedRequest = nil
+            }
+            do {
+                self.outerFingerprint = try container.decodeIfPresent(Bytes.self, forKey: .outerFingerprint)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'outerFingerprint' — degrading to nil: \(error)")
+                self.outerFingerprint = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -89,6 +139,11 @@ public struct ConvoEventEntry: ATProtocolCodable, ATProtocolValue {
             try container.encode(ciphertext, forKey: .ciphertext)
             try container.encode(paddedSize, forKey: .paddedSize)
             try container.encode(createdAt, forKey: .createdAt)
+            try container.encodeIfPresent(entryId, forKey: .entryId)
+            try container.encodeIfPresent(entryKind, forKey: .entryKind)
+            try container.encodeIfPresent(acceptedPayloadSha256, forKey: .acceptedPayloadSha256)
+            try container.encodeIfPresent(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(outerFingerprint, forKey: .outerFingerprint)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -99,6 +154,31 @@ public struct ConvoEventEntry: ATProtocolCodable, ATProtocolValue {
             hasher.combine(ciphertext)
             hasher.combine(paddedSize)
             hasher.combine(createdAt)
+            if let value = entryId {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = entryKind {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = acceptedPayloadSha256 {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = signedRequest {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = outerFingerprint {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
@@ -122,6 +202,21 @@ public struct ConvoEventEntry: ATProtocolCodable, ATProtocolValue {
                 return false
             }
             if createdAt != other.createdAt {
+                return false
+            }
+            if entryId != other.entryId {
+                return false
+            }
+            if entryKind != other.entryKind {
+                return false
+            }
+            if acceptedPayloadSha256 != other.acceptedPayloadSha256 {
+                return false
+            }
+            if signedRequest != other.signedRequest {
+                return false
+            }
+            if outerFingerprint != other.outerFingerprint {
                 return false
             }
             return true
@@ -148,6 +243,26 @@ public struct ConvoEventEntry: ATProtocolCodable, ATProtocolValue {
             map = map.adding(key: "paddedSize", value: paddedSizeValue)
             let createdAtValue = try createdAt.toCBORValue()
             map = map.adding(key: "createdAt", value: createdAtValue)
+            if let value = entryId {
+                let entryIdValue = try value.toCBORValue()
+                map = map.adding(key: "entryId", value: entryIdValue)
+            }
+            if let value = entryKind {
+                let entryKindValue = try value.toCBORValue()
+                map = map.adding(key: "entryKind", value: entryKindValue)
+            }
+            if let value = acceptedPayloadSha256 {
+                let acceptedPayloadSha256Value = try value.toCBORValue()
+                map = map.adding(key: "acceptedPayloadSha256", value: acceptedPayloadSha256Value)
+            }
+            if let value = signedRequest {
+                let signedRequestValue = try value.toCBORValue()
+                map = map.adding(key: "signedRequest", value: signedRequestValue)
+            }
+            if let value = outerFingerprint {
+                let outerFingerprintValue = try value.toCBORValue()
+                map = map.adding(key: "outerFingerprint", value: outerFingerprintValue)
+            }
             return map
         }
 
@@ -160,6 +275,11 @@ public struct ConvoEventEntry: ATProtocolCodable, ATProtocolValue {
             case ciphertext
             case paddedSize
             case createdAt
+            case entryId
+            case entryKind
+            case acceptedPayloadSha256
+            case signedRequest
+            case outerFingerprint
         }
     }    
 public struct Parameters: Parametrizable {

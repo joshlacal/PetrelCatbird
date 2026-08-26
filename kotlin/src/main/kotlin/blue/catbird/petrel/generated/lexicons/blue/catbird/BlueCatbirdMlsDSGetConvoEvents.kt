@@ -27,7 +27,12 @@ object BlueCatbirdMlsDSGetConvoEventsDefs {
         val messageType: String,/** Encrypted message payload */        @SerialName("ciphertext")
         val ciphertext: Bytes,/** Padded plaintext size */        @SerialName("paddedSize")
         val paddedSize: Int,/** Creation timestamp */        @SerialName("createdAt")
-        val createdAt: ATProtocolDate    ) {
+        val createdAt: ATProtocolDate,        @SerialName("entryId")
+        val entryId: String? = null,        @SerialName("entryKind")
+        val entryKind: String? = null,        @SerialName("acceptedPayloadSha256")
+        val acceptedPayloadSha256: Bytes? = null,        @SerialName("signedRequest")
+        val signedRequest: Bytes? = null,        @SerialName("outerFingerprint")
+        val outerFingerprint: Bytes? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdMlsDSGetConvoEventsConvoEventEntry"
         }
