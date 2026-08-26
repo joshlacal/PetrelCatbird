@@ -16,26 +16,6 @@ object BlueCatbirdCircleDefsDefs {
 }
 
 @Serializable
-enum class BlueCatbirdCircleDefsDefsAccessState {
-    @SerialName("active")
-    value_active,
-    @SerialName("expired")
-    value_expired,
-    @SerialName("removed")
-    value_removed,
-    @SerialName("unsupported")
-    value_unsupported}
-
-@Serializable
-enum class BlueCatbirdCircleDefsOperationStatus {
-    @SerialName("pending")
-    value_pending,
-    @SerialName("complete")
-    value_complete,
-    @SerialName("failed")
-    value_failed}
-
-@Serializable
 enum class BlueCatbirdCircleDefsNotificationReason {
     @SerialName("reply")
     value_reply,
@@ -47,26 +27,14 @@ enum class BlueCatbirdCircleDefsNotificationReason {
     @Serializable
     data class BlueCatbirdCircleDefsCircleSummary(
         @SerialName("uri")
-        val uri: SpaceRef,        @SerialName("name")
+        val uri: SpaceRef,/** Stable Circle identity, independent of the Space key, so a Circle remains recognizable across a Space migration. */        @SerialName("circleId")
+        val circleId: String,        @SerialName("name")
         val name: String,        @SerialName("owner")
-        val owner: DID,        @SerialName("accessState")
-        val accessState: BlueCatbirdCircleDefsDefsAccessState,        @SerialName("muted")
-        val muted: Boolean? = null,        @SerialName("members")
-        val members: List<DID>? = null    ) {
+        val owner: DID,/** Number of members on the owner's PDS member list. The member list itself is owner-only and is read from the owner's PDS, not from this service. */        @SerialName("memberCount")
+        val memberCount: Int? = null,        @SerialName("muted")
+        val muted: Boolean? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdCircleDefsCircleSummary"
-        }
-    }
-
-    @Serializable
-    data class BlueCatbirdCircleDefsOperation(
-/** Canonical lowercase hyphenated RFC 4122 UUID. */        @SerialName("id")
-        val id: String,        @SerialName("status")
-        val status: BlueCatbirdCircleDefsOperationStatus,        @SerialName("space")
-        val space: SpaceRef? = null,        @SerialName("error")
-        val error: String? = null    ) {
-        companion object {
-            const val TYPE_IDENTIFIER = "#blueCatbirdCircleDefsOperation"
         }
     }
 

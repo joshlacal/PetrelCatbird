@@ -14,21 +14,21 @@ public struct BlueCatbirdCircleDefs {
 public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
             public static let typeIdentifier = "blue.catbird.circle.defs#circleSummary"
             public let uri: SpaceRef
+            public let circleId: TID
             public let name: String
             public let owner: DID
-            public let accessState: DefsAccessState
+            public let memberCount: Int?
             public let muted: Bool?
-            public let members: [DID]?
 
         public init(
-            uri: SpaceRef, name: String, owner: DID, accessState: DefsAccessState, muted: Bool?, members: [DID]?
+            uri: SpaceRef, circleId: TID, name: String, owner: DID, memberCount: Int?, muted: Bool?
         ) {
             self.uri = uri
+            self.circleId = circleId
             self.name = name
             self.owner = owner
-            self.accessState = accessState
+            self.memberCount = memberCount
             self.muted = muted
-            self.members = members
         }
 
         public init(from decoder: Decoder) throws {
@@ -37,6 +37,12 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
                 self.uri = try container.decode(SpaceRef.self, forKey: .uri)
             } catch {
                 LogManager.logError("Decoding error for required property 'uri': \(error)")
+                throw error
+            }
+            do {
+                self.circleId = try container.decode(TID.self, forKey: .circleId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'circleId': \(error)")
                 throw error
             }
             do {
@@ -52,10 +58,12 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
                 throw error
             }
             do {
-                self.accessState = try container.decode(DefsAccessState.self, forKey: .accessState)
+                self.memberCount = try container.decodeIfPresent(Int.self, forKey: .memberCount)
             } catch {
-                LogManager.logError("Decoding error for required property 'accessState': \(error)")
-                throw error
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'memberCount' — degrading to nil: \(error)")
+                self.memberCount = nil
             }
             do {
                 self.muted = try container.decodeIfPresent(Bool.self, forKey: .muted)
@@ -65,38 +73,30 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
                 LogManager.logWarning("Decoding error for optional property 'muted' — degrading to nil: \(error)")
                 self.muted = nil
             }
-            do {
-                self.members = try container.decodeIfPresent([DID].self, forKey: .members)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'members' — degrading to nil: \(error)")
-                self.members = nil
-            }
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
             try container.encode(uri, forKey: .uri)
+            try container.encode(circleId, forKey: .circleId)
             try container.encode(name, forKey: .name)
             try container.encode(owner, forKey: .owner)
-            try container.encode(accessState, forKey: .accessState)
+            try container.encodeIfPresent(memberCount, forKey: .memberCount)
             try container.encodeIfPresent(muted, forKey: .muted)
-            try container.encodeIfPresent(members, forKey: .members)
         }
 
         public func hash(into hasher: inout Hasher) {
             hasher.combine(uri)
+            hasher.combine(circleId)
             hasher.combine(name)
             hasher.combine(owner)
-            hasher.combine(accessState)
-            if let value = muted {
+            if let value = memberCount {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = members {
+            if let value = muted {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
@@ -108,19 +108,19 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
             if uri != other.uri {
                 return false
             }
+            if circleId != other.circleId {
+                return false
+            }
             if name != other.name {
                 return false
             }
             if owner != other.owner {
                 return false
             }
-            if accessState != other.accessState {
+            if memberCount != other.memberCount {
                 return false
             }
             if muted != other.muted {
-                return false
-            }
-            if members != other.members {
                 return false
             }
             return true
@@ -135,19 +135,19 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
             map = map.adding(key: "$type", value: Self.typeIdentifier)
             let uriValue = try uri.toCBORValue()
             map = map.adding(key: "uri", value: uriValue)
+            let circleIdValue = try circleId.toCBORValue()
+            map = map.adding(key: "circleId", value: circleIdValue)
             let nameValue = try name.toCBORValue()
             map = map.adding(key: "name", value: nameValue)
             let ownerValue = try owner.toCBORValue()
             map = map.adding(key: "owner", value: ownerValue)
-            let accessStateValue = try accessState.toCBORValue()
-            map = map.adding(key: "accessState", value: accessStateValue)
+            if let value = memberCount {
+                let memberCountValue = try value.toCBORValue()
+                map = map.adding(key: "memberCount", value: memberCountValue)
+            }
             if let value = muted {
                 let mutedValue = try value.toCBORValue()
                 map = map.adding(key: "muted", value: mutedValue)
-            }
-            if let value = members {
-                let membersValue = try value.toCBORValue()
-                map = map.adding(key: "members", value: membersValue)
             }
             return map
         }
@@ -155,131 +155,11 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
         private enum CodingKeys: String, CodingKey {
             case typeIdentifier = "$type"
             case uri
+            case circleId
             case name
             case owner
-            case accessState
+            case memberCount
             case muted
-            case members
-        }
-    }
-        
-public struct Operation: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.circle.defs#operation"
-            public let id: String
-            public let status: OperationStatus
-            public let space: SpaceRef?
-            public let error: String?
-
-        public init(
-            id: String, status: OperationStatus, space: SpaceRef?, error: String?
-        ) {
-            self.id = id
-            self.status = status
-            self.space = space
-            self.error = error
-        }
-
-        public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.id = try container.decode(String.self, forKey: .id)
-            } catch {
-                LogManager.logError("Decoding error for required property 'id': \(error)")
-                throw error
-            }
-            do {
-                self.status = try container.decode(OperationStatus.self, forKey: .status)
-            } catch {
-                LogManager.logError("Decoding error for required property 'status': \(error)")
-                throw error
-            }
-            do {
-                self.space = try container.decodeIfPresent(SpaceRef.self, forKey: .space)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'space' — degrading to nil: \(error)")
-                self.space = nil
-            }
-            do {
-                self.error = try container.decodeIfPresent(String.self, forKey: .error)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'error' — degrading to nil: \(error)")
-                self.error = nil
-            }
-        }
-
-        public func encode(to encoder: Encoder) throws {
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(id, forKey: .id)
-            try container.encode(status, forKey: .status)
-            try container.encodeIfPresent(space, forKey: .space)
-            try container.encodeIfPresent(error, forKey: .error)
-        }
-
-        public func hash(into hasher: inout Hasher) {
-            hasher.combine(id)
-            hasher.combine(status)
-            if let value = space {
-                hasher.combine(value)
-            } else {
-                hasher.combine(nil as Int?)
-            }
-            if let value = error {
-                hasher.combine(value)
-            } else {
-                hasher.combine(nil as Int?)
-            }
-        }
-
-        public func isEqual(to other: any ATProtocolValue) -> Bool {
-            guard let other = other as? Self else { return false }
-            if id != other.id {
-                return false
-            }
-            if status != other.status {
-                return false
-            }
-            if space != other.space {
-                return false
-            }
-            if error != other.error {
-                return false
-            }
-            return true
-        }
-
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
-        public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let idValue = try id.toCBORValue()
-            map = map.adding(key: "id", value: idValue)
-            let statusValue = try status.toCBORValue()
-            map = map.adding(key: "status", value: statusValue)
-            if let value = space {
-                let spaceValue = try value.toCBORValue()
-                map = map.adding(key: "space", value: spaceValue)
-            }
-            if let value = error {
-                let errorValue = try value.toCBORValue()
-                map = map.adding(key: "error", value: errorValue)
-            }
-            return map
-        }
-
-        private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
-            case id
-            case status
-            case space
-            case error
         }
     }
         
@@ -499,39 +379,6 @@ public struct Notification: ATProtocolCodable, ATProtocolValue {
         }
     }
 
-
-
-public enum DefsAccessState: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_active = "active"
-    case value_expired = "expired"
-    case value_removed = "removed"
-    case value_unsupported = "unsupported"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsAccessState else { return false }
-        return self == otherValue
-    }
-
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
-
-
-public enum OperationStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_pending = "pending"
-    case value_complete = "complete"
-    case value_failed = "failed"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? OperationStatus else { return false }
-        return self == otherValue
-    }
-
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
 
 
 public enum NotificationReason: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {

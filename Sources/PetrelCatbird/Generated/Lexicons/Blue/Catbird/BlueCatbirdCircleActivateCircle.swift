@@ -4,12 +4,12 @@ import Petrel
 
 
 
-// lexicon: 1, id: blue.catbird.circle.activateSpace
+// lexicon: 1, id: blue.catbird.circle.activateCircle
 
 
-public struct BlueCatbirdCircleActivateSpace { 
+public struct BlueCatbirdCircleActivateCircle { 
 
-    public static let typeIdentifier = "blue.catbird.circle.activateSpace"
+    public static let typeIdentifier = "blue.catbird.circle.activateCircle"
 public struct Input: ATProtocolCodable {
         public let space: SpaceRef
 
@@ -44,9 +44,7 @@ public struct Input: ATProtocolCodable {
 public struct Output: ATProtocolCodable {
         
         
-        public let accessState: BlueCatbirdCircleDefs.DefsAccessState
-        
-        public let expiresAt: ATProtocolDate?
+        public let circle: BlueCatbirdCircleDefs.CircleSummary
         
         
         
@@ -54,17 +52,13 @@ public struct Output: ATProtocolCodable {
         public init(
             
             
-            accessState: BlueCatbirdCircleDefs.DefsAccessState,
-            
-            expiresAt: ATProtocolDate? = nil
+            circle: BlueCatbirdCircleDefs.CircleSummary
             
             
         ) {
             
             
-            self.accessState = accessState
-            
-            self.expiresAt = expiresAt
+            self.circle = circle
             
             
         }
@@ -74,18 +68,7 @@ public struct Output: ATProtocolCodable {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             
             
-            self.accessState = try container.decode(BlueCatbirdCircleDefs.DefsAccessState.self, forKey: .accessState)
-            
-            
-            
-            
-            do {
-                self.expiresAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expiresAt)
-            } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'expiresAt' — degrading to nil: \(error)")
-                self.expiresAt = nil
-            }
+            self.circle = try container.decode(BlueCatbirdCircleDefs.CircleSummary.self, forKey: .circle)
             
             
             
@@ -95,11 +78,7 @@ public struct Output: ATProtocolCodable {
             
             var container = encoder.container(keyedBy: CodingKeys.self)
             
-            try container.encode(accessState, forKey: .accessState)
-            
-            
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(expiresAt, forKey: .expiresAt)
+            try container.encode(circle, forKey: .circle)
             
             
         }
@@ -110,16 +89,8 @@ public struct Output: ATProtocolCodable {
 
             
             
-            let accessStateValue = try accessState.toCBORValue()
-            map = map.adding(key: "accessState", value: accessStateValue)
-            
-            
-            
-            if let value = expiresAt {
-                // Encode optional property even if it's an empty array for CBOR
-                let expiresAtValue = try value.toCBORValue()
-                map = map.adding(key: "expiresAt", value: expiresAtValue)
-            }
+            let circleValue = try circle.toCBORValue()
+            map = map.adding(key: "circle", value: circleValue)
             
             
 
@@ -129,15 +100,19 @@ public struct Output: ATProtocolCodable {
         
         
         private enum CodingKeys: String, CodingKey {
-            case accessState
-            case expiresAt
+            case circle
         }
         
     }
         
 public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                case authRequired = "AuthRequired"
-                case accessRemoved = "AccessRemoved"
+                /// This service holds no usable OAuth grant for a participant of the Space, so it cannot obtain a Space credential.
+                case authorizationRequired = "AuthorizationRequired"
+                /// The caller is not on the Space's member list.
+                case notAuthorized = "NotAuthorized"
+                case spaceNotFound = "SpaceNotFound"
+                /// The Space exists but is not a usable Circle: its app access does not name this service, or its metadata record is absent.
+                case spaceNotEligible = "SpaceNotEligible"
                 case unsupportedPDS = "UnsupportedPDS"
                 case protocolRevisionMismatch = "ProtocolRevisionMismatch"
                 case upstreamUnavailable = "UpstreamUnavailable"
@@ -155,21 +130,21 @@ public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertibl
 }
 
 extension ATProtoClient.Blue.Catbird.Circle {
-    // MARK: - activateSpace
+    // MARK: - activateCircle
 
-    /// Activate or renew access to a Circle Space
+    /// Ask this service to begin indexing a Circle Space. The service verifies the Space independently against the owner's PDS; it does not trust the caller's claim that the Space exists. Idempotent: activating an already-active Circle returns its current summary.
     /// 
     /// - Parameter input: The input parameters for the request
     
     /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func activateSpace(
+    public func activateCircle(
         
-        input: BlueCatbirdCircleActivateSpace.Input
+        input: BlueCatbirdCircleActivateCircle.Input
         
-    ) async throws -> (responseCode: Int, data: BlueCatbirdCircleActivateSpace.Output?) {
-        let endpoint = "blue.catbird.circle.activateSpace"
+    ) async throws -> (responseCode: Int, data: BlueCatbirdCircleActivateCircle.Output?) {
+        let endpoint = "blue.catbird.circle.activateCircle"
         
         var headers: [String: String] = [:]
         
@@ -195,7 +170,7 @@ extension ATProtoClient.Blue.Catbird.Circle {
         )
 
         // Determine service DID for this endpoint
-        let serviceDID = await networkService.getServiceDID(for: "blue.catbird.circle.activateSpace")
+        let serviceDID = await networkService.getServiceDID(for: "blue.catbird.circle.activateCircle")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
@@ -218,12 +193,12 @@ extension ATProtoClient.Blue.Catbird.Circle {
             do {
                 
                 let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdCircleActivateSpace.Output.self, from: responseData)
+                let decodedData = try decoder.decode(BlueCatbirdCircleActivateCircle.Output.self, from: responseData)
                 
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.circle.activateSpace: \(error)")
+                LogManager.logError("Failed to decode successful response for blue.catbird.circle.activateCircle: \(error)")
                 return (responseCode, nil)
             }
         } else {
@@ -231,7 +206,7 @@ extension ATProtoClient.Blue.Catbird.Circle {
             if let atprotoError = ATProtoErrorParser.parse(
                 data: responseData,
                 statusCode: responseCode,
-                errorType: BlueCatbirdCircleActivateSpace.Error.self
+                errorType: BlueCatbirdCircleActivateCircle.Error.self
             ) {
                 throw atprotoError
             }

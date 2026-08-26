@@ -2,33 +2,24 @@
   "lexicon": 1,
   "id": "blue.catbird.circle.defs",
   "defs": {
-    "accessState": {
-      "type": "string",
-      "enum": ["active", "expired", "removed", "unsupported"]
-    },
     "circleSummary": {
       "type": "object",
-      "required": ["uri", "name", "owner", "accessState"],
+      "required": ["uri", "circleId", "name", "owner"],
       "properties": {
         "uri": { "type": "string", "format": "space-ref" },
+        "circleId": {
+          "type": "string",
+          "format": "tid",
+          "description": "Stable Circle identity, independent of the Space key, so a Circle remains recognizable across a Space migration."
+        },
         "name": { "type": "string", "minLength": 1, "maxLength": 64 },
         "owner": { "type": "string", "format": "did" },
-        "accessState": { "type": "ref", "ref": "#accessState" },
-        "muted": { "type": "boolean" },
-        "members": {
-          "type": "array",
-          "items": { "type": "string", "format": "did" }
-        }
-      }
-    },
-    "operation": {
-      "type": "object",
-      "required": ["id", "status"],
-      "properties": {
-        "id": { "type": "string", "minLength": 36, "maxLength": 36, "description": "Canonical lowercase hyphenated RFC 4122 UUID." },
-        "status": { "type": "string", "enum": ["pending", "complete", "failed"] },
-        "space": { "type": "string", "format": "space-ref" },
-        "error": { "type": "string" }
+        "memberCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of members on the owner's PDS member list. The member list itself is owner-only and is read from the owner's PDS, not from this service."
+        },
+        "muted": { "type": "boolean" }
       }
     },
     "feedItem": {

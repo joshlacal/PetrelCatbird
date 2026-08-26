@@ -181,7 +181,6 @@ public enum PetrelCatbirdLexicons {
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#subscriptionMessage", as: BlueCatbirdChatDefs.SubscriptionMessage.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.device", as: BlueCatbirdChatDevice.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.circle.defs#circleSummary", as: BlueCatbirdCircleDefs.CircleSummary.self)
-        ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.circle.defs#operation", as: BlueCatbirdCircleDefs.Operation.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.circle.defs#feedItem", as: BlueCatbirdCircleDefs.FeedItem.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.circle.defs#notification", as: BlueCatbirdCircleDefs.Notification.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.circle.metadata", as: BlueCatbirdCircleMetadata.self)
