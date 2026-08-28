@@ -14,7 +14,7 @@ public struct PlaceStreamKey: ATProtocolCodable, ATProtocolValue {
         public let createdAt: ATProtocolDate
         public let createdBy: String?
 
-        public init(signingKey: String, createdAt: ATProtocolDate, createdBy: String?) {
+        public init(signingKey: String, createdAt: ATProtocolDate, createdBy: String? = nil) {
             self.signingKey = signingKey
             self.createdAt = createdAt
             self.createdBy = createdBy

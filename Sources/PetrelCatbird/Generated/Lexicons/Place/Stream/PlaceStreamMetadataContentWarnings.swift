@@ -12,7 +12,7 @@ public struct PlaceStreamMetadataContentWarnings: ATProtocolCodable, ATProtocolV
     public static let typeIdentifier = "place.stream.metadata.contentWarnings"
         public let warnings: [String]?
 
-        public init(warnings: [String]?) {
+        public init(warnings: [String]? = nil) {
             self.warnings = warnings
         }
 

@@ -22,7 +22,7 @@ public struct PlaceStreamSegment: ATProtocolCodable, ATProtocolValue {
         public let contentRights: PlaceStreamMetadataContentRights?
         public let distributionPolicy: PlaceStreamMetadataDistributionPolicy?
 
-        public init(id: String, signingKey: String, startTime: ATProtocolDate, duration: Int?, creator: DID, video: [Video]?, audio: [Audio]?, size: Int?, contentWarnings: PlaceStreamMetadataContentWarnings?, contentRights: PlaceStreamMetadataContentRights?, distributionPolicy: PlaceStreamMetadataDistributionPolicy?) {
+        public init(id: String, signingKey: String, startTime: ATProtocolDate, duration: Int? = nil, creator: DID, video: [Video]? = nil, audio: [Audio]? = nil, size: Int? = nil, contentWarnings: PlaceStreamMetadataContentWarnings? = nil, contentRights: PlaceStreamMetadataContentRights? = nil, distributionPolicy: PlaceStreamMetadataDistributionPolicy? = nil) {
             self.id = id
             self.signingKey = signingKey
             self.startTime = startTime
@@ -347,7 +347,7 @@ public struct Video: ATProtocolCodable, ATProtocolValue {
             public let bframes: Bool?
 
         public init(
-            codec: VideoCodec, width: Int, height: Int, framerate: Framerate?, bframes: Bool?
+            codec: VideoCodec, width: Int, height: Int, framerate: Framerate? = nil, bframes: Bool? = nil
         ) {
             self.codec = codec
             self.width = width

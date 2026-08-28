@@ -16,7 +16,7 @@ public struct PlaceStreamChatMessage: ATProtocolCodable, ATProtocolValue {
         public let streamer: DID
         public let reply: ReplyRef?
 
-        public init(text: String, createdAt: ATProtocolDate, facets: [PlaceStreamRichtextFacet]?, streamer: DID, reply: ReplyRef?) {
+        public init(text: String, createdAt: ATProtocolDate, facets: [PlaceStreamRichtextFacet]? = nil, streamer: DID, reply: ReplyRef? = nil) {
             self.text = text
             self.createdAt = createdAt
             self.facets = facets

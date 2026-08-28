@@ -27,7 +27,7 @@ public struct ConvoEventEntry: ATProtocolCodable, ATProtocolValue {
             public let outerFingerprint: Bytes?
 
         public init(
-            seq: Int, epoch: Int, msgId: String, messageType: String, ciphertext: Bytes, paddedSize: Int, createdAt: ATProtocolDate, entryId: String?, entryKind: String?, acceptedPayloadSha256: Bytes?, signedRequest: Bytes?, outerFingerprint: Bytes?
+            seq: Int, epoch: Int, msgId: String, messageType: String, ciphertext: Bytes, paddedSize: Int, createdAt: ATProtocolDate, entryId: String? = nil, entryKind: String? = nil, acceptedPayloadSha256: Bytes? = nil, signedRequest: Bytes? = nil, outerFingerprint: Bytes? = nil
         ) {
             self.seq = seq
             self.epoch = epoch

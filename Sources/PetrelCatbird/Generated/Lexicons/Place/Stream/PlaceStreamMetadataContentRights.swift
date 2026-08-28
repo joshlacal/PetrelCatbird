@@ -16,7 +16,7 @@ public struct PlaceStreamMetadataContentRights: ATProtocolCodable, ATProtocolVal
         public let license: String?
         public let creditLine: String?
 
-        public init(creator: String?, copyrightNotice: String?, copyrightYear: Int?, license: String?, creditLine: String?) {
+        public init(creator: String? = nil, copyrightNotice: String? = nil, copyrightYear: Int? = nil, license: String? = nil, creditLine: String? = nil) {
             self.creator = creator
             self.copyrightNotice = copyrightNotice
             self.copyrightYear = copyrightYear

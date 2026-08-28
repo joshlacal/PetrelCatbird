@@ -15,7 +15,7 @@ public struct PlaceStreamChatPinnedRecord: ATProtocolCodable, ATProtocolValue {
         public let createdAt: ATProtocolDate
         public let expiresAt: ATProtocolDate?
 
-        public init(pinnedMessage: ATProtocolURI, pinnedBy: DID?, createdAt: ATProtocolDate, expiresAt: ATProtocolDate?) {
+        public init(pinnedMessage: ATProtocolURI, pinnedBy: DID? = nil, createdAt: ATProtocolDate, expiresAt: ATProtocolDate? = nil) {
             self.pinnedMessage = pinnedMessage
             self.pinnedBy = pinnedBy
             self.createdAt = createdAt

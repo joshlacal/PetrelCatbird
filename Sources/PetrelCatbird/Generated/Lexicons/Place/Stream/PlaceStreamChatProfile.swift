@@ -12,7 +12,7 @@ public struct PlaceStreamChatProfile: ATProtocolCodable, ATProtocolValue {
     public static let typeIdentifier = "place.stream.chat.profile"
         public let color: Color?
 
-        public init(color: Color?) {
+        public init(color: Color? = nil) {
             self.color = color
         }
 

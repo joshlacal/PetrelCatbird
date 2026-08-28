@@ -21,7 +21,7 @@ public struct BrandingAsset: ATProtocolCodable, ATProtocolValue {
             public let height: Int?
 
         public init(
-            key: String, mimeType: String, url: String?, data: String?, width: Int?, height: Int?
+            key: String, mimeType: String, url: String? = nil, data: String? = nil, width: Int? = nil, height: Int? = nil
         ) {
             self.key = key
             self.mimeType = mimeType

@@ -16,7 +16,7 @@ public struct PlaceStreamVideo: ATProtocolCodable, ATProtocolValue {
         public let thumb: Blob?
         public let description: String?
 
-        public init(title: String, duration: Int?, createdAt: ATProtocolDate, thumb: Blob?, description: String?) {
+        public init(title: String, duration: Int? = nil, createdAt: ATProtocolDate, thumb: Blob? = nil, description: String? = nil) {
             self.title = title
             self.duration = duration
             self.createdAt = createdAt

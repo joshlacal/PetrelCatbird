@@ -15,7 +15,7 @@ public struct PlaceStreamLiveViewerCount: ATProtocolCodable, ATProtocolValue {
         public let count: Int
         public let updatedAt: ATProtocolDate?
 
-        public init(streamer: DID, server: DID, count: Int, updatedAt: ATProtocolDate?) {
+        public init(streamer: DID, server: DID, count: Int, updatedAt: ATProtocolDate? = nil) {
             self.streamer = streamer
             self.server = server
             self.count = count

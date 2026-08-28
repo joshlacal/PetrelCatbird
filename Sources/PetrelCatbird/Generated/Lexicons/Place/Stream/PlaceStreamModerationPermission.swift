@@ -15,7 +15,7 @@ public struct PlaceStreamModerationPermission: ATProtocolCodable, ATProtocolValu
         public let createdAt: ATProtocolDate
         public let expirationTime: ATProtocolDate?
 
-        public init(moderator: DID, permissions: [PlaceStreamModerationPermissionPermissions], createdAt: ATProtocolDate, expirationTime: ATProtocolDate?) {
+        public init(moderator: DID, permissions: [PlaceStreamModerationPermissionPermissions], createdAt: ATProtocolDate, expirationTime: ATProtocolDate? = nil) {
             self.moderator = moderator
             self.permissions = permissions
             self.createdAt = createdAt

@@ -14,7 +14,7 @@ public struct PlaceStreamLiveTeleport: ATProtocolCodable, ATProtocolValue {
         public let startsAt: ATProtocolDate
         public let durationSeconds: Int?
 
-        public init(streamer: DID, startsAt: ATProtocolDate, durationSeconds: Int?) {
+        public init(streamer: DID, startsAt: ATProtocolDate, durationSeconds: Int? = nil) {
             self.streamer = streamer
             self.startsAt = startsAt
             self.durationSeconds = durationSeconds

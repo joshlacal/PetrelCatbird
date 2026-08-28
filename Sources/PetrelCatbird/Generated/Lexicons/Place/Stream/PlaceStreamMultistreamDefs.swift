@@ -19,7 +19,7 @@ public struct TargetView: ATProtocolCodable, ATProtocolValue {
             public let latestEvent: PlaceStreamMultistreamDefs.Event?
 
         public init(
-            uri: ATProtocolURI, cid: CID, record: ATProtocolValueContainer, latestEvent: PlaceStreamMultistreamDefs.Event?
+            uri: ATProtocolURI, cid: CID, record: ATProtocolValueContainer, latestEvent: PlaceStreamMultistreamDefs.Event? = nil
         ) {
             self.uri = uri
             self.cid = cid

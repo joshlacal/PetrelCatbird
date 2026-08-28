@@ -29,7 +29,7 @@ public struct Webhook: ATProtocolCodable, ATProtocolValue {
             public let muteWords: [String]?
 
         public init(
-            id: String, url: URI, events: [WebhookEvents], active: Bool, prefix: String?, suffix: String?, rewrite: [RewriteRule]?, createdAt: ATProtocolDate, updatedAt: ATProtocolDate?, name: String?, description: String?, lastTriggered: ATProtocolDate?, errorCount: Int?, muteWords: [String]?
+            id: String, url: URI, events: [WebhookEvents], active: Bool, prefix: String? = nil, suffix: String? = nil, rewrite: [RewriteRule]? = nil, createdAt: ATProtocolDate, updatedAt: ATProtocolDate? = nil, name: String? = nil, description: String? = nil, lastTriggered: ATProtocolDate? = nil, errorCount: Int? = nil, muteWords: [String]? = nil
         ) {
             self.id = id
             self.url = url

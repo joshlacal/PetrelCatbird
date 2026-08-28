@@ -12,7 +12,7 @@ public struct PlaceStreamServerSettings: ATProtocolCodable, ATProtocolValue {
     public static let typeIdentifier = "place.stream.server.settings"
         public let debugRecording: Bool?
 
-        public init(debugRecording: Bool?) {
+        public init(debugRecording: Bool? = nil) {
             self.debugRecording = debugRecording
         }
 

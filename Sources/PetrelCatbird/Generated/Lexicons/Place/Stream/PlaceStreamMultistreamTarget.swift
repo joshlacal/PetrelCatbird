@@ -15,7 +15,7 @@ public struct PlaceStreamMultistreamTarget: ATProtocolCodable, ATProtocolValue {
         public let createdAt: ATProtocolDate
         public let name: String?
 
-        public init(url: URI, active: Bool, createdAt: ATProtocolDate, name: String?) {
+        public init(url: URI, active: Bool, createdAt: ATProtocolDate, name: String? = nil) {
             self.url = url
             self.active = active
             self.createdAt = createdAt

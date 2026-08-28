@@ -19,7 +19,7 @@ public struct BadgeView: ATProtocolCodable, ATProtocolValue {
             public let signature: String?
 
         public init(
-            badgeType: String, issuer: DID, recipient: DID, signature: String?
+            badgeType: String, issuer: DID, recipient: DID, signature: String? = nil
         ) {
             self.badgeType = badgeType
             self.issuer = issuer

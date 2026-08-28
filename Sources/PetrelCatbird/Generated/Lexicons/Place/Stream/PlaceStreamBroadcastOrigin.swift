@@ -17,7 +17,7 @@ public struct PlaceStreamBroadcastOrigin: ATProtocolCodable, ATProtocolValue {
         public let irohTicket: String?
         public let websocketURL: URI?
 
-        public init(streamer: DID, server: DID, broadcaster: DID?, updatedAt: ATProtocolDate, irohTicket: String?, websocketURL: URI?) {
+        public init(streamer: DID, server: DID, broadcaster: DID? = nil, updatedAt: ATProtocolDate, irohTicket: String? = nil, websocketURL: URI? = nil) {
             self.streamer = streamer
             self.server = server
             self.broadcaster = broadcaster

@@ -14,7 +14,7 @@ public struct PlaceStreamMetadataConfiguration: ATProtocolCodable, ATProtocolVal
         public let contentRights: PlaceStreamMetadataContentRights?
         public let distributionPolicy: PlaceStreamMetadataDistributionPolicy?
 
-        public init(contentWarnings: PlaceStreamMetadataContentWarnings?, contentRights: PlaceStreamMetadataContentRights?, distributionPolicy: PlaceStreamMetadataDistributionPolicy?) {
+        public init(contentWarnings: PlaceStreamMetadataContentWarnings? = nil, contentRights: PlaceStreamMetadataContentRights? = nil, distributionPolicy: PlaceStreamMetadataDistributionPolicy? = nil) {
             self.contentWarnings = contentWarnings
             self.contentRights = contentRights
             self.distributionPolicy = distributionPolicy

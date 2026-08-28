@@ -13,7 +13,7 @@ public struct PlaceStreamMetadataDistributionPolicy: ATProtocolCodable, ATProtoc
         public let deleteAfter: Int?
         public let allowedBroadcasters: [String]?
 
-        public init(deleteAfter: Int?, allowedBroadcasters: [String]?) {
+        public init(deleteAfter: Int? = nil, allowedBroadcasters: [String]? = nil) {
             self.deleteAfter = deleteAfter
             self.allowedBroadcasters = allowedBroadcasters
         }

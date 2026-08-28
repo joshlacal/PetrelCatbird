@@ -22,7 +22,7 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
         public let thumb: Blob?
         public let notificationSettings: PlaceStreamLivestream.NotificationSettings?
 
-        public init(title: String, url: URI?, createdAt: ATProtocolDate, lastSeenAt: ATProtocolDate?, endedAt: ATProtocolDate?, idleTimeoutSeconds: Int?, post: ComAtprotoRepoStrongRef?, agent: String?, canonicalUrl: URI?, thumb: Blob?, notificationSettings: PlaceStreamLivestream.NotificationSettings?) {
+        public init(title: String, url: URI? = nil, createdAt: ATProtocolDate, lastSeenAt: ATProtocolDate? = nil, endedAt: ATProtocolDate? = nil, idleTimeoutSeconds: Int? = nil, post: ComAtprotoRepoStrongRef? = nil, agent: String? = nil, canonicalUrl: URI? = nil, thumb: Blob? = nil, notificationSettings: PlaceStreamLivestream.NotificationSettings? = nil) {
             self.title = title
             self.url = url
             self.createdAt = createdAt
@@ -279,7 +279,7 @@ public struct NotificationSettings: ATProtocolCodable, ATProtocolValue {
             public let pushNotification: Bool?
 
         public init(
-            pushNotification: Bool?
+            pushNotification: Bool? = nil
         ) {
             self.pushNotification = pushNotification
         }
@@ -348,7 +348,7 @@ public struct LivestreamView: ATProtocolCodable, ATProtocolValue {
             public let viewerCount: ViewerCount?
 
         public init(
-            uri: ATProtocolURI, cid: CID, author: AppBskyActorDefs.ProfileViewBasic, record: ATProtocolValueContainer, indexedAt: ATProtocolDate, viewerCount: ViewerCount?
+            uri: ATProtocolURI, cid: CID, author: AppBskyActorDefs.ProfileViewBasic, record: ATProtocolValueContainer, indexedAt: ATProtocolDate, viewerCount: ViewerCount? = nil
         ) {
             self.uri = uri
             self.cid = cid
@@ -547,7 +547,7 @@ public struct TeleportArrival: ATProtocolCodable, ATProtocolValue {
             public let startsAt: ATProtocolDate
 
         public init(
-            teleportUri: ATProtocolURI, source: AppBskyActorDefs.ProfileViewBasic, chatProfile: PlaceStreamChatProfile?, viewerCount: Int, startsAt: ATProtocolDate
+            teleportUri: ATProtocolURI, source: AppBskyActorDefs.ProfileViewBasic, chatProfile: PlaceStreamChatProfile? = nil, viewerCount: Int, startsAt: ATProtocolDate
         ) {
             self.teleportUri = teleportUri
             self.source = source

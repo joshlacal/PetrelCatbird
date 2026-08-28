@@ -26,7 +26,7 @@ public struct PeerRecord: ATProtocolCodable, ATProtocolValue {
             public let updatedAt: ATProtocolDate?
 
         public init(
-            dsDid: String, status: String, trustScore: Int?, maxRequestsPerMinute: Int?, note: String?, invalidTokenCount: Int?, rejectedRequestCount: Int?, successfulRequestCount: Int?, lastSeenAt: ATProtocolDate?, createdAt: ATProtocolDate?, updatedAt: ATProtocolDate?
+            dsDid: String, status: String, trustScore: Int? = nil, maxRequestsPerMinute: Int? = nil, note: String? = nil, invalidTokenCount: Int? = nil, rejectedRequestCount: Int? = nil, successfulRequestCount: Int? = nil, lastSeenAt: ATProtocolDate? = nil, createdAt: ATProtocolDate? = nil, updatedAt: ATProtocolDate? = nil
         ) {
             self.dsDid = dsDid
             self.status = status

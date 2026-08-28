@@ -24,7 +24,7 @@ public struct MessageView: ATProtocolCodable, ATProtocolValue {
             public let badges: [PlaceStreamBadgeDefs.BadgeView]?
 
         public init(
-            uri: ATProtocolURI, cid: CID, author: AppBskyActorDefs.ProfileViewBasic, record: ATProtocolValueContainer, indexedAt: ATProtocolDate, chatProfile: PlaceStreamChatProfile?, replyTo: MessageViewReplyToUnion?, deleted: Bool?, badges: [PlaceStreamBadgeDefs.BadgeView]?
+            uri: ATProtocolURI, cid: CID, author: AppBskyActorDefs.ProfileViewBasic, record: ATProtocolValueContainer, indexedAt: ATProtocolDate, chatProfile: PlaceStreamChatProfile? = nil, replyTo: MessageViewReplyToUnion? = nil, deleted: Bool? = nil, badges: [PlaceStreamBadgeDefs.BadgeView]? = nil
         ) {
             self.uri = uri
             self.cid = cid
@@ -237,7 +237,7 @@ public struct PinnedRecordView: ATProtocolCodable, ATProtocolValue {
             public let message: MessageView?
 
         public init(
-            uri: ATProtocolURI, cid: CID, record: PlaceStreamChatPinnedRecord, indexedAt: ATProtocolDate, pinnedBy: PlaceStreamChatProfile?, message: MessageView?
+            uri: ATProtocolURI, cid: CID, record: PlaceStreamChatPinnedRecord, indexedAt: ATProtocolDate, pinnedBy: PlaceStreamChatProfile? = nil, message: MessageView? = nil
         ) {
             self.uri = uri
             self.cid = cid

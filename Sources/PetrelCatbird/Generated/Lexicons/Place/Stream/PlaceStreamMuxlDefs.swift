@@ -21,7 +21,7 @@ public struct Track: ATProtocolCodable, ATProtocolValue {
             public let channels: Int?
 
         public init(
-            id: Int, codec: String, width: Int?, height: Int?, rate: Int?, channels: Int?
+            id: Int, codec: String, width: Int? = nil, height: Int? = nil, rate: Int? = nil, channels: Int? = nil
         ) {
             self.id = id
             self.codec = codec
