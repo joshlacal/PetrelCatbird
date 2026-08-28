@@ -2822,7 +2822,7 @@ enum class BlueCatbirdChatDefsResetRequestViewStatus {
     }
 
     /**
-     * Exactly one MLS 1.0 MLSMessage wire-format 4 wrapper. OpenMLS 0.8.1 GroupInfo extensions are frozen to exactly ratchet_tree followed by external_pub; every other GroupInfo extension is rejected. external_pub presence does not authorize external commits, which protocol policy forbids.
+     * Exactly one MLS 1.0 MLSMessage wire-format 4 wrapper. GroupInfo extensions are frozen to exactly ratchet_tree followed by external_pub; every other GroupInfo extension is rejected. external_pub presence does not authorize external commits, which protocol policy forbids.
      */
     @Serializable
     data class BlueCatbirdChatDefsGroupInfoArtifact(
@@ -2849,7 +2849,7 @@ enum class BlueCatbirdChatDefsResetRequestViewStatus {
     }
 
     /**
-     * Protocol v1 exact capability profile: suite 0x004D, BasicCredential, by-value Add/Remove and ordinary sender Update path. KeyPackage, LeafNode, and GroupContext extensions are empty; OpenMLS 0.8.1 GroupInfo has exactly [ratchet_tree, external_pub]. External commits remain forbidden by protocol policy.
+     * Protocol v1 exact capability profile: suite 0x004D, BasicCredential, by-value Add/Remove and ordinary sender Update path. KeyPackage, LeafNode, and GroupContext extensions are empty; GroupInfo has exactly [ratchet_tree, external_pub]. External commits remain forbidden by protocol policy.
      */
     @Serializable
     data class BlueCatbirdChatDefsDeviceCapability(
