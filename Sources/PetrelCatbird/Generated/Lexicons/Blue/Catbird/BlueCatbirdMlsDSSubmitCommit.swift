@@ -2,264 +2,169 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.mlsDS.submitCommit
 
-
-public struct BlueCatbirdMlsDSSubmitCommit { 
-
+public enum BlueCatbirdMlsDSSubmitCommit {
     public static let typeIdentifier = "blue.catbird.mlsDS.submitCommit"
-public struct Input: ATProtocolCodable {
-        public let convoId: String
-        public let senderDsDid: String
-        public let epoch: Int
-        public let proposedEpoch: Int
-        public let commitData: Bytes
-        public let sequencerTerm: Int
+    public struct Input: ATProtocolCodable {
+        public let header: BlueCatbirdMlsDSDefs.EnvelopeHeaderV1
+        public let signedRequestBytes: Bytes
 
         /// Standard public initializer
-        public init(convoId: String, senderDsDid: String, epoch: Int, proposedEpoch: Int, commitData: Bytes, sequencerTerm: Int) {
-            self.convoId = convoId
-            self.senderDsDid = senderDsDid
-            self.epoch = epoch
-            self.proposedEpoch = proposedEpoch
-            self.commitData = commitData
-            self.sequencerTerm = sequencerTerm
+        public init(header: BlueCatbirdMlsDSDefs.EnvelopeHeaderV1, signedRequestBytes: Bytes) {
+            self.header = header
+            self.signedRequestBytes = signedRequestBytes
         }
-        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.convoId = try container.decode(String.self, forKey: .convoId)
-            self.senderDsDid = try container.decode(String.self, forKey: .senderDsDid)
-            self.epoch = try container.decode(Int.self, forKey: .epoch)
-            self.proposedEpoch = try container.decode(Int.self, forKey: .proposedEpoch)
-            self.commitData = try container.decode(Bytes.self, forKey: .commitData)
-            self.sequencerTerm = try container.decode(Int.self, forKey: .sequencerTerm)
+            header = try container.decode(BlueCatbirdMlsDSDefs.EnvelopeHeaderV1.self, forKey: .header)
+            signedRequestBytes = try container.decode(Bytes.self, forKey: .signedRequestBytes)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(convoId, forKey: .convoId)
-            try container.encode(senderDsDid, forKey: .senderDsDid)
-            try container.encode(epoch, forKey: .epoch)
-            try container.encode(proposedEpoch, forKey: .proposedEpoch)
-            try container.encode(commitData, forKey: .commitData)
-            try container.encode(sequencerTerm, forKey: .sequencerTerm)
+            try container.encode(header, forKey: .header)
+            try container.encode(signedRequestBytes, forKey: .signedRequestBytes)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let convoIdValue = try convoId.toCBORValue()
-            map = map.adding(key: "convoId", value: convoIdValue)
-            let senderDsDidValue = try senderDsDid.toCBORValue()
-            map = map.adding(key: "senderDsDid", value: senderDsDidValue)
-            let epochValue = try epoch.toCBORValue()
-            map = map.adding(key: "epoch", value: epochValue)
-            let proposedEpochValue = try proposedEpoch.toCBORValue()
-            map = map.adding(key: "proposedEpoch", value: proposedEpochValue)
-            let commitDataValue = try commitData.toCBORValue()
-            map = map.adding(key: "commitData", value: commitDataValue)
-            let sequencerTermValue = try sequencerTerm.toCBORValue()
-            map = map.adding(key: "sequencerTerm", value: sequencerTermValue)
+            let headerValue = try header.toCBORValue()
+            map = map.adding(key: "header", value: headerValue)
+            let signedRequestBytesValue = try signedRequestBytes.toCBORValue()
+            map = map.adding(key: "signedRequestBytes", value: signedRequestBytesValue)
             return map
         }
 
         private enum CodingKeys: String, CodingKey {
-            case convoId
-            case senderDsDid
-            case epoch
-            case proposedEpoch
-            case commitData
-            case sequencerTerm
+            case header
+            case signedRequestBytes
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
-        public let accepted: Bool
-        
-        public let assignedEpoch: Int
-        
-        public let sequencerTerm: Int
-        
-        public let receipt: String?
-        
-        
-        
-        // Standard public initializer
+
+    public struct Output: ATProtocolCodable {
+        public let coordinates: BlueCatbirdChatDefs.ConversationCoordinates
+
+        public let commitEntry: BlueCatbirdChatDefs.CommitEntry
+
+        public let welcomes: [BlueCatbirdChatDefs.WelcomeView]
+
+        public let receipt: BlueCatbirdMlsDSDefs.FederationReceiptV1
+
+        /// Standard public initializer
         public init(
-            
-            
-            accepted: Bool,
-            
-            assignedEpoch: Int,
-            
-            sequencerTerm: Int,
-            
-            receipt: String? = nil
-            
-            
+            coordinates: BlueCatbirdChatDefs.ConversationCoordinates,
+
+            commitEntry: BlueCatbirdChatDefs.CommitEntry,
+
+            welcomes: [BlueCatbirdChatDefs.WelcomeView],
+
+            receipt: BlueCatbirdMlsDSDefs.FederationReceiptV1
+
         ) {
-            
-            
-            self.accepted = accepted
-            
-            self.assignedEpoch = assignedEpoch
-            
-            self.sequencerTerm = sequencerTerm
-            
+            self.coordinates = coordinates
+
+            self.commitEntry = commitEntry
+
+            self.welcomes = welcomes
+
             self.receipt = receipt
-            
-            
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            
-            self.accepted = try container.decode(Bool.self, forKey: .accepted)
-            
-            
-            
-            
-            self.assignedEpoch = try container.decode(Int.self, forKey: .assignedEpoch)
-            
-            
-            
-            
-            self.sequencerTerm = try container.decode(Int.self, forKey: .sequencerTerm)
-            
-            
-            
-            
-            do {
-                self.receipt = try container.decodeIfPresent(String.self, forKey: .receipt)
-            } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'receipt' — degrading to nil: \(error)")
-                self.receipt = nil
-            }
-            
-            
-            
+
+            coordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .coordinates)
+
+            commitEntry = try container.decode(BlueCatbirdChatDefs.CommitEntry.self, forKey: .commitEntry)
+
+            welcomes = try container.decode([BlueCatbirdChatDefs.WelcomeView].self, forKey: .welcomes)
+
+            receipt = try container.decode(BlueCatbirdMlsDSDefs.FederationReceiptV1.self, forKey: .receipt)
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
-            try container.encode(accepted, forKey: .accepted)
-            
-            
-            try container.encode(assignedEpoch, forKey: .assignedEpoch)
-            
-            
-            try container.encode(sequencerTerm, forKey: .sequencerTerm)
-            
-            
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(receipt, forKey: .receipt)
-            
-            
+
+            try container.encode(coordinates, forKey: .coordinates)
+
+            try container.encode(commitEntry, forKey: .commitEntry)
+
+            try container.encode(welcomes, forKey: .welcomes)
+
+            try container.encode(receipt, forKey: .receipt)
         }
 
         public func toCBORValue() throws -> Any {
-            
             var map = OrderedCBORMap()
 
-            
-            
-            let acceptedValue = try accepted.toCBORValue()
-            map = map.adding(key: "accepted", value: acceptedValue)
-            
-            
-            
-            let assignedEpochValue = try assignedEpoch.toCBORValue()
-            map = map.adding(key: "assignedEpoch", value: assignedEpochValue)
-            
-            
-            
-            let sequencerTermValue = try sequencerTerm.toCBORValue()
-            map = map.adding(key: "sequencerTerm", value: sequencerTermValue)
-            
-            
-            
-            if let value = receipt {
-                // Encode optional property even if it's an empty array for CBOR
-                let receiptValue = try value.toCBORValue()
-                map = map.adding(key: "receipt", value: receiptValue)
-            }
-            
-            
+            let coordinatesValue = try coordinates.toCBORValue()
+            map = map.adding(key: "coordinates", value: coordinatesValue)
+
+            let commitEntryValue = try commitEntry.toCBORValue()
+            map = map.adding(key: "commitEntry", value: commitEntryValue)
+
+            let welcomesValue = try welcomes.toCBORValue()
+            map = map.adding(key: "welcomes", value: welcomesValue)
+
+            let receiptValue = try receipt.toCBORValue()
+            map = map.adding(key: "receipt", value: receiptValue)
 
             return map
-            
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
-            case accepted
-            case assignedEpoch
-            case sequencerTerm
+            case coordinates
+            case commitEntry
+            case welcomes
             case receipt
         }
-        
     }
-        
-public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                case conversationNotFound = "ConversationNotFound"
-                case notSequencer = "NotSequencer"
-                case termStale = "TermStale"
-                case commitConflict = "CommitConflict"
-            public var description: String {
-                return self.rawValue
-            }
 
-            public var errorName: String {
-                return self.rawValue
-            }
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case conversationNotFound = "ConversationNotFound"
+        case notSequencer = "NotSequencer"
+        case termStale = "TermStale"
+        case commitConflict = "CommitConflict"
+        case invalidEnvelope = "InvalidEnvelope"
+        case unauthorizedParticipantDs = "UnauthorizedParticipantDs"
+        public var description: String {
+            return rawValue
         }
 
-
-
+        public var errorName: String {
+            return rawValue
+        }
+    }
 }
 
-extension ATProtoClient.Blue.Catbird.MlsDS {
+public extension ATProtoClient.Blue.Catbird.MlsDS {
     // MARK: - submitCommit
 
-    /// Submit a commit for CAS sequencing on the sequencer DS. Submit an MLS commit for epoch ordering via compare-and-swap. The sequencer assigns the epoch and returns a receipt.
-    /// 
-    /// - Parameter input: The input parameters for the request
-    
-    /// 
+    // Submit an actor-signed MLS commit to the sequencer DS for canonical transition planning and execution. Submit a signed commit transition to the sequencer DS for execution through the canonical submitTransition planner and executor.
+    //
+    // - Parameter input: The input parameters for the request
+
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func submitCommit(
-        
+    func submitCommit(
         input: BlueCatbirdMlsDSSubmitCommit.Input
-        
+
     ) async throws -> (responseCode: Int, data: BlueCatbirdMlsDSSubmitCommit.Output?) {
         let endpoint = "blue.catbird.mlsDS.submitCommit"
-        
-        var headers: [String: String] = [:]
-        
-        headers["Content-Type"] = "application/json"
-        
-        
-        
-        headers["Accept"] = "application/json"
-        
 
-        
+        var headers: [String: String] = [:]
+
+        headers["Content-Type"] = "application/json"
+
+        headers["Accept"] = "application/json"
+
         let requestData: Data? = try JSONEncoder().encode(input)
-        
-        
+
         let queryItems: [URLQueryItem]? = nil
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -274,12 +179,10 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-            
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -287,13 +190,11 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
-                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdMlsDSSubmitCommit.Output.self, from: responseData)
-                
+
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -309,14 +210,9 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
             ) {
                 throw atprotoError
             }
-            
-            
+
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-        
     }
-    
 }
-                           
-

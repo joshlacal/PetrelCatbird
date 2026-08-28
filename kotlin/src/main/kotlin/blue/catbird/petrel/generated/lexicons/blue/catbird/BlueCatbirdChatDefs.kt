@@ -4683,7 +4683,9 @@ enum class BlueCatbirdChatDefsResetRequestViewStatus {
         val participants: List<BlueCatbirdChatDefsParticipantView>,        @SerialName("leaves")
         val leaves: List<BlueCatbirdChatDefsDeviceLeafView>,        @SerialName("metadataSnapshot")
         val metadataSnapshot: BlueCatbirdChatDefsMetadataSnapshot,        @SerialName("snapshotSeq")
-        val snapshotSeq: Int    ) {
+        val snapshotSeq: Int,        @SerialName("sequencerDid")
+        val sequencerDid: BlueCatbirdChatDefsBareDid? = null,        @SerialName("sequencerTerm")
+        val sequencerTerm: Int? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsConversationState"
         }
