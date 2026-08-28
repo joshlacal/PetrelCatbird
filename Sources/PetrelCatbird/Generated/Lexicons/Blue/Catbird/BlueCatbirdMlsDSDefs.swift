@@ -2,22 +2,26 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.mlsDS.defs
 
-public enum BlueCatbirdMlsDSDefs {
-    public static let typeIdentifier = "blue.catbird.mlsDS.defs"
 
-    public struct EnvelopeHeaderV1: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "blue.catbird.mlsDS.defs#envelopeHeaderV1"
-        public let protocolVersion: DefsProtocolVersion
-        public let deliveryId: BlueCatbirdChatDefs.OperationId
-        public let conversationId: BlueCatbirdChatDefs.OperationId
-        public let senderDsDid: BlueCatbirdChatDefs.BareDid
-        public let receiverDsDid: BlueCatbirdChatDefs.BareDid
-        public let sequencerDid: BlueCatbirdChatDefs.BareDid
-        public let sequencerTerm: Int
-        public let receivedAt: BlueCatbirdChatDefs.CanonicalDatetime
-        public let payloadSha256: Bytes
+public struct BlueCatbirdMlsDSDefs { 
+
+    public static let typeIdentifier = "blue.catbird.mlsDS.defs"
+        
+public struct EnvelopeHeaderV1: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.mlsDS.defs#envelopeHeaderV1"
+            public let protocolVersion: DefsProtocolVersion
+            public let deliveryId: BlueCatbirdChatDefs.OperationId
+            public let conversationId: BlueCatbirdChatDefs.OperationId
+            public let senderDsDid: BlueCatbirdChatDefs.BareDid
+            public let receiverDsDid: BlueCatbirdChatDefs.BareDid
+            public let sequencerDid: BlueCatbirdChatDefs.BareDid
+            public let sequencerTerm: Int
+            public let receivedAt: BlueCatbirdChatDefs.CanonicalDatetime
+            public let payloadSha256: Bytes
 
         public init(
             protocolVersion: DefsProtocolVersion, deliveryId: BlueCatbirdChatDefs.OperationId, conversationId: BlueCatbirdChatDefs.OperationId, senderDsDid: BlueCatbirdChatDefs.BareDid, receiverDsDid: BlueCatbirdChatDefs.BareDid, sequencerDid: BlueCatbirdChatDefs.BareDid, sequencerTerm: Int, receivedAt: BlueCatbirdChatDefs.CanonicalDatetime, payloadSha256: Bytes
@@ -36,55 +40,55 @@ public enum BlueCatbirdMlsDSDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                protocolVersion = try container.decode(DefsProtocolVersion.self, forKey: .protocolVersion)
+                self.protocolVersion = try container.decode(DefsProtocolVersion.self, forKey: .protocolVersion)
             } catch {
                 LogManager.logError("Decoding error for required property 'protocolVersion': \(error)")
                 throw error
             }
             do {
-                deliveryId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .deliveryId)
+                self.deliveryId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .deliveryId)
             } catch {
                 LogManager.logError("Decoding error for required property 'deliveryId': \(error)")
                 throw error
             }
             do {
-                conversationId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .conversationId)
+                self.conversationId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .conversationId)
             } catch {
                 LogManager.logError("Decoding error for required property 'conversationId': \(error)")
                 throw error
             }
             do {
-                senderDsDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .senderDsDid)
+                self.senderDsDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .senderDsDid)
             } catch {
                 LogManager.logError("Decoding error for required property 'senderDsDid': \(error)")
                 throw error
             }
             do {
-                receiverDsDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .receiverDsDid)
+                self.receiverDsDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .receiverDsDid)
             } catch {
                 LogManager.logError("Decoding error for required property 'receiverDsDid': \(error)")
                 throw error
             }
             do {
-                sequencerDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .sequencerDid)
+                self.sequencerDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .sequencerDid)
             } catch {
                 LogManager.logError("Decoding error for required property 'sequencerDid': \(error)")
                 throw error
             }
             do {
-                sequencerTerm = try container.decode(Int.self, forKey: .sequencerTerm)
+                self.sequencerTerm = try container.decode(Int.self, forKey: .sequencerTerm)
             } catch {
                 LogManager.logError("Decoding error for required property 'sequencerTerm': \(error)")
                 throw error
             }
             do {
-                receivedAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .receivedAt)
+                self.receivedAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
                 throw error
             }
             do {
-                payloadSha256 = try container.decode(Bytes.self, forKey: .payloadSha256)
+                self.payloadSha256 = try container.decode(Bytes.self, forKey: .payloadSha256)
             } catch {
                 LogManager.logError("Decoding error for required property 'payloadSha256': \(error)")
                 throw error
@@ -190,13 +194,13 @@ public enum BlueCatbirdMlsDSDefs {
             case payloadSha256
         }
     }
-
-    public struct EntryLocatorV1: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "blue.catbird.mlsDS.defs#entryLocatorV1"
-        public let entryId: BlueCatbirdChatDefs.OperationId
-        public let seq: Int
-        public let acceptedPayloadSha256: Bytes
-        public let outerEntryFingerprint: Bytes
+        
+public struct EntryLocatorV1: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.mlsDS.defs#entryLocatorV1"
+            public let entryId: BlueCatbirdChatDefs.OperationId
+            public let seq: Int
+            public let acceptedPayloadSha256: Bytes
+            public let outerEntryFingerprint: Bytes
 
         public init(
             entryId: BlueCatbirdChatDefs.OperationId, seq: Int, acceptedPayloadSha256: Bytes, outerEntryFingerprint: Bytes
@@ -210,25 +214,25 @@ public enum BlueCatbirdMlsDSDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                entryId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .entryId)
+                self.entryId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .entryId)
             } catch {
                 LogManager.logError("Decoding error for required property 'entryId': \(error)")
                 throw error
             }
             do {
-                seq = try container.decode(Int.self, forKey: .seq)
+                self.seq = try container.decode(Int.self, forKey: .seq)
             } catch {
                 LogManager.logError("Decoding error for required property 'seq': \(error)")
                 throw error
             }
             do {
-                acceptedPayloadSha256 = try container.decode(Bytes.self, forKey: .acceptedPayloadSha256)
+                self.acceptedPayloadSha256 = try container.decode(Bytes.self, forKey: .acceptedPayloadSha256)
             } catch {
                 LogManager.logError("Decoding error for required property 'acceptedPayloadSha256': \(error)")
                 throw error
             }
             do {
-                outerEntryFingerprint = try container.decode(Bytes.self, forKey: .outerEntryFingerprint)
+                self.outerEntryFingerprint = try container.decode(Bytes.self, forKey: .outerEntryFingerprint)
             } catch {
                 LogManager.logError("Decoding error for required property 'outerEntryFingerprint': \(error)")
                 throw error
@@ -294,22 +298,22 @@ public enum BlueCatbirdMlsDSDefs {
             case outerEntryFingerprint
         }
     }
-
-    public struct FederationReceiptV1: ATProtocolCodable, ATProtocolValue {
-        public static let typeIdentifier = "blue.catbird.mlsDS.defs#federationReceiptV1"
-        public let protocolVersion: DefsProtocolVersion
-        public let endpoint: DefsFederationEndpoint
-        public let deliveryId: BlueCatbirdChatDefs.OperationId
-        public let conversationId: BlueCatbirdChatDefs.OperationId
-        public let senderDsDid: BlueCatbirdChatDefs.BareDid
-        public let receiverDsDid: BlueCatbirdChatDefs.BareDid
-        public let sequencerDid: BlueCatbirdChatDefs.BareDid
-        public let sequencerTerm: Int
-        public let envelopeSha256: Bytes
-        public let resultSha256: Bytes
-        public let sourceLocator: EntryLocatorV1
-        public let completedAt: BlueCatbirdChatDefs.CanonicalDatetime
-        public let signature: Bytes
+        
+public struct FederationReceiptV1: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.mlsDS.defs#federationReceiptV1"
+            public let protocolVersion: DefsProtocolVersion
+            public let endpoint: DefsFederationEndpoint
+            public let deliveryId: BlueCatbirdChatDefs.OperationId
+            public let conversationId: BlueCatbirdChatDefs.OperationId
+            public let senderDsDid: BlueCatbirdChatDefs.BareDid
+            public let receiverDsDid: BlueCatbirdChatDefs.BareDid
+            public let sequencerDid: BlueCatbirdChatDefs.BareDid
+            public let sequencerTerm: Int
+            public let envelopeSha256: Bytes
+            public let resultSha256: Bytes
+            public let sourceLocator: EntryLocatorV1
+            public let completedAt: BlueCatbirdChatDefs.CanonicalDatetime
+            public let signature: Bytes
 
         public init(
             protocolVersion: DefsProtocolVersion, endpoint: DefsFederationEndpoint, deliveryId: BlueCatbirdChatDefs.OperationId, conversationId: BlueCatbirdChatDefs.OperationId, senderDsDid: BlueCatbirdChatDefs.BareDid, receiverDsDid: BlueCatbirdChatDefs.BareDid, sequencerDid: BlueCatbirdChatDefs.BareDid, sequencerTerm: Int, envelopeSha256: Bytes, resultSha256: Bytes, sourceLocator: EntryLocatorV1, completedAt: BlueCatbirdChatDefs.CanonicalDatetime, signature: Bytes
@@ -332,79 +336,79 @@ public enum BlueCatbirdMlsDSDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                protocolVersion = try container.decode(DefsProtocolVersion.self, forKey: .protocolVersion)
+                self.protocolVersion = try container.decode(DefsProtocolVersion.self, forKey: .protocolVersion)
             } catch {
                 LogManager.logError("Decoding error for required property 'protocolVersion': \(error)")
                 throw error
             }
             do {
-                endpoint = try container.decode(DefsFederationEndpoint.self, forKey: .endpoint)
+                self.endpoint = try container.decode(DefsFederationEndpoint.self, forKey: .endpoint)
             } catch {
                 LogManager.logError("Decoding error for required property 'endpoint': \(error)")
                 throw error
             }
             do {
-                deliveryId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .deliveryId)
+                self.deliveryId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .deliveryId)
             } catch {
                 LogManager.logError("Decoding error for required property 'deliveryId': \(error)")
                 throw error
             }
             do {
-                conversationId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .conversationId)
+                self.conversationId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .conversationId)
             } catch {
                 LogManager.logError("Decoding error for required property 'conversationId': \(error)")
                 throw error
             }
             do {
-                senderDsDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .senderDsDid)
+                self.senderDsDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .senderDsDid)
             } catch {
                 LogManager.logError("Decoding error for required property 'senderDsDid': \(error)")
                 throw error
             }
             do {
-                receiverDsDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .receiverDsDid)
+                self.receiverDsDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .receiverDsDid)
             } catch {
                 LogManager.logError("Decoding error for required property 'receiverDsDid': \(error)")
                 throw error
             }
             do {
-                sequencerDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .sequencerDid)
+                self.sequencerDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .sequencerDid)
             } catch {
                 LogManager.logError("Decoding error for required property 'sequencerDid': \(error)")
                 throw error
             }
             do {
-                sequencerTerm = try container.decode(Int.self, forKey: .sequencerTerm)
+                self.sequencerTerm = try container.decode(Int.self, forKey: .sequencerTerm)
             } catch {
                 LogManager.logError("Decoding error for required property 'sequencerTerm': \(error)")
                 throw error
             }
             do {
-                envelopeSha256 = try container.decode(Bytes.self, forKey: .envelopeSha256)
+                self.envelopeSha256 = try container.decode(Bytes.self, forKey: .envelopeSha256)
             } catch {
                 LogManager.logError("Decoding error for required property 'envelopeSha256': \(error)")
                 throw error
             }
             do {
-                resultSha256 = try container.decode(Bytes.self, forKey: .resultSha256)
+                self.resultSha256 = try container.decode(Bytes.self, forKey: .resultSha256)
             } catch {
                 LogManager.logError("Decoding error for required property 'resultSha256': \(error)")
                 throw error
             }
             do {
-                sourceLocator = try container.decode(EntryLocatorV1.self, forKey: .sourceLocator)
+                self.sourceLocator = try container.decode(EntryLocatorV1.self, forKey: .sourceLocator)
             } catch {
                 LogManager.logError("Decoding error for required property 'sourceLocator': \(error)")
                 throw error
             }
             do {
-                completedAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .completedAt)
+                self.completedAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .completedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'completedAt': \(error)")
                 throw error
             }
             do {
-                signature = try container.decode(Bytes.self, forKey: .signature)
+                self.signature = try container.decode(Bytes.self, forKey: .signature)
             } catch {
                 LogManager.logError("Decoding error for required property 'signature': \(error)")
                 throw error
@@ -543,31 +547,40 @@ public enum BlueCatbirdMlsDSDefs {
         }
     }
 
-    public enum DefsProtocolVersion: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-        case value_1 = "1"
 
-        public func isEqual(to other: any ATProtocolValue) -> Bool {
-            guard let otherValue = other as? DefsProtocolVersion else { return false }
-            return self == otherValue
-        }
 
-        public func toCBORValue() throws -> Any {
-            return rawValue
-        }
+public enum DefsProtocolVersion: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+    case value_1 = "1"
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let otherValue = other as? DefsProtocolVersion else { return false }
+        return self == otherValue
     }
 
-    public enum DefsFederationEndpoint: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-        case value_blue_u2e_catbird_u2e_mlsDS_u2e_deliverWelcome = "blue.catbird.mlsDS.deliverWelcome"
-        case value_blue_u2e_catbird_u2e_mlsDS_u2e_deliverMessage = "blue.catbird.mlsDS.deliverMessage"
-        case value_blue_u2e_catbird_u2e_mlsDS_u2e_submitCommit = "blue.catbird.mlsDS.submitCommit"
-
-        public func isEqual(to other: any ATProtocolValue) -> Bool {
-            guard let otherValue = other as? DefsFederationEndpoint else { return false }
-            return self == otherValue
-        }
-
-        public func toCBORValue() throws -> Any {
-            return rawValue
-        }
+    public func toCBORValue() throws -> Any {
+        return rawValue
     }
 }
+
+
+public enum DefsFederationEndpoint: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+    case value_blue_u2e_catbird_u2e_mlsDS_u2e_deliverWelcome = "blue.catbird.mlsDS.deliverWelcome"
+    case value_blue_u2e_catbird_u2e_mlsDS_u2e_deliverMessage = "blue.catbird.mlsDS.deliverMessage"
+    case value_blue_u2e_catbird_u2e_mlsDS_u2e_submitCommit = "blue.catbird.mlsDS.submitCommit"
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let otherValue = other as? DefsFederationEndpoint else { return false }
+        return self == otherValue
+    }
+
+    public func toCBORValue() throws -> Any {
+        return rawValue
+    }
+}
+
+
+}
+
+
+                           
+

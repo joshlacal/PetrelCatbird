@@ -2,11 +2,15 @@
 import Foundation
 import Petrel
 
+
+
 // lexicon: 1, id: blue.catbird.mlsDS.deliverWelcome
 
-public enum BlueCatbirdMlsDSDeliverWelcome {
+
+public struct BlueCatbirdMlsDSDeliverWelcome { 
+
     public static let typeIdentifier = "blue.catbird.mlsDS.deliverWelcome"
-    public struct Input: ATProtocolCodable {
+public struct Input: ATProtocolCodable {
         public let header: BlueCatbirdMlsDSDefs.EnvelopeHeaderV1
         public let recipientDid: BlueCatbirdChatDefs.BareDid
         public let recipientDeviceId: BlueCatbirdChatDefs.DeviceId
@@ -39,23 +43,24 @@ public enum BlueCatbirdMlsDSDeliverWelcome {
             self.publicSnapshotSha256 = publicSnapshotSha256
             self.treeSummarySha256 = treeSummarySha256
         }
+        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            header = try container.decode(BlueCatbirdMlsDSDefs.EnvelopeHeaderV1.self, forKey: .header)
-            recipientDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .recipientDid)
-            recipientDeviceId = try container.decode(BlueCatbirdChatDefs.DeviceId.self, forKey: .recipientDeviceId)
-            welcomeId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .welcomeId)
-            recoveryRequestId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .recoveryRequestId)
-            keyPackageRef = try container.decode(Bytes.self, forKey: .keyPackageRef)
-            welcomeBytes = try container.decode(Bytes.self, forKey: .welcomeBytes)
-            welcomeSha256 = try container.decode(Bytes.self, forKey: .welcomeSha256)
-            entryBytes = try container.decode(Bytes.self, forKey: .entryBytes)
-            signedRequestBytes = try container.decode(Bytes.self, forKey: .signedRequestBytes)
-            entryLocator = try container.decode(BlueCatbirdMlsDSDefs.EntryLocatorV1.self, forKey: .entryLocator)
-            coordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .coordinates)
-            publicSnapshotSha256 = try container.decode(Bytes.self, forKey: .publicSnapshotSha256)
-            treeSummarySha256 = try container.decode(Bytes.self, forKey: .treeSummarySha256)
+            self.header = try container.decode(BlueCatbirdMlsDSDefs.EnvelopeHeaderV1.self, forKey: .header)
+            self.recipientDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .recipientDid)
+            self.recipientDeviceId = try container.decode(BlueCatbirdChatDefs.DeviceId.self, forKey: .recipientDeviceId)
+            self.welcomeId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .welcomeId)
+            self.recoveryRequestId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .recoveryRequestId)
+            self.keyPackageRef = try container.decode(Bytes.self, forKey: .keyPackageRef)
+            self.welcomeBytes = try container.decode(Bytes.self, forKey: .welcomeBytes)
+            self.welcomeSha256 = try container.decode(Bytes.self, forKey: .welcomeSha256)
+            self.entryBytes = try container.decode(Bytes.self, forKey: .entryBytes)
+            self.signedRequestBytes = try container.decode(Bytes.self, forKey: .signedRequestBytes)
+            self.entryLocator = try container.decode(BlueCatbirdMlsDSDefs.EntryLocatorV1.self, forKey: .entryLocator)
+            self.coordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .coordinates)
+            self.publicSnapshotSha256 = try container.decode(Bytes.self, forKey: .publicSnapshotSha256)
+            self.treeSummarySha256 = try container.decode(Bytes.self, forKey: .treeSummarySha256)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -126,101 +131,143 @@ public enum BlueCatbirdMlsDSDeliverWelcome {
             case treeSummarySha256
         }
     }
-
-    public struct Output: ATProtocolCodable {
+    
+public struct Output: ATProtocolCodable {
+        
+        
         public let accepted: Bool
-
+        
         public let receipt: BlueCatbirdMlsDSDefs.FederationReceiptV1
-
-        /// Standard public initializer
+        
+        
+        
+        // Standard public initializer
         public init(
+            
+            
             accepted: Bool,
-
+            
             receipt: BlueCatbirdMlsDSDefs.FederationReceiptV1
-
+            
+            
         ) {
+            
+            
             self.accepted = accepted
-
+            
             self.receipt = receipt
+            
+            
         }
-
+        
         public init(from decoder: Decoder) throws {
+            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            accepted = try container.decode(Bool.self, forKey: .accepted)
-
-            receipt = try container.decode(BlueCatbirdMlsDSDefs.FederationReceiptV1.self, forKey: .receipt)
+            
+            
+            self.accepted = try container.decode(Bool.self, forKey: .accepted)
+            
+            
+            
+            
+            self.receipt = try container.decode(BlueCatbirdMlsDSDefs.FederationReceiptV1.self, forKey: .receipt)
+            
+            
+            
         }
-
+        
         public func encode(to encoder: Encoder) throws {
+            
             var container = encoder.container(keyedBy: CodingKeys.self)
-
+            
             try container.encode(accepted, forKey: .accepted)
-
+            
+            
             try container.encode(receipt, forKey: .receipt)
+            
+            
         }
 
         public func toCBORValue() throws -> Any {
+            
             var map = OrderedCBORMap()
 
+            
+            
             let acceptedValue = try accepted.toCBORValue()
             map = map.adding(key: "accepted", value: acceptedValue)
-
+            
+            
+            
             let receiptValue = try receipt.toCBORValue()
             map = map.adding(key: "receipt", value: receiptValue)
+            
+            
 
             return map
+            
         }
-
+        
+        
         private enum CodingKeys: String, CodingKey {
             case accepted
             case receipt
         }
+        
     }
+        
+public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case mailboxNotProvisioned = "MailboxNotProvisioned"
+                case deliveryConflict = "DeliveryConflict"
+                case notSequencer = "NotSequencer"
+                case termStale = "TermStale"
+                case invalidEnvelope = "InvalidEnvelope"
+                case unauthorizedRecipient = "UnauthorizedRecipient"
+            public var description: String {
+                return self.rawValue
+            }
 
-    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case mailboxNotProvisioned = "MailboxNotProvisioned"
-        case deliveryConflict = "DeliveryConflict"
-        case notSequencer = "NotSequencer"
-        case termStale = "TermStale"
-        case invalidEnvelope = "InvalidEnvelope"
-        case unauthorizedRecipient = "UnauthorizedRecipient"
-        public var description: String {
-            return rawValue
+            public var errorName: String {
+                return self.rawValue
+            }
         }
 
-        public var errorName: String {
-            return rawValue
-        }
-    }
+
+
 }
 
-public extension ATProtoClient.Blue.Catbird.MlsDS {
+extension ATProtoClient.Blue.Catbird.MlsDS {
     // MARK: - deliverWelcome
 
-    // Accept and verify an inbound MLS Welcome message from a remote sequencer DS for a preprovisioned local recipient mailbox. Deliver a federated MLS Welcome message to complete local preprovisioned participant addition on the destination DS.
-    //
-    // - Parameter input: The input parameters for the request
-
-    ///
+    /// Accept and verify an inbound MLS Welcome message from a remote sequencer DS for a preprovisioned local recipient mailbox. Deliver a federated MLS Welcome message to complete local preprovisioned participant addition on the destination DS.
+    /// 
+    /// - Parameter input: The input parameters for the request
+    
+    /// 
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func deliverWelcome(
+    public func deliverWelcome(
+        
         input: BlueCatbirdMlsDSDeliverWelcome.Input
-
+        
     ) async throws -> (responseCode: Int, data: BlueCatbirdMlsDSDeliverWelcome.Output?) {
         let endpoint = "blue.catbird.mlsDS.deliverWelcome"
-
+        
         var headers: [String: String] = [:]
-
+        
         headers["Content-Type"] = "application/json"
-
+        
+        
+        
         headers["Accept"] = "application/json"
+        
 
+        
         let requestData: Data? = try JSONEncoder().encode(input)
-
+        
+        
         let queryItems: [URLQueryItem]? = nil
-
+        
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -235,10 +282,12 @@ public extension ATProtoClient.Blue.Catbird.MlsDS {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
+        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+            
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -246,11 +295,13 @@ public extension ATProtoClient.Blue.Catbird.MlsDS {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
+            
 
             do {
+                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdMlsDSDeliverWelcome.Output.self, from: responseData)
-
+                
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -266,9 +317,14 @@ public extension ATProtoClient.Blue.Catbird.MlsDS {
             ) {
                 throw atprotoError
             }
-
+            
+            
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+        
     }
+    
 }
+                           
+
