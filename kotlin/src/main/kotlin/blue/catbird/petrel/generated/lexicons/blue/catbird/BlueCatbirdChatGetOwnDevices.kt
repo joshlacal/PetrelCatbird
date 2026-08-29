@@ -31,6 +31,7 @@ object BlueCatbirdChatGetOwnDevicesDefs {
         val snapshotExpiresAt: BlueCatbirdChatDefsCanonicalDatetime    )
 
 sealed class BlueCatbirdChatGetOwnDevicesError(val name: String, val description: String?) {
+        object InvalidRequest: BlueCatbirdChatGetOwnDevicesError("InvalidRequest", "")
         object CursorExpired: BlueCatbirdChatGetOwnDevicesError("CursorExpired", "")
         object CutoverRequired: BlueCatbirdChatGetOwnDevicesError("CutoverRequired", "")
         object DeviceNotRegistered: BlueCatbirdChatGetOwnDevicesError("DeviceNotRegistered", "")

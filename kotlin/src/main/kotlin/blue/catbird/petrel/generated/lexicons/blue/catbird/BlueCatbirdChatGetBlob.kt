@@ -28,6 +28,7 @@ object BlueCatbirdChatGetBlobDefs {
 
 sealed class BlueCatbirdChatGetBlobError(val name: String, val description: String?) {
         object BlobNotFound: BlueCatbirdChatGetBlobError("BlobNotFound", "")
+        object InvalidRequest: BlueCatbirdChatGetBlobError("InvalidRequest", "")
         object CutoverRequired: BlueCatbirdChatGetBlobError("CutoverRequired", "")
         object DeviceNotRegistered: BlueCatbirdChatGetBlobError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatGetBlobError("DeviceRevoked", "")

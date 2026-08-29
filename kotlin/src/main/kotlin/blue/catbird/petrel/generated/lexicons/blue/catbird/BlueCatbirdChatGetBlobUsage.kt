@@ -26,6 +26,7 @@ object BlueCatbirdChatGetBlobUsageDefs {
         val usage: BlueCatbirdChatDefsBlobUsageView    )
 
 sealed class BlueCatbirdChatGetBlobUsageError(val name: String, val description: String?) {
+        object InvalidRequest: BlueCatbirdChatGetBlobUsageError("InvalidRequest", "")
         object CutoverRequired: BlueCatbirdChatGetBlobUsageError("CutoverRequired", "")
         object DeviceNotRegistered: BlueCatbirdChatGetBlobUsageError("DeviceNotRegistered", "")
         object DeviceRevoked: BlueCatbirdChatGetBlobUsageError("DeviceRevoked", "")

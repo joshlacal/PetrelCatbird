@@ -1,5 +1,5 @@
 // Lexicon: 1, ID: blue.catbird.mlsDS.deliverWelcome
-// Accept a Welcome message for a new member from a remote DS. Deliver a federated MLS Welcome message to add a user to a group on the local DS.
+// Accept and verify an inbound MLS Welcome message from a remote sequencer DS for a preprovisioned local recipient mailbox. Deliver a federated MLS Welcome message to complete local preprovisioned participant addition on the destination DS.
 package blue.catbird.petrel.generated
 
 import kotlinx.serialization.*
@@ -17,27 +17,39 @@ object BlueCatbirdMlsDSDeliverWelcomeDefs {
 
 @Serializable
     data class BlueCatbirdMlsDSDeliverWelcomeInput(
-// Conversation ID        @SerialName("convoId")
-        val convoId: String,// DID of the recipient user        @SerialName("recipientDid")
-        val recipientDid: String,// DID of the sending delivery service        @SerialName("senderDsDid")
-        val senderDsDid: String,// Hash of the consumed key package        @SerialName("keyPackageHash")
-        val keyPackageHash: String,// Serialized MLS Welcome message        @SerialName("welcomeData")
-        val welcomeData: Bytes,// Initial epoch of the group for the new member        @SerialName("initialEpoch")
-        val initialEpoch: Int    )
+        @SerialName("header")
+        val header: BlueCatbirdMlsDSDefsEnvelopeHeaderV1,        @SerialName("recipientDid")
+        val recipientDid: BlueCatbirdChatDefsBareDid,        @SerialName("recipientDeviceId")
+        val recipientDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("welcomeId")
+        val welcomeId: BlueCatbirdChatDefsOperationId,        @SerialName("recoveryRequestId")
+        val recoveryRequestId: BlueCatbirdChatDefsOperationId,        @SerialName("keyPackageRef")
+        val keyPackageRef: Bytes,// Serialized MLS Welcome message bytes        @SerialName("welcomeBytes")
+        val welcomeBytes: Bytes,        @SerialName("welcomeSha256")
+        val welcomeSha256: Bytes,// Canonical DAG-CBOR bytes of the exact control entry        @SerialName("entryBytes")
+        val entryBytes: Bytes,// Exact JSON bytes of the signed transition request        @SerialName("signedRequestBytes")
+        val signedRequestBytes: Bytes,        @SerialName("entryLocator")
+        val entryLocator: BlueCatbirdMlsDSDefsEntryLocatorV1,        @SerialName("coordinates")
+        val coordinates: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("publicSnapshotSha256")
+        val publicSnapshotSha256: Bytes,        @SerialName("treeSummarySha256")
+        val treeSummarySha256: Bytes    )
 
     @Serializable
     data class BlueCatbirdMlsDSDeliverWelcomeOutput(
-// Whether the welcome was accepted        @SerialName("accepted")
-        val accepted: Boolean,        @SerialName("ack")
-        val ack: BlueCatbirdMlsDSDeliverMessageDeliveryAck? = null    )
+// Whether the welcome was accepted and verified against preprovisioned mailbox state        @SerialName("accepted")
+        val accepted: Boolean,        @SerialName("receipt")
+        val receipt: BlueCatbirdMlsDSDefsFederationReceiptV1    )
 
 sealed class BlueCatbirdMlsDSDeliverWelcomeError(val name: String, val description: String?) {
-        object RecipientNotFound: BlueCatbirdMlsDSDeliverWelcomeError("RecipientNotFound", "")
+        object MailboxNotProvisioned: BlueCatbirdMlsDSDeliverWelcomeError("MailboxNotProvisioned", "")
+        object DeliveryConflict: BlueCatbirdMlsDSDeliverWelcomeError("DeliveryConflict", "")
         object NotSequencer: BlueCatbirdMlsDSDeliverWelcomeError("NotSequencer", "")
+        object TermStale: BlueCatbirdMlsDSDeliverWelcomeError("TermStale", "")
+        object InvalidEnvelope: BlueCatbirdMlsDSDeliverWelcomeError("InvalidEnvelope", "")
+        object UnauthorizedRecipient: BlueCatbirdMlsDSDeliverWelcomeError("UnauthorizedRecipient", "")
     }
 
 /**
- * Accept a Welcome message for a new member from a remote DS. Deliver a federated MLS Welcome message to add a user to a group on the local DS.
+ * Accept and verify an inbound MLS Welcome message from a remote sequencer DS for a preprovisioned local recipient mailbox. Deliver a federated MLS Welcome message to complete local preprovisioned participant addition on the destination DS.
  *
  * Endpoint: blue.catbird.mlsDS.deliverWelcome
  */

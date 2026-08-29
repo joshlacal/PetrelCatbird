@@ -1,12 +1,12 @@
 {
-  "originHash" : "7cf573557b3760162a3f9f6d9096a8c949562cd1e999125ede19269b793bbdb9",
+  "originHash" : "ee7d5788719f67a83a31c44f1783029ce886234572f6171c4e5ec97ec0324194",
   "pins" : [
     {
       "identity" : "petrel",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/joshlacal/Petrel.git",
       "state" : {
-        "revision" : "77879aa416a0e0b3c072514d52b8ea0ade745a32"
+        "revision" : "a4caf64fd837e72ded5f6843c630a4d032c9d872"
       }
     },
     {
@@ -61,6 +61,15 @@
       "state" : {
         "revision" : "fd929a6d8f7651ce0f63fc99397fd5762358cc29",
         "version" : "0.6.0"
+      }
+    },
+    {
+      "identity" : "zstd",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/facebook/zstd.git",
+      "state" : {
+        "revision" : "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+        "version" : "1.5.7"
       }
     }
   ],

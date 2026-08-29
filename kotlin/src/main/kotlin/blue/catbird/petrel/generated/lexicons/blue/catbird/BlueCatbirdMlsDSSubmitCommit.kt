@@ -1,5 +1,5 @@
 // Lexicon: 1, ID: blue.catbird.mlsDS.submitCommit
-// Submit a commit for CAS sequencing on the sequencer DS. Submit an MLS commit for epoch ordering via compare-and-swap. The sequencer assigns the epoch and returns a receipt.
+// Submit an actor-signed MLS commit to the sequencer DS for canonical transition planning and execution. Submit a signed commit transition to the sequencer DS for execution through the canonical submitTransition planner and executor.
 package blue.catbird.petrel.generated
 
 import kotlinx.serialization.*
@@ -17,31 +17,29 @@ object BlueCatbirdMlsDSSubmitCommitDefs {
 
 @Serializable
     data class BlueCatbirdMlsDSSubmitCommitInput(
-// Conversation ID        @SerialName("convoId")
-        val convoId: String,// DID of the submitting delivery service        @SerialName("senderDsDid")
-        val senderDsDid: String,// Current expected epoch        @SerialName("epoch")
-        val epoch: Int,// Proposed next epoch        @SerialName("proposedEpoch")
-        val proposedEpoch: Int,// Serialized MLS commit        @SerialName("commitData")
-        val commitData: Bytes,// Current sequencer term for CAS validation        @SerialName("sequencerTerm")
-        val sequencerTerm: Int    )
+        @SerialName("header")
+        val header: BlueCatbirdMlsDSDefsEnvelopeHeaderV1,// Exact JSON bytes of the signed commit transition request        @SerialName("signedRequestBytes")
+        val signedRequestBytes: Bytes    )
 
     @Serializable
     data class BlueCatbirdMlsDSSubmitCommitOutput(
-// Whether the commit was accepted        @SerialName("accepted")
-        val accepted: Boolean,// Epoch assigned by the sequencer        @SerialName("assignedEpoch")
-        val assignedEpoch: Int,// Current sequencer term        @SerialName("sequencerTerm")
-        val sequencerTerm: Int,// Sequencer receipt for the commit        @SerialName("receipt")
-        val receipt: String? = null    )
+        @SerialName("coordinates")
+        val coordinates: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("commitEntry")
+        val commitEntry: BlueCatbirdChatDefsCommitEntry,        @SerialName("welcomes")
+        val welcomes: List<BlueCatbirdChatDefsWelcomeView>,        @SerialName("receipt")
+        val receipt: BlueCatbirdMlsDSDefsFederationReceiptV1    )
 
 sealed class BlueCatbirdMlsDSSubmitCommitError(val name: String, val description: String?) {
         object ConversationNotFound: BlueCatbirdMlsDSSubmitCommitError("ConversationNotFound", "")
         object NotSequencer: BlueCatbirdMlsDSSubmitCommitError("NotSequencer", "")
         object TermStale: BlueCatbirdMlsDSSubmitCommitError("TermStale", "")
         object CommitConflict: BlueCatbirdMlsDSSubmitCommitError("CommitConflict", "")
+        object InvalidEnvelope: BlueCatbirdMlsDSSubmitCommitError("InvalidEnvelope", "")
+        object UnauthorizedParticipantDs: BlueCatbirdMlsDSSubmitCommitError("UnauthorizedParticipantDs", "")
     }
 
 /**
- * Submit a commit for CAS sequencing on the sequencer DS. Submit an MLS commit for epoch ordering via compare-and-swap. The sequencer assigns the epoch and returns a receipt.
+ * Submit an actor-signed MLS commit to the sequencer DS for canonical transition planning and execution. Submit a signed commit transition to the sequencer DS for execution through the canonical submitTransition planner and executor.
  *
  * Endpoint: blue.catbird.mlsDS.submitCommit
  */

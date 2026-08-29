@@ -1,5 +1,5 @@
 // Lexicon: 1, ID: blue.catbird.mlsDS.deliverMessage
-// Accept an inbound MLS message from a remote DS and store it for local subscribers. Deliver a federated MLS message to a local DS for storage and SSE fanout.
+// Accept an inbound MLS application message from a remote sequencer DS for a local recipient. Deliver a federated MLS application message to a local recipient on the destination DS.
 package blue.catbird.petrel.generated
 
 import kotlinx.serialization.*
@@ -15,51 +15,33 @@ object BlueCatbirdMlsDSDeliverMessageDefs {
     const val TYPE_IDENTIFIER = "blue.catbird.mlsDS.deliverMessage"
 }
 
-    /**
-     * Signed delivery acknowledgment
-     */
-    @Serializable
-    data class BlueCatbirdMlsDSDeliverMessageDeliveryAck(
-/** Signed acknowledgment token */        @SerialName("sig")
-        val sig: String,        @SerialName("msgId")
-        val msgId: String? = null,        @SerialName("convoId")
-        val convoId: String? = null,        @SerialName("epoch")
-        val epoch: Int? = null,        @SerialName("term")
-        val term: Int? = null    ) {
-        companion object {
-            const val TYPE_IDENTIFIER = "#blueCatbirdMlsDSDeliverMessageDeliveryAck"
-        }
-    }
-
 @Serializable
     data class BlueCatbirdMlsDSDeliverMessageInput(
-// Conversation ID        @SerialName("convoId")
-        val convoId: String,// Unique message ID (ULID)        @SerialName("msgId")
-        val msgId: String,// MLS epoch of the message        @SerialName("epoch")
-        val epoch: Int,// DID of the sending delivery service        @SerialName("senderDsDid")
-        val senderDsDid: String,// Encrypted MLS message payload        @SerialName("ciphertext")
-        val ciphertext: Bytes,// Padded size of the plaintext for uniform message lengths        @SerialName("paddedSize")
-        val paddedSize: Int,// Message type (default: 'app')        @SerialName("messageType")
-        val messageType: String? = null,// Delivery tracking ID (ULID)        @SerialName("deliveryId")
-        val deliveryId: String,// Current sequencer term for CAS validation        @SerialName("sequencerTerm")
-        val sequencerTerm: Int    )
+        @SerialName("header")
+        val header: BlueCatbirdMlsDSDefsEnvelopeHeaderV1,// Canonical DAG-CBOR bytes of the exact applicationEntry        @SerialName("entryBytes")
+        val entryBytes: Bytes,// Exact JSON bytes of the signed message request        @SerialName("signedRequestBytes")
+        val signedRequestBytes: Bytes,        @SerialName("recipientDid")
+        val recipientDid: BlueCatbirdChatDefsBareDid,        @SerialName("entryLocator")
+        val entryLocator: BlueCatbirdMlsDSDefsEntryLocatorV1    )
 
     @Serializable
     data class BlueCatbirdMlsDSDeliverMessageOutput(
-// Whether the message was accepted        @SerialName("accepted")
-        val accepted: Boolean,// Assigned sequence number        @SerialName("seq")
-        val seq: Int,// Echo of the delivery ID        @SerialName("deliveryId")
-        val deliveryId: String,        @SerialName("ack")
-        val ack: BlueCatbirdMlsDSDeliverMessageDeliveryAck? = null    )
+// Whether the message was delivered and persisted        @SerialName("accepted")
+        val accepted: Boolean,        @SerialName("receipt")
+        val receipt: BlueCatbirdMlsDSDefsFederationReceiptV1    )
 
 sealed class BlueCatbirdMlsDSDeliverMessageError(val name: String, val description: String?) {
-        object ConversationNotFound: BlueCatbirdMlsDSDeliverMessageError("ConversationNotFound", "")
+        object MailboxNotProvisioned: BlueCatbirdMlsDSDeliverMessageError("MailboxNotProvisioned", "")
+        object SequenceConflict: BlueCatbirdMlsDSDeliverMessageError("SequenceConflict", "")
+        object DeliveryConflict: BlueCatbirdMlsDSDeliverMessageError("DeliveryConflict", "")
         object NotSequencer: BlueCatbirdMlsDSDeliverMessageError("NotSequencer", "")
         object TermStale: BlueCatbirdMlsDSDeliverMessageError("TermStale", "")
+        object InvalidEnvelope: BlueCatbirdMlsDSDeliverMessageError("InvalidEnvelope", "")
+        object UnauthorizedRecipient: BlueCatbirdMlsDSDeliverMessageError("UnauthorizedRecipient", "")
     }
 
 /**
- * Accept an inbound MLS message from a remote DS and store it for local subscribers. Deliver a federated MLS message to a local DS for storage and SSE fanout.
+ * Accept an inbound MLS application message from a remote sequencer DS for a local recipient. Deliver a federated MLS application message to a local recipient on the destination DS.
  *
  * Endpoint: blue.catbird.mlsDS.deliverMessage
  */

@@ -16844,9 +16844,11 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
             public let leaves: [DeviceLeafView]
             public let metadataSnapshot: MetadataSnapshot
             public let snapshotSeq: Int
+            public let sequencerDid: BareDid?
+            public let sequencerTerm: Int?
 
         public init(
-            conversationKind: DefsConversationKind, coordinates: ConversationCoordinates, cipherSuite: DefsCipherSuite, participants: [ParticipantView], leaves: [DeviceLeafView], metadataSnapshot: MetadataSnapshot, snapshotSeq: Int
+            conversationKind: DefsConversationKind, coordinates: ConversationCoordinates, cipherSuite: DefsCipherSuite, participants: [ParticipantView], leaves: [DeviceLeafView], metadataSnapshot: MetadataSnapshot, snapshotSeq: Int, sequencerDid: BareDid?, sequencerTerm: Int?
         ) {
             self.conversationKind = conversationKind
             self.coordinates = coordinates
@@ -16855,6 +16857,8 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
             self.leaves = leaves
             self.metadataSnapshot = metadataSnapshot
             self.snapshotSeq = snapshotSeq
+            self.sequencerDid = sequencerDid
+            self.sequencerTerm = sequencerTerm
         }
 
         public init(from decoder: Decoder) throws {
@@ -16901,6 +16905,22 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
                 LogManager.logError("Decoding error for required property 'snapshotSeq': \(error)")
                 throw error
             }
+            do {
+                self.sequencerDid = try container.decodeIfPresent(BareDid.self, forKey: .sequencerDid)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerDid' — degrading to nil: \(error)")
+                self.sequencerDid = nil
+            }
+            do {
+                self.sequencerTerm = try container.decodeIfPresent(Int.self, forKey: .sequencerTerm)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerTerm' — degrading to nil: \(error)")
+                self.sequencerTerm = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -16913,6 +16933,8 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
             try container.encode(leaves, forKey: .leaves)
             try container.encode(metadataSnapshot, forKey: .metadataSnapshot)
             try container.encode(snapshotSeq, forKey: .snapshotSeq)
+            try container.encodeIfPresent(sequencerDid, forKey: .sequencerDid)
+            try container.encodeIfPresent(sequencerTerm, forKey: .sequencerTerm)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -16923,6 +16945,16 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
             hasher.combine(leaves)
             hasher.combine(metadataSnapshot)
             hasher.combine(snapshotSeq)
+            if let value = sequencerDid {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = sequencerTerm {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
@@ -16946,6 +16978,12 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
                 return false
             }
             if snapshotSeq != other.snapshotSeq {
+                return false
+            }
+            if sequencerDid != other.sequencerDid {
+                return false
+            }
+            if sequencerTerm != other.sequencerTerm {
                 return false
             }
             return true
@@ -16972,6 +17010,14 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
             map = map.adding(key: "metadataSnapshot", value: metadataSnapshotValue)
             let snapshotSeqValue = try snapshotSeq.toCBORValue()
             map = map.adding(key: "snapshotSeq", value: snapshotSeqValue)
+            if let value = sequencerDid {
+                let sequencerDidValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerDid", value: sequencerDidValue)
+            }
+            if let value = sequencerTerm {
+                let sequencerTermValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerTerm", value: sequencerTermValue)
+            }
             return map
         }
 
@@ -16984,6 +17030,8 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
             case leaves
             case metadataSnapshot
             case snapshotSeq
+            case sequencerDid
+            case sequencerTerm
         }
     }
         

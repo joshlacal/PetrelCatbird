@@ -162,6 +162,7 @@ public struct Output: ATProtocolCodable {
     }
         
 public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+                case invalidRequest = "InvalidRequest"
                 case cursorExpired = "CursorExpired"
                 case cutoverRequired = "CutoverRequired"
                 case deviceNotRegistered = "DeviceNotRegistered"
