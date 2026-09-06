@@ -1,5 +1,5 @@
 // Lexicon: 1, ID: blue.catbird.chat.getConversationState
-// Returns public state and visible pending reset/leave work under separate control-plane entitlement. state.snapshotSeq is the greatest committed conversation seq included in this transactionally observed state; it is not a getEntries afterSeq or an application-visibility grant. A logical participant with zero leaves may receive bounded inventory/reset/recovery/leave visibility needed to join or leave, but roster status and sibling-device membership grant no application ciphertext. A former concrete device leaf is bounded by its own inclusive terminalSeq and cannot inherit another device's interval.
+// Returns public state and visible pending reset/leave/recovery work under separate control-plane entitlement. state.snapshotSeq is the greatest committed conversation seq included in this transactionally observed state; it is not a getEntries afterSeq or an application-visibility grant. A logical participant with zero leaves may receive bounded inventory/reset/recovery/leave visibility needed to join or leave, but roster status and sibling-device membership grant no application ciphertext. A former concrete device leaf is bounded by its own inclusive terminalSeq and cannot inherit another device's interval.
 package blue.catbird.petrel.generated
 
 import kotlinx.serialization.*
@@ -26,7 +26,8 @@ object BlueCatbirdChatGetConversationStateDefs {
         @SerialName("state")
         val state: BlueCatbirdChatDefsConversationState,        @SerialName("pendingResetRequests")
         val pendingResetRequests: List<BlueCatbirdChatDefsResetRequestView>,        @SerialName("pendingLeaveRequests")
-        val pendingLeaveRequests: List<BlueCatbirdChatDefsLeaveRequestView>    )
+        val pendingLeaveRequests: List<BlueCatbirdChatDefsLeaveRequestView>,// Open unexpired leaf recoveries bound to the current coordinate, visible only to an active concrete device leaf that may fulfill them. Excludes the requesting exact device, but includes other devices of the same DID. Ordered oldest first; successful fulfillment changes the coordinate and stale requests must be renewed. Absent on older servers; empty for logical participants without a current concrete leaf. This is separate from the exact-target-device getLeafRecoveryInbox and grants no additional application history.        @SerialName("pendingLeafRecoveryRequests")
+        val pendingLeafRecoveryRequests: List<BlueCatbirdChatDefsLeafRecoveryView>? = null    )
 
 sealed class BlueCatbirdChatGetConversationStateError(val name: String, val description: String?) {
         object AccessOutsideMembershipInterval: BlueCatbirdChatGetConversationStateError("AccessOutsideMembershipInterval", "")
@@ -44,7 +45,7 @@ sealed class BlueCatbirdChatGetConversationStateError(val name: String, val desc
     }
 
 /**
- * Returns public state and visible pending reset/leave work under separate control-plane entitlement. state.snapshotSeq is the greatest committed conversation seq included in this transactionally observed state; it is not a getEntries afterSeq or an application-visibility grant. A logical participant with zero leaves may receive bounded inventory/reset/recovery/leave visibility needed to join or leave, but roster status and sibling-device membership grant no application ciphertext. A former concrete device leaf is bounded by its own inclusive terminalSeq and cannot inherit another device's interval.
+ * Returns public state and visible pending reset/leave/recovery work under separate control-plane entitlement. state.snapshotSeq is the greatest committed conversation seq included in this transactionally observed state; it is not a getEntries afterSeq or an application-visibility grant. A logical participant with zero leaves may receive bounded inventory/reset/recovery/leave visibility needed to join or leave, but roster status and sibling-device membership grant no application ciphertext. A former concrete device leaf is bounded by its own inclusive terminalSeq and cannot inherit another device's interval.
  *
  * Endpoint: blue.catbird.chat.getConversationState
  */
