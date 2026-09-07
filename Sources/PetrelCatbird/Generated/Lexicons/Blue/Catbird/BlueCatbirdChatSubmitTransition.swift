@@ -184,6 +184,8 @@ public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertibl
                 case participantLeafLimitReached = "ParticipantLeafLimitReached"
                 case participantLimitReached = "ParticipantLimitReached"
                 case relationshipPolicyUnavailable = "RelationshipPolicyUnavailable"
+                /// The exact signed operation has no durable operation claim and its signedAt is older than the first-execution acceptance window. The server verified the device signature after global idempotency arbitration. This operation was not accepted and cannot execute; completed operations remain replayable regardless of age.
+                case signedOperationExpired = "SignedOperationExpired"
                 case staleCoordinates = "StaleCoordinates"
                 case standaloneProposalForbidden = "StandaloneProposalForbidden"
                 case unsupportedMlsProfile = "UnsupportedMlsProfile"
