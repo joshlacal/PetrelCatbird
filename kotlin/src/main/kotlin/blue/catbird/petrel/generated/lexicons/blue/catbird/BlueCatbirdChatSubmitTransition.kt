@@ -66,6 +66,7 @@ sealed class BlueCatbirdChatSubmitTransitionError(val name: String, val descript
         object ParticipantLeafLimitReached: BlueCatbirdChatSubmitTransitionError("ParticipantLeafLimitReached", "")
         object ParticipantLimitReached: BlueCatbirdChatSubmitTransitionError("ParticipantLimitReached", "")
         object RelationshipPolicyUnavailable: BlueCatbirdChatSubmitTransitionError("RelationshipPolicyUnavailable", "")
+        object SignedOperationExpired: BlueCatbirdChatSubmitTransitionError("SignedOperationExpired", "The exact signed operation has no durable operation claim and its signedAt is older than the first-execution acceptance window. The server verified the device signature after global idempotency arbitration. This operation was not accepted and cannot execute; completed operations remain replayable regardless of age.")
         object StaleCoordinates: BlueCatbirdChatSubmitTransitionError("StaleCoordinates", "")
         object StandaloneProposalForbidden: BlueCatbirdChatSubmitTransitionError("StandaloneProposalForbidden", "")
         object UnsupportedMlsProfile: BlueCatbirdChatSubmitTransitionError("UnsupportedMlsProfile", "")
