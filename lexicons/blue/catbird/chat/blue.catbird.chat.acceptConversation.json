@@ -48,6 +48,10 @@
             "recovery": {
               "type": "ref",
               "ref": "blue.catbird.chat.defs#leafRecoveryView"
+            },
+            "acceptanceProof": {
+              "type": "ref",
+              "ref": "blue.catbird.chat.defs#directRequestAcceptanceProof"
             }
           }
         }

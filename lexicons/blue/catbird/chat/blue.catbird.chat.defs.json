@@ -7709,16 +7709,31 @@
         "preparationDigest": {
           "type": "ref",
           "ref": "#artifactHash"
+        },
+        "acceptanceProof": {
+          "type": "ref",
+          "ref": "#directRequestAcceptanceProof"
         }
       }
     },
     "directRequestEntry": {
       "type": "object",
       "required": [
+        "entryId",
+        "conversationId",
         "seq",
-        "signedRequest"
+        "signedRequest",
+        "receivedAt"
       ],
       "properties": {
+        "entryId": {
+          "type": "ref",
+          "ref": "#operationId"
+        },
+        "conversationId": {
+          "type": "ref",
+          "ref": "#operationId"
+        },
         "seq": {
           "type": "integer",
           "minimum": 1,
@@ -7727,16 +7742,31 @@
         "signedRequest": {
           "type": "ref",
           "ref": "#signedDirectRequestPublication"
+        },
+        "receivedAt": {
+          "type": "ref",
+          "ref": "#canonicalDatetime"
         }
       }
     },
     "directRequestAcceptanceEntry": {
       "type": "object",
       "required": [
+        "entryId",
+        "conversationId",
         "seq",
-        "signedRequest"
+        "signedRequest",
+        "receivedAt"
       ],
       "properties": {
+        "entryId": {
+          "type": "ref",
+          "ref": "#operationId"
+        },
+        "conversationId": {
+          "type": "ref",
+          "ref": "#operationId"
+        },
         "seq": {
           "type": "integer",
           "minimum": 1,
@@ -7745,6 +7775,10 @@
         "signedRequest": {
           "type": "ref",
           "ref": "#signedDirectRequestAcceptance"
+        },
+        "receivedAt": {
+          "type": "ref",
+          "ref": "#canonicalDatetime"
         }
       }
     },
@@ -7922,6 +7956,101 @@
       "minLength": 111,
       "maxLength": 111,
       "description": "Exact did:web:chat.catbird.blue#chat-request-receipt- plus lowercase hex SHA256 of compressed P256 SEC1 public key. Resolve authenticated authority DID document unique method/controller/P256 Multikey. Retain historical verification methods across key rotation."
+    },
+    "directRequestAcceptanceCommitReceiptBody": {
+      "type": "object",
+      "required": [
+        "signatureDomain",
+        "protocolVersion",
+        "authorityDid",
+        "keyId",
+        "requestId",
+        "acceptanceDigest",
+        "entryHash",
+        "prior",
+        "next",
+        "recordedAt"
+      ],
+      "properties": {
+        "signatureDomain": {
+          "type": "string",
+          "const": "CATBIRD-DIRECT-REQUEST-ACCEPTANCE-COMMIT\u0000"
+        },
+        "protocolVersion": {
+          "type": "string",
+          "const": "2"
+        },
+        "authorityDid": {
+          "type": "string",
+          "const": "did:web:chat.catbird.blue"
+        },
+        "keyId": {
+          "type": "ref",
+          "ref": "#directRequestReceiptKeyId"
+        },
+        "requestId": {
+          "type": "ref",
+          "ref": "#operationId"
+        },
+        "acceptanceDigest": {
+          "type": "ref",
+          "ref": "#artifactHash"
+        },
+        "entryHash": {
+          "type": "ref",
+          "ref": "#artifactHash"
+        },
+        "prior": {
+          "type": "ref",
+          "ref": "#conversationCoordinates"
+        },
+        "next": {
+          "type": "ref",
+          "ref": "#conversationCoordinates"
+        },
+        "recordedAt": {
+          "type": "ref",
+          "ref": "#canonicalDatetime"
+        }
+      }
+    },
+    "signedDirectRequestAcceptanceCommitReceipt": {
+      "type": "object",
+      "required": [
+        "body",
+        "signature"
+      ],
+      "properties": {
+        "body": {
+          "type": "union",
+          "refs": [
+            "#directRequestAcceptanceCommitReceiptBody"
+          ],
+          "closed": true
+        },
+        "signature": {
+          "type": "bytes",
+          "minLength": 64,
+          "maxLength": 64
+        }
+      }
+    },
+    "directRequestAcceptanceProof": {
+      "type": "object",
+      "required": [
+        "entry",
+        "receipt"
+      ],
+      "properties": {
+        "entry": {
+          "type": "ref",
+          "ref": "#directRequestAcceptanceEntry"
+        },
+        "receipt": {
+          "type": "ref",
+          "ref": "#signedDirectRequestAcceptanceCommitReceipt"
+        }
+      }
     }
   }
 }
