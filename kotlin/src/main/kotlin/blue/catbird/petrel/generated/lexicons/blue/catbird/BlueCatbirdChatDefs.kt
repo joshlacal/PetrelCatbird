@@ -3611,7 +3611,8 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
     @Serializable
     data class BlueCatbirdChatDefsOwnDeviceView(
         @SerialName("device")
-        val device: BlueCatbirdChatDefsDeviceView    ) {
+        val device: BlueCatbirdChatDefsDeviceView,/** Present only for the authenticated actorDeviceId when its request capability record exists; absent for all peer/other-device items. Counts include only current authorized request-purpose KeyPackages with valid enabled nonrevoked grants and the full indicated lifetime horizon. */        @SerialName("directRequestKeyPool")
+        val directRequestKeyPool: BlueCatbirdChatDefsDirectRequestKeyPoolStats? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsOwnDeviceView"
         }
@@ -5952,7 +5953,7 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
         val creator: BlueCatbirdChatDefsDirectRequestCreator,        @SerialName("selectedDevices")
         val selectedDevices: List<BlueCatbirdChatDefsDirectRequestSelectedDevice>,        @SerialName("preparedAt")
         val preparedAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("leaseExpiresAt")
-        val leaseExpiresAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("minimumImportUntil")
+        val leaseExpiresAt: BlueCatbirdChatDefsCanonicalDatetime,/** Request-specific whole-second timestamp rendered with canonical .000Z. Nonzero fractional seconds are rejected as InvalidBootstrap; they are never truncated. */        @SerialName("minimumImportUntil")
         val minimumImportUntil: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("preparationRequestDigest")
         val preparationRequestDigest: BlueCatbirdChatDefsArtifactHash,        @SerialName("authorityDid")
         val authorityDid: String,        @SerialName("receiptKeyId")
@@ -6023,7 +6024,7 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
         val contextHash: BlueCatbirdChatDefsArtifactHash,        @SerialName("grantId")
         val grantId: BlueCatbirdChatDefsOperationId,        @SerialName("grantRevision")
         val grantRevision: Int,        @SerialName("keyPackageRef")
-        val keyPackageRef: BlueCatbirdChatDefsArtifactHash,        @SerialName("importUntil")
+        val keyPackageRef: BlueCatbirdChatDefsArtifactHash,/** Request-specific whole-second timestamp rendered with canonical .000Z. Nonzero fractional seconds are rejected as InvalidBootstrap; they are never truncated. */        @SerialName("importUntil")
         val importUntil: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestWelcomeProvenance"
@@ -6089,7 +6090,7 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
         val profile: BlueCatbirdChatDefsDirectRequestProfile,        @SerialName("preparationDigest")
         val preparationDigest: BlueCatbirdChatDefsArtifactHash,        @SerialName("contextHash")
         val contextHash: BlueCatbirdChatDefsArtifactHash,        @SerialName("next")
-        val next: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("importUntil")
+        val next: BlueCatbirdChatDefsConversationCoordinates,/** Request-specific whole-second timestamp rendered with canonical .000Z. Nonzero fractional seconds are rejected as InvalidBootstrap; they are never truncated. */        @SerialName("importUntil")
         val importUntil: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("artifacts")
         val artifacts: BlueCatbirdChatDefsDirectRequestBootstrapArtifacts,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
@@ -6323,7 +6324,7 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
         val firstMessageId: BlueCatbirdChatDefsOperationId,        @SerialName("senderDid")
         val senderDid: BlueCatbirdChatDefsBareDid,        @SerialName("recipientDid")
         val recipientDid: BlueCatbirdChatDefsBareDid,        @SerialName("consent")
-        val consent: BlueCatbirdChatDefsDirectRequestStateConsent,        @SerialName("importUntil")
+        val consent: BlueCatbirdChatDefsDirectRequestStateConsent,/** Request-specific whole-second timestamp rendered with canonical .000Z. Nonzero fractional seconds are rejected as InvalidBootstrap; they are never truncated. */        @SerialName("importUntil")
         val importUntil: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("contextHash")
         val contextHash: BlueCatbirdChatDefsArtifactHash,        @SerialName("preparationDigest")
         val preparationDigest: BlueCatbirdChatDefsArtifactHash,        @SerialName("acceptanceProof")
@@ -6403,7 +6404,7 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
         val creator: BlueCatbirdChatDefsDirectRequestCreator,        @SerialName("selectedDevices")
         val selectedDevices: List<BlueCatbirdChatDefsDirectRequestSelectedDevice>,        @SerialName("preparedAt")
         val preparedAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("leaseExpiresAt")
-        val leaseExpiresAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("minimumImportUntil")
+        val leaseExpiresAt: BlueCatbirdChatDefsCanonicalDatetime,/** Request-specific whole-second timestamp rendered with canonical .000Z. Nonzero fractional seconds are rejected as InvalidBootstrap; they are never truncated. */        @SerialName("minimumImportUntil")
         val minimumImportUntil: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("preparationRequestDigest")
         val preparationRequestDigest: BlueCatbirdChatDefsArtifactHash,        @SerialName("authorityDid")
         val authorityDid: String,        @SerialName("receiptKeyId")
@@ -6453,5 +6454,22 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
         val receipt: BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceipt    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestAcceptanceProof"
+        }
+    }
+
+    /**
+     * Replenishment hint for the authenticated actor device only, bound to the enclosing ownDeviceView device identity, keyId and authGeneration. Counts are not publication or preparation authority. usableUntil equals asOf plus seven days, 300 seconds import margin and 300 seconds preparation lease.
+     */
+    @Serializable
+    data class BlueCatbirdChatDefsDirectRequestKeyPoolStats(
+        @SerialName("enabled")
+        val enabled: Boolean,        @SerialName("revision")
+        val revision: Int,        @SerialName("usableCount")
+        val usableCount: Int,        @SerialName("reservedCount")
+        val reservedCount: Int,        @SerialName("asOf")
+        val asOf: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("usableUntil")
+        val usableUntil: BlueCatbirdChatDefsCanonicalDatetime    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestKeyPoolStats"
         }
     }

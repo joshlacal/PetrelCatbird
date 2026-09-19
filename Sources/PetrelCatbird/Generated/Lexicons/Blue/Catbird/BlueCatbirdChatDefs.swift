@@ -1554,11 +1554,13 @@ public enum BlueCatbirdChatDefs {
     public struct OwnDeviceView: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.chat.defs#ownDeviceView"
         public let device: DeviceView
+        public let directRequestKeyPool: DirectRequestKeyPoolStats?
 
         public init(
-            device: DeviceView
+            device: DeviceView, directRequestKeyPool: DirectRequestKeyPoolStats? = nil
         ) {
             self.device = device
+            self.directRequestKeyPool = directRequestKeyPool
         }
 
         public init(from decoder: Decoder) throws {
@@ -1569,21 +1571,38 @@ public enum BlueCatbirdChatDefs {
                 LogManager.logError("Decoding error for required property 'device': \(error)")
                 throw error
             }
+            do {
+                directRequestKeyPool = try container.decodeIfPresent(DirectRequestKeyPoolStats.self, forKey: .directRequestKeyPool)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'directRequestKeyPool' — degrading to nil: \(error)")
+                directRequestKeyPool = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
             try container.encode(device, forKey: .device)
+            try container.encodeIfPresent(directRequestKeyPool, forKey: .directRequestKeyPool)
         }
 
         public func hash(into hasher: inout Hasher) {
             hasher.combine(device)
+            if let value = directRequestKeyPool {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
             if device != other.device {
+                return false
+            }
+            if directRequestKeyPool != other.directRequestKeyPool {
                 return false
             }
             return true
@@ -1598,12 +1617,17 @@ public enum BlueCatbirdChatDefs {
             map = map.adding(key: "$type", value: Self.typeIdentifier)
             let deviceValue = try device.toCBORValue()
             map = map.adding(key: "device", value: deviceValue)
+            if let value = directRequestKeyPool {
+                let directRequestKeyPoolValue = try value.toCBORValue()
+                map = map.adding(key: "directRequestKeyPool", value: directRequestKeyPoolValue)
+            }
             return map
         }
 
         private enum CodingKeys: String, CodingKey {
             case typeIdentifier = "$type"
             case device
+            case directRequestKeyPool
         }
     }
 
@@ -26655,6 +26679,142 @@ public enum BlueCatbirdChatDefs {
             case typeIdentifier = "$type"
             case entry
             case receipt
+        }
+    }
+
+    public struct DirectRequestKeyPoolStats: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestKeyPoolStats"
+        public let enabled: Bool
+        public let revision: Int
+        public let usableCount: Int
+        public let reservedCount: Int
+        public let asOf: CanonicalDatetime
+        public let usableUntil: CanonicalDatetime
+
+        public init(
+            enabled: Bool, revision: Int, usableCount: Int, reservedCount: Int, asOf: CanonicalDatetime, usableUntil: CanonicalDatetime
+        ) {
+            self.enabled = enabled
+            self.revision = revision
+            self.usableCount = usableCount
+            self.reservedCount = reservedCount
+            self.asOf = asOf
+            self.usableUntil = usableUntil
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                enabled = try container.decode(Bool.self, forKey: .enabled)
+            } catch {
+                LogManager.logError("Decoding error for required property 'enabled': \(error)")
+                throw error
+            }
+            do {
+                revision = try container.decode(Int.self, forKey: .revision)
+            } catch {
+                LogManager.logError("Decoding error for required property 'revision': \(error)")
+                throw error
+            }
+            do {
+                usableCount = try container.decode(Int.self, forKey: .usableCount)
+            } catch {
+                LogManager.logError("Decoding error for required property 'usableCount': \(error)")
+                throw error
+            }
+            do {
+                reservedCount = try container.decode(Int.self, forKey: .reservedCount)
+            } catch {
+                LogManager.logError("Decoding error for required property 'reservedCount': \(error)")
+                throw error
+            }
+            do {
+                asOf = try container.decode(CanonicalDatetime.self, forKey: .asOf)
+            } catch {
+                LogManager.logError("Decoding error for required property 'asOf': \(error)")
+                throw error
+            }
+            do {
+                usableUntil = try container.decode(CanonicalDatetime.self, forKey: .usableUntil)
+            } catch {
+                LogManager.logError("Decoding error for required property 'usableUntil': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(enabled, forKey: .enabled)
+            try container.encode(revision, forKey: .revision)
+            try container.encode(usableCount, forKey: .usableCount)
+            try container.encode(reservedCount, forKey: .reservedCount)
+            try container.encode(asOf, forKey: .asOf)
+            try container.encode(usableUntil, forKey: .usableUntil)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(enabled)
+            hasher.combine(revision)
+            hasher.combine(usableCount)
+            hasher.combine(reservedCount)
+            hasher.combine(asOf)
+            hasher.combine(usableUntil)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if enabled != other.enabled {
+                return false
+            }
+            if revision != other.revision {
+                return false
+            }
+            if usableCount != other.usableCount {
+                return false
+            }
+            if reservedCount != other.reservedCount {
+                return false
+            }
+            if asOf != other.asOf {
+                return false
+            }
+            if usableUntil != other.usableUntil {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let enabledValue = try enabled.toCBORValue()
+            map = map.adding(key: "enabled", value: enabledValue)
+            let revisionValue = try revision.toCBORValue()
+            map = map.adding(key: "revision", value: revisionValue)
+            let usableCountValue = try usableCount.toCBORValue()
+            map = map.adding(key: "usableCount", value: usableCountValue)
+            let reservedCountValue = try reservedCount.toCBORValue()
+            map = map.adding(key: "reservedCount", value: reservedCountValue)
+            let asOfValue = try asOf.toCBORValue()
+            map = map.adding(key: "asOf", value: asOfValue)
+            let usableUntilValue = try usableUntil.toCBORValue()
+            map = map.adding(key: "usableUntil", value: usableUntilValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case enabled
+            case revision
+            case usableCount
+            case reservedCount
+            case asOf
+            case usableUntil
         }
     }
 
