@@ -2,26 +2,21 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.chat.acceptConversation
 
-
-public struct BlueCatbirdChatAcceptConversation { 
-
+public enum BlueCatbirdChatAcceptConversation {
     public static let typeIdentifier = "blue.catbird.chat.acceptConversation"
-public struct Input: ATProtocolCodable {
-        public let signedRequest: BlueCatbirdChatDefs.SignedParticipantAcceptance
+    public struct Input: ATProtocolCodable {
+        public let signedRequest: InputSignedRequestUnion
 
         /// Standard public initializer
-        public init(signedRequest: BlueCatbirdChatDefs.SignedParticipantAcceptance) {
+        public init(signedRequest: InputSignedRequestUnion) {
             self.signedRequest = signedRequest
         }
-        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedParticipantAcceptance.self, forKey: .signedRequest)
+            signedRequest = try container.decode(InputSignedRequestUnion.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -40,181 +35,399 @@ public struct Input: ATProtocolCodable {
             case signedRequest
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
         public let coordinates: BlueCatbirdChatDefs.ConversationCoordinates
-        
-        public let entry: BlueCatbirdChatDefs.ParticipantAcceptanceEntry
-        
-        public let recovery: BlueCatbirdChatDefs.LeafRecoveryView
-        
-        
-        
-        // Standard public initializer
+
+        public let entry: OutputEntryUnion
+
+        public let recovery: BlueCatbirdChatDefs.LeafRecoveryView?
+
+        /// Standard public initializer
         public init(
-            
-            
             coordinates: BlueCatbirdChatDefs.ConversationCoordinates,
-            
-            entry: BlueCatbirdChatDefs.ParticipantAcceptanceEntry,
-            
-            recovery: BlueCatbirdChatDefs.LeafRecoveryView
-            
-            
+
+            entry: OutputEntryUnion,
+
+            recovery: BlueCatbirdChatDefs.LeafRecoveryView? = nil
+
         ) {
-            
-            
             self.coordinates = coordinates
-            
+
             self.entry = entry
-            
+
             self.recovery = recovery
-            
-            
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            
-            self.coordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .coordinates)
-            
-            
-            
-            
-            self.entry = try container.decode(BlueCatbirdChatDefs.ParticipantAcceptanceEntry.self, forKey: .entry)
-            
-            
-            
-            
-            self.recovery = try container.decode(BlueCatbirdChatDefs.LeafRecoveryView.self, forKey: .recovery)
-            
-            
-            
+
+            coordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .coordinates)
+
+            entry = try container.decode(OutputEntryUnion.self, forKey: .entry)
+
+            do {
+                recovery = try container.decodeIfPresent(BlueCatbirdChatDefs.LeafRecoveryView.self, forKey: .recovery)
+            } catch {
+                // Forward compatibility: a malformed optional field must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'recovery' — degrading to nil: \(error)")
+                recovery = nil
+            }
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(coordinates, forKey: .coordinates)
-            
-            
+
             try container.encode(entry, forKey: .entry)
-            
-            
-            try container.encode(recovery, forKey: .recovery)
-            
-            
+
+            // Encode optional property even if it's an empty array
+            try container.encodeIfPresent(recovery, forKey: .recovery)
         }
 
         public func toCBORValue() throws -> Any {
-            
             var map = OrderedCBORMap()
 
-            
-            
             let coordinatesValue = try coordinates.toCBORValue()
             map = map.adding(key: "coordinates", value: coordinatesValue)
-            
-            
-            
+
             let entryValue = try entry.toCBORValue()
             map = map.adding(key: "entry", value: entryValue)
-            
-            
-            
-            let recoveryValue = try recovery.toCBORValue()
-            map = map.adding(key: "recovery", value: recoveryValue)
-            
-            
+
+            if let value = recovery {
+                // Encode optional property even if it's an empty array for CBOR
+                let recoveryValue = try value.toCBORValue()
+                map = map.adding(key: "recovery", value: recoveryValue)
+            }
 
             return map
-            
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case coordinates
             case entry
             case recovery
         }
-        
     }
-        
-public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                case blockedRelationship = "BlockedRelationship"
-                case conversationNotFound = "ConversationNotFound"
-                case coordinateOverflow = "CoordinateOverflow"
-                case cutoverRequired = "CutoverRequired"
-                case deviceNotRegistered = "DeviceNotRegistered"
-                case deviceRevoked = "DeviceRevoked"
-                case groupInvitesDisabled = "GroupInvitesDisabled"
-                case idempotencyConflict = "IdempotencyConflict"
-                case invalidRequest = "InvalidRequest"
-                case invalidSignature = "InvalidSignature"
-                case invitationNotFound = "InvitationNotFound"
-                case invitationNotPending = "InvitationNotPending"
-                case invitationProvenanceMismatch = "InvitationProvenanceMismatch"
-                case keyPackageUnavailable = "KeyPackageUnavailable"
-                case messagesDisabled = "MessagesDisabled"
-                case notFollowedByRecipient = "NotFollowedByRecipient"
-                case notParticipant = "NotParticipant"
-                case relationshipPolicyUnavailable = "RelationshipPolicyUnavailable"
-                case staleCoordinates = "StaleCoordinates"
-                case accountSessionExpired = "AccountSessionExpired"
-                case notAuthorized = "NotAuthorized"
-                case deviceBindingMismatch = "DeviceBindingMismatch"
-                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
-                case rateLimited = "RateLimited"
-            public var description: String {
-                return self.rawValue
-            }
 
-            public var errorName: String {
-                return self.rawValue
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case blockedRelationship = "BlockedRelationship"
+        case conversationNotFound = "ConversationNotFound"
+        case coordinateOverflow = "CoordinateOverflow"
+        case cutoverRequired = "CutoverRequired"
+        case deviceNotRegistered = "DeviceNotRegistered"
+        case deviceRevoked = "DeviceRevoked"
+        case groupInvitesDisabled = "GroupInvitesDisabled"
+        case idempotencyConflict = "IdempotencyConflict"
+        case invalidRequest = "InvalidRequest"
+        case invalidSignature = "InvalidSignature"
+        case invitationNotFound = "InvitationNotFound"
+        case invitationNotPending = "InvitationNotPending"
+        case invitationProvenanceMismatch = "InvitationProvenanceMismatch"
+        case keyPackageUnavailable = "KeyPackageUnavailable"
+        case messagesDisabled = "MessagesDisabled"
+        case notFollowedByRecipient = "NotFollowedByRecipient"
+        case notParticipant = "NotParticipant"
+        case relationshipPolicyUnavailable = "RelationshipPolicyUnavailable"
+        case staleCoordinates = "StaleCoordinates"
+        case accountSessionExpired = "AccountSessionExpired"
+        case notAuthorized = "NotAuthorized"
+        case deviceBindingMismatch = "DeviceBindingMismatch"
+        case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+        case rateLimited = "RateLimited"
+        public var description: String {
+            return rawValue
+        }
+
+        public var errorName: String {
+            return rawValue
+        }
+    }
+
+    public enum InputSignedRequestUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsSignedParticipantAcceptance(BlueCatbirdChatDefs.SignedParticipantAcceptance)
+        case blueCatbirdChatDefsSignedDirectRequestAcceptance(BlueCatbirdChatDefs.SignedDirectRequestAcceptance)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.SignedParticipantAcceptance) {
+            self = .blueCatbirdChatDefsSignedParticipantAcceptance(value)
+        }
+
+        public init(_ value: BlueCatbirdChatDefs.SignedDirectRequestAcceptance) {
+            self = .blueCatbirdChatDefsSignedDirectRequestAcceptance(value)
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
+
+            switch typeValue {
+            case "blue.catbird.chat.defs#signedParticipantAcceptance":
+                let value = try BlueCatbirdChatDefs.SignedParticipantAcceptance(from: decoder)
+                self = .blueCatbirdChatDefsSignedParticipantAcceptance(value)
+            case "blue.catbird.chat.defs#signedDirectRequestAcceptance":
+                let value = try BlueCatbirdChatDefs.SignedDirectRequestAcceptance(from: decoder)
+                self = .blueCatbirdChatDefsSignedDirectRequestAcceptance(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
         }
 
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
 
+            switch self {
+            case let .blueCatbirdChatDefsSignedParticipantAcceptance(value):
+                try container.encode("blue.catbird.chat.defs#signedParticipantAcceptance", forKey: .type)
+                try value.encode(to: encoder)
+            case let .blueCatbirdChatDefsSignedDirectRequestAcceptance(value):
+                try container.encode("blue.catbird.chat.defs#signedDirectRequestAcceptance", forKey: .type)
+                try value.encode(to: encoder)
+            case let .unexpected(container):
+                try container.encode(to: encoder)
+            }
+        }
 
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case let .blueCatbirdChatDefsSignedParticipantAcceptance(value):
+                hasher.combine("blue.catbird.chat.defs#signedParticipantAcceptance")
+                hasher.combine(value)
+            case let .blueCatbirdChatDefsSignedDirectRequestAcceptance(value):
+                hasher.combine("blue.catbird.chat.defs#signedDirectRequestAcceptance")
+                hasher.combine(value)
+            case let .unexpected(container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: InputSignedRequestUnion, rhs: InputSignedRequestUnion) -> Bool {
+            switch (lhs, rhs) {
+            case let (.blueCatbirdChatDefsSignedParticipantAcceptance(lhsValue),
+                      .blueCatbirdChatDefsSignedParticipantAcceptance(rhsValue)):
+                return lhsValue == rhsValue
+            case let (.blueCatbirdChatDefsSignedDirectRequestAcceptance(lhsValue),
+                      .blueCatbirdChatDefsSignedDirectRequestAcceptance(rhsValue)):
+                return lhsValue == rhsValue
+            case let (.unexpected(lhsValue), .unexpected(rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? InputSignedRequestUnion else { return false }
+            return self == other
+        }
+
+        /// DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case let .blueCatbirdChatDefsSignedParticipantAcceptance(value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedParticipantAcceptance")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case let .blueCatbirdChatDefsSignedDirectRequestAcceptance(value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedDirectRequestAcceptance")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case let .unexpected(container):
+                return try container.toCBORValue()
+            }
+        }
+    }
+
+    public enum OutputEntryUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsParticipantAcceptanceEntry(BlueCatbirdChatDefs.ParticipantAcceptanceEntry)
+        case blueCatbirdChatDefsDirectRequestAcceptanceEntry(BlueCatbirdChatDefs.DirectRequestAcceptanceEntry)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.ParticipantAcceptanceEntry) {
+            self = .blueCatbirdChatDefsParticipantAcceptanceEntry(value)
+        }
+
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestAcceptanceEntry) {
+            self = .blueCatbirdChatDefsDirectRequestAcceptanceEntry(value)
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
+
+            switch typeValue {
+            case "blue.catbird.chat.defs#participantAcceptanceEntry":
+                let value = try BlueCatbirdChatDefs.ParticipantAcceptanceEntry(from: decoder)
+                self = .blueCatbirdChatDefsParticipantAcceptanceEntry(value)
+            case "blue.catbird.chat.defs#directRequestAcceptanceEntry":
+                let value = try BlueCatbirdChatDefs.DirectRequestAcceptanceEntry(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestAcceptanceEntry(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case let .blueCatbirdChatDefsParticipantAcceptanceEntry(value):
+                try container.encode("blue.catbird.chat.defs#participantAcceptanceEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case let .blueCatbirdChatDefsDirectRequestAcceptanceEntry(value):
+                try container.encode("blue.catbird.chat.defs#directRequestAcceptanceEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case let .unexpected(container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case let .blueCatbirdChatDefsParticipantAcceptanceEntry(value):
+                hasher.combine("blue.catbird.chat.defs#participantAcceptanceEntry")
+                hasher.combine(value)
+            case let .blueCatbirdChatDefsDirectRequestAcceptanceEntry(value):
+                hasher.combine("blue.catbird.chat.defs#directRequestAcceptanceEntry")
+                hasher.combine(value)
+            case let .unexpected(container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: OutputEntryUnion, rhs: OutputEntryUnion) -> Bool {
+            switch (lhs, rhs) {
+            case let (.blueCatbirdChatDefsParticipantAcceptanceEntry(lhsValue),
+                      .blueCatbirdChatDefsParticipantAcceptanceEntry(rhsValue)):
+                return lhsValue == rhsValue
+            case let (.blueCatbirdChatDefsDirectRequestAcceptanceEntry(lhsValue),
+                      .blueCatbirdChatDefsDirectRequestAcceptanceEntry(rhsValue)):
+                return lhsValue == rhsValue
+            case let (.unexpected(lhsValue), .unexpected(rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? OutputEntryUnion else { return false }
+            return self == other
+        }
+
+        /// DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case let .blueCatbirdChatDefsParticipantAcceptanceEntry(value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#participantAcceptanceEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case let .blueCatbirdChatDefsDirectRequestAcceptanceEntry(value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestAcceptanceEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case let .unexpected(container):
+                return try container.toCBORValue()
+            }
+        }
+    }
 }
 
-extension ATProtoClient.Blue.Catbird.Chat {
+public extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - acceptConversation
 
-    /// Accepts one exact pending invitation from the target participant's active registered device. Under the conversation mutation lock it verifies immutable invitation provenance, consent and every-pair block policy, changes only pending to active at prior stateVersion plus one, and atomically creates one add-kind target-device-signed recovery request with a request-bound KeyPackage reservation. A different current leaf later fulfills the one-device Add Commit and Welcome.
-    /// 
-    /// - Parameter input: The input parameters for the request
-    
-    /// 
+    // Accepts one exact pending invitation from the target participant's active registered device. Under the conversation mutation lock it verifies immutable invitation provenance, consent and every-pair block policy, changes only pending to active at prior stateVersion plus one, and atomically creates one add-kind target-device-signed recovery request with a request-bound KeyPackage reservation. A different current leaf later fulfills the one-device Add Commit and Welcome. Wire protocol 2 directRequestAcceptance is policy-only and never reserves or adds a leaf; accepted devices recover separately. Version 1 keeps its mandatory recovery semantics.
+    //
+    // - Parameter input: The input parameters for the request
+
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func acceptConversation(
-        
+    func acceptConversation(
         input: BlueCatbirdChatAcceptConversation.Input
-        
+
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatAcceptConversation.Output?) {
         let endpoint = "blue.catbird.chat.acceptConversation"
-        
-        var headers: [String: String] = [:]
-        
-        headers["Content-Type"] = "application/json"
-        
-        
-        
-        headers["Accept"] = "application/json"
-        
 
-        
+        var headers: [String: String] = [:]
+
+        headers["Content-Type"] = "application/json"
+
+        headers["Accept"] = "application/json"
+
         let requestData: Data? = try JSONEncoder().encode(input)
-        
-        
+
         let queryItems: [URLQueryItem]? = nil
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -229,12 +442,10 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-            
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -242,13 +453,11 @@ extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
-                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatAcceptConversation.Output.self, from: responseData)
-                
+
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -264,14 +473,9 @@ extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-            
-            
+
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-        
     }
-    
 }
-                           
-

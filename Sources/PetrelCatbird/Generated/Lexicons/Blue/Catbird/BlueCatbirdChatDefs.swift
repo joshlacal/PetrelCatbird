@@ -1099,9 +1099,10 @@ public struct DeviceCapability: ATProtocolCodable, ATProtocolValue {
             public let attachmentProfile: String
             public let metadataProfile: String
             public let typingProfile: String
+            public let directRequestProfile: DirectRequestProfile?
 
         public init(
-            protocolVersion: DefsProtocolVersion, mlsVersion: String, cipherSuite: DefsCipherSuite, credentialType: String, addByValue: String, updatePath: String, removeByValue: String, ratchetTreeGroupInfo: String, externalPubGroupInfo: String, applicationFrameProfile: String, controlProfile: String, attachmentProfile: String, metadataProfile: String, typingProfile: String
+            protocolVersion: DefsProtocolVersion, mlsVersion: String, cipherSuite: DefsCipherSuite, credentialType: String, addByValue: String, updatePath: String, removeByValue: String, ratchetTreeGroupInfo: String, externalPubGroupInfo: String, applicationFrameProfile: String, controlProfile: String, attachmentProfile: String, metadataProfile: String, typingProfile: String, directRequestProfile: DirectRequestProfile? = nil
         ) {
             self.protocolVersion = protocolVersion
             self.mlsVersion = mlsVersion
@@ -1117,6 +1118,7 @@ public struct DeviceCapability: ATProtocolCodable, ATProtocolValue {
             self.attachmentProfile = attachmentProfile
             self.metadataProfile = metadataProfile
             self.typingProfile = typingProfile
+            self.directRequestProfile = directRequestProfile
         }
 
         public init(from decoder: Decoder) throws {
@@ -1205,6 +1207,14 @@ public struct DeviceCapability: ATProtocolCodable, ATProtocolValue {
                 LogManager.logError("Decoding error for required property 'typingProfile': \(error)")
                 throw error
             }
+            do {
+                self.directRequestProfile = try container.decodeIfPresent(DirectRequestProfile.self, forKey: .directRequestProfile)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'directRequestProfile' — degrading to nil: \(error)")
+                self.directRequestProfile = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -1224,6 +1234,7 @@ public struct DeviceCapability: ATProtocolCodable, ATProtocolValue {
             try container.encode(attachmentProfile, forKey: .attachmentProfile)
             try container.encode(metadataProfile, forKey: .metadataProfile)
             try container.encode(typingProfile, forKey: .typingProfile)
+            try container.encodeIfPresent(directRequestProfile, forKey: .directRequestProfile)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -1241,6 +1252,11 @@ public struct DeviceCapability: ATProtocolCodable, ATProtocolValue {
             hasher.combine(attachmentProfile)
             hasher.combine(metadataProfile)
             hasher.combine(typingProfile)
+            if let value = directRequestProfile {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
@@ -1287,6 +1303,9 @@ public struct DeviceCapability: ATProtocolCodable, ATProtocolValue {
             if typingProfile != other.typingProfile {
                 return false
             }
+            if directRequestProfile != other.directRequestProfile {
+                return false
+            }
             return true
         }
 
@@ -1325,6 +1344,10 @@ public struct DeviceCapability: ATProtocolCodable, ATProtocolValue {
             map = map.adding(key: "metadataProfile", value: metadataProfileValue)
             let typingProfileValue = try typingProfile.toCBORValue()
             map = map.adding(key: "typingProfile", value: typingProfileValue)
+            if let value = directRequestProfile {
+                let directRequestProfileValue = try value.toCBORValue()
+                map = map.adding(key: "directRequestProfile", value: directRequestProfileValue)
+            }
             return map
         }
 
@@ -1344,6 +1367,7 @@ public struct DeviceCapability: ATProtocolCodable, ATProtocolValue {
             case attachmentProfile
             case metadataProfile
             case typingProfile
+            case directRequestProfile
         }
     }
         
@@ -1803,7 +1827,7 @@ public struct Participant: ATProtocolCodable, ATProtocolValue {
             public let invitationProvenance: InvitationProvenance?
 
         public init(
-            userDid: BareDid, role: DefsMemberRole, status: DefsParticipantStatus, invitationProvenance: InvitationProvenance?
+            userDid: BareDid, role: DefsMemberRole, status: DefsParticipantStatus, invitationProvenance: InvitationProvenance? = nil
         ) {
             self.userDid = userDid
             self.role = role
@@ -1916,7 +1940,7 @@ public struct ParticipantView: ATProtocolCodable, ATProtocolValue {
             public let leafCount: Int
 
         public init(
-            userDid: BareDid, role: DefsMemberRole, status: DefsParticipantStatus, invitationProvenance: InvitationProvenance?, leafCount: Int
+            userDid: BareDid, role: DefsMemberRole, status: DefsParticipantStatus, invitationProvenance: InvitationProvenance? = nil, leafCount: Int
         ) {
             self.userDid = userDid
             self.role = role
@@ -2043,7 +2067,7 @@ public struct DeviceLeaf: ATProtocolCodable, ATProtocolValue {
             public let joinKeyPackageRef: Bytes?
 
         public init(
-            userDid: BareDid, deviceId: DeviceId, leafOrigin: DefsLeafOrigin, joinKeyPackageRef: Bytes?
+            userDid: BareDid, deviceId: DeviceId, leafOrigin: DefsLeafOrigin, joinKeyPackageRef: Bytes? = nil
         ) {
             self.userDid = userDid
             self.deviceId = deviceId
@@ -2157,7 +2181,7 @@ public struct DeviceLeafView: ATProtocolCodable, ATProtocolValue {
             public let deviceStatus: DefsDeviceStatus
 
         public init(
-            userDid: BareDid, deviceId: DeviceId, leafOrigin: DefsLeafOrigin, joinKeyPackageRef: Bytes?, keyId: KeyId, deviceStatus: DefsDeviceStatus
+            userDid: BareDid, deviceId: DeviceId, leafOrigin: DefsLeafOrigin, joinKeyPackageRef: Bytes? = nil, keyId: KeyId, deviceStatus: DefsDeviceStatus
         ) {
             self.userDid = userDid
             self.deviceId = deviceId
@@ -3459,7 +3483,7 @@ public struct TransitionManifest: ATProtocolCodable, ATProtocolValue {
             public let leafRecoveryRequestId: OperationId?
 
         public init(
-            participantChanges: [ParticipantChange], leafChanges: [LeafChange], welcomeBundle: WelcomeBundle?, leafRecoveryRequestId: OperationId?
+            participantChanges: [ParticipantChange], leafChanges: [LeafChange], welcomeBundle: WelcomeBundle? = nil, leafRecoveryRequestId: OperationId? = nil
         ) {
             self.participantChanges = participantChanges
             self.leafChanges = leafChanges
@@ -6412,7 +6436,7 @@ public struct EncryptedImageEmbed: ATProtocolCodable, ATProtocolValue {
             public let blurhash: String?
 
         public init(
-            blobId: Bytes, purpose: String, algorithm: String, key: Bytes, nonce: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, plaintextSize: Int, mimeType: EncryptedImageEmbedMimeType, width: Int, height: Int, altText: String?, blurhash: String?
+            blobId: Bytes, purpose: String, algorithm: String, key: Bytes, nonce: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, plaintextSize: Int, mimeType: EncryptedImageEmbedMimeType, width: Int, height: Int, altText: String? = nil, blurhash: String? = nil
         ) {
             self.blobId = blobId
             self.purpose = purpose
@@ -6675,7 +6699,7 @@ public struct EncryptedAudioEmbed: ATProtocolCodable, ATProtocolValue {
             public let transcript: String?
 
         public init(
-            blobId: Bytes, purpose: String, algorithm: String, key: Bytes, nonce: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, plaintextSize: Int, mimeType: EncryptedAudioEmbedMimeType, durationMillis: Int, waveform: Bytes, transcript: String?
+            blobId: Bytes, purpose: String, algorithm: String, key: Bytes, nonce: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, plaintextSize: Int, mimeType: EncryptedAudioEmbedMimeType, durationMillis: Int, waveform: Bytes, transcript: String? = nil
         ) {
             self.blobId = blobId
             self.purpose = purpose
@@ -6978,7 +7002,7 @@ public struct ExternalLinkEmbed: ATProtocolCodable, ATProtocolValue {
             public let description: String?
 
         public init(
-            uri: URI, title: String?, description: String?
+            uri: URI, title: String? = nil, description: String? = nil
         ) {
             self.uri = uri
             self.title = title
@@ -7306,7 +7330,7 @@ public struct MessageFrameBody: ATProtocolCodable, ATProtocolValue {
             public let embed: ApplicationEmbed?
 
         public init(
-            text: String?, replyTo: MessageTarget?, embed: ApplicationEmbed?
+            text: String? = nil, replyTo: MessageTarget? = nil, embed: ApplicationEmbed? = nil
         ) {
             self.text = text
             self.replyTo = replyTo
@@ -8286,7 +8310,7 @@ public struct MetadataAvatarEmbed: ATProtocolCodable, ATProtocolValue {
             public let originalMetadataVersion: Int
 
         public init(
-            blobId: Bytes, purpose: String, algorithm: String, key: Bytes, nonce: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, plaintextSize: Int, mimeType: MetadataAvatarEmbedMimeType, width: Int, height: Int, altText: String?, blurhash: String?, originTransitionId: Bytes, originalMetadataVersion: Int
+            blobId: Bytes, purpose: String, algorithm: String, key: Bytes, nonce: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, plaintextSize: Int, mimeType: MetadataAvatarEmbedMimeType, width: Int, height: Int, altText: String? = nil, blurhash: String? = nil, originTransitionId: Bytes, originalMetadataVersion: Int
         ) {
             self.blobId = blobId
             self.purpose = purpose
@@ -8998,7 +9022,7 @@ public struct MetadataAad: ATProtocolCodable, ATProtocolValue {
             public let avatarBinding: MetadataAadAvatarBinding?
 
         public init(
-            `protocol`: String, version: Int, coordinate: MetadataCryptoContext, metadataVersion: Int, originTransitionId: Bytes, ciphertextSize: Int, avatarBinding: MetadataAadAvatarBinding?
+            `protocol`: String, version: Int, coordinate: MetadataCryptoContext, metadataVersion: Int, originTransitionId: Bytes, ciphertextSize: Int, avatarBinding: MetadataAadAvatarBinding? = nil
         ) {
             self.`protocol` = `protocol`
             self.version = version
@@ -9345,7 +9369,7 @@ public struct MetadataContentProjection: ATProtocolCodable, ATProtocolValue {
             public let avatar: MetadataAvatarEmbed?
 
         public init(
-            `protocol`: String, version: Int, originTransitionId: Bytes, metadataVersion: Int, authorDid: BareDid, authorDeviceId: Bytes, authorKeyId: KeyId, title: String, description: String?, avatar: MetadataAvatarEmbed?
+            `protocol`: String, version: Int, originTransitionId: Bytes, metadataVersion: Int, authorDid: BareDid, authorDeviceId: Bytes, authorKeyId: KeyId, title: String, description: String? = nil, avatar: MetadataAvatarEmbed? = nil
         ) {
             self.`protocol` = `protocol`
             self.version = version
@@ -9632,7 +9656,7 @@ public struct MetadataSnapshot: ATProtocolCodable, ATProtocolValue {
             public let authorProof: MetadataAuthorProof
 
         public init(
-            coordinate: MetadataCryptoContext, originTransitionId: OperationId, metadataVersion: Int, nonce: Bytes, ciphertext: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, avatarBinding: MetadataAvatarBinding?, authorProof: MetadataAuthorProof
+            coordinate: MetadataCryptoContext, originTransitionId: OperationId, metadataVersion: Int, nonce: Bytes, ciphertext: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, avatarBinding: MetadataAvatarBinding? = nil, authorProof: MetadataAuthorProof
         ) {
             self.coordinate = coordinate
             self.originTransitionId = originTransitionId
@@ -16846,9 +16870,10 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
             public let snapshotSeq: Int
             public let sequencerDid: BareDid?
             public let sequencerTerm: Int?
+            public let directRequest: DirectRequestState?
 
         public init(
-            conversationKind: DefsConversationKind, coordinates: ConversationCoordinates, cipherSuite: DefsCipherSuite, participants: [ParticipantView], leaves: [DeviceLeafView], metadataSnapshot: MetadataSnapshot, snapshotSeq: Int, sequencerDid: BareDid?, sequencerTerm: Int?
+            conversationKind: DefsConversationKind, coordinates: ConversationCoordinates, cipherSuite: DefsCipherSuite, participants: [ParticipantView], leaves: [DeviceLeafView], metadataSnapshot: MetadataSnapshot, snapshotSeq: Int, sequencerDid: BareDid? = nil, sequencerTerm: Int? = nil, directRequest: DirectRequestState? = nil
         ) {
             self.conversationKind = conversationKind
             self.coordinates = coordinates
@@ -16859,6 +16884,7 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
             self.snapshotSeq = snapshotSeq
             self.sequencerDid = sequencerDid
             self.sequencerTerm = sequencerTerm
+            self.directRequest = directRequest
         }
 
         public init(from decoder: Decoder) throws {
@@ -16921,6 +16947,14 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
                 LogManager.logWarning("Decoding error for optional property 'sequencerTerm' — degrading to nil: \(error)")
                 self.sequencerTerm = nil
             }
+            do {
+                self.directRequest = try container.decodeIfPresent(DirectRequestState.self, forKey: .directRequest)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'directRequest' — degrading to nil: \(error)")
+                self.directRequest = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -16935,6 +16969,7 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
             try container.encode(snapshotSeq, forKey: .snapshotSeq)
             try container.encodeIfPresent(sequencerDid, forKey: .sequencerDid)
             try container.encodeIfPresent(sequencerTerm, forKey: .sequencerTerm)
+            try container.encodeIfPresent(directRequest, forKey: .directRequest)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -16951,6 +16986,11 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
                 hasher.combine(nil as Int?)
             }
             if let value = sequencerTerm {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = directRequest {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
@@ -16986,6 +17026,9 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
             if sequencerTerm != other.sequencerTerm {
                 return false
             }
+            if directRequest != other.directRequest {
+                return false
+            }
             return true
         }
 
@@ -17018,6 +17061,10 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
                 let sequencerTermValue = try value.toCBORValue()
                 map = map.adding(key: "sequencerTerm", value: sequencerTermValue)
             }
+            if let value = directRequest {
+                let directRequestValue = try value.toCBORValue()
+                map = map.adding(key: "directRequest", value: directRequestValue)
+            }
             return map
         }
 
@@ -17032,17 +17079,20 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
             case snapshotSeq
             case sequencerDid
             case sequencerTerm
+            case directRequest
         }
     }
         
 public struct ConversationInventoryState: ATProtocolCodable, ATProtocolValue {
             public static let typeIdentifier = "blue.catbird.chat.defs#conversationInventoryState"
             public let state: ConversationState
+            public let directRequest: DirectRequestState?
 
         public init(
-            state: ConversationState
+            state: ConversationState, directRequest: DirectRequestState? = nil
         ) {
             self.state = state
+            self.directRequest = directRequest
         }
 
         public init(from decoder: Decoder) throws {
@@ -17053,21 +17103,38 @@ public struct ConversationInventoryState: ATProtocolCodable, ATProtocolValue {
                 LogManager.logError("Decoding error for required property 'state': \(error)")
                 throw error
             }
+            do {
+                self.directRequest = try container.decodeIfPresent(DirectRequestState.self, forKey: .directRequest)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'directRequest' — degrading to nil: \(error)")
+                self.directRequest = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
             try container.encode(state, forKey: .state)
+            try container.encodeIfPresent(directRequest, forKey: .directRequest)
         }
 
         public func hash(into hasher: inout Hasher) {
             hasher.combine(state)
+            if let value = directRequest {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
             if state != other.state {
+                return false
+            }
+            if directRequest != other.directRequest {
                 return false
             }
             return true
@@ -17082,12 +17149,17 @@ public struct ConversationInventoryState: ATProtocolCodable, ATProtocolValue {
             map = map.adding(key: "$type", value: Self.typeIdentifier)
             let stateValue = try state.toCBORValue()
             map = map.adding(key: "state", value: stateValue)
+            if let value = directRequest {
+                let directRequestValue = try value.toCBORValue()
+                map = map.adding(key: "directRequest", value: directRequestValue)
+            }
             return map
         }
 
         private enum CodingKeys: String, CodingKey {
             case typeIdentifier = "$type"
             case state
+            case directRequest
         }
     }
         
@@ -20050,11 +20122,6077 @@ public struct EventEnvelope: ATProtocolCodable, ATProtocolValue {
             case createdAt
         }
     }
+        
+public struct FreshDirectOrigin: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#freshDirectOrigin"
+
+        public init(
+            
+        ) {
+        }
+
+        public init(from decoder: Decoder) throws {
+            
+            let _ = decoder
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            
+            return other is Self
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+        }
+    }
+        
+public struct LegacyPendingDirectOrigin: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#legacyPendingDirectOrigin"
+            public let exactPrior: ConversationCoordinates
+            public let originalInvitationProvenance: InvitationProvenance
+
+        public init(
+            exactPrior: ConversationCoordinates, originalInvitationProvenance: InvitationProvenance
+        ) {
+            self.exactPrior = exactPrior
+            self.originalInvitationProvenance = originalInvitationProvenance
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.exactPrior = try container.decode(ConversationCoordinates.self, forKey: .exactPrior)
+            } catch {
+                LogManager.logError("Decoding error for required property 'exactPrior': \(error)")
+                throw error
+            }
+            do {
+                self.originalInvitationProvenance = try container.decode(InvitationProvenance.self, forKey: .originalInvitationProvenance)
+            } catch {
+                LogManager.logError("Decoding error for required property 'originalInvitationProvenance': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(exactPrior, forKey: .exactPrior)
+            try container.encode(originalInvitationProvenance, forKey: .originalInvitationProvenance)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(exactPrior)
+            hasher.combine(originalInvitationProvenance)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if exactPrior != other.exactPrior {
+                return false
+            }
+            if originalInvitationProvenance != other.originalInvitationProvenance {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let exactPriorValue = try exactPrior.toCBORValue()
+            map = map.adding(key: "exactPrior", value: exactPriorValue)
+            let originalInvitationProvenanceValue = try originalInvitationProvenance.toCBORValue()
+            map = map.adding(key: "originalInvitationProvenance", value: originalInvitationProvenanceValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case exactPrior
+            case originalInvitationProvenance
+        }
+    }
+        
+public struct GroupInvitationReference: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#groupInvitationReference"
+            public let authorityDid: BareDid
+            public let conversationId: OperationId
+            public let invitationTransitionId: OperationId
+            public let invitedByDid: BareDid
+            public let invitedByDeviceId: DeviceId
+            public let recipientDid: BareDid
+
+        public init(
+            authorityDid: BareDid, conversationId: OperationId, invitationTransitionId: OperationId, invitedByDid: BareDid, invitedByDeviceId: DeviceId, recipientDid: BareDid
+        ) {
+            self.authorityDid = authorityDid
+            self.conversationId = conversationId
+            self.invitationTransitionId = invitationTransitionId
+            self.invitedByDid = invitedByDid
+            self.invitedByDeviceId = invitedByDeviceId
+            self.recipientDid = recipientDid
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.authorityDid = try container.decode(BareDid.self, forKey: .authorityDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authorityDid': \(error)")
+                throw error
+            }
+            do {
+                self.conversationId = try container.decode(OperationId.self, forKey: .conversationId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'conversationId': \(error)")
+                throw error
+            }
+            do {
+                self.invitationTransitionId = try container.decode(OperationId.self, forKey: .invitationTransitionId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'invitationTransitionId': \(error)")
+                throw error
+            }
+            do {
+                self.invitedByDid = try container.decode(BareDid.self, forKey: .invitedByDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'invitedByDid': \(error)")
+                throw error
+            }
+            do {
+                self.invitedByDeviceId = try container.decode(DeviceId.self, forKey: .invitedByDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'invitedByDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.recipientDid = try container.decode(BareDid.self, forKey: .recipientDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recipientDid': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(authorityDid, forKey: .authorityDid)
+            try container.encode(conversationId, forKey: .conversationId)
+            try container.encode(invitationTransitionId, forKey: .invitationTransitionId)
+            try container.encode(invitedByDid, forKey: .invitedByDid)
+            try container.encode(invitedByDeviceId, forKey: .invitedByDeviceId)
+            try container.encode(recipientDid, forKey: .recipientDid)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(authorityDid)
+            hasher.combine(conversationId)
+            hasher.combine(invitationTransitionId)
+            hasher.combine(invitedByDid)
+            hasher.combine(invitedByDeviceId)
+            hasher.combine(recipientDid)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if authorityDid != other.authorityDid {
+                return false
+            }
+            if conversationId != other.conversationId {
+                return false
+            }
+            if invitationTransitionId != other.invitationTransitionId {
+                return false
+            }
+            if invitedByDid != other.invitedByDid {
+                return false
+            }
+            if invitedByDeviceId != other.invitedByDeviceId {
+                return false
+            }
+            if recipientDid != other.recipientDid {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let authorityDidValue = try authorityDid.toCBORValue()
+            map = map.adding(key: "authorityDid", value: authorityDidValue)
+            let conversationIdValue = try conversationId.toCBORValue()
+            map = map.adding(key: "conversationId", value: conversationIdValue)
+            let invitationTransitionIdValue = try invitationTransitionId.toCBORValue()
+            map = map.adding(key: "invitationTransitionId", value: invitationTransitionIdValue)
+            let invitedByDidValue = try invitedByDid.toCBORValue()
+            map = map.adding(key: "invitedByDid", value: invitedByDidValue)
+            let invitedByDeviceIdValue = try invitedByDeviceId.toCBORValue()
+            map = map.adding(key: "invitedByDeviceId", value: invitedByDeviceIdValue)
+            let recipientDidValue = try recipientDid.toCBORValue()
+            map = map.adding(key: "recipientDid", value: recipientDidValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case authorityDid
+            case conversationId
+            case invitationTransitionId
+            case invitedByDid
+            case invitedByDeviceId
+            case recipientDid
+        }
+    }
+        
+public struct DirectRequestGrantBody: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestGrantBody"
+            public let signatureDomain: String
+            public let protocolVersion: String
+            public let actorDid: BareDid
+            public let actorDeviceId: DeviceId
+            public let keyId: KeyId
+            public let authGeneration: Int
+            public let grantId: OperationId
+            public let grantRevision: Int
+            public let purpose: String
+            public let profile: DirectRequestProfile
+            public let keyPackageRef: Bytes
+            public let keyPackageSha256: Bytes
+            public let expiresAt: CanonicalDatetime
+            public let idempotencyKey: OperationId
+            public let signedAt: CanonicalDatetime
+
+        public init(
+            signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, grantId: OperationId, grantRevision: Int, purpose: String, profile: DirectRequestProfile, keyPackageRef: Bytes, keyPackageSha256: Bytes, expiresAt: CanonicalDatetime, idempotencyKey: OperationId, signedAt: CanonicalDatetime
+        ) {
+            self.signatureDomain = signatureDomain
+            self.protocolVersion = protocolVersion
+            self.actorDid = actorDid
+            self.actorDeviceId = actorDeviceId
+            self.keyId = keyId
+            self.authGeneration = authGeneration
+            self.grantId = grantId
+            self.grantRevision = grantRevision
+            self.purpose = purpose
+            self.profile = profile
+            self.keyPackageRef = keyPackageRef
+            self.keyPackageSha256 = keyPackageSha256
+            self.expiresAt = expiresAt
+            self.idempotencyKey = idempotencyKey
+            self.signedAt = signedAt
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.signatureDomain = try container.decode(String.self, forKey: .signatureDomain)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signatureDomain': \(error)")
+                throw error
+            }
+            do {
+                self.protocolVersion = try container.decode(String.self, forKey: .protocolVersion)
+            } catch {
+                LogManager.logError("Decoding error for required property 'protocolVersion': \(error)")
+                throw error
+            }
+            do {
+                self.actorDid = try container.decode(BareDid.self, forKey: .actorDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDid': \(error)")
+                throw error
+            }
+            do {
+                self.actorDeviceId = try container.decode(DeviceId.self, forKey: .actorDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.keyId = try container.decode(KeyId.self, forKey: .keyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyId': \(error)")
+                throw error
+            }
+            do {
+                self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authGeneration': \(error)")
+                throw error
+            }
+            do {
+                self.grantId = try container.decode(OperationId.self, forKey: .grantId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'grantId': \(error)")
+                throw error
+            }
+            do {
+                self.grantRevision = try container.decode(Int.self, forKey: .grantRevision)
+            } catch {
+                LogManager.logError("Decoding error for required property 'grantRevision': \(error)")
+                throw error
+            }
+            do {
+                self.purpose = try container.decode(String.self, forKey: .purpose)
+            } catch {
+                LogManager.logError("Decoding error for required property 'purpose': \(error)")
+                throw error
+            }
+            do {
+                self.profile = try container.decode(DirectRequestProfile.self, forKey: .profile)
+            } catch {
+                LogManager.logError("Decoding error for required property 'profile': \(error)")
+                throw error
+            }
+            do {
+                self.keyPackageRef = try container.decode(Bytes.self, forKey: .keyPackageRef)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyPackageRef': \(error)")
+                throw error
+            }
+            do {
+                self.keyPackageSha256 = try container.decode(Bytes.self, forKey: .keyPackageSha256)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyPackageSha256': \(error)")
+                throw error
+            }
+            do {
+                self.expiresAt = try container.decode(CanonicalDatetime.self, forKey: .expiresAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'expiresAt': \(error)")
+                throw error
+            }
+            do {
+                self.idempotencyKey = try container.decode(OperationId.self, forKey: .idempotencyKey)
+            } catch {
+                LogManager.logError("Decoding error for required property 'idempotencyKey': \(error)")
+                throw error
+            }
+            do {
+                self.signedAt = try container.decode(CanonicalDatetime.self, forKey: .signedAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signedAt': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(signatureDomain, forKey: .signatureDomain)
+            try container.encode(protocolVersion, forKey: .protocolVersion)
+            try container.encode(actorDid, forKey: .actorDid)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(keyId, forKey: .keyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
+            try container.encode(grantId, forKey: .grantId)
+            try container.encode(grantRevision, forKey: .grantRevision)
+            try container.encode(purpose, forKey: .purpose)
+            try container.encode(profile, forKey: .profile)
+            try container.encode(keyPackageRef, forKey: .keyPackageRef)
+            try container.encode(keyPackageSha256, forKey: .keyPackageSha256)
+            try container.encode(expiresAt, forKey: .expiresAt)
+            try container.encode(idempotencyKey, forKey: .idempotencyKey)
+            try container.encode(signedAt, forKey: .signedAt)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(signatureDomain)
+            hasher.combine(protocolVersion)
+            hasher.combine(actorDid)
+            hasher.combine(actorDeviceId)
+            hasher.combine(keyId)
+            hasher.combine(authGeneration)
+            hasher.combine(grantId)
+            hasher.combine(grantRevision)
+            hasher.combine(purpose)
+            hasher.combine(profile)
+            hasher.combine(keyPackageRef)
+            hasher.combine(keyPackageSha256)
+            hasher.combine(expiresAt)
+            hasher.combine(idempotencyKey)
+            hasher.combine(signedAt)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if signatureDomain != other.signatureDomain {
+                return false
+            }
+            if protocolVersion != other.protocolVersion {
+                return false
+            }
+            if actorDid != other.actorDid {
+                return false
+            }
+            if actorDeviceId != other.actorDeviceId {
+                return false
+            }
+            if keyId != other.keyId {
+                return false
+            }
+            if authGeneration != other.authGeneration {
+                return false
+            }
+            if grantId != other.grantId {
+                return false
+            }
+            if grantRevision != other.grantRevision {
+                return false
+            }
+            if purpose != other.purpose {
+                return false
+            }
+            if profile != other.profile {
+                return false
+            }
+            if keyPackageRef != other.keyPackageRef {
+                return false
+            }
+            if keyPackageSha256 != other.keyPackageSha256 {
+                return false
+            }
+            if expiresAt != other.expiresAt {
+                return false
+            }
+            if idempotencyKey != other.idempotencyKey {
+                return false
+            }
+            if signedAt != other.signedAt {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let signatureDomainValue = try signatureDomain.toCBORValue()
+            map = map.adding(key: "signatureDomain", value: signatureDomainValue)
+            let protocolVersionValue = try protocolVersion.toCBORValue()
+            map = map.adding(key: "protocolVersion", value: protocolVersionValue)
+            let actorDidValue = try actorDid.toCBORValue()
+            map = map.adding(key: "actorDid", value: actorDidValue)
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let keyIdValue = try keyId.toCBORValue()
+            map = map.adding(key: "keyId", value: keyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
+            let grantIdValue = try grantId.toCBORValue()
+            map = map.adding(key: "grantId", value: grantIdValue)
+            let grantRevisionValue = try grantRevision.toCBORValue()
+            map = map.adding(key: "grantRevision", value: grantRevisionValue)
+            let purposeValue = try purpose.toCBORValue()
+            map = map.adding(key: "purpose", value: purposeValue)
+            let profileValue = try profile.toCBORValue()
+            map = map.adding(key: "profile", value: profileValue)
+            let keyPackageRefValue = try keyPackageRef.toCBORValue()
+            map = map.adding(key: "keyPackageRef", value: keyPackageRefValue)
+            let keyPackageSha256Value = try keyPackageSha256.toCBORValue()
+            map = map.adding(key: "keyPackageSha256", value: keyPackageSha256Value)
+            let expiresAtValue = try expiresAt.toCBORValue()
+            map = map.adding(key: "expiresAt", value: expiresAtValue)
+            let idempotencyKeyValue = try idempotencyKey.toCBORValue()
+            map = map.adding(key: "idempotencyKey", value: idempotencyKeyValue)
+            let signedAtValue = try signedAt.toCBORValue()
+            map = map.adding(key: "signedAt", value: signedAtValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case signatureDomain
+            case protocolVersion
+            case actorDid
+            case actorDeviceId
+            case keyId
+            case authGeneration
+            case grantId
+            case grantRevision
+            case purpose
+            case profile
+            case keyPackageRef
+            case keyPackageSha256
+            case expiresAt
+            case idempotencyKey
+            case signedAt
+        }
+    }
+        
+public struct SignedDirectRequestGrant: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestGrant"
+            public let body: SignedDirectRequestGrantBodyUnion
+            public let signature: Bytes
+
+        public init(
+            body: SignedDirectRequestGrantBodyUnion, signature: Bytes
+        ) {
+            self.body = body
+            self.signature = signature
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.body = try container.decode(SignedDirectRequestGrantBodyUnion.self, forKey: .body)
+            } catch {
+                LogManager.logError("Decoding error for required property 'body': \(error)")
+                throw error
+            }
+            do {
+                self.signature = try container.decode(Bytes.self, forKey: .signature)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signature': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(body, forKey: .body)
+            try container.encode(signature, forKey: .signature)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(body)
+            hasher.combine(signature)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if body != other.body {
+                return false
+            }
+            if signature != other.signature {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let bodyValue = try body.toCBORValue()
+            map = map.adding(key: "body", value: bodyValue)
+            let signatureValue = try signature.toCBORValue()
+            map = map.adding(key: "signature", value: signatureValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case body
+            case signature
+        }
+    }
+        
+public struct DirectRequestKey: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestKey"
+            public let keyPackage: KeyPackageArtifact
+            public let grant: SignedDirectRequestGrant
+
+        public init(
+            keyPackage: KeyPackageArtifact, grant: SignedDirectRequestGrant
+        ) {
+            self.keyPackage = keyPackage
+            self.grant = grant
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.keyPackage = try container.decode(KeyPackageArtifact.self, forKey: .keyPackage)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyPackage': \(error)")
+                throw error
+            }
+            do {
+                self.grant = try container.decode(SignedDirectRequestGrant.self, forKey: .grant)
+            } catch {
+                LogManager.logError("Decoding error for required property 'grant': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(keyPackage, forKey: .keyPackage)
+            try container.encode(grant, forKey: .grant)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(keyPackage)
+            hasher.combine(grant)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if keyPackage != other.keyPackage {
+                return false
+            }
+            if grant != other.grant {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let keyPackageValue = try keyPackage.toCBORValue()
+            map = map.adding(key: "keyPackage", value: keyPackageValue)
+            let grantValue = try grant.toCBORValue()
+            map = map.adding(key: "grant", value: grantValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case keyPackage
+            case grant
+        }
+    }
+        
+public struct DirectRequestKeysPublicationBody: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestKeysPublicationBody"
+            public let signatureDomain: String
+            public let protocolVersion: String
+            public let actorDid: BareDid
+            public let actorDeviceId: DeviceId
+            public let keyId: KeyId
+            public let authGeneration: Int
+            public let revision: Int
+            public let enabled: Bool
+            public let keys: [DirectRequestKey]
+            public let idempotencyKey: OperationId
+            public let signedAt: CanonicalDatetime
+
+        public init(
+            signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, revision: Int, enabled: Bool, keys: [DirectRequestKey], idempotencyKey: OperationId, signedAt: CanonicalDatetime
+        ) {
+            self.signatureDomain = signatureDomain
+            self.protocolVersion = protocolVersion
+            self.actorDid = actorDid
+            self.actorDeviceId = actorDeviceId
+            self.keyId = keyId
+            self.authGeneration = authGeneration
+            self.revision = revision
+            self.enabled = enabled
+            self.keys = keys
+            self.idempotencyKey = idempotencyKey
+            self.signedAt = signedAt
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.signatureDomain = try container.decode(String.self, forKey: .signatureDomain)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signatureDomain': \(error)")
+                throw error
+            }
+            do {
+                self.protocolVersion = try container.decode(String.self, forKey: .protocolVersion)
+            } catch {
+                LogManager.logError("Decoding error for required property 'protocolVersion': \(error)")
+                throw error
+            }
+            do {
+                self.actorDid = try container.decode(BareDid.self, forKey: .actorDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDid': \(error)")
+                throw error
+            }
+            do {
+                self.actorDeviceId = try container.decode(DeviceId.self, forKey: .actorDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.keyId = try container.decode(KeyId.self, forKey: .keyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyId': \(error)")
+                throw error
+            }
+            do {
+                self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authGeneration': \(error)")
+                throw error
+            }
+            do {
+                self.revision = try container.decode(Int.self, forKey: .revision)
+            } catch {
+                LogManager.logError("Decoding error for required property 'revision': \(error)")
+                throw error
+            }
+            do {
+                self.enabled = try container.decode(Bool.self, forKey: .enabled)
+            } catch {
+                LogManager.logError("Decoding error for required property 'enabled': \(error)")
+                throw error
+            }
+            do {
+                self.keys = try container.decode([DirectRequestKey].self, forKey: .keys)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keys': \(error)")
+                throw error
+            }
+            do {
+                self.idempotencyKey = try container.decode(OperationId.self, forKey: .idempotencyKey)
+            } catch {
+                LogManager.logError("Decoding error for required property 'idempotencyKey': \(error)")
+                throw error
+            }
+            do {
+                self.signedAt = try container.decode(CanonicalDatetime.self, forKey: .signedAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signedAt': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(signatureDomain, forKey: .signatureDomain)
+            try container.encode(protocolVersion, forKey: .protocolVersion)
+            try container.encode(actorDid, forKey: .actorDid)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(keyId, forKey: .keyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
+            try container.encode(revision, forKey: .revision)
+            try container.encode(enabled, forKey: .enabled)
+            try container.encode(keys, forKey: .keys)
+            try container.encode(idempotencyKey, forKey: .idempotencyKey)
+            try container.encode(signedAt, forKey: .signedAt)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(signatureDomain)
+            hasher.combine(protocolVersion)
+            hasher.combine(actorDid)
+            hasher.combine(actorDeviceId)
+            hasher.combine(keyId)
+            hasher.combine(authGeneration)
+            hasher.combine(revision)
+            hasher.combine(enabled)
+            hasher.combine(keys)
+            hasher.combine(idempotencyKey)
+            hasher.combine(signedAt)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if signatureDomain != other.signatureDomain {
+                return false
+            }
+            if protocolVersion != other.protocolVersion {
+                return false
+            }
+            if actorDid != other.actorDid {
+                return false
+            }
+            if actorDeviceId != other.actorDeviceId {
+                return false
+            }
+            if keyId != other.keyId {
+                return false
+            }
+            if authGeneration != other.authGeneration {
+                return false
+            }
+            if revision != other.revision {
+                return false
+            }
+            if enabled != other.enabled {
+                return false
+            }
+            if keys != other.keys {
+                return false
+            }
+            if idempotencyKey != other.idempotencyKey {
+                return false
+            }
+            if signedAt != other.signedAt {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let signatureDomainValue = try signatureDomain.toCBORValue()
+            map = map.adding(key: "signatureDomain", value: signatureDomainValue)
+            let protocolVersionValue = try protocolVersion.toCBORValue()
+            map = map.adding(key: "protocolVersion", value: protocolVersionValue)
+            let actorDidValue = try actorDid.toCBORValue()
+            map = map.adding(key: "actorDid", value: actorDidValue)
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let keyIdValue = try keyId.toCBORValue()
+            map = map.adding(key: "keyId", value: keyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
+            let revisionValue = try revision.toCBORValue()
+            map = map.adding(key: "revision", value: revisionValue)
+            let enabledValue = try enabled.toCBORValue()
+            map = map.adding(key: "enabled", value: enabledValue)
+            let keysValue = try keys.toCBORValue()
+            map = map.adding(key: "keys", value: keysValue)
+            let idempotencyKeyValue = try idempotencyKey.toCBORValue()
+            map = map.adding(key: "idempotencyKey", value: idempotencyKeyValue)
+            let signedAtValue = try signedAt.toCBORValue()
+            map = map.adding(key: "signedAt", value: signedAtValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case signatureDomain
+            case protocolVersion
+            case actorDid
+            case actorDeviceId
+            case keyId
+            case authGeneration
+            case revision
+            case enabled
+            case keys
+            case idempotencyKey
+            case signedAt
+        }
+    }
+        
+public struct SignedDirectRequestKeysPublication: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestKeysPublication"
+            public let body: SignedDirectRequestKeysPublicationBodyUnion
+            public let signature: Bytes
+
+        public init(
+            body: SignedDirectRequestKeysPublicationBodyUnion, signature: Bytes
+        ) {
+            self.body = body
+            self.signature = signature
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.body = try container.decode(SignedDirectRequestKeysPublicationBodyUnion.self, forKey: .body)
+            } catch {
+                LogManager.logError("Decoding error for required property 'body': \(error)")
+                throw error
+            }
+            do {
+                self.signature = try container.decode(Bytes.self, forKey: .signature)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signature': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(body, forKey: .body)
+            try container.encode(signature, forKey: .signature)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(body)
+            hasher.combine(signature)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if body != other.body {
+                return false
+            }
+            if signature != other.signature {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let bodyValue = try body.toCBORValue()
+            map = map.adding(key: "body", value: bodyValue)
+            let signatureValue = try signature.toCBORValue()
+            map = map.adding(key: "signature", value: signatureValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case body
+            case signature
+        }
+    }
+        
+public struct DirectRequestPreparationBody: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPreparationBody"
+            public let signatureDomain: String
+            public let protocolVersion: String
+            public let actorDid: BareDid
+            public let actorDeviceId: DeviceId
+            public let keyId: KeyId
+            public let authGeneration: Int
+            public let requestId: OperationId
+            public let firstMessageId: OperationId
+            public let conversationId: OperationId
+            public let recipientDid: BareDid
+            public let origin: DirectRequestOrigin
+            public let profile: DirectRequestProfile
+            public let idempotencyKey: OperationId
+            public let signedAt: CanonicalDatetime
+
+        public init(
+            signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, requestId: OperationId, firstMessageId: OperationId, conversationId: OperationId, recipientDid: BareDid, origin: DirectRequestOrigin, profile: DirectRequestProfile, idempotencyKey: OperationId, signedAt: CanonicalDatetime
+        ) {
+            self.signatureDomain = signatureDomain
+            self.protocolVersion = protocolVersion
+            self.actorDid = actorDid
+            self.actorDeviceId = actorDeviceId
+            self.keyId = keyId
+            self.authGeneration = authGeneration
+            self.requestId = requestId
+            self.firstMessageId = firstMessageId
+            self.conversationId = conversationId
+            self.recipientDid = recipientDid
+            self.origin = origin
+            self.profile = profile
+            self.idempotencyKey = idempotencyKey
+            self.signedAt = signedAt
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.signatureDomain = try container.decode(String.self, forKey: .signatureDomain)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signatureDomain': \(error)")
+                throw error
+            }
+            do {
+                self.protocolVersion = try container.decode(String.self, forKey: .protocolVersion)
+            } catch {
+                LogManager.logError("Decoding error for required property 'protocolVersion': \(error)")
+                throw error
+            }
+            do {
+                self.actorDid = try container.decode(BareDid.self, forKey: .actorDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDid': \(error)")
+                throw error
+            }
+            do {
+                self.actorDeviceId = try container.decode(DeviceId.self, forKey: .actorDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.keyId = try container.decode(KeyId.self, forKey: .keyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyId': \(error)")
+                throw error
+            }
+            do {
+                self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authGeneration': \(error)")
+                throw error
+            }
+            do {
+                self.requestId = try container.decode(OperationId.self, forKey: .requestId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestId': \(error)")
+                throw error
+            }
+            do {
+                self.firstMessageId = try container.decode(OperationId.self, forKey: .firstMessageId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'firstMessageId': \(error)")
+                throw error
+            }
+            do {
+                self.conversationId = try container.decode(OperationId.self, forKey: .conversationId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'conversationId': \(error)")
+                throw error
+            }
+            do {
+                self.recipientDid = try container.decode(BareDid.self, forKey: .recipientDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recipientDid': \(error)")
+                throw error
+            }
+            do {
+                self.origin = try container.decode(DirectRequestOrigin.self, forKey: .origin)
+            } catch {
+                LogManager.logError("Decoding error for required property 'origin': \(error)")
+                throw error
+            }
+            do {
+                self.profile = try container.decode(DirectRequestProfile.self, forKey: .profile)
+            } catch {
+                LogManager.logError("Decoding error for required property 'profile': \(error)")
+                throw error
+            }
+            do {
+                self.idempotencyKey = try container.decode(OperationId.self, forKey: .idempotencyKey)
+            } catch {
+                LogManager.logError("Decoding error for required property 'idempotencyKey': \(error)")
+                throw error
+            }
+            do {
+                self.signedAt = try container.decode(CanonicalDatetime.self, forKey: .signedAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signedAt': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(signatureDomain, forKey: .signatureDomain)
+            try container.encode(protocolVersion, forKey: .protocolVersion)
+            try container.encode(actorDid, forKey: .actorDid)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(keyId, forKey: .keyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
+            try container.encode(requestId, forKey: .requestId)
+            try container.encode(firstMessageId, forKey: .firstMessageId)
+            try container.encode(conversationId, forKey: .conversationId)
+            try container.encode(recipientDid, forKey: .recipientDid)
+            try container.encode(origin, forKey: .origin)
+            try container.encode(profile, forKey: .profile)
+            try container.encode(idempotencyKey, forKey: .idempotencyKey)
+            try container.encode(signedAt, forKey: .signedAt)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(signatureDomain)
+            hasher.combine(protocolVersion)
+            hasher.combine(actorDid)
+            hasher.combine(actorDeviceId)
+            hasher.combine(keyId)
+            hasher.combine(authGeneration)
+            hasher.combine(requestId)
+            hasher.combine(firstMessageId)
+            hasher.combine(conversationId)
+            hasher.combine(recipientDid)
+            hasher.combine(origin)
+            hasher.combine(profile)
+            hasher.combine(idempotencyKey)
+            hasher.combine(signedAt)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if signatureDomain != other.signatureDomain {
+                return false
+            }
+            if protocolVersion != other.protocolVersion {
+                return false
+            }
+            if actorDid != other.actorDid {
+                return false
+            }
+            if actorDeviceId != other.actorDeviceId {
+                return false
+            }
+            if keyId != other.keyId {
+                return false
+            }
+            if authGeneration != other.authGeneration {
+                return false
+            }
+            if requestId != other.requestId {
+                return false
+            }
+            if firstMessageId != other.firstMessageId {
+                return false
+            }
+            if conversationId != other.conversationId {
+                return false
+            }
+            if recipientDid != other.recipientDid {
+                return false
+            }
+            if origin != other.origin {
+                return false
+            }
+            if profile != other.profile {
+                return false
+            }
+            if idempotencyKey != other.idempotencyKey {
+                return false
+            }
+            if signedAt != other.signedAt {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let signatureDomainValue = try signatureDomain.toCBORValue()
+            map = map.adding(key: "signatureDomain", value: signatureDomainValue)
+            let protocolVersionValue = try protocolVersion.toCBORValue()
+            map = map.adding(key: "protocolVersion", value: protocolVersionValue)
+            let actorDidValue = try actorDid.toCBORValue()
+            map = map.adding(key: "actorDid", value: actorDidValue)
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let keyIdValue = try keyId.toCBORValue()
+            map = map.adding(key: "keyId", value: keyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
+            let firstMessageIdValue = try firstMessageId.toCBORValue()
+            map = map.adding(key: "firstMessageId", value: firstMessageIdValue)
+            let conversationIdValue = try conversationId.toCBORValue()
+            map = map.adding(key: "conversationId", value: conversationIdValue)
+            let recipientDidValue = try recipientDid.toCBORValue()
+            map = map.adding(key: "recipientDid", value: recipientDidValue)
+            let originValue = try origin.toCBORValue()
+            map = map.adding(key: "origin", value: originValue)
+            let profileValue = try profile.toCBORValue()
+            map = map.adding(key: "profile", value: profileValue)
+            let idempotencyKeyValue = try idempotencyKey.toCBORValue()
+            map = map.adding(key: "idempotencyKey", value: idempotencyKeyValue)
+            let signedAtValue = try signedAt.toCBORValue()
+            map = map.adding(key: "signedAt", value: signedAtValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case signatureDomain
+            case protocolVersion
+            case actorDid
+            case actorDeviceId
+            case keyId
+            case authGeneration
+            case requestId
+            case firstMessageId
+            case conversationId
+            case recipientDid
+            case origin
+            case profile
+            case idempotencyKey
+            case signedAt
+        }
+    }
+        
+public struct SignedDirectRequestPreparation: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestPreparation"
+            public let body: SignedDirectRequestPreparationBodyUnion
+            public let signature: Bytes
+
+        public init(
+            body: SignedDirectRequestPreparationBodyUnion, signature: Bytes
+        ) {
+            self.body = body
+            self.signature = signature
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.body = try container.decode(SignedDirectRequestPreparationBodyUnion.self, forKey: .body)
+            } catch {
+                LogManager.logError("Decoding error for required property 'body': \(error)")
+                throw error
+            }
+            do {
+                self.signature = try container.decode(Bytes.self, forKey: .signature)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signature': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(body, forKey: .body)
+            try container.encode(signature, forKey: .signature)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(body)
+            hasher.combine(signature)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if body != other.body {
+                return false
+            }
+            if signature != other.signature {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let bodyValue = try body.toCBORValue()
+            map = map.adding(key: "body", value: bodyValue)
+            let signatureValue = try signature.toCBORValue()
+            map = map.adding(key: "signature", value: signatureValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case body
+            case signature
+        }
+    }
+        
+public struct DirectRequestSelectedDevice: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestSelectedDevice"
+            public let actorDid: BareDid
+            public let actorDeviceId: DeviceId
+            public let keyId: KeyId
+            public let authGeneration: Int
+            public let keyPackage: KeyPackageArtifact
+            public let grant: SignedDirectRequestGrant
+
+        public init(
+            actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, keyPackage: KeyPackageArtifact, grant: SignedDirectRequestGrant
+        ) {
+            self.actorDid = actorDid
+            self.actorDeviceId = actorDeviceId
+            self.keyId = keyId
+            self.authGeneration = authGeneration
+            self.keyPackage = keyPackage
+            self.grant = grant
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.actorDid = try container.decode(BareDid.self, forKey: .actorDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDid': \(error)")
+                throw error
+            }
+            do {
+                self.actorDeviceId = try container.decode(DeviceId.self, forKey: .actorDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.keyId = try container.decode(KeyId.self, forKey: .keyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyId': \(error)")
+                throw error
+            }
+            do {
+                self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authGeneration': \(error)")
+                throw error
+            }
+            do {
+                self.keyPackage = try container.decode(KeyPackageArtifact.self, forKey: .keyPackage)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyPackage': \(error)")
+                throw error
+            }
+            do {
+                self.grant = try container.decode(SignedDirectRequestGrant.self, forKey: .grant)
+            } catch {
+                LogManager.logError("Decoding error for required property 'grant': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(actorDid, forKey: .actorDid)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(keyId, forKey: .keyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
+            try container.encode(keyPackage, forKey: .keyPackage)
+            try container.encode(grant, forKey: .grant)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(actorDid)
+            hasher.combine(actorDeviceId)
+            hasher.combine(keyId)
+            hasher.combine(authGeneration)
+            hasher.combine(keyPackage)
+            hasher.combine(grant)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if actorDid != other.actorDid {
+                return false
+            }
+            if actorDeviceId != other.actorDeviceId {
+                return false
+            }
+            if keyId != other.keyId {
+                return false
+            }
+            if authGeneration != other.authGeneration {
+                return false
+            }
+            if keyPackage != other.keyPackage {
+                return false
+            }
+            if grant != other.grant {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let actorDidValue = try actorDid.toCBORValue()
+            map = map.adding(key: "actorDid", value: actorDidValue)
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let keyIdValue = try keyId.toCBORValue()
+            map = map.adding(key: "keyId", value: keyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
+            let keyPackageValue = try keyPackage.toCBORValue()
+            map = map.adding(key: "keyPackage", value: keyPackageValue)
+            let grantValue = try grant.toCBORValue()
+            map = map.adding(key: "grant", value: grantValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case actorDid
+            case actorDeviceId
+            case keyId
+            case authGeneration
+            case keyPackage
+            case grant
+        }
+    }
+        
+public struct DirectRequestCreator: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestCreator"
+            public let actorDid: BareDid
+            public let actorDeviceId: DeviceId
+            public let keyId: KeyId
+            public let authGeneration: Int
+
+        public init(
+            actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int
+        ) {
+            self.actorDid = actorDid
+            self.actorDeviceId = actorDeviceId
+            self.keyId = keyId
+            self.authGeneration = authGeneration
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.actorDid = try container.decode(BareDid.self, forKey: .actorDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDid': \(error)")
+                throw error
+            }
+            do {
+                self.actorDeviceId = try container.decode(DeviceId.self, forKey: .actorDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.keyId = try container.decode(KeyId.self, forKey: .keyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyId': \(error)")
+                throw error
+            }
+            do {
+                self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authGeneration': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(actorDid, forKey: .actorDid)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(keyId, forKey: .keyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(actorDid)
+            hasher.combine(actorDeviceId)
+            hasher.combine(keyId)
+            hasher.combine(authGeneration)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if actorDid != other.actorDid {
+                return false
+            }
+            if actorDeviceId != other.actorDeviceId {
+                return false
+            }
+            if keyId != other.keyId {
+                return false
+            }
+            if authGeneration != other.authGeneration {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let actorDidValue = try actorDid.toCBORValue()
+            map = map.adding(key: "actorDid", value: actorDidValue)
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let keyIdValue = try keyId.toCBORValue()
+            map = map.adding(key: "keyId", value: keyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case actorDid
+            case actorDeviceId
+            case keyId
+            case authGeneration
+        }
+    }
+        
+public struct DirectRequestPreparationView: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPreparationView"
+            public let protocolVersion: String
+            public let requestId: OperationId
+            public let firstMessageId: OperationId
+            public let conversationId: OperationId
+            public let recipientDid: BareDid
+            public let origin: DirectRequestOrigin
+            public let profile: DirectRequestProfile
+            public let preparationDigest: Bytes
+            public let preparationSignature: Bytes
+            public let creator: DirectRequestCreator
+            public let selectedDevices: [DirectRequestSelectedDevice]
+            public let preparedAt: CanonicalDatetime
+            public let leaseExpiresAt: CanonicalDatetime
+            public let minimumImportUntil: CanonicalDatetime
+            public let preparationRequestDigest: Bytes
+            public let authorityDid: String
+            public let receiptKeyId: DirectRequestReceiptKeyId
+
+        public init(
+            protocolVersion: String, requestId: OperationId, firstMessageId: OperationId, conversationId: OperationId, recipientDid: BareDid, origin: DirectRequestOrigin, profile: DirectRequestProfile, preparationDigest: Bytes, preparationSignature: Bytes, creator: DirectRequestCreator, selectedDevices: [DirectRequestSelectedDevice], preparedAt: CanonicalDatetime, leaseExpiresAt: CanonicalDatetime, minimumImportUntil: CanonicalDatetime, preparationRequestDigest: Bytes, authorityDid: String, receiptKeyId: DirectRequestReceiptKeyId
+        ) {
+            self.protocolVersion = protocolVersion
+            self.requestId = requestId
+            self.firstMessageId = firstMessageId
+            self.conversationId = conversationId
+            self.recipientDid = recipientDid
+            self.origin = origin
+            self.profile = profile
+            self.preparationDigest = preparationDigest
+            self.preparationSignature = preparationSignature
+            self.creator = creator
+            self.selectedDevices = selectedDevices
+            self.preparedAt = preparedAt
+            self.leaseExpiresAt = leaseExpiresAt
+            self.minimumImportUntil = minimumImportUntil
+            self.preparationRequestDigest = preparationRequestDigest
+            self.authorityDid = authorityDid
+            self.receiptKeyId = receiptKeyId
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.protocolVersion = try container.decode(String.self, forKey: .protocolVersion)
+            } catch {
+                LogManager.logError("Decoding error for required property 'protocolVersion': \(error)")
+                throw error
+            }
+            do {
+                self.requestId = try container.decode(OperationId.self, forKey: .requestId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestId': \(error)")
+                throw error
+            }
+            do {
+                self.firstMessageId = try container.decode(OperationId.self, forKey: .firstMessageId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'firstMessageId': \(error)")
+                throw error
+            }
+            do {
+                self.conversationId = try container.decode(OperationId.self, forKey: .conversationId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'conversationId': \(error)")
+                throw error
+            }
+            do {
+                self.recipientDid = try container.decode(BareDid.self, forKey: .recipientDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recipientDid': \(error)")
+                throw error
+            }
+            do {
+                self.origin = try container.decode(DirectRequestOrigin.self, forKey: .origin)
+            } catch {
+                LogManager.logError("Decoding error for required property 'origin': \(error)")
+                throw error
+            }
+            do {
+                self.profile = try container.decode(DirectRequestProfile.self, forKey: .profile)
+            } catch {
+                LogManager.logError("Decoding error for required property 'profile': \(error)")
+                throw error
+            }
+            do {
+                self.preparationDigest = try container.decode(Bytes.self, forKey: .preparationDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparationDigest': \(error)")
+                throw error
+            }
+            do {
+                self.preparationSignature = try container.decode(Bytes.self, forKey: .preparationSignature)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparationSignature': \(error)")
+                throw error
+            }
+            do {
+                self.creator = try container.decode(DirectRequestCreator.self, forKey: .creator)
+            } catch {
+                LogManager.logError("Decoding error for required property 'creator': \(error)")
+                throw error
+            }
+            do {
+                self.selectedDevices = try container.decode([DirectRequestSelectedDevice].self, forKey: .selectedDevices)
+            } catch {
+                LogManager.logError("Decoding error for required property 'selectedDevices': \(error)")
+                throw error
+            }
+            do {
+                self.preparedAt = try container.decode(CanonicalDatetime.self, forKey: .preparedAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparedAt': \(error)")
+                throw error
+            }
+            do {
+                self.leaseExpiresAt = try container.decode(CanonicalDatetime.self, forKey: .leaseExpiresAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'leaseExpiresAt': \(error)")
+                throw error
+            }
+            do {
+                self.minimumImportUntil = try container.decode(CanonicalDatetime.self, forKey: .minimumImportUntil)
+            } catch {
+                LogManager.logError("Decoding error for required property 'minimumImportUntil': \(error)")
+                throw error
+            }
+            do {
+                self.preparationRequestDigest = try container.decode(Bytes.self, forKey: .preparationRequestDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparationRequestDigest': \(error)")
+                throw error
+            }
+            do {
+                self.authorityDid = try container.decode(String.self, forKey: .authorityDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authorityDid': \(error)")
+                throw error
+            }
+            do {
+                self.receiptKeyId = try container.decode(DirectRequestReceiptKeyId.self, forKey: .receiptKeyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'receiptKeyId': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(protocolVersion, forKey: .protocolVersion)
+            try container.encode(requestId, forKey: .requestId)
+            try container.encode(firstMessageId, forKey: .firstMessageId)
+            try container.encode(conversationId, forKey: .conversationId)
+            try container.encode(recipientDid, forKey: .recipientDid)
+            try container.encode(origin, forKey: .origin)
+            try container.encode(profile, forKey: .profile)
+            try container.encode(preparationDigest, forKey: .preparationDigest)
+            try container.encode(preparationSignature, forKey: .preparationSignature)
+            try container.encode(creator, forKey: .creator)
+            try container.encode(selectedDevices, forKey: .selectedDevices)
+            try container.encode(preparedAt, forKey: .preparedAt)
+            try container.encode(leaseExpiresAt, forKey: .leaseExpiresAt)
+            try container.encode(minimumImportUntil, forKey: .minimumImportUntil)
+            try container.encode(preparationRequestDigest, forKey: .preparationRequestDigest)
+            try container.encode(authorityDid, forKey: .authorityDid)
+            try container.encode(receiptKeyId, forKey: .receiptKeyId)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(protocolVersion)
+            hasher.combine(requestId)
+            hasher.combine(firstMessageId)
+            hasher.combine(conversationId)
+            hasher.combine(recipientDid)
+            hasher.combine(origin)
+            hasher.combine(profile)
+            hasher.combine(preparationDigest)
+            hasher.combine(preparationSignature)
+            hasher.combine(creator)
+            hasher.combine(selectedDevices)
+            hasher.combine(preparedAt)
+            hasher.combine(leaseExpiresAt)
+            hasher.combine(minimumImportUntil)
+            hasher.combine(preparationRequestDigest)
+            hasher.combine(authorityDid)
+            hasher.combine(receiptKeyId)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if protocolVersion != other.protocolVersion {
+                return false
+            }
+            if requestId != other.requestId {
+                return false
+            }
+            if firstMessageId != other.firstMessageId {
+                return false
+            }
+            if conversationId != other.conversationId {
+                return false
+            }
+            if recipientDid != other.recipientDid {
+                return false
+            }
+            if origin != other.origin {
+                return false
+            }
+            if profile != other.profile {
+                return false
+            }
+            if preparationDigest != other.preparationDigest {
+                return false
+            }
+            if preparationSignature != other.preparationSignature {
+                return false
+            }
+            if creator != other.creator {
+                return false
+            }
+            if selectedDevices != other.selectedDevices {
+                return false
+            }
+            if preparedAt != other.preparedAt {
+                return false
+            }
+            if leaseExpiresAt != other.leaseExpiresAt {
+                return false
+            }
+            if minimumImportUntil != other.minimumImportUntil {
+                return false
+            }
+            if preparationRequestDigest != other.preparationRequestDigest {
+                return false
+            }
+            if authorityDid != other.authorityDid {
+                return false
+            }
+            if receiptKeyId != other.receiptKeyId {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let protocolVersionValue = try protocolVersion.toCBORValue()
+            map = map.adding(key: "protocolVersion", value: protocolVersionValue)
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
+            let firstMessageIdValue = try firstMessageId.toCBORValue()
+            map = map.adding(key: "firstMessageId", value: firstMessageIdValue)
+            let conversationIdValue = try conversationId.toCBORValue()
+            map = map.adding(key: "conversationId", value: conversationIdValue)
+            let recipientDidValue = try recipientDid.toCBORValue()
+            map = map.adding(key: "recipientDid", value: recipientDidValue)
+            let originValue = try origin.toCBORValue()
+            map = map.adding(key: "origin", value: originValue)
+            let profileValue = try profile.toCBORValue()
+            map = map.adding(key: "profile", value: profileValue)
+            let preparationDigestValue = try preparationDigest.toCBORValue()
+            map = map.adding(key: "preparationDigest", value: preparationDigestValue)
+            let preparationSignatureValue = try preparationSignature.toCBORValue()
+            map = map.adding(key: "preparationSignature", value: preparationSignatureValue)
+            let creatorValue = try creator.toCBORValue()
+            map = map.adding(key: "creator", value: creatorValue)
+            let selectedDevicesValue = try selectedDevices.toCBORValue()
+            map = map.adding(key: "selectedDevices", value: selectedDevicesValue)
+            let preparedAtValue = try preparedAt.toCBORValue()
+            map = map.adding(key: "preparedAt", value: preparedAtValue)
+            let leaseExpiresAtValue = try leaseExpiresAt.toCBORValue()
+            map = map.adding(key: "leaseExpiresAt", value: leaseExpiresAtValue)
+            let minimumImportUntilValue = try minimumImportUntil.toCBORValue()
+            map = map.adding(key: "minimumImportUntil", value: minimumImportUntilValue)
+            let preparationRequestDigestValue = try preparationRequestDigest.toCBORValue()
+            map = map.adding(key: "preparationRequestDigest", value: preparationRequestDigestValue)
+            let authorityDidValue = try authorityDid.toCBORValue()
+            map = map.adding(key: "authorityDid", value: authorityDidValue)
+            let receiptKeyIdValue = try receiptKeyId.toCBORValue()
+            map = map.adding(key: "receiptKeyId", value: receiptKeyIdValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case protocolVersion
+            case requestId
+            case firstMessageId
+            case conversationId
+            case recipientDid
+            case origin
+            case profile
+            case preparationDigest
+            case preparationSignature
+            case creator
+            case selectedDevices
+            case preparedAt
+            case leaseExpiresAt
+            case minimumImportUntil
+            case preparationRequestDigest
+            case authorityDid
+            case receiptKeyId
+        }
+    }
+        
+public struct DirectRequestContext: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestContext"
+            public let protocolVersion: String
+            public let requestId: OperationId
+            public let firstMessageId: OperationId
+            public let conversationId: OperationId
+            public let origin: DirectRequestOrigin
+            public let actorDid: BareDid
+            public let actorDeviceId: DeviceId
+            public let actorKeyId: KeyId
+            public let recipientDid: BareDid
+            public let preparationDigest: Bytes
+
+        public init(
+            protocolVersion: String, requestId: OperationId, firstMessageId: OperationId, conversationId: OperationId, origin: DirectRequestOrigin, actorDid: BareDid, actorDeviceId: DeviceId, actorKeyId: KeyId, recipientDid: BareDid, preparationDigest: Bytes
+        ) {
+            self.protocolVersion = protocolVersion
+            self.requestId = requestId
+            self.firstMessageId = firstMessageId
+            self.conversationId = conversationId
+            self.origin = origin
+            self.actorDid = actorDid
+            self.actorDeviceId = actorDeviceId
+            self.actorKeyId = actorKeyId
+            self.recipientDid = recipientDid
+            self.preparationDigest = preparationDigest
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.protocolVersion = try container.decode(String.self, forKey: .protocolVersion)
+            } catch {
+                LogManager.logError("Decoding error for required property 'protocolVersion': \(error)")
+                throw error
+            }
+            do {
+                self.requestId = try container.decode(OperationId.self, forKey: .requestId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestId': \(error)")
+                throw error
+            }
+            do {
+                self.firstMessageId = try container.decode(OperationId.self, forKey: .firstMessageId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'firstMessageId': \(error)")
+                throw error
+            }
+            do {
+                self.conversationId = try container.decode(OperationId.self, forKey: .conversationId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'conversationId': \(error)")
+                throw error
+            }
+            do {
+                self.origin = try container.decode(DirectRequestOrigin.self, forKey: .origin)
+            } catch {
+                LogManager.logError("Decoding error for required property 'origin': \(error)")
+                throw error
+            }
+            do {
+                self.actorDid = try container.decode(BareDid.self, forKey: .actorDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDid': \(error)")
+                throw error
+            }
+            do {
+                self.actorDeviceId = try container.decode(DeviceId.self, forKey: .actorDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.actorKeyId = try container.decode(KeyId.self, forKey: .actorKeyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorKeyId': \(error)")
+                throw error
+            }
+            do {
+                self.recipientDid = try container.decode(BareDid.self, forKey: .recipientDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recipientDid': \(error)")
+                throw error
+            }
+            do {
+                self.preparationDigest = try container.decode(Bytes.self, forKey: .preparationDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparationDigest': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(protocolVersion, forKey: .protocolVersion)
+            try container.encode(requestId, forKey: .requestId)
+            try container.encode(firstMessageId, forKey: .firstMessageId)
+            try container.encode(conversationId, forKey: .conversationId)
+            try container.encode(origin, forKey: .origin)
+            try container.encode(actorDid, forKey: .actorDid)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(actorKeyId, forKey: .actorKeyId)
+            try container.encode(recipientDid, forKey: .recipientDid)
+            try container.encode(preparationDigest, forKey: .preparationDigest)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(protocolVersion)
+            hasher.combine(requestId)
+            hasher.combine(firstMessageId)
+            hasher.combine(conversationId)
+            hasher.combine(origin)
+            hasher.combine(actorDid)
+            hasher.combine(actorDeviceId)
+            hasher.combine(actorKeyId)
+            hasher.combine(recipientDid)
+            hasher.combine(preparationDigest)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if protocolVersion != other.protocolVersion {
+                return false
+            }
+            if requestId != other.requestId {
+                return false
+            }
+            if firstMessageId != other.firstMessageId {
+                return false
+            }
+            if conversationId != other.conversationId {
+                return false
+            }
+            if origin != other.origin {
+                return false
+            }
+            if actorDid != other.actorDid {
+                return false
+            }
+            if actorDeviceId != other.actorDeviceId {
+                return false
+            }
+            if actorKeyId != other.actorKeyId {
+                return false
+            }
+            if recipientDid != other.recipientDid {
+                return false
+            }
+            if preparationDigest != other.preparationDigest {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let protocolVersionValue = try protocolVersion.toCBORValue()
+            map = map.adding(key: "protocolVersion", value: protocolVersionValue)
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
+            let firstMessageIdValue = try firstMessageId.toCBORValue()
+            map = map.adding(key: "firstMessageId", value: firstMessageIdValue)
+            let conversationIdValue = try conversationId.toCBORValue()
+            map = map.adding(key: "conversationId", value: conversationIdValue)
+            let originValue = try origin.toCBORValue()
+            map = map.adding(key: "origin", value: originValue)
+            let actorDidValue = try actorDid.toCBORValue()
+            map = map.adding(key: "actorDid", value: actorDidValue)
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let actorKeyIdValue = try actorKeyId.toCBORValue()
+            map = map.adding(key: "actorKeyId", value: actorKeyIdValue)
+            let recipientDidValue = try recipientDid.toCBORValue()
+            map = map.adding(key: "recipientDid", value: recipientDidValue)
+            let preparationDigestValue = try preparationDigest.toCBORValue()
+            map = map.adding(key: "preparationDigest", value: preparationDigestValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case protocolVersion
+            case requestId
+            case firstMessageId
+            case conversationId
+            case origin
+            case actorDid
+            case actorDeviceId
+            case actorKeyId
+            case recipientDid
+            case preparationDigest
+        }
+    }
+        
+public struct DirectRequestCommitAad: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestCommitAad"
+            public let protocolVersion: String
+            public let contextHash: Bytes
+
+        public init(
+            protocolVersion: String, contextHash: Bytes
+        ) {
+            self.protocolVersion = protocolVersion
+            self.contextHash = contextHash
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.protocolVersion = try container.decode(String.self, forKey: .protocolVersion)
+            } catch {
+                LogManager.logError("Decoding error for required property 'protocolVersion': \(error)")
+                throw error
+            }
+            do {
+                self.contextHash = try container.decode(Bytes.self, forKey: .contextHash)
+            } catch {
+                LogManager.logError("Decoding error for required property 'contextHash': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(protocolVersion, forKey: .protocolVersion)
+            try container.encode(contextHash, forKey: .contextHash)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(protocolVersion)
+            hasher.combine(contextHash)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if protocolVersion != other.protocolVersion {
+                return false
+            }
+            if contextHash != other.contextHash {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let protocolVersionValue = try protocolVersion.toCBORValue()
+            map = map.adding(key: "protocolVersion", value: protocolVersionValue)
+            let contextHashValue = try contextHash.toCBORValue()
+            map = map.adding(key: "contextHash", value: contextHashValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case protocolVersion
+            case contextHash
+        }
+    }
+        
+public struct DirectRequestApplicationAad: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestApplicationAad"
+            public let protocolVersion: String
+            public let contextHash: Bytes
+            public let coordinates: ConversationCoordinates
+            public let messageId: OperationId
+
+        public init(
+            protocolVersion: String, contextHash: Bytes, coordinates: ConversationCoordinates, messageId: OperationId
+        ) {
+            self.protocolVersion = protocolVersion
+            self.contextHash = contextHash
+            self.coordinates = coordinates
+            self.messageId = messageId
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.protocolVersion = try container.decode(String.self, forKey: .protocolVersion)
+            } catch {
+                LogManager.logError("Decoding error for required property 'protocolVersion': \(error)")
+                throw error
+            }
+            do {
+                self.contextHash = try container.decode(Bytes.self, forKey: .contextHash)
+            } catch {
+                LogManager.logError("Decoding error for required property 'contextHash': \(error)")
+                throw error
+            }
+            do {
+                self.coordinates = try container.decode(ConversationCoordinates.self, forKey: .coordinates)
+            } catch {
+                LogManager.logError("Decoding error for required property 'coordinates': \(error)")
+                throw error
+            }
+            do {
+                self.messageId = try container.decode(OperationId.self, forKey: .messageId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'messageId': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(protocolVersion, forKey: .protocolVersion)
+            try container.encode(contextHash, forKey: .contextHash)
+            try container.encode(coordinates, forKey: .coordinates)
+            try container.encode(messageId, forKey: .messageId)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(protocolVersion)
+            hasher.combine(contextHash)
+            hasher.combine(coordinates)
+            hasher.combine(messageId)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if protocolVersion != other.protocolVersion {
+                return false
+            }
+            if contextHash != other.contextHash {
+                return false
+            }
+            if coordinates != other.coordinates {
+                return false
+            }
+            if messageId != other.messageId {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let protocolVersionValue = try protocolVersion.toCBORValue()
+            map = map.adding(key: "protocolVersion", value: protocolVersionValue)
+            let contextHashValue = try contextHash.toCBORValue()
+            map = map.adding(key: "contextHash", value: contextHashValue)
+            let coordinatesValue = try coordinates.toCBORValue()
+            map = map.adding(key: "coordinates", value: coordinatesValue)
+            let messageIdValue = try messageId.toCBORValue()
+            map = map.adding(key: "messageId", value: messageIdValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case protocolVersion
+            case contextHash
+            case coordinates
+            case messageId
+        }
+    }
+        
+public struct DirectRequestIntroduction: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestIntroduction"
+            public let text: String
+            public let invitation: GroupInvitationReference?
+
+        public init(
+            text: String, invitation: GroupInvitationReference? = nil
+        ) {
+            self.text = text
+            self.invitation = invitation
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.text = try container.decode(String.self, forKey: .text)
+            } catch {
+                LogManager.logError("Decoding error for required property 'text': \(error)")
+                throw error
+            }
+            do {
+                self.invitation = try container.decodeIfPresent(GroupInvitationReference.self, forKey: .invitation)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'invitation' — degrading to nil: \(error)")
+                self.invitation = nil
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(text, forKey: .text)
+            try container.encodeIfPresent(invitation, forKey: .invitation)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(text)
+            if let value = invitation {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if text != other.text {
+                return false
+            }
+            if invitation != other.invitation {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let textValue = try text.toCBORValue()
+            map = map.adding(key: "text", value: textValue)
+            if let value = invitation {
+                let invitationValue = try value.toCBORValue()
+                map = map.adding(key: "invitation", value: invitationValue)
+            }
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case text
+            case invitation
+        }
+    }
+        
+public struct DirectRequestWelcomeProvenance: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestWelcomeProvenance"
+            public let requestId: OperationId
+            public let preparationDigest: Bytes
+            public let contextHash: Bytes
+            public let grantId: OperationId
+            public let grantRevision: Int
+            public let keyPackageRef: Bytes
+            public let importUntil: CanonicalDatetime
+
+        public init(
+            requestId: OperationId, preparationDigest: Bytes, contextHash: Bytes, grantId: OperationId, grantRevision: Int, keyPackageRef: Bytes, importUntil: CanonicalDatetime
+        ) {
+            self.requestId = requestId
+            self.preparationDigest = preparationDigest
+            self.contextHash = contextHash
+            self.grantId = grantId
+            self.grantRevision = grantRevision
+            self.keyPackageRef = keyPackageRef
+            self.importUntil = importUntil
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.requestId = try container.decode(OperationId.self, forKey: .requestId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestId': \(error)")
+                throw error
+            }
+            do {
+                self.preparationDigest = try container.decode(Bytes.self, forKey: .preparationDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparationDigest': \(error)")
+                throw error
+            }
+            do {
+                self.contextHash = try container.decode(Bytes.self, forKey: .contextHash)
+            } catch {
+                LogManager.logError("Decoding error for required property 'contextHash': \(error)")
+                throw error
+            }
+            do {
+                self.grantId = try container.decode(OperationId.self, forKey: .grantId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'grantId': \(error)")
+                throw error
+            }
+            do {
+                self.grantRevision = try container.decode(Int.self, forKey: .grantRevision)
+            } catch {
+                LogManager.logError("Decoding error for required property 'grantRevision': \(error)")
+                throw error
+            }
+            do {
+                self.keyPackageRef = try container.decode(Bytes.self, forKey: .keyPackageRef)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyPackageRef': \(error)")
+                throw error
+            }
+            do {
+                self.importUntil = try container.decode(CanonicalDatetime.self, forKey: .importUntil)
+            } catch {
+                LogManager.logError("Decoding error for required property 'importUntil': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(requestId, forKey: .requestId)
+            try container.encode(preparationDigest, forKey: .preparationDigest)
+            try container.encode(contextHash, forKey: .contextHash)
+            try container.encode(grantId, forKey: .grantId)
+            try container.encode(grantRevision, forKey: .grantRevision)
+            try container.encode(keyPackageRef, forKey: .keyPackageRef)
+            try container.encode(importUntil, forKey: .importUntil)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(requestId)
+            hasher.combine(preparationDigest)
+            hasher.combine(contextHash)
+            hasher.combine(grantId)
+            hasher.combine(grantRevision)
+            hasher.combine(keyPackageRef)
+            hasher.combine(importUntil)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if requestId != other.requestId {
+                return false
+            }
+            if preparationDigest != other.preparationDigest {
+                return false
+            }
+            if contextHash != other.contextHash {
+                return false
+            }
+            if grantId != other.grantId {
+                return false
+            }
+            if grantRevision != other.grantRevision {
+                return false
+            }
+            if keyPackageRef != other.keyPackageRef {
+                return false
+            }
+            if importUntil != other.importUntil {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
+            let preparationDigestValue = try preparationDigest.toCBORValue()
+            map = map.adding(key: "preparationDigest", value: preparationDigestValue)
+            let contextHashValue = try contextHash.toCBORValue()
+            map = map.adding(key: "contextHash", value: contextHashValue)
+            let grantIdValue = try grantId.toCBORValue()
+            map = map.adding(key: "grantId", value: grantIdValue)
+            let grantRevisionValue = try grantRevision.toCBORValue()
+            map = map.adding(key: "grantRevision", value: grantRevisionValue)
+            let keyPackageRefValue = try keyPackageRef.toCBORValue()
+            map = map.adding(key: "keyPackageRef", value: keyPackageRefValue)
+            let importUntilValue = try importUntil.toCBORValue()
+            map = map.adding(key: "importUntil", value: importUntilValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case requestId
+            case preparationDigest
+            case contextHash
+            case grantId
+            case grantRevision
+            case keyPackageRef
+            case importUntil
+        }
+    }
+        
+public struct DirectRequestWelcomeDelivery: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestWelcomeDelivery"
+            public let recipientDid: BareDid
+            public let recipientDeviceId: DeviceId
+            public let provenance: DirectRequestWelcomeProvenance
+
+        public init(
+            recipientDid: BareDid, recipientDeviceId: DeviceId, provenance: DirectRequestWelcomeProvenance
+        ) {
+            self.recipientDid = recipientDid
+            self.recipientDeviceId = recipientDeviceId
+            self.provenance = provenance
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.recipientDid = try container.decode(BareDid.self, forKey: .recipientDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recipientDid': \(error)")
+                throw error
+            }
+            do {
+                self.recipientDeviceId = try container.decode(DeviceId.self, forKey: .recipientDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recipientDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.provenance = try container.decode(DirectRequestWelcomeProvenance.self, forKey: .provenance)
+            } catch {
+                LogManager.logError("Decoding error for required property 'provenance': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(recipientDid, forKey: .recipientDid)
+            try container.encode(recipientDeviceId, forKey: .recipientDeviceId)
+            try container.encode(provenance, forKey: .provenance)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(recipientDid)
+            hasher.combine(recipientDeviceId)
+            hasher.combine(provenance)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if recipientDid != other.recipientDid {
+                return false
+            }
+            if recipientDeviceId != other.recipientDeviceId {
+                return false
+            }
+            if provenance != other.provenance {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let recipientDidValue = try recipientDid.toCBORValue()
+            map = map.adding(key: "recipientDid", value: recipientDidValue)
+            let recipientDeviceIdValue = try recipientDeviceId.toCBORValue()
+            map = map.adding(key: "recipientDeviceId", value: recipientDeviceIdValue)
+            let provenanceValue = try provenance.toCBORValue()
+            map = map.adding(key: "provenance", value: provenanceValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case recipientDid
+            case recipientDeviceId
+            case provenance
+        }
+    }
+        
+public struct DirectRequestWelcomeBundle: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestWelcomeBundle"
+            public let opaqueWelcome: Bytes
+            public let sha256: Bytes
+            public let deliveries: [DirectRequestWelcomeDelivery]
+
+        public init(
+            opaqueWelcome: Bytes, sha256: Bytes, deliveries: [DirectRequestWelcomeDelivery]
+        ) {
+            self.opaqueWelcome = opaqueWelcome
+            self.sha256 = sha256
+            self.deliveries = deliveries
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.opaqueWelcome = try container.decode(Bytes.self, forKey: .opaqueWelcome)
+            } catch {
+                LogManager.logError("Decoding error for required property 'opaqueWelcome': \(error)")
+                throw error
+            }
+            do {
+                self.sha256 = try container.decode(Bytes.self, forKey: .sha256)
+            } catch {
+                LogManager.logError("Decoding error for required property 'sha256': \(error)")
+                throw error
+            }
+            do {
+                self.deliveries = try container.decode([DirectRequestWelcomeDelivery].self, forKey: .deliveries)
+            } catch {
+                LogManager.logError("Decoding error for required property 'deliveries': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(opaqueWelcome, forKey: .opaqueWelcome)
+            try container.encode(sha256, forKey: .sha256)
+            try container.encode(deliveries, forKey: .deliveries)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(opaqueWelcome)
+            hasher.combine(sha256)
+            hasher.combine(deliveries)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if opaqueWelcome != other.opaqueWelcome {
+                return false
+            }
+            if sha256 != other.sha256 {
+                return false
+            }
+            if deliveries != other.deliveries {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let opaqueWelcomeValue = try opaqueWelcome.toCBORValue()
+            map = map.adding(key: "opaqueWelcome", value: opaqueWelcomeValue)
+            let sha256Value = try sha256.toCBORValue()
+            map = map.adding(key: "sha256", value: sha256Value)
+            let deliveriesValue = try deliveries.toCBORValue()
+            map = map.adding(key: "deliveries", value: deliveriesValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case opaqueWelcome
+            case sha256
+            case deliveries
+        }
+    }
+        
+public struct DirectRequestBootstrapArtifacts: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestBootstrapArtifacts"
+            public let genesisGroupInfo: GroupInfoArtifact
+            public let addCommit: PublicCommit
+            public let finalGroupInfo: GroupInfoArtifact
+            public let welcome: DirectRequestWelcomeBundle
+            public let metadataSnapshot: MetadataSnapshot
+            public let initialCiphertext: Bytes
+
+        public init(
+            genesisGroupInfo: GroupInfoArtifact, addCommit: PublicCommit, finalGroupInfo: GroupInfoArtifact, welcome: DirectRequestWelcomeBundle, metadataSnapshot: MetadataSnapshot, initialCiphertext: Bytes
+        ) {
+            self.genesisGroupInfo = genesisGroupInfo
+            self.addCommit = addCommit
+            self.finalGroupInfo = finalGroupInfo
+            self.welcome = welcome
+            self.metadataSnapshot = metadataSnapshot
+            self.initialCiphertext = initialCiphertext
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.genesisGroupInfo = try container.decode(GroupInfoArtifact.self, forKey: .genesisGroupInfo)
+            } catch {
+                LogManager.logError("Decoding error for required property 'genesisGroupInfo': \(error)")
+                throw error
+            }
+            do {
+                self.addCommit = try container.decode(PublicCommit.self, forKey: .addCommit)
+            } catch {
+                LogManager.logError("Decoding error for required property 'addCommit': \(error)")
+                throw error
+            }
+            do {
+                self.finalGroupInfo = try container.decode(GroupInfoArtifact.self, forKey: .finalGroupInfo)
+            } catch {
+                LogManager.logError("Decoding error for required property 'finalGroupInfo': \(error)")
+                throw error
+            }
+            do {
+                self.welcome = try container.decode(DirectRequestWelcomeBundle.self, forKey: .welcome)
+            } catch {
+                LogManager.logError("Decoding error for required property 'welcome': \(error)")
+                throw error
+            }
+            do {
+                self.metadataSnapshot = try container.decode(MetadataSnapshot.self, forKey: .metadataSnapshot)
+            } catch {
+                LogManager.logError("Decoding error for required property 'metadataSnapshot': \(error)")
+                throw error
+            }
+            do {
+                self.initialCiphertext = try container.decode(Bytes.self, forKey: .initialCiphertext)
+            } catch {
+                LogManager.logError("Decoding error for required property 'initialCiphertext': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(genesisGroupInfo, forKey: .genesisGroupInfo)
+            try container.encode(addCommit, forKey: .addCommit)
+            try container.encode(finalGroupInfo, forKey: .finalGroupInfo)
+            try container.encode(welcome, forKey: .welcome)
+            try container.encode(metadataSnapshot, forKey: .metadataSnapshot)
+            try container.encode(initialCiphertext, forKey: .initialCiphertext)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(genesisGroupInfo)
+            hasher.combine(addCommit)
+            hasher.combine(finalGroupInfo)
+            hasher.combine(welcome)
+            hasher.combine(metadataSnapshot)
+            hasher.combine(initialCiphertext)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if genesisGroupInfo != other.genesisGroupInfo {
+                return false
+            }
+            if addCommit != other.addCommit {
+                return false
+            }
+            if finalGroupInfo != other.finalGroupInfo {
+                return false
+            }
+            if welcome != other.welcome {
+                return false
+            }
+            if metadataSnapshot != other.metadataSnapshot {
+                return false
+            }
+            if initialCiphertext != other.initialCiphertext {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let genesisGroupInfoValue = try genesisGroupInfo.toCBORValue()
+            map = map.adding(key: "genesisGroupInfo", value: genesisGroupInfoValue)
+            let addCommitValue = try addCommit.toCBORValue()
+            map = map.adding(key: "addCommit", value: addCommitValue)
+            let finalGroupInfoValue = try finalGroupInfo.toCBORValue()
+            map = map.adding(key: "finalGroupInfo", value: finalGroupInfoValue)
+            let welcomeValue = try welcome.toCBORValue()
+            map = map.adding(key: "welcome", value: welcomeValue)
+            let metadataSnapshotValue = try metadataSnapshot.toCBORValue()
+            map = map.adding(key: "metadataSnapshot", value: metadataSnapshotValue)
+            let initialCiphertextValue = try initialCiphertext.toCBORValue()
+            map = map.adding(key: "initialCiphertext", value: initialCiphertextValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case genesisGroupInfo
+            case addCommit
+            case finalGroupInfo
+            case welcome
+            case metadataSnapshot
+            case initialCiphertext
+        }
+    }
+        
+public struct DirectRequestPublicationBody: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPublicationBody"
+            public let signatureDomain: String
+            public let protocolVersion: String
+            public let actorDid: BareDid
+            public let actorDeviceId: DeviceId
+            public let keyId: KeyId
+            public let authGeneration: Int
+            public let requestId: OperationId
+            public let firstMessageId: OperationId
+            public let conversationId: OperationId
+            public let recipientDid: BareDid
+            public let origin: DirectRequestOrigin
+            public let profile: DirectRequestProfile
+            public let preparationDigest: Bytes
+            public let contextHash: Bytes
+            public let next: ConversationCoordinates
+            public let importUntil: CanonicalDatetime
+            public let artifacts: DirectRequestBootstrapArtifacts
+            public let idempotencyKey: OperationId
+            public let signedAt: CanonicalDatetime
+
+        public init(
+            signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, requestId: OperationId, firstMessageId: OperationId, conversationId: OperationId, recipientDid: BareDid, origin: DirectRequestOrigin, profile: DirectRequestProfile, preparationDigest: Bytes, contextHash: Bytes, next: ConversationCoordinates, importUntil: CanonicalDatetime, artifacts: DirectRequestBootstrapArtifacts, idempotencyKey: OperationId, signedAt: CanonicalDatetime
+        ) {
+            self.signatureDomain = signatureDomain
+            self.protocolVersion = protocolVersion
+            self.actorDid = actorDid
+            self.actorDeviceId = actorDeviceId
+            self.keyId = keyId
+            self.authGeneration = authGeneration
+            self.requestId = requestId
+            self.firstMessageId = firstMessageId
+            self.conversationId = conversationId
+            self.recipientDid = recipientDid
+            self.origin = origin
+            self.profile = profile
+            self.preparationDigest = preparationDigest
+            self.contextHash = contextHash
+            self.next = next
+            self.importUntil = importUntil
+            self.artifacts = artifacts
+            self.idempotencyKey = idempotencyKey
+            self.signedAt = signedAt
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.signatureDomain = try container.decode(String.self, forKey: .signatureDomain)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signatureDomain': \(error)")
+                throw error
+            }
+            do {
+                self.protocolVersion = try container.decode(String.self, forKey: .protocolVersion)
+            } catch {
+                LogManager.logError("Decoding error for required property 'protocolVersion': \(error)")
+                throw error
+            }
+            do {
+                self.actorDid = try container.decode(BareDid.self, forKey: .actorDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDid': \(error)")
+                throw error
+            }
+            do {
+                self.actorDeviceId = try container.decode(DeviceId.self, forKey: .actorDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.keyId = try container.decode(KeyId.self, forKey: .keyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyId': \(error)")
+                throw error
+            }
+            do {
+                self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authGeneration': \(error)")
+                throw error
+            }
+            do {
+                self.requestId = try container.decode(OperationId.self, forKey: .requestId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestId': \(error)")
+                throw error
+            }
+            do {
+                self.firstMessageId = try container.decode(OperationId.self, forKey: .firstMessageId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'firstMessageId': \(error)")
+                throw error
+            }
+            do {
+                self.conversationId = try container.decode(OperationId.self, forKey: .conversationId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'conversationId': \(error)")
+                throw error
+            }
+            do {
+                self.recipientDid = try container.decode(BareDid.self, forKey: .recipientDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recipientDid': \(error)")
+                throw error
+            }
+            do {
+                self.origin = try container.decode(DirectRequestOrigin.self, forKey: .origin)
+            } catch {
+                LogManager.logError("Decoding error for required property 'origin': \(error)")
+                throw error
+            }
+            do {
+                self.profile = try container.decode(DirectRequestProfile.self, forKey: .profile)
+            } catch {
+                LogManager.logError("Decoding error for required property 'profile': \(error)")
+                throw error
+            }
+            do {
+                self.preparationDigest = try container.decode(Bytes.self, forKey: .preparationDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparationDigest': \(error)")
+                throw error
+            }
+            do {
+                self.contextHash = try container.decode(Bytes.self, forKey: .contextHash)
+            } catch {
+                LogManager.logError("Decoding error for required property 'contextHash': \(error)")
+                throw error
+            }
+            do {
+                self.next = try container.decode(ConversationCoordinates.self, forKey: .next)
+            } catch {
+                LogManager.logError("Decoding error for required property 'next': \(error)")
+                throw error
+            }
+            do {
+                self.importUntil = try container.decode(CanonicalDatetime.self, forKey: .importUntil)
+            } catch {
+                LogManager.logError("Decoding error for required property 'importUntil': \(error)")
+                throw error
+            }
+            do {
+                self.artifacts = try container.decode(DirectRequestBootstrapArtifacts.self, forKey: .artifacts)
+            } catch {
+                LogManager.logError("Decoding error for required property 'artifacts': \(error)")
+                throw error
+            }
+            do {
+                self.idempotencyKey = try container.decode(OperationId.self, forKey: .idempotencyKey)
+            } catch {
+                LogManager.logError("Decoding error for required property 'idempotencyKey': \(error)")
+                throw error
+            }
+            do {
+                self.signedAt = try container.decode(CanonicalDatetime.self, forKey: .signedAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signedAt': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(signatureDomain, forKey: .signatureDomain)
+            try container.encode(protocolVersion, forKey: .protocolVersion)
+            try container.encode(actorDid, forKey: .actorDid)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(keyId, forKey: .keyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
+            try container.encode(requestId, forKey: .requestId)
+            try container.encode(firstMessageId, forKey: .firstMessageId)
+            try container.encode(conversationId, forKey: .conversationId)
+            try container.encode(recipientDid, forKey: .recipientDid)
+            try container.encode(origin, forKey: .origin)
+            try container.encode(profile, forKey: .profile)
+            try container.encode(preparationDigest, forKey: .preparationDigest)
+            try container.encode(contextHash, forKey: .contextHash)
+            try container.encode(next, forKey: .next)
+            try container.encode(importUntil, forKey: .importUntil)
+            try container.encode(artifacts, forKey: .artifacts)
+            try container.encode(idempotencyKey, forKey: .idempotencyKey)
+            try container.encode(signedAt, forKey: .signedAt)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(signatureDomain)
+            hasher.combine(protocolVersion)
+            hasher.combine(actorDid)
+            hasher.combine(actorDeviceId)
+            hasher.combine(keyId)
+            hasher.combine(authGeneration)
+            hasher.combine(requestId)
+            hasher.combine(firstMessageId)
+            hasher.combine(conversationId)
+            hasher.combine(recipientDid)
+            hasher.combine(origin)
+            hasher.combine(profile)
+            hasher.combine(preparationDigest)
+            hasher.combine(contextHash)
+            hasher.combine(next)
+            hasher.combine(importUntil)
+            hasher.combine(artifacts)
+            hasher.combine(idempotencyKey)
+            hasher.combine(signedAt)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if signatureDomain != other.signatureDomain {
+                return false
+            }
+            if protocolVersion != other.protocolVersion {
+                return false
+            }
+            if actorDid != other.actorDid {
+                return false
+            }
+            if actorDeviceId != other.actorDeviceId {
+                return false
+            }
+            if keyId != other.keyId {
+                return false
+            }
+            if authGeneration != other.authGeneration {
+                return false
+            }
+            if requestId != other.requestId {
+                return false
+            }
+            if firstMessageId != other.firstMessageId {
+                return false
+            }
+            if conversationId != other.conversationId {
+                return false
+            }
+            if recipientDid != other.recipientDid {
+                return false
+            }
+            if origin != other.origin {
+                return false
+            }
+            if profile != other.profile {
+                return false
+            }
+            if preparationDigest != other.preparationDigest {
+                return false
+            }
+            if contextHash != other.contextHash {
+                return false
+            }
+            if next != other.next {
+                return false
+            }
+            if importUntil != other.importUntil {
+                return false
+            }
+            if artifacts != other.artifacts {
+                return false
+            }
+            if idempotencyKey != other.idempotencyKey {
+                return false
+            }
+            if signedAt != other.signedAt {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let signatureDomainValue = try signatureDomain.toCBORValue()
+            map = map.adding(key: "signatureDomain", value: signatureDomainValue)
+            let protocolVersionValue = try protocolVersion.toCBORValue()
+            map = map.adding(key: "protocolVersion", value: protocolVersionValue)
+            let actorDidValue = try actorDid.toCBORValue()
+            map = map.adding(key: "actorDid", value: actorDidValue)
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let keyIdValue = try keyId.toCBORValue()
+            map = map.adding(key: "keyId", value: keyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
+            let firstMessageIdValue = try firstMessageId.toCBORValue()
+            map = map.adding(key: "firstMessageId", value: firstMessageIdValue)
+            let conversationIdValue = try conversationId.toCBORValue()
+            map = map.adding(key: "conversationId", value: conversationIdValue)
+            let recipientDidValue = try recipientDid.toCBORValue()
+            map = map.adding(key: "recipientDid", value: recipientDidValue)
+            let originValue = try origin.toCBORValue()
+            map = map.adding(key: "origin", value: originValue)
+            let profileValue = try profile.toCBORValue()
+            map = map.adding(key: "profile", value: profileValue)
+            let preparationDigestValue = try preparationDigest.toCBORValue()
+            map = map.adding(key: "preparationDigest", value: preparationDigestValue)
+            let contextHashValue = try contextHash.toCBORValue()
+            map = map.adding(key: "contextHash", value: contextHashValue)
+            let nextValue = try next.toCBORValue()
+            map = map.adding(key: "next", value: nextValue)
+            let importUntilValue = try importUntil.toCBORValue()
+            map = map.adding(key: "importUntil", value: importUntilValue)
+            let artifactsValue = try artifacts.toCBORValue()
+            map = map.adding(key: "artifacts", value: artifactsValue)
+            let idempotencyKeyValue = try idempotencyKey.toCBORValue()
+            map = map.adding(key: "idempotencyKey", value: idempotencyKeyValue)
+            let signedAtValue = try signedAt.toCBORValue()
+            map = map.adding(key: "signedAt", value: signedAtValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case signatureDomain
+            case protocolVersion
+            case actorDid
+            case actorDeviceId
+            case keyId
+            case authGeneration
+            case requestId
+            case firstMessageId
+            case conversationId
+            case recipientDid
+            case origin
+            case profile
+            case preparationDigest
+            case contextHash
+            case next
+            case importUntil
+            case artifacts
+            case idempotencyKey
+            case signedAt
+        }
+    }
+        
+public struct SignedDirectRequestPublication: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestPublication"
+            public let body: SignedDirectRequestPublicationBodyUnion
+            public let signature: Bytes
+
+        public init(
+            body: SignedDirectRequestPublicationBodyUnion, signature: Bytes
+        ) {
+            self.body = body
+            self.signature = signature
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.body = try container.decode(SignedDirectRequestPublicationBodyUnion.self, forKey: .body)
+            } catch {
+                LogManager.logError("Decoding error for required property 'body': \(error)")
+                throw error
+            }
+            do {
+                self.signature = try container.decode(Bytes.self, forKey: .signature)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signature': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(body, forKey: .body)
+            try container.encode(signature, forKey: .signature)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(body)
+            hasher.combine(signature)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if body != other.body {
+                return false
+            }
+            if signature != other.signature {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let bodyValue = try body.toCBORValue()
+            map = map.adding(key: "body", value: bodyValue)
+            let signatureValue = try signature.toCBORValue()
+            map = map.adding(key: "signature", value: signatureValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case body
+            case signature
+        }
+    }
+        
+public struct DirectRequestCancellationBody: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestCancellationBody"
+            public let signatureDomain: String
+            public let protocolVersion: String
+            public let actorDid: BareDid
+            public let actorDeviceId: DeviceId
+            public let keyId: KeyId
+            public let authGeneration: Int
+            public let requestId: OperationId
+            public let idempotencyKey: OperationId
+            public let signedAt: CanonicalDatetime
+            public let recipientDid: BareDid
+            public let preparationRequestDigest: Bytes
+
+        public init(
+            signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, requestId: OperationId, idempotencyKey: OperationId, signedAt: CanonicalDatetime, recipientDid: BareDid, preparationRequestDigest: Bytes
+        ) {
+            self.signatureDomain = signatureDomain
+            self.protocolVersion = protocolVersion
+            self.actorDid = actorDid
+            self.actorDeviceId = actorDeviceId
+            self.keyId = keyId
+            self.authGeneration = authGeneration
+            self.requestId = requestId
+            self.idempotencyKey = idempotencyKey
+            self.signedAt = signedAt
+            self.recipientDid = recipientDid
+            self.preparationRequestDigest = preparationRequestDigest
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.signatureDomain = try container.decode(String.self, forKey: .signatureDomain)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signatureDomain': \(error)")
+                throw error
+            }
+            do {
+                self.protocolVersion = try container.decode(String.self, forKey: .protocolVersion)
+            } catch {
+                LogManager.logError("Decoding error for required property 'protocolVersion': \(error)")
+                throw error
+            }
+            do {
+                self.actorDid = try container.decode(BareDid.self, forKey: .actorDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDid': \(error)")
+                throw error
+            }
+            do {
+                self.actorDeviceId = try container.decode(DeviceId.self, forKey: .actorDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.keyId = try container.decode(KeyId.self, forKey: .keyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyId': \(error)")
+                throw error
+            }
+            do {
+                self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authGeneration': \(error)")
+                throw error
+            }
+            do {
+                self.requestId = try container.decode(OperationId.self, forKey: .requestId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestId': \(error)")
+                throw error
+            }
+            do {
+                self.idempotencyKey = try container.decode(OperationId.self, forKey: .idempotencyKey)
+            } catch {
+                LogManager.logError("Decoding error for required property 'idempotencyKey': \(error)")
+                throw error
+            }
+            do {
+                self.signedAt = try container.decode(CanonicalDatetime.self, forKey: .signedAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signedAt': \(error)")
+                throw error
+            }
+            do {
+                self.recipientDid = try container.decode(BareDid.self, forKey: .recipientDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recipientDid': \(error)")
+                throw error
+            }
+            do {
+                self.preparationRequestDigest = try container.decode(Bytes.self, forKey: .preparationRequestDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparationRequestDigest': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(signatureDomain, forKey: .signatureDomain)
+            try container.encode(protocolVersion, forKey: .protocolVersion)
+            try container.encode(actorDid, forKey: .actorDid)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(keyId, forKey: .keyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
+            try container.encode(requestId, forKey: .requestId)
+            try container.encode(idempotencyKey, forKey: .idempotencyKey)
+            try container.encode(signedAt, forKey: .signedAt)
+            try container.encode(recipientDid, forKey: .recipientDid)
+            try container.encode(preparationRequestDigest, forKey: .preparationRequestDigest)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(signatureDomain)
+            hasher.combine(protocolVersion)
+            hasher.combine(actorDid)
+            hasher.combine(actorDeviceId)
+            hasher.combine(keyId)
+            hasher.combine(authGeneration)
+            hasher.combine(requestId)
+            hasher.combine(idempotencyKey)
+            hasher.combine(signedAt)
+            hasher.combine(recipientDid)
+            hasher.combine(preparationRequestDigest)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if signatureDomain != other.signatureDomain {
+                return false
+            }
+            if protocolVersion != other.protocolVersion {
+                return false
+            }
+            if actorDid != other.actorDid {
+                return false
+            }
+            if actorDeviceId != other.actorDeviceId {
+                return false
+            }
+            if keyId != other.keyId {
+                return false
+            }
+            if authGeneration != other.authGeneration {
+                return false
+            }
+            if requestId != other.requestId {
+                return false
+            }
+            if idempotencyKey != other.idempotencyKey {
+                return false
+            }
+            if signedAt != other.signedAt {
+                return false
+            }
+            if recipientDid != other.recipientDid {
+                return false
+            }
+            if preparationRequestDigest != other.preparationRequestDigest {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let signatureDomainValue = try signatureDomain.toCBORValue()
+            map = map.adding(key: "signatureDomain", value: signatureDomainValue)
+            let protocolVersionValue = try protocolVersion.toCBORValue()
+            map = map.adding(key: "protocolVersion", value: protocolVersionValue)
+            let actorDidValue = try actorDid.toCBORValue()
+            map = map.adding(key: "actorDid", value: actorDidValue)
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let keyIdValue = try keyId.toCBORValue()
+            map = map.adding(key: "keyId", value: keyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
+            let idempotencyKeyValue = try idempotencyKey.toCBORValue()
+            map = map.adding(key: "idempotencyKey", value: idempotencyKeyValue)
+            let signedAtValue = try signedAt.toCBORValue()
+            map = map.adding(key: "signedAt", value: signedAtValue)
+            let recipientDidValue = try recipientDid.toCBORValue()
+            map = map.adding(key: "recipientDid", value: recipientDidValue)
+            let preparationRequestDigestValue = try preparationRequestDigest.toCBORValue()
+            map = map.adding(key: "preparationRequestDigest", value: preparationRequestDigestValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case signatureDomain
+            case protocolVersion
+            case actorDid
+            case actorDeviceId
+            case keyId
+            case authGeneration
+            case requestId
+            case idempotencyKey
+            case signedAt
+            case recipientDid
+            case preparationRequestDigest
+        }
+    }
+        
+public struct SignedDirectRequestCancellation: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestCancellation"
+            public let body: SignedDirectRequestCancellationBodyUnion
+            public let signature: Bytes
+
+        public init(
+            body: SignedDirectRequestCancellationBodyUnion, signature: Bytes
+        ) {
+            self.body = body
+            self.signature = signature
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.body = try container.decode(SignedDirectRequestCancellationBodyUnion.self, forKey: .body)
+            } catch {
+                LogManager.logError("Decoding error for required property 'body': \(error)")
+                throw error
+            }
+            do {
+                self.signature = try container.decode(Bytes.self, forKey: .signature)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signature': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(body, forKey: .body)
+            try container.encode(signature, forKey: .signature)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(body)
+            hasher.combine(signature)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if body != other.body {
+                return false
+            }
+            if signature != other.signature {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let bodyValue = try body.toCBORValue()
+            map = map.adding(key: "body", value: bodyValue)
+            let signatureValue = try signature.toCBORValue()
+            map = map.adding(key: "signature", value: signatureValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case body
+            case signature
+        }
+    }
+        
+public struct DirectRequestAcceptanceBody: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestAcceptanceBody"
+            public let signatureDomain: String
+            public let protocolVersion: String
+            public let actorDid: BareDid
+            public let actorDeviceId: DeviceId
+            public let keyId: KeyId
+            public let authGeneration: Int
+            public let requestId: OperationId
+            public let transitionId: OperationId
+            public let prior: ConversationCoordinates
+            public let next: ConversationCoordinates
+            public let invitationProvenance: InvitationProvenance
+            public let idempotencyKey: OperationId
+            public let signedAt: CanonicalDatetime
+
+        public init(
+            signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, requestId: OperationId, transitionId: OperationId, prior: ConversationCoordinates, next: ConversationCoordinates, invitationProvenance: InvitationProvenance, idempotencyKey: OperationId, signedAt: CanonicalDatetime
+        ) {
+            self.signatureDomain = signatureDomain
+            self.protocolVersion = protocolVersion
+            self.actorDid = actorDid
+            self.actorDeviceId = actorDeviceId
+            self.keyId = keyId
+            self.authGeneration = authGeneration
+            self.requestId = requestId
+            self.transitionId = transitionId
+            self.prior = prior
+            self.next = next
+            self.invitationProvenance = invitationProvenance
+            self.idempotencyKey = idempotencyKey
+            self.signedAt = signedAt
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.signatureDomain = try container.decode(String.self, forKey: .signatureDomain)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signatureDomain': \(error)")
+                throw error
+            }
+            do {
+                self.protocolVersion = try container.decode(String.self, forKey: .protocolVersion)
+            } catch {
+                LogManager.logError("Decoding error for required property 'protocolVersion': \(error)")
+                throw error
+            }
+            do {
+                self.actorDid = try container.decode(BareDid.self, forKey: .actorDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDid': \(error)")
+                throw error
+            }
+            do {
+                self.actorDeviceId = try container.decode(DeviceId.self, forKey: .actorDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.keyId = try container.decode(KeyId.self, forKey: .keyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyId': \(error)")
+                throw error
+            }
+            do {
+                self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authGeneration': \(error)")
+                throw error
+            }
+            do {
+                self.requestId = try container.decode(OperationId.self, forKey: .requestId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestId': \(error)")
+                throw error
+            }
+            do {
+                self.transitionId = try container.decode(OperationId.self, forKey: .transitionId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'transitionId': \(error)")
+                throw error
+            }
+            do {
+                self.prior = try container.decode(ConversationCoordinates.self, forKey: .prior)
+            } catch {
+                LogManager.logError("Decoding error for required property 'prior': \(error)")
+                throw error
+            }
+            do {
+                self.next = try container.decode(ConversationCoordinates.self, forKey: .next)
+            } catch {
+                LogManager.logError("Decoding error for required property 'next': \(error)")
+                throw error
+            }
+            do {
+                self.invitationProvenance = try container.decode(InvitationProvenance.self, forKey: .invitationProvenance)
+            } catch {
+                LogManager.logError("Decoding error for required property 'invitationProvenance': \(error)")
+                throw error
+            }
+            do {
+                self.idempotencyKey = try container.decode(OperationId.self, forKey: .idempotencyKey)
+            } catch {
+                LogManager.logError("Decoding error for required property 'idempotencyKey': \(error)")
+                throw error
+            }
+            do {
+                self.signedAt = try container.decode(CanonicalDatetime.self, forKey: .signedAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signedAt': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(signatureDomain, forKey: .signatureDomain)
+            try container.encode(protocolVersion, forKey: .protocolVersion)
+            try container.encode(actorDid, forKey: .actorDid)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(keyId, forKey: .keyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
+            try container.encode(requestId, forKey: .requestId)
+            try container.encode(transitionId, forKey: .transitionId)
+            try container.encode(prior, forKey: .prior)
+            try container.encode(next, forKey: .next)
+            try container.encode(invitationProvenance, forKey: .invitationProvenance)
+            try container.encode(idempotencyKey, forKey: .idempotencyKey)
+            try container.encode(signedAt, forKey: .signedAt)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(signatureDomain)
+            hasher.combine(protocolVersion)
+            hasher.combine(actorDid)
+            hasher.combine(actorDeviceId)
+            hasher.combine(keyId)
+            hasher.combine(authGeneration)
+            hasher.combine(requestId)
+            hasher.combine(transitionId)
+            hasher.combine(prior)
+            hasher.combine(next)
+            hasher.combine(invitationProvenance)
+            hasher.combine(idempotencyKey)
+            hasher.combine(signedAt)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if signatureDomain != other.signatureDomain {
+                return false
+            }
+            if protocolVersion != other.protocolVersion {
+                return false
+            }
+            if actorDid != other.actorDid {
+                return false
+            }
+            if actorDeviceId != other.actorDeviceId {
+                return false
+            }
+            if keyId != other.keyId {
+                return false
+            }
+            if authGeneration != other.authGeneration {
+                return false
+            }
+            if requestId != other.requestId {
+                return false
+            }
+            if transitionId != other.transitionId {
+                return false
+            }
+            if prior != other.prior {
+                return false
+            }
+            if next != other.next {
+                return false
+            }
+            if invitationProvenance != other.invitationProvenance {
+                return false
+            }
+            if idempotencyKey != other.idempotencyKey {
+                return false
+            }
+            if signedAt != other.signedAt {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let signatureDomainValue = try signatureDomain.toCBORValue()
+            map = map.adding(key: "signatureDomain", value: signatureDomainValue)
+            let protocolVersionValue = try protocolVersion.toCBORValue()
+            map = map.adding(key: "protocolVersion", value: protocolVersionValue)
+            let actorDidValue = try actorDid.toCBORValue()
+            map = map.adding(key: "actorDid", value: actorDidValue)
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let keyIdValue = try keyId.toCBORValue()
+            map = map.adding(key: "keyId", value: keyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
+            let transitionIdValue = try transitionId.toCBORValue()
+            map = map.adding(key: "transitionId", value: transitionIdValue)
+            let priorValue = try prior.toCBORValue()
+            map = map.adding(key: "prior", value: priorValue)
+            let nextValue = try next.toCBORValue()
+            map = map.adding(key: "next", value: nextValue)
+            let invitationProvenanceValue = try invitationProvenance.toCBORValue()
+            map = map.adding(key: "invitationProvenance", value: invitationProvenanceValue)
+            let idempotencyKeyValue = try idempotencyKey.toCBORValue()
+            map = map.adding(key: "idempotencyKey", value: idempotencyKeyValue)
+            let signedAtValue = try signedAt.toCBORValue()
+            map = map.adding(key: "signedAt", value: signedAtValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case signatureDomain
+            case protocolVersion
+            case actorDid
+            case actorDeviceId
+            case keyId
+            case authGeneration
+            case requestId
+            case transitionId
+            case prior
+            case next
+            case invitationProvenance
+            case idempotencyKey
+            case signedAt
+        }
+    }
+        
+public struct SignedDirectRequestAcceptance: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestAcceptance"
+            public let body: SignedDirectRequestAcceptanceBodyUnion
+            public let signature: Bytes
+
+        public init(
+            body: SignedDirectRequestAcceptanceBodyUnion, signature: Bytes
+        ) {
+            self.body = body
+            self.signature = signature
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.body = try container.decode(SignedDirectRequestAcceptanceBodyUnion.self, forKey: .body)
+            } catch {
+                LogManager.logError("Decoding error for required property 'body': \(error)")
+                throw error
+            }
+            do {
+                self.signature = try container.decode(Bytes.self, forKey: .signature)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signature': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(body, forKey: .body)
+            try container.encode(signature, forKey: .signature)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(body)
+            hasher.combine(signature)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if body != other.body {
+                return false
+            }
+            if signature != other.signature {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let bodyValue = try body.toCBORValue()
+            map = map.adding(key: "body", value: bodyValue)
+            let signatureValue = try signature.toCBORValue()
+            map = map.adding(key: "signature", value: signatureValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case body
+            case signature
+        }
+    }
+        
+public struct DirectRequestUnknownOutcome: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestUnknownOutcome"
+            public let requestId: OperationId
+
+        public init(
+            requestId: OperationId
+        ) {
+            self.requestId = requestId
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.requestId = try container.decode(OperationId.self, forKey: .requestId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestId': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(requestId, forKey: .requestId)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(requestId)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if requestId != other.requestId {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case requestId
+        }
+    }
+        
+public struct DirectRequestPreparedOutcome: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPreparedOutcome"
+            public let preparation: DirectRequestPreparationView
+
+        public init(
+            preparation: DirectRequestPreparationView
+        ) {
+            self.preparation = preparation
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.preparation = try container.decode(DirectRequestPreparationView.self, forKey: .preparation)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparation': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(preparation, forKey: .preparation)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(preparation)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if preparation != other.preparation {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let preparationValue = try preparation.toCBORValue()
+            map = map.adding(key: "preparation", value: preparationValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case preparation
+        }
+    }
+        
+public struct DirectRequestPublishedReceipt: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPublishedReceipt"
+            public let requestId: OperationId
+            public let requestDigest: Bytes
+            public let recordedAt: CanonicalDatetime
+            public let conversationId: OperationId
+            public let firstMessageId: OperationId
+            public let coordinates: ConversationCoordinates
+            public let preparationRequestDigest: Bytes
+            public let actorDid: BareDid
+            public let actorDeviceId: DeviceId
+            public let actorKeyId: KeyId
+            public let authGeneration: Int
+            public let requestKind: String
+
+        public init(
+            requestId: OperationId, requestDigest: Bytes, recordedAt: CanonicalDatetime, conversationId: OperationId, firstMessageId: OperationId, coordinates: ConversationCoordinates, preparationRequestDigest: Bytes, actorDid: BareDid, actorDeviceId: DeviceId, actorKeyId: KeyId, authGeneration: Int, requestKind: String
+        ) {
+            self.requestId = requestId
+            self.requestDigest = requestDigest
+            self.recordedAt = recordedAt
+            self.conversationId = conversationId
+            self.firstMessageId = firstMessageId
+            self.coordinates = coordinates
+            self.preparationRequestDigest = preparationRequestDigest
+            self.actorDid = actorDid
+            self.actorDeviceId = actorDeviceId
+            self.actorKeyId = actorKeyId
+            self.authGeneration = authGeneration
+            self.requestKind = requestKind
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.requestId = try container.decode(OperationId.self, forKey: .requestId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestId': \(error)")
+                throw error
+            }
+            do {
+                self.requestDigest = try container.decode(Bytes.self, forKey: .requestDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestDigest': \(error)")
+                throw error
+            }
+            do {
+                self.recordedAt = try container.decode(CanonicalDatetime.self, forKey: .recordedAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recordedAt': \(error)")
+                throw error
+            }
+            do {
+                self.conversationId = try container.decode(OperationId.self, forKey: .conversationId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'conversationId': \(error)")
+                throw error
+            }
+            do {
+                self.firstMessageId = try container.decode(OperationId.self, forKey: .firstMessageId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'firstMessageId': \(error)")
+                throw error
+            }
+            do {
+                self.coordinates = try container.decode(ConversationCoordinates.self, forKey: .coordinates)
+            } catch {
+                LogManager.logError("Decoding error for required property 'coordinates': \(error)")
+                throw error
+            }
+            do {
+                self.preparationRequestDigest = try container.decode(Bytes.self, forKey: .preparationRequestDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparationRequestDigest': \(error)")
+                throw error
+            }
+            do {
+                self.actorDid = try container.decode(BareDid.self, forKey: .actorDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDid': \(error)")
+                throw error
+            }
+            do {
+                self.actorDeviceId = try container.decode(DeviceId.self, forKey: .actorDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.actorKeyId = try container.decode(KeyId.self, forKey: .actorKeyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorKeyId': \(error)")
+                throw error
+            }
+            do {
+                self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authGeneration': \(error)")
+                throw error
+            }
+            do {
+                self.requestKind = try container.decode(String.self, forKey: .requestKind)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestKind': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(requestId, forKey: .requestId)
+            try container.encode(requestDigest, forKey: .requestDigest)
+            try container.encode(recordedAt, forKey: .recordedAt)
+            try container.encode(conversationId, forKey: .conversationId)
+            try container.encode(firstMessageId, forKey: .firstMessageId)
+            try container.encode(coordinates, forKey: .coordinates)
+            try container.encode(preparationRequestDigest, forKey: .preparationRequestDigest)
+            try container.encode(actorDid, forKey: .actorDid)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(actorKeyId, forKey: .actorKeyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
+            try container.encode(requestKind, forKey: .requestKind)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(requestId)
+            hasher.combine(requestDigest)
+            hasher.combine(recordedAt)
+            hasher.combine(conversationId)
+            hasher.combine(firstMessageId)
+            hasher.combine(coordinates)
+            hasher.combine(preparationRequestDigest)
+            hasher.combine(actorDid)
+            hasher.combine(actorDeviceId)
+            hasher.combine(actorKeyId)
+            hasher.combine(authGeneration)
+            hasher.combine(requestKind)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if requestId != other.requestId {
+                return false
+            }
+            if requestDigest != other.requestDigest {
+                return false
+            }
+            if recordedAt != other.recordedAt {
+                return false
+            }
+            if conversationId != other.conversationId {
+                return false
+            }
+            if firstMessageId != other.firstMessageId {
+                return false
+            }
+            if coordinates != other.coordinates {
+                return false
+            }
+            if preparationRequestDigest != other.preparationRequestDigest {
+                return false
+            }
+            if actorDid != other.actorDid {
+                return false
+            }
+            if actorDeviceId != other.actorDeviceId {
+                return false
+            }
+            if actorKeyId != other.actorKeyId {
+                return false
+            }
+            if authGeneration != other.authGeneration {
+                return false
+            }
+            if requestKind != other.requestKind {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
+            let requestDigestValue = try requestDigest.toCBORValue()
+            map = map.adding(key: "requestDigest", value: requestDigestValue)
+            let recordedAtValue = try recordedAt.toCBORValue()
+            map = map.adding(key: "recordedAt", value: recordedAtValue)
+            let conversationIdValue = try conversationId.toCBORValue()
+            map = map.adding(key: "conversationId", value: conversationIdValue)
+            let firstMessageIdValue = try firstMessageId.toCBORValue()
+            map = map.adding(key: "firstMessageId", value: firstMessageIdValue)
+            let coordinatesValue = try coordinates.toCBORValue()
+            map = map.adding(key: "coordinates", value: coordinatesValue)
+            let preparationRequestDigestValue = try preparationRequestDigest.toCBORValue()
+            map = map.adding(key: "preparationRequestDigest", value: preparationRequestDigestValue)
+            let actorDidValue = try actorDid.toCBORValue()
+            map = map.adding(key: "actorDid", value: actorDidValue)
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let actorKeyIdValue = try actorKeyId.toCBORValue()
+            map = map.adding(key: "actorKeyId", value: actorKeyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
+            let requestKindValue = try requestKind.toCBORValue()
+            map = map.adding(key: "requestKind", value: requestKindValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case requestId
+            case requestDigest
+            case recordedAt
+            case conversationId
+            case firstMessageId
+            case coordinates
+            case preparationRequestDigest
+            case actorDid
+            case actorDeviceId
+            case actorKeyId
+            case authGeneration
+            case requestKind
+        }
+    }
+        
+public struct DirectRequestCancelledReceipt: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestCancelledReceipt"
+            public let requestId: OperationId
+            public let requestDigest: Bytes
+            public let recordedAt: CanonicalDatetime
+            public let preparationRequestDigest: Bytes
+            public let actorDid: BareDid
+            public let actorDeviceId: DeviceId
+            public let actorKeyId: KeyId
+            public let authGeneration: Int
+            public let requestKind: String
+
+        public init(
+            requestId: OperationId, requestDigest: Bytes, recordedAt: CanonicalDatetime, preparationRequestDigest: Bytes, actorDid: BareDid, actorDeviceId: DeviceId, actorKeyId: KeyId, authGeneration: Int, requestKind: String
+        ) {
+            self.requestId = requestId
+            self.requestDigest = requestDigest
+            self.recordedAt = recordedAt
+            self.preparationRequestDigest = preparationRequestDigest
+            self.actorDid = actorDid
+            self.actorDeviceId = actorDeviceId
+            self.actorKeyId = actorKeyId
+            self.authGeneration = authGeneration
+            self.requestKind = requestKind
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.requestId = try container.decode(OperationId.self, forKey: .requestId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestId': \(error)")
+                throw error
+            }
+            do {
+                self.requestDigest = try container.decode(Bytes.self, forKey: .requestDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestDigest': \(error)")
+                throw error
+            }
+            do {
+                self.recordedAt = try container.decode(CanonicalDatetime.self, forKey: .recordedAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recordedAt': \(error)")
+                throw error
+            }
+            do {
+                self.preparationRequestDigest = try container.decode(Bytes.self, forKey: .preparationRequestDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparationRequestDigest': \(error)")
+                throw error
+            }
+            do {
+                self.actorDid = try container.decode(BareDid.self, forKey: .actorDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDid': \(error)")
+                throw error
+            }
+            do {
+                self.actorDeviceId = try container.decode(DeviceId.self, forKey: .actorDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.actorKeyId = try container.decode(KeyId.self, forKey: .actorKeyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorKeyId': \(error)")
+                throw error
+            }
+            do {
+                self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authGeneration': \(error)")
+                throw error
+            }
+            do {
+                self.requestKind = try container.decode(String.self, forKey: .requestKind)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestKind': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(requestId, forKey: .requestId)
+            try container.encode(requestDigest, forKey: .requestDigest)
+            try container.encode(recordedAt, forKey: .recordedAt)
+            try container.encode(preparationRequestDigest, forKey: .preparationRequestDigest)
+            try container.encode(actorDid, forKey: .actorDid)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(actorKeyId, forKey: .actorKeyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
+            try container.encode(requestKind, forKey: .requestKind)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(requestId)
+            hasher.combine(requestDigest)
+            hasher.combine(recordedAt)
+            hasher.combine(preparationRequestDigest)
+            hasher.combine(actorDid)
+            hasher.combine(actorDeviceId)
+            hasher.combine(actorKeyId)
+            hasher.combine(authGeneration)
+            hasher.combine(requestKind)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if requestId != other.requestId {
+                return false
+            }
+            if requestDigest != other.requestDigest {
+                return false
+            }
+            if recordedAt != other.recordedAt {
+                return false
+            }
+            if preparationRequestDigest != other.preparationRequestDigest {
+                return false
+            }
+            if actorDid != other.actorDid {
+                return false
+            }
+            if actorDeviceId != other.actorDeviceId {
+                return false
+            }
+            if actorKeyId != other.actorKeyId {
+                return false
+            }
+            if authGeneration != other.authGeneration {
+                return false
+            }
+            if requestKind != other.requestKind {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
+            let requestDigestValue = try requestDigest.toCBORValue()
+            map = map.adding(key: "requestDigest", value: requestDigestValue)
+            let recordedAtValue = try recordedAt.toCBORValue()
+            map = map.adding(key: "recordedAt", value: recordedAtValue)
+            let preparationRequestDigestValue = try preparationRequestDigest.toCBORValue()
+            map = map.adding(key: "preparationRequestDigest", value: preparationRequestDigestValue)
+            let actorDidValue = try actorDid.toCBORValue()
+            map = map.adding(key: "actorDid", value: actorDidValue)
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let actorKeyIdValue = try actorKeyId.toCBORValue()
+            map = map.adding(key: "actorKeyId", value: actorKeyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
+            let requestKindValue = try requestKind.toCBORValue()
+            map = map.adding(key: "requestKind", value: requestKindValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case requestId
+            case requestDigest
+            case recordedAt
+            case preparationRequestDigest
+            case actorDid
+            case actorDeviceId
+            case actorKeyId
+            case authGeneration
+            case requestKind
+        }
+    }
+        
+public struct DirectRequestExpiredReceipt: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestExpiredReceipt"
+            public let requestId: OperationId
+            public let requestDigest: Bytes
+            public let recordedAt: CanonicalDatetime
+            public let preparationRequestDigest: Bytes
+            public let actorDid: BareDid
+            public let actorDeviceId: DeviceId
+            public let actorKeyId: KeyId
+            public let authGeneration: Int
+            public let requestKind: String
+
+        public init(
+            requestId: OperationId, requestDigest: Bytes, recordedAt: CanonicalDatetime, preparationRequestDigest: Bytes, actorDid: BareDid, actorDeviceId: DeviceId, actorKeyId: KeyId, authGeneration: Int, requestKind: String
+        ) {
+            self.requestId = requestId
+            self.requestDigest = requestDigest
+            self.recordedAt = recordedAt
+            self.preparationRequestDigest = preparationRequestDigest
+            self.actorDid = actorDid
+            self.actorDeviceId = actorDeviceId
+            self.actorKeyId = actorKeyId
+            self.authGeneration = authGeneration
+            self.requestKind = requestKind
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.requestId = try container.decode(OperationId.self, forKey: .requestId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestId': \(error)")
+                throw error
+            }
+            do {
+                self.requestDigest = try container.decode(Bytes.self, forKey: .requestDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestDigest': \(error)")
+                throw error
+            }
+            do {
+                self.recordedAt = try container.decode(CanonicalDatetime.self, forKey: .recordedAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recordedAt': \(error)")
+                throw error
+            }
+            do {
+                self.preparationRequestDigest = try container.decode(Bytes.self, forKey: .preparationRequestDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparationRequestDigest': \(error)")
+                throw error
+            }
+            do {
+                self.actorDid = try container.decode(BareDid.self, forKey: .actorDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDid': \(error)")
+                throw error
+            }
+            do {
+                self.actorDeviceId = try container.decode(DeviceId.self, forKey: .actorDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.actorKeyId = try container.decode(KeyId.self, forKey: .actorKeyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorKeyId': \(error)")
+                throw error
+            }
+            do {
+                self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authGeneration': \(error)")
+                throw error
+            }
+            do {
+                self.requestKind = try container.decode(String.self, forKey: .requestKind)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestKind': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(requestId, forKey: .requestId)
+            try container.encode(requestDigest, forKey: .requestDigest)
+            try container.encode(recordedAt, forKey: .recordedAt)
+            try container.encode(preparationRequestDigest, forKey: .preparationRequestDigest)
+            try container.encode(actorDid, forKey: .actorDid)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(actorKeyId, forKey: .actorKeyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
+            try container.encode(requestKind, forKey: .requestKind)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(requestId)
+            hasher.combine(requestDigest)
+            hasher.combine(recordedAt)
+            hasher.combine(preparationRequestDigest)
+            hasher.combine(actorDid)
+            hasher.combine(actorDeviceId)
+            hasher.combine(actorKeyId)
+            hasher.combine(authGeneration)
+            hasher.combine(requestKind)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if requestId != other.requestId {
+                return false
+            }
+            if requestDigest != other.requestDigest {
+                return false
+            }
+            if recordedAt != other.recordedAt {
+                return false
+            }
+            if preparationRequestDigest != other.preparationRequestDigest {
+                return false
+            }
+            if actorDid != other.actorDid {
+                return false
+            }
+            if actorDeviceId != other.actorDeviceId {
+                return false
+            }
+            if actorKeyId != other.actorKeyId {
+                return false
+            }
+            if authGeneration != other.authGeneration {
+                return false
+            }
+            if requestKind != other.requestKind {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
+            let requestDigestValue = try requestDigest.toCBORValue()
+            map = map.adding(key: "requestDigest", value: requestDigestValue)
+            let recordedAtValue = try recordedAt.toCBORValue()
+            map = map.adding(key: "recordedAt", value: recordedAtValue)
+            let preparationRequestDigestValue = try preparationRequestDigest.toCBORValue()
+            map = map.adding(key: "preparationRequestDigest", value: preparationRequestDigestValue)
+            let actorDidValue = try actorDid.toCBORValue()
+            map = map.adding(key: "actorDid", value: actorDidValue)
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let actorKeyIdValue = try actorKeyId.toCBORValue()
+            map = map.adding(key: "actorKeyId", value: actorKeyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
+            let requestKindValue = try requestKind.toCBORValue()
+            map = map.adding(key: "requestKind", value: requestKindValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case requestId
+            case requestDigest
+            case recordedAt
+            case preparationRequestDigest
+            case actorDid
+            case actorDeviceId
+            case actorKeyId
+            case authGeneration
+            case requestKind
+        }
+    }
+        
+public struct DirectRequestRejectedReceipt: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestRejectedReceipt"
+            public let requestId: OperationId
+            public let requestDigest: Bytes
+            public let recordedAt: CanonicalDatetime
+            public let code: DefsDirectRequestErrorCode
+            public let preparationRequestDigest: Bytes
+            public let actorDid: BareDid
+            public let actorDeviceId: DeviceId
+            public let actorKeyId: KeyId
+            public let authGeneration: Int
+            public let requestKind: DirectRequestRejectedReceiptRequestKind
+
+        public init(
+            requestId: OperationId, requestDigest: Bytes, recordedAt: CanonicalDatetime, code: DefsDirectRequestErrorCode, preparationRequestDigest: Bytes, actorDid: BareDid, actorDeviceId: DeviceId, actorKeyId: KeyId, authGeneration: Int, requestKind: DirectRequestRejectedReceiptRequestKind
+        ) {
+            self.requestId = requestId
+            self.requestDigest = requestDigest
+            self.recordedAt = recordedAt
+            self.code = code
+            self.preparationRequestDigest = preparationRequestDigest
+            self.actorDid = actorDid
+            self.actorDeviceId = actorDeviceId
+            self.actorKeyId = actorKeyId
+            self.authGeneration = authGeneration
+            self.requestKind = requestKind
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.requestId = try container.decode(OperationId.self, forKey: .requestId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestId': \(error)")
+                throw error
+            }
+            do {
+                self.requestDigest = try container.decode(Bytes.self, forKey: .requestDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestDigest': \(error)")
+                throw error
+            }
+            do {
+                self.recordedAt = try container.decode(CanonicalDatetime.self, forKey: .recordedAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recordedAt': \(error)")
+                throw error
+            }
+            do {
+                self.code = try container.decode(DefsDirectRequestErrorCode.self, forKey: .code)
+            } catch {
+                LogManager.logError("Decoding error for required property 'code': \(error)")
+                throw error
+            }
+            do {
+                self.preparationRequestDigest = try container.decode(Bytes.self, forKey: .preparationRequestDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparationRequestDigest': \(error)")
+                throw error
+            }
+            do {
+                self.actorDid = try container.decode(BareDid.self, forKey: .actorDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDid': \(error)")
+                throw error
+            }
+            do {
+                self.actorDeviceId = try container.decode(DeviceId.self, forKey: .actorDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.actorKeyId = try container.decode(KeyId.self, forKey: .actorKeyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorKeyId': \(error)")
+                throw error
+            }
+            do {
+                self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authGeneration': \(error)")
+                throw error
+            }
+            do {
+                self.requestKind = try container.decode(DirectRequestRejectedReceiptRequestKind.self, forKey: .requestKind)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestKind': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(requestId, forKey: .requestId)
+            try container.encode(requestDigest, forKey: .requestDigest)
+            try container.encode(recordedAt, forKey: .recordedAt)
+            try container.encode(code, forKey: .code)
+            try container.encode(preparationRequestDigest, forKey: .preparationRequestDigest)
+            try container.encode(actorDid, forKey: .actorDid)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(actorKeyId, forKey: .actorKeyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
+            try container.encode(requestKind, forKey: .requestKind)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(requestId)
+            hasher.combine(requestDigest)
+            hasher.combine(recordedAt)
+            hasher.combine(code)
+            hasher.combine(preparationRequestDigest)
+            hasher.combine(actorDid)
+            hasher.combine(actorDeviceId)
+            hasher.combine(actorKeyId)
+            hasher.combine(authGeneration)
+            hasher.combine(requestKind)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if requestId != other.requestId {
+                return false
+            }
+            if requestDigest != other.requestDigest {
+                return false
+            }
+            if recordedAt != other.recordedAt {
+                return false
+            }
+            if code != other.code {
+                return false
+            }
+            if preparationRequestDigest != other.preparationRequestDigest {
+                return false
+            }
+            if actorDid != other.actorDid {
+                return false
+            }
+            if actorDeviceId != other.actorDeviceId {
+                return false
+            }
+            if actorKeyId != other.actorKeyId {
+                return false
+            }
+            if authGeneration != other.authGeneration {
+                return false
+            }
+            if requestKind != other.requestKind {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
+            let requestDigestValue = try requestDigest.toCBORValue()
+            map = map.adding(key: "requestDigest", value: requestDigestValue)
+            let recordedAtValue = try recordedAt.toCBORValue()
+            map = map.adding(key: "recordedAt", value: recordedAtValue)
+            let codeValue = try code.toCBORValue()
+            map = map.adding(key: "code", value: codeValue)
+            let preparationRequestDigestValue = try preparationRequestDigest.toCBORValue()
+            map = map.adding(key: "preparationRequestDigest", value: preparationRequestDigestValue)
+            let actorDidValue = try actorDid.toCBORValue()
+            map = map.adding(key: "actorDid", value: actorDidValue)
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let actorKeyIdValue = try actorKeyId.toCBORValue()
+            map = map.adding(key: "actorKeyId", value: actorKeyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
+            let requestKindValue = try requestKind.toCBORValue()
+            map = map.adding(key: "requestKind", value: requestKindValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case requestId
+            case requestDigest
+            case recordedAt
+            case code
+            case preparationRequestDigest
+            case actorDid
+            case actorDeviceId
+            case actorKeyId
+            case authGeneration
+            case requestKind
+        }
+    }
+        
+public struct DirectRequestExistingDirectReceipt: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestExistingDirectReceipt"
+            public let requestId: OperationId
+            public let requestDigest: Bytes
+            public let recordedAt: CanonicalDatetime
+            public let conversationId: OperationId
+            public let requiresAcceptance: Bool
+            public let preparationRequestDigest: Bytes
+            public let actorDid: BareDid
+            public let actorDeviceId: DeviceId
+            public let actorKeyId: KeyId
+            public let authGeneration: Int
+            public let requestKind: DirectRequestExistingDirectReceiptRequestKind
+
+        public init(
+            requestId: OperationId, requestDigest: Bytes, recordedAt: CanonicalDatetime, conversationId: OperationId, requiresAcceptance: Bool, preparationRequestDigest: Bytes, actorDid: BareDid, actorDeviceId: DeviceId, actorKeyId: KeyId, authGeneration: Int, requestKind: DirectRequestExistingDirectReceiptRequestKind
+        ) {
+            self.requestId = requestId
+            self.requestDigest = requestDigest
+            self.recordedAt = recordedAt
+            self.conversationId = conversationId
+            self.requiresAcceptance = requiresAcceptance
+            self.preparationRequestDigest = preparationRequestDigest
+            self.actorDid = actorDid
+            self.actorDeviceId = actorDeviceId
+            self.actorKeyId = actorKeyId
+            self.authGeneration = authGeneration
+            self.requestKind = requestKind
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.requestId = try container.decode(OperationId.self, forKey: .requestId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestId': \(error)")
+                throw error
+            }
+            do {
+                self.requestDigest = try container.decode(Bytes.self, forKey: .requestDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestDigest': \(error)")
+                throw error
+            }
+            do {
+                self.recordedAt = try container.decode(CanonicalDatetime.self, forKey: .recordedAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recordedAt': \(error)")
+                throw error
+            }
+            do {
+                self.conversationId = try container.decode(OperationId.self, forKey: .conversationId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'conversationId': \(error)")
+                throw error
+            }
+            do {
+                self.requiresAcceptance = try container.decode(Bool.self, forKey: .requiresAcceptance)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requiresAcceptance': \(error)")
+                throw error
+            }
+            do {
+                self.preparationRequestDigest = try container.decode(Bytes.self, forKey: .preparationRequestDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparationRequestDigest': \(error)")
+                throw error
+            }
+            do {
+                self.actorDid = try container.decode(BareDid.self, forKey: .actorDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDid': \(error)")
+                throw error
+            }
+            do {
+                self.actorDeviceId = try container.decode(DeviceId.self, forKey: .actorDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.actorKeyId = try container.decode(KeyId.self, forKey: .actorKeyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorKeyId': \(error)")
+                throw error
+            }
+            do {
+                self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authGeneration': \(error)")
+                throw error
+            }
+            do {
+                self.requestKind = try container.decode(DirectRequestExistingDirectReceiptRequestKind.self, forKey: .requestKind)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestKind': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(requestId, forKey: .requestId)
+            try container.encode(requestDigest, forKey: .requestDigest)
+            try container.encode(recordedAt, forKey: .recordedAt)
+            try container.encode(conversationId, forKey: .conversationId)
+            try container.encode(requiresAcceptance, forKey: .requiresAcceptance)
+            try container.encode(preparationRequestDigest, forKey: .preparationRequestDigest)
+            try container.encode(actorDid, forKey: .actorDid)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(actorKeyId, forKey: .actorKeyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
+            try container.encode(requestKind, forKey: .requestKind)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(requestId)
+            hasher.combine(requestDigest)
+            hasher.combine(recordedAt)
+            hasher.combine(conversationId)
+            hasher.combine(requiresAcceptance)
+            hasher.combine(preparationRequestDigest)
+            hasher.combine(actorDid)
+            hasher.combine(actorDeviceId)
+            hasher.combine(actorKeyId)
+            hasher.combine(authGeneration)
+            hasher.combine(requestKind)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if requestId != other.requestId {
+                return false
+            }
+            if requestDigest != other.requestDigest {
+                return false
+            }
+            if recordedAt != other.recordedAt {
+                return false
+            }
+            if conversationId != other.conversationId {
+                return false
+            }
+            if requiresAcceptance != other.requiresAcceptance {
+                return false
+            }
+            if preparationRequestDigest != other.preparationRequestDigest {
+                return false
+            }
+            if actorDid != other.actorDid {
+                return false
+            }
+            if actorDeviceId != other.actorDeviceId {
+                return false
+            }
+            if actorKeyId != other.actorKeyId {
+                return false
+            }
+            if authGeneration != other.authGeneration {
+                return false
+            }
+            if requestKind != other.requestKind {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
+            let requestDigestValue = try requestDigest.toCBORValue()
+            map = map.adding(key: "requestDigest", value: requestDigestValue)
+            let recordedAtValue = try recordedAt.toCBORValue()
+            map = map.adding(key: "recordedAt", value: recordedAtValue)
+            let conversationIdValue = try conversationId.toCBORValue()
+            map = map.adding(key: "conversationId", value: conversationIdValue)
+            let requiresAcceptanceValue = try requiresAcceptance.toCBORValue()
+            map = map.adding(key: "requiresAcceptance", value: requiresAcceptanceValue)
+            let preparationRequestDigestValue = try preparationRequestDigest.toCBORValue()
+            map = map.adding(key: "preparationRequestDigest", value: preparationRequestDigestValue)
+            let actorDidValue = try actorDid.toCBORValue()
+            map = map.adding(key: "actorDid", value: actorDidValue)
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let actorKeyIdValue = try actorKeyId.toCBORValue()
+            map = map.adding(key: "actorKeyId", value: actorKeyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
+            let requestKindValue = try requestKind.toCBORValue()
+            map = map.adding(key: "requestKind", value: requestKindValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case requestId
+            case requestDigest
+            case recordedAt
+            case conversationId
+            case requiresAcceptance
+            case preparationRequestDigest
+            case actorDid
+            case actorDeviceId
+            case actorKeyId
+            case authGeneration
+            case requestKind
+        }
+    }
+        
+public struct DirectRequestReceiptBody: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestReceiptBody"
+            public let signatureDomain: String
+            public let protocolVersion: String
+            public let authorityDid: String
+            public let keyId: DirectRequestReceiptKeyId
+            public let receipt: DirectRequestTerminalReceipt
+
+        public init(
+            signatureDomain: String, protocolVersion: String, authorityDid: String, keyId: DirectRequestReceiptKeyId, receipt: DirectRequestTerminalReceipt
+        ) {
+            self.signatureDomain = signatureDomain
+            self.protocolVersion = protocolVersion
+            self.authorityDid = authorityDid
+            self.keyId = keyId
+            self.receipt = receipt
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.signatureDomain = try container.decode(String.self, forKey: .signatureDomain)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signatureDomain': \(error)")
+                throw error
+            }
+            do {
+                self.protocolVersion = try container.decode(String.self, forKey: .protocolVersion)
+            } catch {
+                LogManager.logError("Decoding error for required property 'protocolVersion': \(error)")
+                throw error
+            }
+            do {
+                self.authorityDid = try container.decode(String.self, forKey: .authorityDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authorityDid': \(error)")
+                throw error
+            }
+            do {
+                self.keyId = try container.decode(DirectRequestReceiptKeyId.self, forKey: .keyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyId': \(error)")
+                throw error
+            }
+            do {
+                self.receipt = try container.decode(DirectRequestTerminalReceipt.self, forKey: .receipt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'receipt': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(signatureDomain, forKey: .signatureDomain)
+            try container.encode(protocolVersion, forKey: .protocolVersion)
+            try container.encode(authorityDid, forKey: .authorityDid)
+            try container.encode(keyId, forKey: .keyId)
+            try container.encode(receipt, forKey: .receipt)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(signatureDomain)
+            hasher.combine(protocolVersion)
+            hasher.combine(authorityDid)
+            hasher.combine(keyId)
+            hasher.combine(receipt)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if signatureDomain != other.signatureDomain {
+                return false
+            }
+            if protocolVersion != other.protocolVersion {
+                return false
+            }
+            if authorityDid != other.authorityDid {
+                return false
+            }
+            if keyId != other.keyId {
+                return false
+            }
+            if receipt != other.receipt {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let signatureDomainValue = try signatureDomain.toCBORValue()
+            map = map.adding(key: "signatureDomain", value: signatureDomainValue)
+            let protocolVersionValue = try protocolVersion.toCBORValue()
+            map = map.adding(key: "protocolVersion", value: protocolVersionValue)
+            let authorityDidValue = try authorityDid.toCBORValue()
+            map = map.adding(key: "authorityDid", value: authorityDidValue)
+            let keyIdValue = try keyId.toCBORValue()
+            map = map.adding(key: "keyId", value: keyIdValue)
+            let receiptValue = try receipt.toCBORValue()
+            map = map.adding(key: "receipt", value: receiptValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case signatureDomain
+            case protocolVersion
+            case authorityDid
+            case keyId
+            case receipt
+        }
+    }
+        
+public struct SignedDirectRequestReceipt: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestReceipt"
+            public let body: SignedDirectRequestReceiptBodyUnion
+            public let signature: Bytes
+
+        public init(
+            body: SignedDirectRequestReceiptBodyUnion, signature: Bytes
+        ) {
+            self.body = body
+            self.signature = signature
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.body = try container.decode(SignedDirectRequestReceiptBodyUnion.self, forKey: .body)
+            } catch {
+                LogManager.logError("Decoding error for required property 'body': \(error)")
+                throw error
+            }
+            do {
+                self.signature = try container.decode(Bytes.self, forKey: .signature)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signature': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(body, forKey: .body)
+            try container.encode(signature, forKey: .signature)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(body)
+            hasher.combine(signature)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if body != other.body {
+                return false
+            }
+            if signature != other.signature {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let bodyValue = try body.toCBORValue()
+            map = map.adding(key: "body", value: bodyValue)
+            let signatureValue = try signature.toCBORValue()
+            map = map.adding(key: "signature", value: signatureValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case body
+            case signature
+        }
+    }
+        
+public struct DirectRequestCoverage: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestCoverage"
+            public let accountDid: BareDid
+            public let includedDeviceIds: [DeviceId]
+            public let unavailableDeviceIds: [DeviceId]
+
+        public init(
+            accountDid: BareDid, includedDeviceIds: [DeviceId], unavailableDeviceIds: [DeviceId]
+        ) {
+            self.accountDid = accountDid
+            self.includedDeviceIds = includedDeviceIds
+            self.unavailableDeviceIds = unavailableDeviceIds
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.accountDid = try container.decode(BareDid.self, forKey: .accountDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'accountDid': \(error)")
+                throw error
+            }
+            do {
+                self.includedDeviceIds = try container.decode([DeviceId].self, forKey: .includedDeviceIds)
+            } catch {
+                LogManager.logError("Decoding error for required property 'includedDeviceIds': \(error)")
+                throw error
+            }
+            do {
+                self.unavailableDeviceIds = try container.decode([DeviceId].self, forKey: .unavailableDeviceIds)
+            } catch {
+                LogManager.logError("Decoding error for required property 'unavailableDeviceIds': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(accountDid, forKey: .accountDid)
+            try container.encode(includedDeviceIds, forKey: .includedDeviceIds)
+            try container.encode(unavailableDeviceIds, forKey: .unavailableDeviceIds)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(accountDid)
+            hasher.combine(includedDeviceIds)
+            hasher.combine(unavailableDeviceIds)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if accountDid != other.accountDid {
+                return false
+            }
+            if includedDeviceIds != other.includedDeviceIds {
+                return false
+            }
+            if unavailableDeviceIds != other.unavailableDeviceIds {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let accountDidValue = try accountDid.toCBORValue()
+            map = map.adding(key: "accountDid", value: accountDidValue)
+            let includedDeviceIdsValue = try includedDeviceIds.toCBORValue()
+            map = map.adding(key: "includedDeviceIds", value: includedDeviceIdsValue)
+            let unavailableDeviceIdsValue = try unavailableDeviceIds.toCBORValue()
+            map = map.adding(key: "unavailableDeviceIds", value: unavailableDeviceIdsValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case accountDid
+            case includedDeviceIds
+            case unavailableDeviceIds
+        }
+    }
+        
+public struct DirectRequestState: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestState"
+            public let requestId: OperationId
+            public let firstMessageId: OperationId
+            public let senderDid: BareDid
+            public let recipientDid: BareDid
+            public let consent: DirectRequestStateConsent
+            public let importUntil: CanonicalDatetime
+            public let contextHash: Bytes
+            public let preparationDigest: Bytes
+
+        public init(
+            requestId: OperationId, firstMessageId: OperationId, senderDid: BareDid, recipientDid: BareDid, consent: DirectRequestStateConsent, importUntil: CanonicalDatetime, contextHash: Bytes, preparationDigest: Bytes
+        ) {
+            self.requestId = requestId
+            self.firstMessageId = firstMessageId
+            self.senderDid = senderDid
+            self.recipientDid = recipientDid
+            self.consent = consent
+            self.importUntil = importUntil
+            self.contextHash = contextHash
+            self.preparationDigest = preparationDigest
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.requestId = try container.decode(OperationId.self, forKey: .requestId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestId': \(error)")
+                throw error
+            }
+            do {
+                self.firstMessageId = try container.decode(OperationId.self, forKey: .firstMessageId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'firstMessageId': \(error)")
+                throw error
+            }
+            do {
+                self.senderDid = try container.decode(BareDid.self, forKey: .senderDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'senderDid': \(error)")
+                throw error
+            }
+            do {
+                self.recipientDid = try container.decode(BareDid.self, forKey: .recipientDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recipientDid': \(error)")
+                throw error
+            }
+            do {
+                self.consent = try container.decode(DirectRequestStateConsent.self, forKey: .consent)
+            } catch {
+                LogManager.logError("Decoding error for required property 'consent': \(error)")
+                throw error
+            }
+            do {
+                self.importUntil = try container.decode(CanonicalDatetime.self, forKey: .importUntil)
+            } catch {
+                LogManager.logError("Decoding error for required property 'importUntil': \(error)")
+                throw error
+            }
+            do {
+                self.contextHash = try container.decode(Bytes.self, forKey: .contextHash)
+            } catch {
+                LogManager.logError("Decoding error for required property 'contextHash': \(error)")
+                throw error
+            }
+            do {
+                self.preparationDigest = try container.decode(Bytes.self, forKey: .preparationDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparationDigest': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(requestId, forKey: .requestId)
+            try container.encode(firstMessageId, forKey: .firstMessageId)
+            try container.encode(senderDid, forKey: .senderDid)
+            try container.encode(recipientDid, forKey: .recipientDid)
+            try container.encode(consent, forKey: .consent)
+            try container.encode(importUntil, forKey: .importUntil)
+            try container.encode(contextHash, forKey: .contextHash)
+            try container.encode(preparationDigest, forKey: .preparationDigest)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(requestId)
+            hasher.combine(firstMessageId)
+            hasher.combine(senderDid)
+            hasher.combine(recipientDid)
+            hasher.combine(consent)
+            hasher.combine(importUntil)
+            hasher.combine(contextHash)
+            hasher.combine(preparationDigest)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if requestId != other.requestId {
+                return false
+            }
+            if firstMessageId != other.firstMessageId {
+                return false
+            }
+            if senderDid != other.senderDid {
+                return false
+            }
+            if recipientDid != other.recipientDid {
+                return false
+            }
+            if consent != other.consent {
+                return false
+            }
+            if importUntil != other.importUntil {
+                return false
+            }
+            if contextHash != other.contextHash {
+                return false
+            }
+            if preparationDigest != other.preparationDigest {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
+            let firstMessageIdValue = try firstMessageId.toCBORValue()
+            map = map.adding(key: "firstMessageId", value: firstMessageIdValue)
+            let senderDidValue = try senderDid.toCBORValue()
+            map = map.adding(key: "senderDid", value: senderDidValue)
+            let recipientDidValue = try recipientDid.toCBORValue()
+            map = map.adding(key: "recipientDid", value: recipientDidValue)
+            let consentValue = try consent.toCBORValue()
+            map = map.adding(key: "consent", value: consentValue)
+            let importUntilValue = try importUntil.toCBORValue()
+            map = map.adding(key: "importUntil", value: importUntilValue)
+            let contextHashValue = try contextHash.toCBORValue()
+            map = map.adding(key: "contextHash", value: contextHashValue)
+            let preparationDigestValue = try preparationDigest.toCBORValue()
+            map = map.adding(key: "preparationDigest", value: preparationDigestValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case requestId
+            case firstMessageId
+            case senderDid
+            case recipientDid
+            case consent
+            case importUntil
+            case contextHash
+            case preparationDigest
+        }
+    }
+        
+public struct DirectRequestEntry: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestEntry"
+            public let seq: Int
+            public let signedRequest: SignedDirectRequestPublication
+
+        public init(
+            seq: Int, signedRequest: SignedDirectRequestPublication
+        ) {
+            self.seq = seq
+            self.signedRequest = signedRequest
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.seq = try container.decode(Int.self, forKey: .seq)
+            } catch {
+                LogManager.logError("Decoding error for required property 'seq': \(error)")
+                throw error
+            }
+            do {
+                self.signedRequest = try container.decode(SignedDirectRequestPublication.self, forKey: .signedRequest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signedRequest': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(seq, forKey: .seq)
+            try container.encode(signedRequest, forKey: .signedRequest)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(seq)
+            hasher.combine(signedRequest)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if seq != other.seq {
+                return false
+            }
+            if signedRequest != other.signedRequest {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let seqValue = try seq.toCBORValue()
+            map = map.adding(key: "seq", value: seqValue)
+            let signedRequestValue = try signedRequest.toCBORValue()
+            map = map.adding(key: "signedRequest", value: signedRequestValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case seq
+            case signedRequest
+        }
+    }
+        
+public struct DirectRequestAcceptanceEntry: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestAcceptanceEntry"
+            public let seq: Int
+            public let signedRequest: SignedDirectRequestAcceptance
+
+        public init(
+            seq: Int, signedRequest: SignedDirectRequestAcceptance
+        ) {
+            self.seq = seq
+            self.signedRequest = signedRequest
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.seq = try container.decode(Int.self, forKey: .seq)
+            } catch {
+                LogManager.logError("Decoding error for required property 'seq': \(error)")
+                throw error
+            }
+            do {
+                self.signedRequest = try container.decode(SignedDirectRequestAcceptance.self, forKey: .signedRequest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signedRequest': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(seq, forKey: .seq)
+            try container.encode(signedRequest, forKey: .signedRequest)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(seq)
+            hasher.combine(signedRequest)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if seq != other.seq {
+                return false
+            }
+            if signedRequest != other.signedRequest {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let seqValue = try seq.toCBORValue()
+            map = map.adding(key: "seq", value: seqValue)
+            let signedRequestValue = try signedRequest.toCBORValue()
+            map = map.adding(key: "signedRequest", value: signedRequestValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case seq
+            case signedRequest
+        }
+    }
+        
+public struct DirectRequestWelcomeView: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestWelcomeView"
+            public let welcomeId: OperationId
+            public let conversationId: OperationId
+            public let transitionSeq: Int
+            public let coordinates: ConversationCoordinates
+            public let status: DefsWelcomeStatus
+            public let opaqueWelcome: Bytes
+            public let sha256: Bytes
+            public let recipientDid: BareDid
+            public let recipientDeviceId: DeviceId
+            public let provenance: DirectRequestWelcomeProvenance
+
+        public init(
+            welcomeId: OperationId, conversationId: OperationId, transitionSeq: Int, coordinates: ConversationCoordinates, status: DefsWelcomeStatus, opaqueWelcome: Bytes, sha256: Bytes, recipientDid: BareDid, recipientDeviceId: DeviceId, provenance: DirectRequestWelcomeProvenance
+        ) {
+            self.welcomeId = welcomeId
+            self.conversationId = conversationId
+            self.transitionSeq = transitionSeq
+            self.coordinates = coordinates
+            self.status = status
+            self.opaqueWelcome = opaqueWelcome
+            self.sha256 = sha256
+            self.recipientDid = recipientDid
+            self.recipientDeviceId = recipientDeviceId
+            self.provenance = provenance
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.welcomeId = try container.decode(OperationId.self, forKey: .welcomeId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'welcomeId': \(error)")
+                throw error
+            }
+            do {
+                self.conversationId = try container.decode(OperationId.self, forKey: .conversationId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'conversationId': \(error)")
+                throw error
+            }
+            do {
+                self.transitionSeq = try container.decode(Int.self, forKey: .transitionSeq)
+            } catch {
+                LogManager.logError("Decoding error for required property 'transitionSeq': \(error)")
+                throw error
+            }
+            do {
+                self.coordinates = try container.decode(ConversationCoordinates.self, forKey: .coordinates)
+            } catch {
+                LogManager.logError("Decoding error for required property 'coordinates': \(error)")
+                throw error
+            }
+            do {
+                self.status = try container.decode(DefsWelcomeStatus.self, forKey: .status)
+            } catch {
+                LogManager.logError("Decoding error for required property 'status': \(error)")
+                throw error
+            }
+            do {
+                self.opaqueWelcome = try container.decode(Bytes.self, forKey: .opaqueWelcome)
+            } catch {
+                LogManager.logError("Decoding error for required property 'opaqueWelcome': \(error)")
+                throw error
+            }
+            do {
+                self.sha256 = try container.decode(Bytes.self, forKey: .sha256)
+            } catch {
+                LogManager.logError("Decoding error for required property 'sha256': \(error)")
+                throw error
+            }
+            do {
+                self.recipientDid = try container.decode(BareDid.self, forKey: .recipientDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recipientDid': \(error)")
+                throw error
+            }
+            do {
+                self.recipientDeviceId = try container.decode(DeviceId.self, forKey: .recipientDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recipientDeviceId': \(error)")
+                throw error
+            }
+            do {
+                self.provenance = try container.decode(DirectRequestWelcomeProvenance.self, forKey: .provenance)
+            } catch {
+                LogManager.logError("Decoding error for required property 'provenance': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(welcomeId, forKey: .welcomeId)
+            try container.encode(conversationId, forKey: .conversationId)
+            try container.encode(transitionSeq, forKey: .transitionSeq)
+            try container.encode(coordinates, forKey: .coordinates)
+            try container.encode(status, forKey: .status)
+            try container.encode(opaqueWelcome, forKey: .opaqueWelcome)
+            try container.encode(sha256, forKey: .sha256)
+            try container.encode(recipientDid, forKey: .recipientDid)
+            try container.encode(recipientDeviceId, forKey: .recipientDeviceId)
+            try container.encode(provenance, forKey: .provenance)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(welcomeId)
+            hasher.combine(conversationId)
+            hasher.combine(transitionSeq)
+            hasher.combine(coordinates)
+            hasher.combine(status)
+            hasher.combine(opaqueWelcome)
+            hasher.combine(sha256)
+            hasher.combine(recipientDid)
+            hasher.combine(recipientDeviceId)
+            hasher.combine(provenance)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if welcomeId != other.welcomeId {
+                return false
+            }
+            if conversationId != other.conversationId {
+                return false
+            }
+            if transitionSeq != other.transitionSeq {
+                return false
+            }
+            if coordinates != other.coordinates {
+                return false
+            }
+            if status != other.status {
+                return false
+            }
+            if opaqueWelcome != other.opaqueWelcome {
+                return false
+            }
+            if sha256 != other.sha256 {
+                return false
+            }
+            if recipientDid != other.recipientDid {
+                return false
+            }
+            if recipientDeviceId != other.recipientDeviceId {
+                return false
+            }
+            if provenance != other.provenance {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let welcomeIdValue = try welcomeId.toCBORValue()
+            map = map.adding(key: "welcomeId", value: welcomeIdValue)
+            let conversationIdValue = try conversationId.toCBORValue()
+            map = map.adding(key: "conversationId", value: conversationIdValue)
+            let transitionSeqValue = try transitionSeq.toCBORValue()
+            map = map.adding(key: "transitionSeq", value: transitionSeqValue)
+            let coordinatesValue = try coordinates.toCBORValue()
+            map = map.adding(key: "coordinates", value: coordinatesValue)
+            let statusValue = try status.toCBORValue()
+            map = map.adding(key: "status", value: statusValue)
+            let opaqueWelcomeValue = try opaqueWelcome.toCBORValue()
+            map = map.adding(key: "opaqueWelcome", value: opaqueWelcomeValue)
+            let sha256Value = try sha256.toCBORValue()
+            map = map.adding(key: "sha256", value: sha256Value)
+            let recipientDidValue = try recipientDid.toCBORValue()
+            map = map.adding(key: "recipientDid", value: recipientDidValue)
+            let recipientDeviceIdValue = try recipientDeviceId.toCBORValue()
+            map = map.adding(key: "recipientDeviceId", value: recipientDeviceIdValue)
+            let provenanceValue = try provenance.toCBORValue()
+            map = map.adding(key: "provenance", value: provenanceValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case welcomeId
+            case conversationId
+            case transitionSeq
+            case coordinates
+            case status
+            case opaqueWelcome
+            case sha256
+            case recipientDid
+            case recipientDeviceId
+            case provenance
+        }
+    }
+        
+public struct DirectRequestInventoryScope: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestInventoryScope"
+            public let supportedProtocolVersions: [DefsProtocolVersion]
+            public let scopeDigest: Bytes
+
+        public init(
+            supportedProtocolVersions: [DefsProtocolVersion], scopeDigest: Bytes
+        ) {
+            self.supportedProtocolVersions = supportedProtocolVersions
+            self.scopeDigest = scopeDigest
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.supportedProtocolVersions = try container.decode([DefsProtocolVersion].self, forKey: .supportedProtocolVersions)
+            } catch {
+                LogManager.logError("Decoding error for required property 'supportedProtocolVersions': \(error)")
+                throw error
+            }
+            do {
+                self.scopeDigest = try container.decode(Bytes.self, forKey: .scopeDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'scopeDigest': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(supportedProtocolVersions, forKey: .supportedProtocolVersions)
+            try container.encode(scopeDigest, forKey: .scopeDigest)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(supportedProtocolVersions)
+            hasher.combine(scopeDigest)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if supportedProtocolVersions != other.supportedProtocolVersions {
+                return false
+            }
+            if scopeDigest != other.scopeDigest {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let supportedProtocolVersionsValue = try supportedProtocolVersions.toCBORValue()
+            map = map.adding(key: "supportedProtocolVersions", value: supportedProtocolVersionsValue)
+            let scopeDigestValue = try scopeDigest.toCBORValue()
+            map = map.adding(key: "scopeDigest", value: scopeDigestValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case supportedProtocolVersions
+            case scopeDigest
+        }
+    }
+        
+public struct DirectRequestPreparationSnapshot: ATProtocolCodable, ATProtocolValue {
+            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPreparationSnapshot"
+            public let protocolVersion: String
+            public let requestId: OperationId
+            public let firstMessageId: OperationId
+            public let conversationId: OperationId
+            public let recipientDid: BareDid
+            public let origin: DirectRequestOrigin
+            public let profile: DirectRequestProfile
+            public let creator: DirectRequestCreator
+            public let selectedDevices: [DirectRequestSelectedDevice]
+            public let preparedAt: CanonicalDatetime
+            public let leaseExpiresAt: CanonicalDatetime
+            public let minimumImportUntil: CanonicalDatetime
+            public let preparationRequestDigest: Bytes
+            public let authorityDid: String
+            public let receiptKeyId: DirectRequestReceiptKeyId
+
+        public init(
+            protocolVersion: String, requestId: OperationId, firstMessageId: OperationId, conversationId: OperationId, recipientDid: BareDid, origin: DirectRequestOrigin, profile: DirectRequestProfile, creator: DirectRequestCreator, selectedDevices: [DirectRequestSelectedDevice], preparedAt: CanonicalDatetime, leaseExpiresAt: CanonicalDatetime, minimumImportUntil: CanonicalDatetime, preparationRequestDigest: Bytes, authorityDid: String, receiptKeyId: DirectRequestReceiptKeyId
+        ) {
+            self.protocolVersion = protocolVersion
+            self.requestId = requestId
+            self.firstMessageId = firstMessageId
+            self.conversationId = conversationId
+            self.recipientDid = recipientDid
+            self.origin = origin
+            self.profile = profile
+            self.creator = creator
+            self.selectedDevices = selectedDevices
+            self.preparedAt = preparedAt
+            self.leaseExpiresAt = leaseExpiresAt
+            self.minimumImportUntil = minimumImportUntil
+            self.preparationRequestDigest = preparationRequestDigest
+            self.authorityDid = authorityDid
+            self.receiptKeyId = receiptKeyId
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.protocolVersion = try container.decode(String.self, forKey: .protocolVersion)
+            } catch {
+                LogManager.logError("Decoding error for required property 'protocolVersion': \(error)")
+                throw error
+            }
+            do {
+                self.requestId = try container.decode(OperationId.self, forKey: .requestId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'requestId': \(error)")
+                throw error
+            }
+            do {
+                self.firstMessageId = try container.decode(OperationId.self, forKey: .firstMessageId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'firstMessageId': \(error)")
+                throw error
+            }
+            do {
+                self.conversationId = try container.decode(OperationId.self, forKey: .conversationId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'conversationId': \(error)")
+                throw error
+            }
+            do {
+                self.recipientDid = try container.decode(BareDid.self, forKey: .recipientDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'recipientDid': \(error)")
+                throw error
+            }
+            do {
+                self.origin = try container.decode(DirectRequestOrigin.self, forKey: .origin)
+            } catch {
+                LogManager.logError("Decoding error for required property 'origin': \(error)")
+                throw error
+            }
+            do {
+                self.profile = try container.decode(DirectRequestProfile.self, forKey: .profile)
+            } catch {
+                LogManager.logError("Decoding error for required property 'profile': \(error)")
+                throw error
+            }
+            do {
+                self.creator = try container.decode(DirectRequestCreator.self, forKey: .creator)
+            } catch {
+                LogManager.logError("Decoding error for required property 'creator': \(error)")
+                throw error
+            }
+            do {
+                self.selectedDevices = try container.decode([DirectRequestSelectedDevice].self, forKey: .selectedDevices)
+            } catch {
+                LogManager.logError("Decoding error for required property 'selectedDevices': \(error)")
+                throw error
+            }
+            do {
+                self.preparedAt = try container.decode(CanonicalDatetime.self, forKey: .preparedAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparedAt': \(error)")
+                throw error
+            }
+            do {
+                self.leaseExpiresAt = try container.decode(CanonicalDatetime.self, forKey: .leaseExpiresAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'leaseExpiresAt': \(error)")
+                throw error
+            }
+            do {
+                self.minimumImportUntil = try container.decode(CanonicalDatetime.self, forKey: .minimumImportUntil)
+            } catch {
+                LogManager.logError("Decoding error for required property 'minimumImportUntil': \(error)")
+                throw error
+            }
+            do {
+                self.preparationRequestDigest = try container.decode(Bytes.self, forKey: .preparationRequestDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'preparationRequestDigest': \(error)")
+                throw error
+            }
+            do {
+                self.authorityDid = try container.decode(String.self, forKey: .authorityDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authorityDid': \(error)")
+                throw error
+            }
+            do {
+                self.receiptKeyId = try container.decode(DirectRequestReceiptKeyId.self, forKey: .receiptKeyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'receiptKeyId': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(protocolVersion, forKey: .protocolVersion)
+            try container.encode(requestId, forKey: .requestId)
+            try container.encode(firstMessageId, forKey: .firstMessageId)
+            try container.encode(conversationId, forKey: .conversationId)
+            try container.encode(recipientDid, forKey: .recipientDid)
+            try container.encode(origin, forKey: .origin)
+            try container.encode(profile, forKey: .profile)
+            try container.encode(creator, forKey: .creator)
+            try container.encode(selectedDevices, forKey: .selectedDevices)
+            try container.encode(preparedAt, forKey: .preparedAt)
+            try container.encode(leaseExpiresAt, forKey: .leaseExpiresAt)
+            try container.encode(minimumImportUntil, forKey: .minimumImportUntil)
+            try container.encode(preparationRequestDigest, forKey: .preparationRequestDigest)
+            try container.encode(authorityDid, forKey: .authorityDid)
+            try container.encode(receiptKeyId, forKey: .receiptKeyId)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(protocolVersion)
+            hasher.combine(requestId)
+            hasher.combine(firstMessageId)
+            hasher.combine(conversationId)
+            hasher.combine(recipientDid)
+            hasher.combine(origin)
+            hasher.combine(profile)
+            hasher.combine(creator)
+            hasher.combine(selectedDevices)
+            hasher.combine(preparedAt)
+            hasher.combine(leaseExpiresAt)
+            hasher.combine(minimumImportUntil)
+            hasher.combine(preparationRequestDigest)
+            hasher.combine(authorityDid)
+            hasher.combine(receiptKeyId)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if protocolVersion != other.protocolVersion {
+                return false
+            }
+            if requestId != other.requestId {
+                return false
+            }
+            if firstMessageId != other.firstMessageId {
+                return false
+            }
+            if conversationId != other.conversationId {
+                return false
+            }
+            if recipientDid != other.recipientDid {
+                return false
+            }
+            if origin != other.origin {
+                return false
+            }
+            if profile != other.profile {
+                return false
+            }
+            if creator != other.creator {
+                return false
+            }
+            if selectedDevices != other.selectedDevices {
+                return false
+            }
+            if preparedAt != other.preparedAt {
+                return false
+            }
+            if leaseExpiresAt != other.leaseExpiresAt {
+                return false
+            }
+            if minimumImportUntil != other.minimumImportUntil {
+                return false
+            }
+            if preparationRequestDigest != other.preparationRequestDigest {
+                return false
+            }
+            if authorityDid != other.authorityDid {
+                return false
+            }
+            if receiptKeyId != other.receiptKeyId {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let protocolVersionValue = try protocolVersion.toCBORValue()
+            map = map.adding(key: "protocolVersion", value: protocolVersionValue)
+            let requestIdValue = try requestId.toCBORValue()
+            map = map.adding(key: "requestId", value: requestIdValue)
+            let firstMessageIdValue = try firstMessageId.toCBORValue()
+            map = map.adding(key: "firstMessageId", value: firstMessageIdValue)
+            let conversationIdValue = try conversationId.toCBORValue()
+            map = map.adding(key: "conversationId", value: conversationIdValue)
+            let recipientDidValue = try recipientDid.toCBORValue()
+            map = map.adding(key: "recipientDid", value: recipientDidValue)
+            let originValue = try origin.toCBORValue()
+            map = map.adding(key: "origin", value: originValue)
+            let profileValue = try profile.toCBORValue()
+            map = map.adding(key: "profile", value: profileValue)
+            let creatorValue = try creator.toCBORValue()
+            map = map.adding(key: "creator", value: creatorValue)
+            let selectedDevicesValue = try selectedDevices.toCBORValue()
+            map = map.adding(key: "selectedDevices", value: selectedDevicesValue)
+            let preparedAtValue = try preparedAt.toCBORValue()
+            map = map.adding(key: "preparedAt", value: preparedAtValue)
+            let leaseExpiresAtValue = try leaseExpiresAt.toCBORValue()
+            map = map.adding(key: "leaseExpiresAt", value: leaseExpiresAtValue)
+            let minimumImportUntilValue = try minimumImportUntil.toCBORValue()
+            map = map.adding(key: "minimumImportUntil", value: minimumImportUntilValue)
+            let preparationRequestDigestValue = try preparationRequestDigest.toCBORValue()
+            map = map.adding(key: "preparationRequestDigest", value: preparationRequestDigestValue)
+            let authorityDidValue = try authorityDid.toCBORValue()
+            map = map.adding(key: "authorityDid", value: authorityDidValue)
+            let receiptKeyIdValue = try receiptKeyId.toCBORValue()
+            map = map.adding(key: "receiptKeyId", value: receiptKeyIdValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case protocolVersion
+            case requestId
+            case firstMessageId
+            case conversationId
+            case recipientDid
+            case origin
+            case profile
+            case creator
+            case selectedDevices
+            case preparedAt
+            case leaseExpiresAt
+            case minimumImportUntil
+            case preparationRequestDigest
+            case authorityDid
+            case receiptKeyId
+        }
+    }
 
 
 
 public enum DefsProtocolVersion: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
     case value_1 = "1"
+    case value_2 = "2"
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let otherValue = other as? DefsProtocolVersion else { return false }
@@ -24741,6 +30879,8 @@ public enum ConversationEntry: Codable, ATProtocolCodable, ATProtocolValue, Send
     case blueCatbirdChatDefsZeroLeafLeaveEntry(BlueCatbirdChatDefs.ZeroLeafLeaveEntry)
     case blueCatbirdChatDefsLeaveCancellationEntry(BlueCatbirdChatDefs.LeaveCancellationEntry)
     case blueCatbirdChatDefsLeaveCommitFulfillmentEntry(BlueCatbirdChatDefs.LeaveCommitFulfillmentEntry)
+    case blueCatbirdChatDefsDirectRequestEntry(BlueCatbirdChatDefs.DirectRequestEntry)
+    case blueCatbirdChatDefsDirectRequestAcceptanceEntry(BlueCatbirdChatDefs.DirectRequestAcceptanceEntry)
     case unexpected(ATProtocolValueContainer)
     public init(_ value: BlueCatbirdChatDefs.ApplicationEntry) {
         self = .blueCatbirdChatDefsApplicationEntry(value)
@@ -24783,6 +30923,12 @@ public enum ConversationEntry: Codable, ATProtocolCodable, ATProtocolValue, Send
     }
     public init(_ value: BlueCatbirdChatDefs.LeaveCommitFulfillmentEntry) {
         self = .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(value)
+    }
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestEntry) {
+        self = .blueCatbirdChatDefsDirectRequestEntry(value)
+    }
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestAcceptanceEntry) {
+        self = .blueCatbirdChatDefsDirectRequestAcceptanceEntry(value)
     }
 
     public init(from decoder: Decoder) throws {
@@ -24832,6 +30978,12 @@ public enum ConversationEntry: Codable, ATProtocolCodable, ATProtocolValue, Send
         case "blue.catbird.chat.defs#leaveCommitFulfillmentEntry":
             let value = try BlueCatbirdChatDefs.LeaveCommitFulfillmentEntry(from: decoder)
             self = .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(value)
+        case "blue.catbird.chat.defs#directRequestEntry":
+            let value = try BlueCatbirdChatDefs.DirectRequestEntry(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestEntry(value)
+        case "blue.catbird.chat.defs#directRequestAcceptanceEntry":
+            let value = try BlueCatbirdChatDefs.DirectRequestAcceptanceEntry(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestAcceptanceEntry(value)
         default:
             let unknownValue = try ATProtocolValueContainer(from: decoder)
             self = .unexpected(unknownValue)
@@ -24884,6 +31036,12 @@ public enum ConversationEntry: Codable, ATProtocolCodable, ATProtocolValue, Send
         case .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(let value):
             try container.encode("blue.catbird.chat.defs#leaveCommitFulfillmentEntry", forKey: .type)
             try value.encode(to: encoder)
+        case .blueCatbirdChatDefsDirectRequestEntry(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestEntry", forKey: .type)
+            try value.encode(to: encoder)
+        case .blueCatbirdChatDefsDirectRequestAcceptanceEntry(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestAcceptanceEntry", forKey: .type)
+            try value.encode(to: encoder)
         case .unexpected(let container):
             try container.encode(to: encoder)
         }
@@ -24932,6 +31090,12 @@ public enum ConversationEntry: Codable, ATProtocolCodable, ATProtocolValue, Send
             hasher.combine(value)
         case .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(let value):
             hasher.combine("blue.catbird.chat.defs#leaveCommitFulfillmentEntry")
+            hasher.combine(value)
+        case .blueCatbirdChatDefsDirectRequestEntry(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestEntry")
+            hasher.combine(value)
+        case .blueCatbirdChatDefsDirectRequestAcceptanceEntry(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestAcceptanceEntry")
             hasher.combine(value)
         case .unexpected(let container):
             hasher.combine("unexpected")
@@ -24986,6 +31150,12 @@ public enum ConversationEntry: Codable, ATProtocolCodable, ATProtocolValue, Send
             return lhsValue == rhsValue
         case (.blueCatbirdChatDefsLeaveCommitFulfillmentEntry(let lhsValue),
               .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.blueCatbirdChatDefsDirectRequestEntry(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestEntry(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.blueCatbirdChatDefsDirectRequestAcceptanceEntry(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestAcceptanceEntry(let rhsValue)):
             return lhsValue == rhsValue
         case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
             return lhsValue.isEqual(to: rhsValue)
@@ -25228,6 +31398,40 @@ public enum ConversationEntry: Codable, ATProtocolCodable, ATProtocolValue, Send
             return map
         case .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(let value):
             map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leaveCommitFulfillmentEntry")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .blueCatbirdChatDefsDirectRequestEntry(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestEntry")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .blueCatbirdChatDefsDirectRequestAcceptanceEntry(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestAcceptanceEntry")
             
             let valueDict = try value.toCBORValue()
 
@@ -25772,6 +31976,1289 @@ public enum SubscriptionMessage: Codable, ATProtocolCodable, ATProtocolValue, Se
         }
     }
 }
+
+public typealias DirectRequestProfile = String
+
+
+
+
+public enum DirectRequestOrigin: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+    case blueCatbirdChatDefsFreshDirectOrigin(BlueCatbirdChatDefs.FreshDirectOrigin)
+    case blueCatbirdChatDefsLegacyPendingDirectOrigin(BlueCatbirdChatDefs.LegacyPendingDirectOrigin)
+    case unexpected(ATProtocolValueContainer)
+    public init(_ value: BlueCatbirdChatDefs.FreshDirectOrigin) {
+        self = .blueCatbirdChatDefsFreshDirectOrigin(value)
+    }
+    public init(_ value: BlueCatbirdChatDefs.LegacyPendingDirectOrigin) {
+        self = .blueCatbirdChatDefsLegacyPendingDirectOrigin(value)
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let typeValue = try container.decode(String.self, forKey: .type)
+
+        switch typeValue {
+        case "blue.catbird.chat.defs#freshDirectOrigin":
+            let value = try BlueCatbirdChatDefs.FreshDirectOrigin(from: decoder)
+            self = .blueCatbirdChatDefsFreshDirectOrigin(value)
+        case "blue.catbird.chat.defs#legacyPendingDirectOrigin":
+            let value = try BlueCatbirdChatDefs.LegacyPendingDirectOrigin(from: decoder)
+            self = .blueCatbirdChatDefsLegacyPendingDirectOrigin(value)
+        default:
+            let unknownValue = try ATProtocolValueContainer(from: decoder)
+            self = .unexpected(unknownValue)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case .blueCatbirdChatDefsFreshDirectOrigin(let value):
+            try container.encode("blue.catbird.chat.defs#freshDirectOrigin", forKey: .type)
+            try value.encode(to: encoder)
+        case .blueCatbirdChatDefsLegacyPendingDirectOrigin(let value):
+            try container.encode("blue.catbird.chat.defs#legacyPendingDirectOrigin", forKey: .type)
+            try value.encode(to: encoder)
+        case .unexpected(let container):
+            try container.encode(to: encoder)
+        }
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .blueCatbirdChatDefsFreshDirectOrigin(let value):
+            hasher.combine("blue.catbird.chat.defs#freshDirectOrigin")
+            hasher.combine(value)
+        case .blueCatbirdChatDefsLegacyPendingDirectOrigin(let value):
+            hasher.combine("blue.catbird.chat.defs#legacyPendingDirectOrigin")
+            hasher.combine(value)
+        case .unexpected(let container):
+            hasher.combine("unexpected")
+            hasher.combine(container)
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+    }
+    
+    public static func == (lhs: DirectRequestOrigin, rhs: DirectRequestOrigin) -> Bool {
+        switch (lhs, rhs) {
+        case (.blueCatbirdChatDefsFreshDirectOrigin(let lhsValue),
+              .blueCatbirdChatDefsFreshDirectOrigin(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.blueCatbirdChatDefsLegacyPendingDirectOrigin(let lhsValue),
+              .blueCatbirdChatDefsLegacyPendingDirectOrigin(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+            return lhsValue.isEqual(to: rhsValue)
+        default:
+            return false
+        }
+    }
+    
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? DirectRequestOrigin else { return false }
+        return self == other
+    }
+    
+    // DAGCBOR encoding with field ordering
+    public func toCBORValue() throws -> Any {
+        // Create an ordered map to maintain field order
+        var map = OrderedCBORMap()
+        
+        switch self {
+        case .blueCatbirdChatDefsFreshDirectOrigin(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#freshDirectOrigin")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .blueCatbirdChatDefsLegacyPendingDirectOrigin(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#legacyPendingDirectOrigin")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .unexpected(let container):
+            return try container.toCBORValue()
+        }
+    }
+}
+
+
+
+
+public enum SignedDirectRequestGrantBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+    case blueCatbirdChatDefsDirectRequestGrantBody(BlueCatbirdChatDefs.DirectRequestGrantBody)
+    case unexpected(ATProtocolValueContainer)
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestGrantBody) {
+        self = .blueCatbirdChatDefsDirectRequestGrantBody(value)
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let typeValue = try container.decode(String.self, forKey: .type)
+
+        switch typeValue {
+        case "blue.catbird.chat.defs#directRequestGrantBody":
+            let value = try BlueCatbirdChatDefs.DirectRequestGrantBody(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestGrantBody(value)
+        default:
+            let unknownValue = try ATProtocolValueContainer(from: decoder)
+            self = .unexpected(unknownValue)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestGrantBody(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestGrantBody", forKey: .type)
+            try value.encode(to: encoder)
+        case .unexpected(let container):
+            try container.encode(to: encoder)
+        }
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestGrantBody(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestGrantBody")
+            hasher.combine(value)
+        case .unexpected(let container):
+            hasher.combine("unexpected")
+            hasher.combine(container)
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+    }
+    
+    public static func == (lhs: SignedDirectRequestGrantBodyUnion, rhs: SignedDirectRequestGrantBodyUnion) -> Bool {
+        switch (lhs, rhs) {
+        case (.blueCatbirdChatDefsDirectRequestGrantBody(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestGrantBody(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+            return lhsValue.isEqual(to: rhsValue)
+        default:
+            return false
+        }
+    }
+    
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? SignedDirectRequestGrantBodyUnion else { return false }
+        return self == other
+    }
+    
+    // DAGCBOR encoding with field ordering
+    public func toCBORValue() throws -> Any {
+        // Create an ordered map to maintain field order
+        var map = OrderedCBORMap()
+        
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestGrantBody(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestGrantBody")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .unexpected(let container):
+            return try container.toCBORValue()
+        }
+    }
+}
+
+
+
+
+public enum SignedDirectRequestKeysPublicationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+    case blueCatbirdChatDefsDirectRequestKeysPublicationBody(BlueCatbirdChatDefs.DirectRequestKeysPublicationBody)
+    case unexpected(ATProtocolValueContainer)
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestKeysPublicationBody) {
+        self = .blueCatbirdChatDefsDirectRequestKeysPublicationBody(value)
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let typeValue = try container.decode(String.self, forKey: .type)
+
+        switch typeValue {
+        case "blue.catbird.chat.defs#directRequestKeysPublicationBody":
+            let value = try BlueCatbirdChatDefs.DirectRequestKeysPublicationBody(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestKeysPublicationBody(value)
+        default:
+            let unknownValue = try ATProtocolValueContainer(from: decoder)
+            self = .unexpected(unknownValue)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestKeysPublicationBody(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestKeysPublicationBody", forKey: .type)
+            try value.encode(to: encoder)
+        case .unexpected(let container):
+            try container.encode(to: encoder)
+        }
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestKeysPublicationBody(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestKeysPublicationBody")
+            hasher.combine(value)
+        case .unexpected(let container):
+            hasher.combine("unexpected")
+            hasher.combine(container)
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+    }
+    
+    public static func == (lhs: SignedDirectRequestKeysPublicationBodyUnion, rhs: SignedDirectRequestKeysPublicationBodyUnion) -> Bool {
+        switch (lhs, rhs) {
+        case (.blueCatbirdChatDefsDirectRequestKeysPublicationBody(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestKeysPublicationBody(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+            return lhsValue.isEqual(to: rhsValue)
+        default:
+            return false
+        }
+    }
+    
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? SignedDirectRequestKeysPublicationBodyUnion else { return false }
+        return self == other
+    }
+    
+    // DAGCBOR encoding with field ordering
+    public func toCBORValue() throws -> Any {
+        // Create an ordered map to maintain field order
+        var map = OrderedCBORMap()
+        
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestKeysPublicationBody(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestKeysPublicationBody")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .unexpected(let container):
+            return try container.toCBORValue()
+        }
+    }
+}
+
+
+
+
+public enum SignedDirectRequestPreparationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+    case blueCatbirdChatDefsDirectRequestPreparationBody(BlueCatbirdChatDefs.DirectRequestPreparationBody)
+    case unexpected(ATProtocolValueContainer)
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestPreparationBody) {
+        self = .blueCatbirdChatDefsDirectRequestPreparationBody(value)
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let typeValue = try container.decode(String.self, forKey: .type)
+
+        switch typeValue {
+        case "blue.catbird.chat.defs#directRequestPreparationBody":
+            let value = try BlueCatbirdChatDefs.DirectRequestPreparationBody(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestPreparationBody(value)
+        default:
+            let unknownValue = try ATProtocolValueContainer(from: decoder)
+            self = .unexpected(unknownValue)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestPreparationBody(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestPreparationBody", forKey: .type)
+            try value.encode(to: encoder)
+        case .unexpected(let container):
+            try container.encode(to: encoder)
+        }
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestPreparationBody(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestPreparationBody")
+            hasher.combine(value)
+        case .unexpected(let container):
+            hasher.combine("unexpected")
+            hasher.combine(container)
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+    }
+    
+    public static func == (lhs: SignedDirectRequestPreparationBodyUnion, rhs: SignedDirectRequestPreparationBodyUnion) -> Bool {
+        switch (lhs, rhs) {
+        case (.blueCatbirdChatDefsDirectRequestPreparationBody(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestPreparationBody(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+            return lhsValue.isEqual(to: rhsValue)
+        default:
+            return false
+        }
+    }
+    
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? SignedDirectRequestPreparationBodyUnion else { return false }
+        return self == other
+    }
+    
+    // DAGCBOR encoding with field ordering
+    public func toCBORValue() throws -> Any {
+        // Create an ordered map to maintain field order
+        var map = OrderedCBORMap()
+        
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestPreparationBody(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestPreparationBody")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .unexpected(let container):
+            return try container.toCBORValue()
+        }
+    }
+}
+
+
+
+
+public enum SignedDirectRequestPublicationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+    case blueCatbirdChatDefsDirectRequestPublicationBody(BlueCatbirdChatDefs.DirectRequestPublicationBody)
+    case unexpected(ATProtocolValueContainer)
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestPublicationBody) {
+        self = .blueCatbirdChatDefsDirectRequestPublicationBody(value)
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let typeValue = try container.decode(String.self, forKey: .type)
+
+        switch typeValue {
+        case "blue.catbird.chat.defs#directRequestPublicationBody":
+            let value = try BlueCatbirdChatDefs.DirectRequestPublicationBody(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestPublicationBody(value)
+        default:
+            let unknownValue = try ATProtocolValueContainer(from: decoder)
+            self = .unexpected(unknownValue)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestPublicationBody(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestPublicationBody", forKey: .type)
+            try value.encode(to: encoder)
+        case .unexpected(let container):
+            try container.encode(to: encoder)
+        }
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestPublicationBody(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestPublicationBody")
+            hasher.combine(value)
+        case .unexpected(let container):
+            hasher.combine("unexpected")
+            hasher.combine(container)
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+    }
+    
+    public static func == (lhs: SignedDirectRequestPublicationBodyUnion, rhs: SignedDirectRequestPublicationBodyUnion) -> Bool {
+        switch (lhs, rhs) {
+        case (.blueCatbirdChatDefsDirectRequestPublicationBody(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestPublicationBody(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+            return lhsValue.isEqual(to: rhsValue)
+        default:
+            return false
+        }
+    }
+    
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? SignedDirectRequestPublicationBodyUnion else { return false }
+        return self == other
+    }
+    
+    // DAGCBOR encoding with field ordering
+    public func toCBORValue() throws -> Any {
+        // Create an ordered map to maintain field order
+        var map = OrderedCBORMap()
+        
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestPublicationBody(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestPublicationBody")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .unexpected(let container):
+            return try container.toCBORValue()
+        }
+    }
+}
+
+
+
+
+public enum SignedDirectRequestCancellationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+    case blueCatbirdChatDefsDirectRequestCancellationBody(BlueCatbirdChatDefs.DirectRequestCancellationBody)
+    case unexpected(ATProtocolValueContainer)
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestCancellationBody) {
+        self = .blueCatbirdChatDefsDirectRequestCancellationBody(value)
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let typeValue = try container.decode(String.self, forKey: .type)
+
+        switch typeValue {
+        case "blue.catbird.chat.defs#directRequestCancellationBody":
+            let value = try BlueCatbirdChatDefs.DirectRequestCancellationBody(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestCancellationBody(value)
+        default:
+            let unknownValue = try ATProtocolValueContainer(from: decoder)
+            self = .unexpected(unknownValue)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestCancellationBody(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestCancellationBody", forKey: .type)
+            try value.encode(to: encoder)
+        case .unexpected(let container):
+            try container.encode(to: encoder)
+        }
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestCancellationBody(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestCancellationBody")
+            hasher.combine(value)
+        case .unexpected(let container):
+            hasher.combine("unexpected")
+            hasher.combine(container)
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+    }
+    
+    public static func == (lhs: SignedDirectRequestCancellationBodyUnion, rhs: SignedDirectRequestCancellationBodyUnion) -> Bool {
+        switch (lhs, rhs) {
+        case (.blueCatbirdChatDefsDirectRequestCancellationBody(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestCancellationBody(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+            return lhsValue.isEqual(to: rhsValue)
+        default:
+            return false
+        }
+    }
+    
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? SignedDirectRequestCancellationBodyUnion else { return false }
+        return self == other
+    }
+    
+    // DAGCBOR encoding with field ordering
+    public func toCBORValue() throws -> Any {
+        // Create an ordered map to maintain field order
+        var map = OrderedCBORMap()
+        
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestCancellationBody(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestCancellationBody")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .unexpected(let container):
+            return try container.toCBORValue()
+        }
+    }
+}
+
+
+
+
+public enum SignedDirectRequestAcceptanceBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+    case blueCatbirdChatDefsDirectRequestAcceptanceBody(BlueCatbirdChatDefs.DirectRequestAcceptanceBody)
+    case unexpected(ATProtocolValueContainer)
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestAcceptanceBody) {
+        self = .blueCatbirdChatDefsDirectRequestAcceptanceBody(value)
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let typeValue = try container.decode(String.self, forKey: .type)
+
+        switch typeValue {
+        case "blue.catbird.chat.defs#directRequestAcceptanceBody":
+            let value = try BlueCatbirdChatDefs.DirectRequestAcceptanceBody(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestAcceptanceBody(value)
+        default:
+            let unknownValue = try ATProtocolValueContainer(from: decoder)
+            self = .unexpected(unknownValue)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestAcceptanceBody(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestAcceptanceBody", forKey: .type)
+            try value.encode(to: encoder)
+        case .unexpected(let container):
+            try container.encode(to: encoder)
+        }
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestAcceptanceBody(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestAcceptanceBody")
+            hasher.combine(value)
+        case .unexpected(let container):
+            hasher.combine("unexpected")
+            hasher.combine(container)
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+    }
+    
+    public static func == (lhs: SignedDirectRequestAcceptanceBodyUnion, rhs: SignedDirectRequestAcceptanceBodyUnion) -> Bool {
+        switch (lhs, rhs) {
+        case (.blueCatbirdChatDefsDirectRequestAcceptanceBody(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestAcceptanceBody(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+            return lhsValue.isEqual(to: rhsValue)
+        default:
+            return false
+        }
+    }
+    
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? SignedDirectRequestAcceptanceBodyUnion else { return false }
+        return self == other
+    }
+    
+    // DAGCBOR encoding with field ordering
+    public func toCBORValue() throws -> Any {
+        // Create an ordered map to maintain field order
+        var map = OrderedCBORMap()
+        
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestAcceptanceBody(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestAcceptanceBody")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .unexpected(let container):
+            return try container.toCBORValue()
+        }
+    }
+}
+
+
+public enum DefsDirectRequestErrorCode: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+    case value_RecipientKeysUnavailable = "RecipientKeysUnavailable"
+    case value_RequestPolicyDenied = "RequestPolicyDenied"
+    case value_PreparationExpired = "PreparationExpired"
+    case value_PreparationCancelled = "PreparationCancelled"
+    case value_PreparationRevoked = "PreparationRevoked"
+    case value_PreparationConflict = "PreparationConflict"
+    case value_ExistingDirect = "ExistingDirect"
+    case value_ArtifactTooLarge = "ArtifactTooLarge"
+    case value_CapacityUnavailable = "CapacityUnavailable"
+    case value_InvalidBootstrap = "InvalidBootstrap"
+    case value_ImportHorizonTooShort = "ImportHorizonTooShort"
+    case value_StaleLegacyPrior = "StaleLegacyPrior"
+    case value_InvalidSignature = "InvalidSignature"
+    case value_IdempotencyConflict = "IdempotencyConflict"
+    case value_ProtocolUpgradeRequired = "ProtocolUpgradeRequired"
+    case value_RequestNotAccepted = "RequestNotAccepted"
+    case value_UnavailableIntroduction = "UnavailableIntroduction"
+    case value_RateLimited = "RateLimited"
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let otherValue = other as? DefsDirectRequestErrorCode else { return false }
+        return self == otherValue
+    }
+
+    public func toCBORValue() throws -> Any {
+        return rawValue
+    }
+}
+
+
+public enum DirectRequestRejectedReceiptRequestKind: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+    case value_prepare = "prepare"
+    case value_publish = "publish"
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let otherValue = other as? DirectRequestRejectedReceiptRequestKind else { return false }
+        return self == otherValue
+    }
+
+    public func toCBORValue() throws -> Any {
+        return rawValue
+    }
+}
+
+
+public enum DirectRequestExistingDirectReceiptRequestKind: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+    case value_prepare = "prepare"
+    case value_publish = "publish"
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let otherValue = other as? DirectRequestExistingDirectReceiptRequestKind else { return false }
+        return self == otherValue
+    }
+
+    public func toCBORValue() throws -> Any {
+        return rawValue
+    }
+}
+
+
+
+
+public enum DirectRequestTerminalReceipt: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+    case blueCatbirdChatDefsDirectRequestPublishedReceipt(BlueCatbirdChatDefs.DirectRequestPublishedReceipt)
+    case blueCatbirdChatDefsDirectRequestCancelledReceipt(BlueCatbirdChatDefs.DirectRequestCancelledReceipt)
+    case blueCatbirdChatDefsDirectRequestExpiredReceipt(BlueCatbirdChatDefs.DirectRequestExpiredReceipt)
+    case blueCatbirdChatDefsDirectRequestRejectedReceipt(BlueCatbirdChatDefs.DirectRequestRejectedReceipt)
+    case blueCatbirdChatDefsDirectRequestExistingDirectReceipt(BlueCatbirdChatDefs.DirectRequestExistingDirectReceipt)
+    case unexpected(ATProtocolValueContainer)
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestPublishedReceipt) {
+        self = .blueCatbirdChatDefsDirectRequestPublishedReceipt(value)
+    }
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestCancelledReceipt) {
+        self = .blueCatbirdChatDefsDirectRequestCancelledReceipt(value)
+    }
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestExpiredReceipt) {
+        self = .blueCatbirdChatDefsDirectRequestExpiredReceipt(value)
+    }
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestRejectedReceipt) {
+        self = .blueCatbirdChatDefsDirectRequestRejectedReceipt(value)
+    }
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestExistingDirectReceipt) {
+        self = .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(value)
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let typeValue = try container.decode(String.self, forKey: .type)
+
+        switch typeValue {
+        case "blue.catbird.chat.defs#directRequestPublishedReceipt":
+            let value = try BlueCatbirdChatDefs.DirectRequestPublishedReceipt(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestPublishedReceipt(value)
+        case "blue.catbird.chat.defs#directRequestCancelledReceipt":
+            let value = try BlueCatbirdChatDefs.DirectRequestCancelledReceipt(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestCancelledReceipt(value)
+        case "blue.catbird.chat.defs#directRequestExpiredReceipt":
+            let value = try BlueCatbirdChatDefs.DirectRequestExpiredReceipt(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestExpiredReceipt(value)
+        case "blue.catbird.chat.defs#directRequestRejectedReceipt":
+            let value = try BlueCatbirdChatDefs.DirectRequestRejectedReceipt(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestRejectedReceipt(value)
+        case "blue.catbird.chat.defs#directRequestExistingDirectReceipt":
+            let value = try BlueCatbirdChatDefs.DirectRequestExistingDirectReceipt(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(value)
+        default:
+            let unknownValue = try ATProtocolValueContainer(from: decoder)
+            self = .unexpected(unknownValue)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestPublishedReceipt(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestPublishedReceipt", forKey: .type)
+            try value.encode(to: encoder)
+        case .blueCatbirdChatDefsDirectRequestCancelledReceipt(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestCancelledReceipt", forKey: .type)
+            try value.encode(to: encoder)
+        case .blueCatbirdChatDefsDirectRequestExpiredReceipt(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestExpiredReceipt", forKey: .type)
+            try value.encode(to: encoder)
+        case .blueCatbirdChatDefsDirectRequestRejectedReceipt(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestRejectedReceipt", forKey: .type)
+            try value.encode(to: encoder)
+        case .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestExistingDirectReceipt", forKey: .type)
+            try value.encode(to: encoder)
+        case .unexpected(let container):
+            try container.encode(to: encoder)
+        }
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestPublishedReceipt(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestPublishedReceipt")
+            hasher.combine(value)
+        case .blueCatbirdChatDefsDirectRequestCancelledReceipt(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestCancelledReceipt")
+            hasher.combine(value)
+        case .blueCatbirdChatDefsDirectRequestExpiredReceipt(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestExpiredReceipt")
+            hasher.combine(value)
+        case .blueCatbirdChatDefsDirectRequestRejectedReceipt(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestRejectedReceipt")
+            hasher.combine(value)
+        case .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestExistingDirectReceipt")
+            hasher.combine(value)
+        case .unexpected(let container):
+            hasher.combine("unexpected")
+            hasher.combine(container)
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+    }
+    
+    public static func == (lhs: DirectRequestTerminalReceipt, rhs: DirectRequestTerminalReceipt) -> Bool {
+        switch (lhs, rhs) {
+        case (.blueCatbirdChatDefsDirectRequestPublishedReceipt(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestPublishedReceipt(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.blueCatbirdChatDefsDirectRequestCancelledReceipt(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestCancelledReceipt(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.blueCatbirdChatDefsDirectRequestExpiredReceipt(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestExpiredReceipt(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.blueCatbirdChatDefsDirectRequestRejectedReceipt(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestRejectedReceipt(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.blueCatbirdChatDefsDirectRequestExistingDirectReceipt(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+            return lhsValue.isEqual(to: rhsValue)
+        default:
+            return false
+        }
+    }
+    
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? DirectRequestTerminalReceipt else { return false }
+        return self == other
+    }
+    
+    // DAGCBOR encoding with field ordering
+    public func toCBORValue() throws -> Any {
+        // Create an ordered map to maintain field order
+        var map = OrderedCBORMap()
+        
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestPublishedReceipt(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestPublishedReceipt")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .blueCatbirdChatDefsDirectRequestCancelledReceipt(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestCancelledReceipt")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .blueCatbirdChatDefsDirectRequestExpiredReceipt(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestExpiredReceipt")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .blueCatbirdChatDefsDirectRequestRejectedReceipt(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestRejectedReceipt")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestExistingDirectReceipt")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .unexpected(let container):
+            return try container.toCBORValue()
+        }
+    }
+}
+
+
+
+
+public enum SignedDirectRequestReceiptBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+    case blueCatbirdChatDefsDirectRequestReceiptBody(BlueCatbirdChatDefs.DirectRequestReceiptBody)
+    case unexpected(ATProtocolValueContainer)
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestReceiptBody) {
+        self = .blueCatbirdChatDefsDirectRequestReceiptBody(value)
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let typeValue = try container.decode(String.self, forKey: .type)
+
+        switch typeValue {
+        case "blue.catbird.chat.defs#directRequestReceiptBody":
+            let value = try BlueCatbirdChatDefs.DirectRequestReceiptBody(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestReceiptBody(value)
+        default:
+            let unknownValue = try ATProtocolValueContainer(from: decoder)
+            self = .unexpected(unknownValue)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestReceiptBody(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestReceiptBody", forKey: .type)
+            try value.encode(to: encoder)
+        case .unexpected(let container):
+            try container.encode(to: encoder)
+        }
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestReceiptBody(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestReceiptBody")
+            hasher.combine(value)
+        case .unexpected(let container):
+            hasher.combine("unexpected")
+            hasher.combine(container)
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+    }
+    
+    public static func == (lhs: SignedDirectRequestReceiptBodyUnion, rhs: SignedDirectRequestReceiptBodyUnion) -> Bool {
+        switch (lhs, rhs) {
+        case (.blueCatbirdChatDefsDirectRequestReceiptBody(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestReceiptBody(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+            return lhsValue.isEqual(to: rhsValue)
+        default:
+            return false
+        }
+    }
+    
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? SignedDirectRequestReceiptBodyUnion else { return false }
+        return self == other
+    }
+    
+    // DAGCBOR encoding with field ordering
+    public func toCBORValue() throws -> Any {
+        // Create an ordered map to maintain field order
+        var map = OrderedCBORMap()
+        
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestReceiptBody(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestReceiptBody")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .unexpected(let container):
+            return try container.toCBORValue()
+        }
+    }
+}
+
+
+
+
+public enum DirectRequestOutcome: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+    case blueCatbirdChatDefsDirectRequestUnknownOutcome(BlueCatbirdChatDefs.DirectRequestUnknownOutcome)
+    case blueCatbirdChatDefsDirectRequestPreparedOutcome(BlueCatbirdChatDefs.DirectRequestPreparedOutcome)
+    case blueCatbirdChatDefsSignedDirectRequestReceipt(BlueCatbirdChatDefs.SignedDirectRequestReceipt)
+    case unexpected(ATProtocolValueContainer)
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestUnknownOutcome) {
+        self = .blueCatbirdChatDefsDirectRequestUnknownOutcome(value)
+    }
+    public init(_ value: BlueCatbirdChatDefs.DirectRequestPreparedOutcome) {
+        self = .blueCatbirdChatDefsDirectRequestPreparedOutcome(value)
+    }
+    public init(_ value: BlueCatbirdChatDefs.SignedDirectRequestReceipt) {
+        self = .blueCatbirdChatDefsSignedDirectRequestReceipt(value)
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let typeValue = try container.decode(String.self, forKey: .type)
+
+        switch typeValue {
+        case "blue.catbird.chat.defs#directRequestUnknownOutcome":
+            let value = try BlueCatbirdChatDefs.DirectRequestUnknownOutcome(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestUnknownOutcome(value)
+        case "blue.catbird.chat.defs#directRequestPreparedOutcome":
+            let value = try BlueCatbirdChatDefs.DirectRequestPreparedOutcome(from: decoder)
+            self = .blueCatbirdChatDefsDirectRequestPreparedOutcome(value)
+        case "blue.catbird.chat.defs#signedDirectRequestReceipt":
+            let value = try BlueCatbirdChatDefs.SignedDirectRequestReceipt(from: decoder)
+            self = .blueCatbirdChatDefsSignedDirectRequestReceipt(value)
+        default:
+            let unknownValue = try ATProtocolValueContainer(from: decoder)
+            self = .unexpected(unknownValue)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestUnknownOutcome(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestUnknownOutcome", forKey: .type)
+            try value.encode(to: encoder)
+        case .blueCatbirdChatDefsDirectRequestPreparedOutcome(let value):
+            try container.encode("blue.catbird.chat.defs#directRequestPreparedOutcome", forKey: .type)
+            try value.encode(to: encoder)
+        case .blueCatbirdChatDefsSignedDirectRequestReceipt(let value):
+            try container.encode("blue.catbird.chat.defs#signedDirectRequestReceipt", forKey: .type)
+            try value.encode(to: encoder)
+        case .unexpected(let container):
+            try container.encode(to: encoder)
+        }
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestUnknownOutcome(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestUnknownOutcome")
+            hasher.combine(value)
+        case .blueCatbirdChatDefsDirectRequestPreparedOutcome(let value):
+            hasher.combine("blue.catbird.chat.defs#directRequestPreparedOutcome")
+            hasher.combine(value)
+        case .blueCatbirdChatDefsSignedDirectRequestReceipt(let value):
+            hasher.combine("blue.catbird.chat.defs#signedDirectRequestReceipt")
+            hasher.combine(value)
+        case .unexpected(let container):
+            hasher.combine("unexpected")
+            hasher.combine(container)
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case type = "$type"
+    }
+    
+    public static func == (lhs: DirectRequestOutcome, rhs: DirectRequestOutcome) -> Bool {
+        switch (lhs, rhs) {
+        case (.blueCatbirdChatDefsDirectRequestUnknownOutcome(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestUnknownOutcome(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.blueCatbirdChatDefsDirectRequestPreparedOutcome(let lhsValue),
+              .blueCatbirdChatDefsDirectRequestPreparedOutcome(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.blueCatbirdChatDefsSignedDirectRequestReceipt(let lhsValue),
+              .blueCatbirdChatDefsSignedDirectRequestReceipt(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+            return lhsValue.isEqual(to: rhsValue)
+        default:
+            return false
+        }
+    }
+    
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? DirectRequestOutcome else { return false }
+        return self == other
+    }
+    
+    // DAGCBOR encoding with field ordering
+    public func toCBORValue() throws -> Any {
+        // Create an ordered map to maintain field order
+        var map = OrderedCBORMap()
+        
+        switch self {
+        case .blueCatbirdChatDefsDirectRequestUnknownOutcome(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestUnknownOutcome")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .blueCatbirdChatDefsDirectRequestPreparedOutcome(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestPreparedOutcome")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .blueCatbirdChatDefsSignedDirectRequestReceipt(let value):
+            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedDirectRequestReceipt")
+            
+            let valueDict = try value.toCBORValue()
+
+            // If the value is already an OrderedCBORMap, merge its entries
+            if let orderedMap = valueDict as? OrderedCBORMap {
+                for (key, value) in orderedMap.entries where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            } else if let dict = valueDict as? [String: Any] {
+                // Otherwise add each key-value pair from the dictionary
+                for (key, value) in dict where key != "$type" {
+                    map = map.adding(key: key, value: value)
+                }
+            }
+            return map
+        case .unexpected(let container):
+            return try container.toCBORValue()
+        }
+    }
+}
+
+
+public enum DirectRequestStateConsent: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+    case value_incomingPending = "incomingPending"
+    case value_outgoingPending = "outgoingPending"
+    case value_accepted = "accepted"
+    case value_closed = "closed"
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let otherValue = other as? DirectRequestStateConsent else { return false }
+        return self == otherValue
+    }
+
+    public func toCBORValue() throws -> Any {
+        return rawValue
+    }
+}
+
+public typealias DirectRequestReceiptKeyId = String
 
 
 }
