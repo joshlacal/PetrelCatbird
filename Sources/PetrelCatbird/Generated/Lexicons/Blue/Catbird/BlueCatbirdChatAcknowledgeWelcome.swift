@@ -102,6 +102,8 @@ public enum BlueCatbirdChatAcknowledgeWelcome {
         case deviceBindingMismatch = "DeviceBindingMismatch"
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
+        /// The bounded encrypted request lifecycle reserve cannot accommodate this operation. No first-execution effects are committed; retry the same signed operation after capacity is available.
+        case capacityUnavailable = "CapacityUnavailable"
         public var description: String {
             return rawValue
         }
