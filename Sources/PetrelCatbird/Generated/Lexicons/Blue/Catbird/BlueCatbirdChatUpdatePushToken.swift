@@ -8,20 +8,24 @@ public enum BlueCatbirdChatUpdatePushToken {
     public static let typeIdentifier = "blue.catbird.chat.updatePushToken"
     public struct Input: ATProtocolCodable {
         public let token: String?
+        public let registration: BlueCatbirdChatDefs.SignedPushRegistration?
 
         /// Standard public initializer
-        public init(token: String? = nil) {
+        public init(token: String? = nil, registration: BlueCatbirdChatDefs.SignedPushRegistration? = nil) {
             self.token = token
+            self.registration = registration
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             token = try container.decodeIfPresent(String.self, forKey: .token)
+            registration = try container.decodeIfPresent(BlueCatbirdChatDefs.SignedPushRegistration.self, forKey: .registration)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encodeIfPresent(token, forKey: .token)
+            try container.encodeIfPresent(registration, forKey: .registration)
         }
 
         public func toCBORValue() throws -> Any {
@@ -30,35 +34,57 @@ public enum BlueCatbirdChatUpdatePushToken {
                 let tokenValue = try value.toCBORValue()
                 map = map.adding(key: "token", value: tokenValue)
             }
+            if let value = registration {
+                let registrationValue = try value.toCBORValue()
+                map = map.adding(key: "registration", value: registrationValue)
+            }
             return map
         }
 
         private enum CodingKeys: String, CodingKey {
             case token
+            case registration
         }
     }
 
     public struct Output: ATProtocolCodable {
         public let device: BlueCatbirdChatDefs.DeviceView
 
+        public let pushBinding: BlueCatbirdChatDefs.PushRegistrationBinding?
+
         /// Standard public initializer
         public init(
-            device: BlueCatbirdChatDefs.DeviceView
+            device: BlueCatbirdChatDefs.DeviceView,
+
+            pushBinding: BlueCatbirdChatDefs.PushRegistrationBinding? = nil
 
         ) {
             self.device = device
+
+            self.pushBinding = pushBinding
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
             device = try container.decode(BlueCatbirdChatDefs.DeviceView.self, forKey: .device)
+
+            do {
+                pushBinding = try container.decodeIfPresent(BlueCatbirdChatDefs.PushRegistrationBinding.self, forKey: .pushBinding)
+            } catch {
+                // Forward compatibility: a malformed optional field must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'pushBinding' — degrading to nil: \(error)")
+                pushBinding = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(device, forKey: .device)
+
+            // Encode optional property even if it's an empty array
+            try container.encodeIfPresent(pushBinding, forKey: .pushBinding)
         }
 
         public func toCBORValue() throws -> Any {
@@ -67,11 +93,18 @@ public enum BlueCatbirdChatUpdatePushToken {
             let deviceValue = try device.toCBORValue()
             map = map.adding(key: "device", value: deviceValue)
 
+            if let value = pushBinding {
+                // Encode optional property even if it's an empty array for CBOR
+                let pushBindingValue = try value.toCBORValue()
+                map = map.adding(key: "pushBinding", value: pushBindingValue)
+            }
+
             return map
         }
 
         private enum CodingKeys: String, CodingKey {
             case device
+            case pushBinding
         }
     }
 
@@ -84,6 +117,10 @@ public enum BlueCatbirdChatUpdatePushToken {
         case notAuthorized = "NotAuthorized"
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
+        case invalidSignature = "InvalidSignature"
+        case staleAuthGeneration = "StaleAuthGeneration"
+        case registrationConflict = "RegistrationConflict"
+        case capacityUnavailable = "CapacityUnavailable"
         public var description: String {
             return rawValue
         }
@@ -97,7 +134,7 @@ public enum BlueCatbirdChatUpdatePushToken {
 public extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - updatePushToken
 
-    // Register, update, or clear the APNs device token for the caller's active device.
+    // Register, rotate or disable a canonical device-signed APNs/FCM push binding. Unsigned token-only input retains legacy registration behavior and never enables encrypted-request notification delivery.
     //
     // - Parameter input: The input parameters for the request
 

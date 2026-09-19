@@ -26818,6 +26818,414 @@ public enum BlueCatbirdChatDefs {
         }
     }
 
+    public struct PushRegistrationBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#pushRegistrationBody"
+        public let protocolVersion: PushRegistrationBodyProtocolVersion
+        public let signatureDomain: String
+        public let authorityDid: String
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let registrationId: OperationId
+        public let provider: PushRegistrationBodyProvider
+        public let appId: String
+        public let tokenGeneration: Int
+        public let tokenSha256: Bytes
+        public let enabled: Bool
+        public let signedAt: CanonicalDatetime
+
+        public init(
+            protocolVersion: PushRegistrationBodyProtocolVersion, signatureDomain: String, authorityDid: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, registrationId: OperationId, provider: PushRegistrationBodyProvider, appId: String, tokenGeneration: Int, tokenSha256: Bytes, enabled: Bool, signedAt: CanonicalDatetime
+        ) {
+            self.protocolVersion = protocolVersion
+            self.signatureDomain = signatureDomain
+            self.authorityDid = authorityDid
+            self.actorDid = actorDid
+            self.actorDeviceId = actorDeviceId
+            self.keyId = keyId
+            self.authGeneration = authGeneration
+            self.registrationId = registrationId
+            self.provider = provider
+            self.appId = appId
+            self.tokenGeneration = tokenGeneration
+            self.tokenSha256 = tokenSha256
+            self.enabled = enabled
+            self.signedAt = signedAt
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                protocolVersion = try container.decode(PushRegistrationBodyProtocolVersion.self, forKey: .protocolVersion)
+            } catch {
+                LogManager.logError("Decoding error for required property 'protocolVersion': \(error)")
+                throw error
+            }
+            do {
+                signatureDomain = try container.decode(String.self, forKey: .signatureDomain)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signatureDomain': \(error)")
+                throw error
+            }
+            do {
+                authorityDid = try container.decode(String.self, forKey: .authorityDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authorityDid': \(error)")
+                throw error
+            }
+            do {
+                actorDid = try container.decode(BareDid.self, forKey: .actorDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDid': \(error)")
+                throw error
+            }
+            do {
+                actorDeviceId = try container.decode(DeviceId.self, forKey: .actorDeviceId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'actorDeviceId': \(error)")
+                throw error
+            }
+            do {
+                keyId = try container.decode(KeyId.self, forKey: .keyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyId': \(error)")
+                throw error
+            }
+            do {
+                authGeneration = try container.decode(Int.self, forKey: .authGeneration)
+            } catch {
+                LogManager.logError("Decoding error for required property 'authGeneration': \(error)")
+                throw error
+            }
+            do {
+                registrationId = try container.decode(OperationId.self, forKey: .registrationId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'registrationId': \(error)")
+                throw error
+            }
+            do {
+                provider = try container.decode(PushRegistrationBodyProvider.self, forKey: .provider)
+            } catch {
+                LogManager.logError("Decoding error for required property 'provider': \(error)")
+                throw error
+            }
+            do {
+                appId = try container.decode(String.self, forKey: .appId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'appId': \(error)")
+                throw error
+            }
+            do {
+                tokenGeneration = try container.decode(Int.self, forKey: .tokenGeneration)
+            } catch {
+                LogManager.logError("Decoding error for required property 'tokenGeneration': \(error)")
+                throw error
+            }
+            do {
+                tokenSha256 = try container.decode(Bytes.self, forKey: .tokenSha256)
+            } catch {
+                LogManager.logError("Decoding error for required property 'tokenSha256': \(error)")
+                throw error
+            }
+            do {
+                enabled = try container.decode(Bool.self, forKey: .enabled)
+            } catch {
+                LogManager.logError("Decoding error for required property 'enabled': \(error)")
+                throw error
+            }
+            do {
+                signedAt = try container.decode(CanonicalDatetime.self, forKey: .signedAt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signedAt': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(protocolVersion, forKey: .protocolVersion)
+            try container.encode(signatureDomain, forKey: .signatureDomain)
+            try container.encode(authorityDid, forKey: .authorityDid)
+            try container.encode(actorDid, forKey: .actorDid)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(keyId, forKey: .keyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
+            try container.encode(registrationId, forKey: .registrationId)
+            try container.encode(provider, forKey: .provider)
+            try container.encode(appId, forKey: .appId)
+            try container.encode(tokenGeneration, forKey: .tokenGeneration)
+            try container.encode(tokenSha256, forKey: .tokenSha256)
+            try container.encode(enabled, forKey: .enabled)
+            try container.encode(signedAt, forKey: .signedAt)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(protocolVersion)
+            hasher.combine(signatureDomain)
+            hasher.combine(authorityDid)
+            hasher.combine(actorDid)
+            hasher.combine(actorDeviceId)
+            hasher.combine(keyId)
+            hasher.combine(authGeneration)
+            hasher.combine(registrationId)
+            hasher.combine(provider)
+            hasher.combine(appId)
+            hasher.combine(tokenGeneration)
+            hasher.combine(tokenSha256)
+            hasher.combine(enabled)
+            hasher.combine(signedAt)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if protocolVersion != other.protocolVersion {
+                return false
+            }
+            if signatureDomain != other.signatureDomain {
+                return false
+            }
+            if authorityDid != other.authorityDid {
+                return false
+            }
+            if actorDid != other.actorDid {
+                return false
+            }
+            if actorDeviceId != other.actorDeviceId {
+                return false
+            }
+            if keyId != other.keyId {
+                return false
+            }
+            if authGeneration != other.authGeneration {
+                return false
+            }
+            if registrationId != other.registrationId {
+                return false
+            }
+            if provider != other.provider {
+                return false
+            }
+            if appId != other.appId {
+                return false
+            }
+            if tokenGeneration != other.tokenGeneration {
+                return false
+            }
+            if tokenSha256 != other.tokenSha256 {
+                return false
+            }
+            if enabled != other.enabled {
+                return false
+            }
+            if signedAt != other.signedAt {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let protocolVersionValue = try protocolVersion.toCBORValue()
+            map = map.adding(key: "protocolVersion", value: protocolVersionValue)
+            let signatureDomainValue = try signatureDomain.toCBORValue()
+            map = map.adding(key: "signatureDomain", value: signatureDomainValue)
+            let authorityDidValue = try authorityDid.toCBORValue()
+            map = map.adding(key: "authorityDid", value: authorityDidValue)
+            let actorDidValue = try actorDid.toCBORValue()
+            map = map.adding(key: "actorDid", value: actorDidValue)
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let keyIdValue = try keyId.toCBORValue()
+            map = map.adding(key: "keyId", value: keyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
+            let registrationIdValue = try registrationId.toCBORValue()
+            map = map.adding(key: "registrationId", value: registrationIdValue)
+            let providerValue = try provider.toCBORValue()
+            map = map.adding(key: "provider", value: providerValue)
+            let appIdValue = try appId.toCBORValue()
+            map = map.adding(key: "appId", value: appIdValue)
+            let tokenGenerationValue = try tokenGeneration.toCBORValue()
+            map = map.adding(key: "tokenGeneration", value: tokenGenerationValue)
+            let tokenSha256Value = try tokenSha256.toCBORValue()
+            map = map.adding(key: "tokenSha256", value: tokenSha256Value)
+            let enabledValue = try enabled.toCBORValue()
+            map = map.adding(key: "enabled", value: enabledValue)
+            let signedAtValue = try signedAt.toCBORValue()
+            map = map.adding(key: "signedAt", value: signedAtValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case protocolVersion
+            case signatureDomain
+            case authorityDid
+            case actorDid
+            case actorDeviceId
+            case keyId
+            case authGeneration
+            case registrationId
+            case provider
+            case appId
+            case tokenGeneration
+            case tokenSha256
+            case enabled
+            case signedAt
+        }
+    }
+
+    public struct SignedPushRegistration: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedPushRegistration"
+        public let body: PushRegistrationBody
+        public let signature: Bytes
+
+        public init(
+            body: PushRegistrationBody, signature: Bytes
+        ) {
+            self.body = body
+            self.signature = signature
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                body = try container.decode(PushRegistrationBody.self, forKey: .body)
+            } catch {
+                LogManager.logError("Decoding error for required property 'body': \(error)")
+                throw error
+            }
+            do {
+                signature = try container.decode(Bytes.self, forKey: .signature)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signature': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(body, forKey: .body)
+            try container.encode(signature, forKey: .signature)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(body)
+            hasher.combine(signature)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if body != other.body {
+                return false
+            }
+            if signature != other.signature {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let bodyValue = try body.toCBORValue()
+            map = map.adding(key: "body", value: bodyValue)
+            let signatureValue = try signature.toCBORValue()
+            map = map.adding(key: "signature", value: signatureValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case body
+            case signature
+        }
+    }
+
+    public struct PushRegistrationBinding: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#pushRegistrationBinding"
+        public let body: PushRegistrationBody
+        public let bindingDigest: Bytes
+
+        public init(
+            body: PushRegistrationBody, bindingDigest: Bytes
+        ) {
+            self.body = body
+            self.bindingDigest = bindingDigest
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                body = try container.decode(PushRegistrationBody.self, forKey: .body)
+            } catch {
+                LogManager.logError("Decoding error for required property 'body': \(error)")
+                throw error
+            }
+            do {
+                bindingDigest = try container.decode(Bytes.self, forKey: .bindingDigest)
+            } catch {
+                LogManager.logError("Decoding error for required property 'bindingDigest': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(body, forKey: .body)
+            try container.encode(bindingDigest, forKey: .bindingDigest)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(body)
+            hasher.combine(bindingDigest)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if body != other.body {
+                return false
+            }
+            if bindingDigest != other.bindingDigest {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let bodyValue = try body.toCBORValue()
+            map = map.adding(key: "body", value: bodyValue)
+            let bindingDigestValue = try bindingDigest.toCBORValue()
+            map = map.adding(key: "bindingDigest", value: bindingDigestValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case body
+            case bindingDigest
+        }
+    }
+
     public enum DefsProtocolVersion: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
         case value_1 = "1"
         case value_2 = "2"
@@ -33865,6 +34273,33 @@ public enum BlueCatbirdChatDefs {
             case let .unexpected(container):
                 return try container.toCBORValue()
             }
+        }
+    }
+
+    public enum PushRegistrationBodyProtocolVersion: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_2 = "2"
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? PushRegistrationBodyProtocolVersion else { return false }
+            return self == otherValue
+        }
+
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
+    }
+
+    public enum PushRegistrationBodyProvider: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_apns = "apns"
+        case value_fcm = "fcm"
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? PushRegistrationBodyProvider else { return false }
+            return self == otherValue
+        }
+
+        public func toCBORValue() throws -> Any {
+            return rawValue
         }
     }
 }

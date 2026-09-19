@@ -42,6 +42,7 @@ sealed class BlueCatbirdChatRejectWelcomeError(val name: String, val description
         object DeviceBindingMismatch: BlueCatbirdChatRejectWelcomeError("DeviceBindingMismatch", null)
         object ProtocolUpgradeRequired: BlueCatbirdChatRejectWelcomeError("ProtocolUpgradeRequired", null)
         object RateLimited: BlueCatbirdChatRejectWelcomeError("RateLimited", null)
+        object CapacityUnavailable: BlueCatbirdChatRejectWelcomeError("CapacityUnavailable", "The bounded encrypted request lifecycle reserve cannot accommodate this operation. No first-execution effects are committed; retry the same signed operation after capacity is available.")
     }
 
 /**

@@ -3412,6 +3412,18 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
     @SerialName("closed")
     value_closed}
 
+@Serializable
+enum class BlueCatbirdChatDefsPushRegistrationBodyProtocolVersion {
+    @SerialName("2")
+    value_2}
+
+@Serializable
+enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
+    @SerialName("apns")
+    value_apns,
+    @SerialName("fcm")
+    value_fcm}
+
     /**
      * Exact UTC grammar YYYY-MM-DDTHH:MM:SS.sssZ; offsets, lowercase, leap seconds, and variable fractions are invalid.
      */
@@ -6471,5 +6483,53 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
         val usableUntil: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestKeyPoolStats"
+        }
+    }
+
+    /**
+     * Device-signed push binding for the canonical authority. Transcript is the literal UTF8 signatureDomain, then protocolVersion, authorityDid, actorDid as u32-big-endian length-prefixed UTF8, actorDeviceId as16 raw UUID bytes, keyId as length-prefixed UTF8, authGeneration u64 big-endian, registrationId as16 UUID bytes, provider and appId as length-prefixed UTF8, tokenGeneration u64 big-endian, tokenSha256 as32 bytes, enabled as one byte0or1, signedAt as length-prefixed UTF8. First execution checks current immutable key and authentication generation, signature, five-minute freshness and monotonic token generation. Exact current binding retry retains the same signature and receipt. Top-level token must hash to tokenSha256 when enabled; disable omits token and uses SHA256(empty). New registrations start at tokenGeneration1; rotation/rebind increments it. Devices never share registrations.
+     */
+    @Serializable
+    data class BlueCatbirdChatDefsPushRegistrationBody(
+        @SerialName("protocolVersion")
+        val protocolVersion: BlueCatbirdChatDefsPushRegistrationBodyProtocolVersion,        @SerialName("signatureDomain")
+        val signatureDomain: String,        @SerialName("authorityDid")
+        val authorityDid: String,        @SerialName("actorDid")
+        val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
+        val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
+        val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
+        val authGeneration: Int,        @SerialName("registrationId")
+        val registrationId: BlueCatbirdChatDefsOperationId,        @SerialName("provider")
+        val provider: BlueCatbirdChatDefsPushRegistrationBodyProvider,        @SerialName("appId")
+        val appId: String,        @SerialName("tokenGeneration")
+        val tokenGeneration: Int,        @SerialName("tokenSha256")
+        val tokenSha256: Bytes,        @SerialName("enabled")
+        val enabled: Boolean,        @SerialName("signedAt")
+        val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsPushRegistrationBody"
+        }
+    }
+
+    @Serializable
+    data class BlueCatbirdChatDefsSignedPushRegistration(
+        @SerialName("body")
+        val body: BlueCatbirdChatDefsPushRegistrationBody,        @SerialName("signature")
+        val signature: Bytes    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsSignedPushRegistration"
+        }
+    }
+
+    /**
+     * The canonical service acknowledged this exact signed device binding. The gateway commits its token registry only after matching this digest and body to the authenticated request; this is not a client-supplied authorization flag.
+     */
+    @Serializable
+    data class BlueCatbirdChatDefsPushRegistrationBinding(
+        @SerialName("body")
+        val body: BlueCatbirdChatDefsPushRegistrationBody,        @SerialName("bindingDigest")
+        val bindingDigest: Bytes    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsPushRegistrationBinding"
         }
     }
