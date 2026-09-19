@@ -228,6 +228,7 @@ public enum PetrelCatbirdLexicons {
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody", as: BlueCatbirdChatDefs.DirectRequestAcceptanceCommitReceiptBody.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#signedDirectRequestAcceptanceCommitReceipt", as: BlueCatbirdChatDefs.SignedDirectRequestAcceptanceCommitReceipt.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#directRequestAcceptanceProof", as: BlueCatbirdChatDefs.DirectRequestAcceptanceProof.self)
+        ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#directRequestKeyPoolStats", as: BlueCatbirdChatDefs.DirectRequestKeyPoolStats.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.device", as: BlueCatbirdChatDevice.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.circle.defs#circleSummary", as: BlueCatbirdCircleDefs.CircleSummary.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.circle.defs#feedItem", as: BlueCatbirdCircleDefs.FeedItem.self)
