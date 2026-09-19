@@ -2,26 +2,21 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.chat.updatePushToken
 
-
-public struct BlueCatbirdChatUpdatePushToken { 
-
+public enum BlueCatbirdChatUpdatePushToken {
     public static let typeIdentifier = "blue.catbird.chat.updatePushToken"
-public struct Input: ATProtocolCodable {
+    public struct Input: ATProtocolCodable {
         public let token: String?
 
         /// Standard public initializer
         public init(token: String? = nil) {
             self.token = token
         }
-        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.token = try container.decodeIfPresent(String.self, forKey: .token)
+            token = try container.decodeIfPresent(String.self, forKey: .token)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -42,125 +37,89 @@ public struct Input: ATProtocolCodable {
             case token
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
         public let device: BlueCatbirdChatDefs.DeviceView
-        
-        
-        
-        // Standard public initializer
+
+        /// Standard public initializer
         public init(
-            
-            
             device: BlueCatbirdChatDefs.DeviceView
-            
-            
+
         ) {
-            
-            
             self.device = device
-            
-            
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            
-            self.device = try container.decode(BlueCatbirdChatDefs.DeviceView.self, forKey: .device)
-            
-            
-            
+
+            device = try container.decode(BlueCatbirdChatDefs.DeviceView.self, forKey: .device)
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(device, forKey: .device)
-            
-            
         }
 
         public func toCBORValue() throws -> Any {
-            
             var map = OrderedCBORMap()
 
-            
-            
             let deviceValue = try device.toCBORValue()
             map = map.adding(key: "device", value: deviceValue)
-            
-            
 
             return map
-            
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case device
         }
-        
     }
-        
-public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                case accountSessionExpired = "AccountSessionExpired"
-                case cutoverRequired = "CutoverRequired"
-                case deviceNotRegistered = "DeviceNotRegistered"
-                case deviceRevoked = "DeviceRevoked"
-                case invalidRequest = "InvalidRequest"
-                case notAuthorized = "NotAuthorized"
-                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
-                case rateLimited = "RateLimited"
-            public var description: String {
-                return self.rawValue
-            }
 
-            public var errorName: String {
-                return self.rawValue
-            }
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case accountSessionExpired = "AccountSessionExpired"
+        case cutoverRequired = "CutoverRequired"
+        case deviceNotRegistered = "DeviceNotRegistered"
+        case deviceRevoked = "DeviceRevoked"
+        case invalidRequest = "InvalidRequest"
+        case notAuthorized = "NotAuthorized"
+        case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+        case rateLimited = "RateLimited"
+        public var description: String {
+            return rawValue
         }
 
-
-
+        public var errorName: String {
+            return rawValue
+        }
+    }
 }
 
-extension ATProtoClient.Blue.Catbird.Chat {
+public extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - updatePushToken
 
-    /// Register, update, or clear the APNs device token for the caller's active device.
-    /// 
-    /// - Parameter input: The input parameters for the request
-    
-    /// 
+    // Register, update, or clear the APNs device token for the caller's active device.
+    //
+    // - Parameter input: The input parameters for the request
+
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func updatePushToken(
-        
+    func updatePushToken(
         input: BlueCatbirdChatUpdatePushToken.Input
-        
+
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatUpdatePushToken.Output?) {
         let endpoint = "blue.catbird.chat.updatePushToken"
-        
-        var headers: [String: String] = [:]
-        
-        headers["Content-Type"] = "application/json"
-        
-        
-        
-        headers["Accept"] = "application/json"
-        
 
-        
+        var headers: [String: String] = [:]
+
+        headers["Content-Type"] = "application/json"
+
+        headers["Accept"] = "application/json"
+
         let requestData: Data? = try JSONEncoder().encode(input)
-        
-        
+
         let queryItems: [URLQueryItem]? = nil
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -175,12 +134,10 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-            
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -188,13 +145,11 @@ extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
-                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatUpdatePushToken.Output.self, from: responseData)
-                
+
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -210,14 +165,9 @@ extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-            
-            
+
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-        
     }
-    
 }
-                           
-

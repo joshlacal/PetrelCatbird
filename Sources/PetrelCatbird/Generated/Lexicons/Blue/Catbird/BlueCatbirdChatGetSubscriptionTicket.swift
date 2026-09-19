@@ -2,32 +2,30 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.chat.getSubscriptionTicket
 
-
-public struct BlueCatbirdChatGetSubscriptionTicket { 
-
+public enum BlueCatbirdChatGetSubscriptionTicket {
     public static let typeIdentifier = "blue.catbird.chat.getSubscriptionTicket"
-public struct Input: ATProtocolCodable {
+    public struct Input: ATProtocolCodable {
         public let actorDeviceId: String
         public let inventorySessionId: String
         public let eventCursor: String
+        public let supportedProtocolVersions: [InputSupportedProtocolVersions]?
 
         /// Standard public initializer
-        public init(actorDeviceId: String, inventorySessionId: String, eventCursor: String) {
+        public init(actorDeviceId: String, inventorySessionId: String, eventCursor: String, supportedProtocolVersions: [InputSupportedProtocolVersions]? = nil) {
             self.actorDeviceId = actorDeviceId
             self.inventorySessionId = inventorySessionId
             self.eventCursor = eventCursor
+            self.supportedProtocolVersions = supportedProtocolVersions
         }
-        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.actorDeviceId = try container.decode(String.self, forKey: .actorDeviceId)
-            self.inventorySessionId = try container.decode(String.self, forKey: .inventorySessionId)
-            self.eventCursor = try container.decode(String.self, forKey: .eventCursor)
+            actorDeviceId = try container.decode(String.self, forKey: .actorDeviceId)
+            inventorySessionId = try container.decode(String.self, forKey: .inventorySessionId)
+            eventCursor = try container.decode(String.self, forKey: .eventCursor)
+            supportedProtocolVersions = try container.decodeIfPresent([InputSupportedProtocolVersions].self, forKey: .supportedProtocolVersions)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -35,6 +33,7 @@ public struct Input: ATProtocolCodable {
             try container.encode(actorDeviceId, forKey: .actorDeviceId)
             try container.encode(inventorySessionId, forKey: .inventorySessionId)
             try container.encode(eventCursor, forKey: .eventCursor)
+            try container.encodeIfPresent(supportedProtocolVersions, forKey: .supportedProtocolVersions)
         }
 
         public func toCBORValue() throws -> Any {
@@ -45,6 +44,10 @@ public struct Input: ATProtocolCodable {
             map = map.adding(key: "inventorySessionId", value: inventorySessionIdValue)
             let eventCursorValue = try eventCursor.toCBORValue()
             map = map.adding(key: "eventCursor", value: eventCursorValue)
+            if let value = supportedProtocolVersions {
+                let supportedProtocolVersionsValue = try value.toCBORValue()
+                map = map.adding(key: "supportedProtocolVersions", value: supportedProtocolVersionsValue)
+            }
             return map
         }
 
@@ -52,172 +55,163 @@ public struct Input: ATProtocolCodable {
             case actorDeviceId
             case inventorySessionId
             case eventCursor
+            case supportedProtocolVersions
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
         public let ticket: String
-        
+
         public let endpoint: URI
-        
+
         public let expiresAt: BlueCatbirdChatDefs.CanonicalDatetime
-        
-        
-        
-        // Standard public initializer
+
+        public let inventoryScope: BlueCatbirdChatDefs.DirectRequestInventoryScope?
+
+        /// Standard public initializer
         public init(
-            
-            
             ticket: String,
-            
+
             endpoint: URI,
-            
-            expiresAt: BlueCatbirdChatDefs.CanonicalDatetime
-            
-            
+
+            expiresAt: BlueCatbirdChatDefs.CanonicalDatetime,
+
+            inventoryScope: BlueCatbirdChatDefs.DirectRequestInventoryScope? = nil
+
         ) {
-            
-            
             self.ticket = ticket
-            
+
             self.endpoint = endpoint
-            
+
             self.expiresAt = expiresAt
-            
-            
+
+            self.inventoryScope = inventoryScope
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            
-            self.ticket = try container.decode(String.self, forKey: .ticket)
-            
-            
-            
-            
-            self.endpoint = try container.decode(URI.self, forKey: .endpoint)
-            
-            
-            
-            
-            self.expiresAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .expiresAt)
-            
-            
-            
+
+            ticket = try container.decode(String.self, forKey: .ticket)
+
+            endpoint = try container.decode(URI.self, forKey: .endpoint)
+
+            expiresAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .expiresAt)
+
+            do {
+                inventoryScope = try container.decodeIfPresent(BlueCatbirdChatDefs.DirectRequestInventoryScope.self, forKey: .inventoryScope)
+            } catch {
+                // Forward compatibility: a malformed optional field must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'inventoryScope' — degrading to nil: \(error)")
+                inventoryScope = nil
+            }
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(ticket, forKey: .ticket)
-            
-            
+
             try container.encode(endpoint, forKey: .endpoint)
-            
-            
+
             try container.encode(expiresAt, forKey: .expiresAt)
-            
-            
+
+            // Encode optional property even if it's an empty array
+            try container.encodeIfPresent(inventoryScope, forKey: .inventoryScope)
         }
 
         public func toCBORValue() throws -> Any {
-            
             var map = OrderedCBORMap()
 
-            
-            
             let ticketValue = try ticket.toCBORValue()
             map = map.adding(key: "ticket", value: ticketValue)
-            
-            
-            
+
             let endpointValue = try endpoint.toCBORValue()
             map = map.adding(key: "endpoint", value: endpointValue)
-            
-            
-            
+
             let expiresAtValue = try expiresAt.toCBORValue()
             map = map.adding(key: "expiresAt", value: expiresAtValue)
-            
-            
+
+            if let value = inventoryScope {
+                // Encode optional property even if it's an empty array for CBOR
+                let inventoryScopeValue = try value.toCBORValue()
+                map = map.adding(key: "inventoryScope", value: inventoryScopeValue)
+            }
 
             return map
-            
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case ticket
             case endpoint
             case expiresAt
+            case inventoryScope
         }
-        
     }
-        
-public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                case cursorExpired = "CursorExpired"
-                case cutoverRequired = "CutoverRequired"
-                case deviceNotRegistered = "DeviceNotRegistered"
-                case deviceRevoked = "DeviceRevoked"
-                case invalidRequest = "InvalidRequest"
-                case inventoryIncomplete = "InventoryIncomplete"
-                case inventorySessionExpired = "InventorySessionExpired"
-                case inventorySessionMismatch = "InventorySessionMismatch"
-                case accountSessionExpired = "AccountSessionExpired"
-                case notAuthorized = "NotAuthorized"
-                case deviceBindingMismatch = "DeviceBindingMismatch"
-                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
-                case rateLimited = "RateLimited"
-            public var description: String {
-                return self.rawValue
-            }
 
-            public var errorName: String {
-                return self.rawValue
-            }
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case cursorExpired = "CursorExpired"
+        case cutoverRequired = "CutoverRequired"
+        case deviceNotRegistered = "DeviceNotRegistered"
+        case deviceRevoked = "DeviceRevoked"
+        case invalidRequest = "InvalidRequest"
+        case inventoryIncomplete = "InventoryIncomplete"
+        case inventorySessionExpired = "InventorySessionExpired"
+        case inventorySessionMismatch = "InventorySessionMismatch"
+        case accountSessionExpired = "AccountSessionExpired"
+        case notAuthorized = "NotAuthorized"
+        case deviceBindingMismatch = "DeviceBindingMismatch"
+        case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+        case rateLimited = "RateLimited"
+        public var description: String {
+            return rawValue
         }
 
+        public var errorName: String {
+            return rawValue
+        }
+    }
 
+    public enum InputSupportedProtocolVersions: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_1 = "1"
+        case value_2 = "2"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? InputSupportedProtocolVersions else { return false }
+            return self == otherValue
+        }
+
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
+    }
 }
 
-extension ATProtoClient.Blue.Catbird.Chat {
+public extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - getSubscriptionTicket
 
-    /// After conversations, pending Welcomes, and recovery inbox have all reached hasMore=false for one inventorySession, a service-authenticated call atomically marks that barrier complete and mints a one-use short-lived ticket. The ticket binds the authenticated DID, actorDeviceId, authGeneration, inventorySessionId, exact event cursor, and subscription path. The first durable envelope's previousCursor equals that cursor.
-    /// 
-    /// - Parameter input: The input parameters for the request
-    
-    /// 
+    // After conversations, pending Welcomes, and recovery inbox have all reached hasMore=false for one inventorySession, a service-authenticated call atomically marks that barrier complete and mints a one-use short-lived ticket. The ticket binds the authenticated DID, actorDeviceId, authGeneration, inventorySessionId, exact event cursor, and subscription path. The first durable envelope's previousCursor equals that cursor. Protocol-two scopes bind audience, inventory/page/event cursors and ticket. Unscoped legacy sessions must fail ProtocolUpgradeRequired before any successful partial inventory if unsupported state exists. Omission is never removal evidence.
+    //
+    // - Parameter input: The input parameters for the request
+
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getSubscriptionTicket(
-        
+    func getSubscriptionTicket(
         input: BlueCatbirdChatGetSubscriptionTicket.Input
-        
+
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatGetSubscriptionTicket.Output?) {
         let endpoint = "blue.catbird.chat.getSubscriptionTicket"
-        
-        var headers: [String: String] = [:]
-        
-        headers["Content-Type"] = "application/json"
-        
-        
-        
-        headers["Accept"] = "application/json"
-        
 
-        
+        var headers: [String: String] = [:]
+
+        headers["Content-Type"] = "application/json"
+
+        headers["Accept"] = "application/json"
+
         let requestData: Data? = try JSONEncoder().encode(input)
-        
-        
+
         let queryItems: [URLQueryItem]? = nil
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -232,12 +226,10 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-            
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -245,13 +237,11 @@ extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
-                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatGetSubscriptionTicket.Output.self, from: responseData)
-                
+
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -267,14 +257,9 @@ extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-            
-            
+
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-        
     }
-    
 }
-                           
-

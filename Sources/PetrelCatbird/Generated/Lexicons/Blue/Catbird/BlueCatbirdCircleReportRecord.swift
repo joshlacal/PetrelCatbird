@@ -2,15 +2,11 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.circle.reportRecord
 
-
-public struct BlueCatbirdCircleReportRecord { 
-
+public enum BlueCatbirdCircleReportRecord {
     public static let typeIdentifier = "blue.catbird.circle.reportRecord"
-public struct Input: ATProtocolCodable {
+    public struct Input: ATProtocolCodable {
         public let space: SpaceRef
         public let uri: ATProtocolURI
         public let reason: InputReason
@@ -23,14 +19,13 @@ public struct Input: ATProtocolCodable {
             self.reason = reason
             self.details = details
         }
-        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.space = try container.decode(SpaceRef.self, forKey: .space)
-            self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
-            self.reason = try container.decode(InputReason.self, forKey: .reason)
-            self.details = try container.decodeIfPresent(String.self, forKey: .details)
+            space = try container.decode(SpaceRef.self, forKey: .space)
+            uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+            reason = try container.decode(InputReason.self, forKey: .reason)
+            details = try container.decodeIfPresent(String.self, forKey: .details)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -63,138 +58,101 @@ public struct Input: ATProtocolCodable {
             case details
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
         public let id: String
-        
-        
-        
-        // Standard public initializer
+
+        /// Standard public initializer
         public init(
-            
-            
             id: String
-            
-            
+
         ) {
-            
-            
             self.id = id
-            
-            
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            
-            self.id = try container.decode(String.self, forKey: .id)
-            
-            
-            
+
+            id = try container.decode(String.self, forKey: .id)
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(id, forKey: .id)
-            
-            
         }
 
         public func toCBORValue() throws -> Any {
-            
             var map = OrderedCBORMap()
 
-            
-            
             let idValue = try id.toCBORValue()
             map = map.adding(key: "id", value: idValue)
-            
-            
 
             return map
-            
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case id
         }
-        
     }
-        
-public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                case authRequired = "AuthRequired"
-                case accessRemoved = "AccessRemoved"
-                case unsupportedPDS = "UnsupportedPDS"
-                case protocolRevisionMismatch = "ProtocolRevisionMismatch"
-                case upstreamUnavailable = "UpstreamUnavailable"
-            public var description: String {
-                return self.rawValue
-            }
 
-            public var errorName: String {
-                return self.rawValue
-            }
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case authRequired = "AuthRequired"
+        case accessRemoved = "AccessRemoved"
+        case unsupportedPDS = "UnsupportedPDS"
+        case protocolRevisionMismatch = "ProtocolRevisionMismatch"
+        case upstreamUnavailable = "UpstreamUnavailable"
+        public var description: String {
+            return rawValue
         }
 
-
-
-public enum InputReason: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_spam = "spam"
-    case value_abuse = "abuse"
-    case value_other = "other"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? InputReason else { return false }
-        return self == otherValue
+        public var errorName: String {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
+    public enum InputReason: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_spam = "spam"
+        case value_abuse = "abuse"
+        case value_other = "other"
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? InputReason else { return false }
+            return self == otherValue
+        }
+
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 }
 
-
-}
-
-extension ATProtoClient.Blue.Catbird.Circle {
+public extension ATProtoClient.Blue.Catbird.Circle {
     // MARK: - reportRecord
 
-    /// Report a record in a Circle Space
-    /// 
-    /// - Parameter input: The input parameters for the request
-    
-    /// 
+    // Report a record in a Circle Space
+    //
+    // - Parameter input: The input parameters for the request
+
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func reportRecord(
-        
+    func reportRecord(
         input: BlueCatbirdCircleReportRecord.Input
-        
+
     ) async throws -> (responseCode: Int, data: BlueCatbirdCircleReportRecord.Output?) {
         let endpoint = "blue.catbird.circle.reportRecord"
-        
-        var headers: [String: String] = [:]
-        
-        headers["Content-Type"] = "application/json"
-        
-        
-        
-        headers["Accept"] = "application/json"
-        
 
-        
+        var headers: [String: String] = [:]
+
+        headers["Content-Type"] = "application/json"
+
+        headers["Accept"] = "application/json"
+
         let requestData: Data? = try JSONEncoder().encode(input)
-        
-        
+
         let queryItems: [URLQueryItem]? = nil
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -209,12 +167,10 @@ extension ATProtoClient.Blue.Catbird.Circle {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-            
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -222,13 +178,11 @@ extension ATProtoClient.Blue.Catbird.Circle {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
-                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdCircleReportRecord.Output.self, from: responseData)
-                
+
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -244,14 +198,9 @@ extension ATProtoClient.Blue.Catbird.Circle {
             ) {
                 throw atprotoError
             }
-            
-            
+
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-        
     }
-    
 }
-                           
-
