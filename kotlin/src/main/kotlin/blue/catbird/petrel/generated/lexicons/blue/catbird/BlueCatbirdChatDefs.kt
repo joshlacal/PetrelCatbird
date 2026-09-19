@@ -3064,6 +3064,55 @@ object BlueCatbirdChatDefsDirectRequestOutcomeSerializer : kotlinx.serialization
     }
 }
 
+@Serializable(with = BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnionSerializer::class)
+sealed interface BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion {
+    @Serializable
+    data class DirectRequestAcceptanceCommitReceiptBody(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody) : BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion
+}
+
+object BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnionSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion.DirectRequestAcceptanceCommitReceiptBody -> {
+                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody.serializer(), value.value)
+                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
+                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody")
+                })
+            }
+            is BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion {
+        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element.jsonObject
+        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+
+        return when (type) {
+            "blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody" -> BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion.DirectRequestAcceptanceCommitReceiptBody(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion.Unexpected(element)
+        }
+    }
+}
+
 @Serializable
 enum class BlueCatbirdChatDefsDefsProtocolVersion {
     @SerialName("1")
@@ -6044,7 +6093,8 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
         val importUntil: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("artifacts")
         val artifacts: BlueCatbirdChatDefsDirectRequestBootstrapArtifacts,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
-        val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
+        val signedAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("preparationRequestDigest")
+        val preparationRequestDigest: BlueCatbirdChatDefsArtifactHash    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestPublicationBody"
         }
@@ -6276,7 +6326,8 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
         val consent: BlueCatbirdChatDefsDirectRequestStateConsent,        @SerialName("importUntil")
         val importUntil: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("contextHash")
         val contextHash: BlueCatbirdChatDefsArtifactHash,        @SerialName("preparationDigest")
-        val preparationDigest: BlueCatbirdChatDefsArtifactHash    ) {
+        val preparationDigest: BlueCatbirdChatDefsArtifactHash,        @SerialName("acceptanceProof")
+        val acceptanceProof: BlueCatbirdChatDefsDirectRequestAcceptanceProof? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestState"
         }
@@ -6284,9 +6335,12 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
 
     @Serializable
     data class BlueCatbirdChatDefsDirectRequestEntry(
-        @SerialName("seq")
+        @SerialName("entryId")
+        val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
+        val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
         val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedDirectRequestPublication    ) {
+        val signedRequest: BlueCatbirdChatDefsSignedDirectRequestPublication,        @SerialName("receivedAt")
+        val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestEntry"
         }
@@ -6294,9 +6348,12 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
 
     @Serializable
     data class BlueCatbirdChatDefsDirectRequestAcceptanceEntry(
-        @SerialName("seq")
+        @SerialName("entryId")
+        val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
+        val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
         val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedDirectRequestAcceptance    ) {
+        val signedRequest: BlueCatbirdChatDefsSignedDirectRequestAcceptance,        @SerialName("receivedAt")
+        val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestAcceptanceEntry"
         }
@@ -6360,3 +6417,41 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
      * Exact did:web:chat.catbird.blue#chat-request-receipt- plus lowercase hex SHA256 of compressed P256 SEC1 public key. Resolve authenticated authority DID document unique method/controller/P256 Multikey. Retain historical verification methods across key rotation.
      */
     typealias BlueCatbirdChatDefsDirectRequestReceiptKeyId = String
+
+    @Serializable
+    data class BlueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(
+        @SerialName("signatureDomain")
+        val signatureDomain: String,        @SerialName("protocolVersion")
+        val protocolVersion: String,        @SerialName("authorityDid")
+        val authorityDid: String,        @SerialName("keyId")
+        val keyId: BlueCatbirdChatDefsDirectRequestReceiptKeyId,        @SerialName("requestId")
+        val requestId: BlueCatbirdChatDefsOperationId,        @SerialName("acceptanceDigest")
+        val acceptanceDigest: BlueCatbirdChatDefsArtifactHash,        @SerialName("entryHash")
+        val entryHash: BlueCatbirdChatDefsArtifactHash,        @SerialName("prior")
+        val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("next")
+        val next: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("recordedAt")
+        val recordedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody"
+        }
+    }
+
+    @Serializable
+    data class BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceipt(
+        @SerialName("body")
+        val body: BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion,        @SerialName("signature")
+        val signature: Bytes    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceipt"
+        }
+    }
+
+    @Serializable
+    data class BlueCatbirdChatDefsDirectRequestAcceptanceProof(
+        @SerialName("entry")
+        val entry: BlueCatbirdChatDefsDirectRequestAcceptanceEntry,        @SerialName("receipt")
+        val receipt: BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceipt    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestAcceptanceProof"
+        }
+    }

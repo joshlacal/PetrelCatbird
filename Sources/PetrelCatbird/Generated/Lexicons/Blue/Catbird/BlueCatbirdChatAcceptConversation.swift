@@ -43,13 +43,17 @@ public enum BlueCatbirdChatAcceptConversation {
 
         public let recovery: BlueCatbirdChatDefs.LeafRecoveryView?
 
+        public let acceptanceProof: BlueCatbirdChatDefs.DirectRequestAcceptanceProof?
+
         /// Standard public initializer
         public init(
             coordinates: BlueCatbirdChatDefs.ConversationCoordinates,
 
             entry: OutputEntryUnion,
 
-            recovery: BlueCatbirdChatDefs.LeafRecoveryView? = nil
+            recovery: BlueCatbirdChatDefs.LeafRecoveryView? = nil,
+
+            acceptanceProof: BlueCatbirdChatDefs.DirectRequestAcceptanceProof? = nil
 
         ) {
             self.coordinates = coordinates
@@ -57,6 +61,8 @@ public enum BlueCatbirdChatAcceptConversation {
             self.entry = entry
 
             self.recovery = recovery
+
+            self.acceptanceProof = acceptanceProof
         }
 
         public init(from decoder: Decoder) throws {
@@ -73,6 +79,14 @@ public enum BlueCatbirdChatAcceptConversation {
                 LogManager.logWarning("Decoding error for optional property 'recovery' — degrading to nil: \(error)")
                 recovery = nil
             }
+
+            do {
+                acceptanceProof = try container.decodeIfPresent(BlueCatbirdChatDefs.DirectRequestAcceptanceProof.self, forKey: .acceptanceProof)
+            } catch {
+                // Forward compatibility: a malformed optional field must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'acceptanceProof' — degrading to nil: \(error)")
+                acceptanceProof = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -84,6 +98,9 @@ public enum BlueCatbirdChatAcceptConversation {
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(recovery, forKey: .recovery)
+
+            // Encode optional property even if it's an empty array
+            try container.encodeIfPresent(acceptanceProof, forKey: .acceptanceProof)
         }
 
         public func toCBORValue() throws -> Any {
@@ -101,6 +118,12 @@ public enum BlueCatbirdChatAcceptConversation {
                 map = map.adding(key: "recovery", value: recoveryValue)
             }
 
+            if let value = acceptanceProof {
+                // Encode optional property even if it's an empty array for CBOR
+                let acceptanceProofValue = try value.toCBORValue()
+                map = map.adding(key: "acceptanceProof", value: acceptanceProofValue)
+            }
+
             return map
         }
 
@@ -108,6 +131,7 @@ public enum BlueCatbirdChatAcceptConversation {
             case coordinates
             case entry
             case recovery
+            case acceptanceProof
         }
     }
 
