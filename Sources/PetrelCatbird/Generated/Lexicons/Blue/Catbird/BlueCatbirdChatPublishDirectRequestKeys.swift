@@ -106,6 +106,14 @@ public enum BlueCatbirdChatPublishDirectRequestKeys {
         case requestNotAccepted = "RequestNotAccepted"
         case unavailableIntroduction = "UnavailableIntroduction"
         case rateLimited = "RateLimited"
+        case accountSessionExpired = "AccountSessionExpired"
+        case notAuthorized = "NotAuthorized"
+        case deviceBindingMismatch = "DeviceBindingMismatch"
+        case deviceNotRegistered = "DeviceNotRegistered"
+        case deviceRevoked = "DeviceRevoked"
+        case invalidRequest = "InvalidRequest"
+        case cutoverRequired = "CutoverRequired"
+        case signedOperationExpired = "SignedOperationExpired"
         public var description: String {
             return rawValue
         }

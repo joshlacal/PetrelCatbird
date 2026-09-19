@@ -16,138 +16,17 @@ object BlueCatbirdChatAcceptConversationDefs {
     const val TYPE_IDENTIFIER = "blue.catbird.chat.acceptConversation"
 }
 
-@Serializable(with = BlueCatbirdChatAcceptConversationInputSignedRequestUnionSerializer::class)
-sealed interface BlueCatbirdChatAcceptConversationInputSignedRequestUnion {
-    @Serializable
-    data class SignedParticipantAcceptance(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedParticipantAcceptance) : BlueCatbirdChatAcceptConversationInputSignedRequestUnion
-
-    @Serializable
-    data class SignedDirectRequestAcceptance(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedDirectRequestAcceptance) : BlueCatbirdChatAcceptConversationInputSignedRequestUnion
-
-    @Serializable
-    data class Unexpected(val value: JsonElement) : BlueCatbirdChatAcceptConversationInputSignedRequestUnion
-}
-
-object BlueCatbirdChatAcceptConversationInputSignedRequestUnionSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatAcceptConversationInputSignedRequestUnion> {
-    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
-        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatAcceptConversationInputSignedRequestUnion")
-
-    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatAcceptConversationInputSignedRequestUnion) {
-        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
-        val element = when (value) {
-            is BlueCatbirdChatAcceptConversationInputSignedRequestUnion.SignedParticipantAcceptance -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedParticipantAcceptance.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedParticipantAcceptance")
-                })
-            }
-            is BlueCatbirdChatAcceptConversationInputSignedRequestUnion.SignedDirectRequestAcceptance -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedDirectRequestAcceptance.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedDirectRequestAcceptance")
-                })
-            }
-            is BlueCatbirdChatAcceptConversationInputSignedRequestUnion.Unexpected -> value.value
-            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
-            // subscription codegen) are runtime-only sentinels; JSON round-trip
-            // serialises them as an empty object tagged with the variant class
-            // name. Consumers should filter these before JSON serialisation.
-            else -> kotlinx.serialization.json.buildJsonObject {
-                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
-            }
-        }
-        jsonEncoder.encodeJsonElement(element)
-    }
-
-    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatAcceptConversationInputSignedRequestUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
-        val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
-
-        return when (type) {
-            "blue.catbird.chat.defs#signedParticipantAcceptance" -> BlueCatbirdChatAcceptConversationInputSignedRequestUnion.SignedParticipantAcceptance(
-                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedParticipantAcceptance.serializer(), element)
-            )
-            "blue.catbird.chat.defs#signedDirectRequestAcceptance" -> BlueCatbirdChatAcceptConversationInputSignedRequestUnion.SignedDirectRequestAcceptance(
-                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedDirectRequestAcceptance.serializer(), element)
-            )
-            else -> BlueCatbirdChatAcceptConversationInputSignedRequestUnion.Unexpected(element)
-        }
-    }
-}
-
-@Serializable(with = BlueCatbirdChatAcceptConversationOutputEntryUnionSerializer::class)
-sealed interface BlueCatbirdChatAcceptConversationOutputEntryUnion {
-    @Serializable
-    data class ParticipantAcceptanceEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsParticipantAcceptanceEntry) : BlueCatbirdChatAcceptConversationOutputEntryUnion
-
-    @Serializable
-    data class DirectRequestAcceptanceEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestAcceptanceEntry) : BlueCatbirdChatAcceptConversationOutputEntryUnion
-
-    @Serializable
-    data class Unexpected(val value: JsonElement) : BlueCatbirdChatAcceptConversationOutputEntryUnion
-}
-
-object BlueCatbirdChatAcceptConversationOutputEntryUnionSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatAcceptConversationOutputEntryUnion> {
-    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
-        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatAcceptConversationOutputEntryUnion")
-
-    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatAcceptConversationOutputEntryUnion) {
-        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
-        val element = when (value) {
-            is BlueCatbirdChatAcceptConversationOutputEntryUnion.ParticipantAcceptanceEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsParticipantAcceptanceEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#participantAcceptanceEntry")
-                })
-            }
-            is BlueCatbirdChatAcceptConversationOutputEntryUnion.DirectRequestAcceptanceEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestAcceptanceEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestAcceptanceEntry")
-                })
-            }
-            is BlueCatbirdChatAcceptConversationOutputEntryUnion.Unexpected -> value.value
-            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
-            // subscription codegen) are runtime-only sentinels; JSON round-trip
-            // serialises them as an empty object tagged with the variant class
-            // name. Consumers should filter these before JSON serialisation.
-            else -> kotlinx.serialization.json.buildJsonObject {
-                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
-            }
-        }
-        jsonEncoder.encodeJsonElement(element)
-    }
-
-    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatAcceptConversationOutputEntryUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
-        val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
-
-        return when (type) {
-            "blue.catbird.chat.defs#participantAcceptanceEntry" -> BlueCatbirdChatAcceptConversationOutputEntryUnion.ParticipantAcceptanceEntry(
-                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsParticipantAcceptanceEntry.serializer(), element)
-            )
-            "blue.catbird.chat.defs#directRequestAcceptanceEntry" -> BlueCatbirdChatAcceptConversationOutputEntryUnion.DirectRequestAcceptanceEntry(
-                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestAcceptanceEntry.serializer(), element)
-            )
-            else -> BlueCatbirdChatAcceptConversationOutputEntryUnion.Unexpected(element)
-        }
-    }
-}
-
 @Serializable
     data class BlueCatbirdChatAcceptConversationInput(
         @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatAcceptConversationInputSignedRequestUnion    )
+        val signedRequest: BlueCatbirdChatDefsSignedParticipantAcceptance? = null,        @SerialName("directRequest")
+        val directRequest: BlueCatbirdChatDefsSignedDirectRequestAcceptance? = null    )
 
     @Serializable
     data class BlueCatbirdChatAcceptConversationOutput(
         @SerialName("coordinates")
         val coordinates: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("entry")
-        val entry: BlueCatbirdChatAcceptConversationOutputEntryUnion,        @SerialName("recovery")
+        val entry: BlueCatbirdChatDefsParticipantAcceptanceEntry? = null,        @SerialName("recovery")
         val recovery: BlueCatbirdChatDefsLeafRecoveryView? = null,        @SerialName("acceptanceProof")
         val acceptanceProof: BlueCatbirdChatDefsDirectRequestAcceptanceProof? = null    )
 
