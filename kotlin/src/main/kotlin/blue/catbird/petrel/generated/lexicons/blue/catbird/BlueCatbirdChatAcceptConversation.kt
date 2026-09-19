@@ -148,7 +148,8 @@ object BlueCatbirdChatAcceptConversationOutputEntryUnionSerializer : kotlinx.ser
         @SerialName("coordinates")
         val coordinates: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("entry")
         val entry: BlueCatbirdChatAcceptConversationOutputEntryUnion,        @SerialName("recovery")
-        val recovery: BlueCatbirdChatDefsLeafRecoveryView? = null    )
+        val recovery: BlueCatbirdChatDefsLeafRecoveryView? = null,        @SerialName("acceptanceProof")
+        val acceptanceProof: BlueCatbirdChatDefsDirectRequestAcceptanceProof? = null    )
 
 sealed class BlueCatbirdChatAcceptConversationError(val name: String, val description: String?) {
         object BlockedRelationship: BlueCatbirdChatAcceptConversationError("BlockedRelationship", null)
