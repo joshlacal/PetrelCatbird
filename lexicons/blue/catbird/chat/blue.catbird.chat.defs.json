@@ -6926,7 +6926,8 @@
         "importUntil",
         "artifacts",
         "idempotencyKey",
-        "signedAt"
+        "signedAt",
+        "preparationRequestDigest"
       ],
       "properties": {
         "signatureDomain": {
@@ -7005,6 +7006,10 @@
         "signedAt": {
           "type": "ref",
           "ref": "#canonicalDatetime"
+        },
+        "preparationRequestDigest": {
+          "type": "ref",
+          "ref": "#artifactHash"
         }
       }
     },
