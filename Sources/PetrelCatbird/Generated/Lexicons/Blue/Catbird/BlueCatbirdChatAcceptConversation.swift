@@ -7,39 +7,50 @@ import Petrel
 public enum BlueCatbirdChatAcceptConversation {
     public static let typeIdentifier = "blue.catbird.chat.acceptConversation"
     public struct Input: ATProtocolCodable {
-        public let signedRequest: InputSignedRequestUnion
+        public let signedRequest: BlueCatbirdChatDefs.SignedParticipantAcceptance?
+        public let directRequest: BlueCatbirdChatDefs.SignedDirectRequestAcceptance?
 
         /// Standard public initializer
-        public init(signedRequest: InputSignedRequestUnion) {
+        public init(signedRequest: BlueCatbirdChatDefs.SignedParticipantAcceptance? = nil, directRequest: BlueCatbirdChatDefs.SignedDirectRequestAcceptance? = nil) {
             self.signedRequest = signedRequest
+            self.directRequest = directRequest
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            signedRequest = try container.decode(InputSignedRequestUnion.self, forKey: .signedRequest)
+            signedRequest = try container.decodeIfPresent(BlueCatbirdChatDefs.SignedParticipantAcceptance.self, forKey: .signedRequest)
+            directRequest = try container.decodeIfPresent(BlueCatbirdChatDefs.SignedDirectRequestAcceptance.self, forKey: .directRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(directRequest, forKey: .directRequest)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let signedRequestValue = try signedRequest.toCBORValue()
-            map = map.adding(key: "signedRequest", value: signedRequestValue)
+            if let value = signedRequest {
+                let signedRequestValue = try value.toCBORValue()
+                map = map.adding(key: "signedRequest", value: signedRequestValue)
+            }
+            if let value = directRequest {
+                let directRequestValue = try value.toCBORValue()
+                map = map.adding(key: "directRequest", value: directRequestValue)
+            }
             return map
         }
 
         private enum CodingKeys: String, CodingKey {
             case signedRequest
+            case directRequest
         }
     }
 
     public struct Output: ATProtocolCodable {
         public let coordinates: BlueCatbirdChatDefs.ConversationCoordinates
 
-        public let entry: OutputEntryUnion
+        public let entry: BlueCatbirdChatDefs.ParticipantAcceptanceEntry?
 
         public let recovery: BlueCatbirdChatDefs.LeafRecoveryView?
 
@@ -49,7 +60,7 @@ public enum BlueCatbirdChatAcceptConversation {
         public init(
             coordinates: BlueCatbirdChatDefs.ConversationCoordinates,
 
-            entry: OutputEntryUnion,
+            entry: BlueCatbirdChatDefs.ParticipantAcceptanceEntry? = nil,
 
             recovery: BlueCatbirdChatDefs.LeafRecoveryView? = nil,
 
@@ -70,7 +81,13 @@ public enum BlueCatbirdChatAcceptConversation {
 
             coordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .coordinates)
 
-            entry = try container.decode(OutputEntryUnion.self, forKey: .entry)
+            do {
+                entry = try container.decodeIfPresent(BlueCatbirdChatDefs.ParticipantAcceptanceEntry.self, forKey: .entry)
+            } catch {
+                // Forward compatibility: a malformed optional field must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'entry' — degrading to nil: \(error)")
+                entry = nil
+            }
 
             do {
                 recovery = try container.decodeIfPresent(BlueCatbirdChatDefs.LeafRecoveryView.self, forKey: .recovery)
@@ -94,7 +111,8 @@ public enum BlueCatbirdChatAcceptConversation {
 
             try container.encode(coordinates, forKey: .coordinates)
 
-            try container.encode(entry, forKey: .entry)
+            // Encode optional property even if it's an empty array
+            try container.encodeIfPresent(entry, forKey: .entry)
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(recovery, forKey: .recovery)
@@ -109,8 +127,11 @@ public enum BlueCatbirdChatAcceptConversation {
             let coordinatesValue = try coordinates.toCBORValue()
             map = map.adding(key: "coordinates", value: coordinatesValue)
 
-            let entryValue = try entry.toCBORValue()
-            map = map.adding(key: "entry", value: entryValue)
+            if let value = entry {
+                // Encode optional property even if it's an empty array for CBOR
+                let entryValue = try value.toCBORValue()
+                map = map.adding(key: "entry", value: entryValue)
+            }
 
             if let value = recovery {
                 // Encode optional property even if it's an empty array for CBOR
@@ -166,262 +187,6 @@ public enum BlueCatbirdChatAcceptConversation {
 
         public var errorName: String {
             return rawValue
-        }
-    }
-
-    public enum InputSignedRequestUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-        case blueCatbirdChatDefsSignedParticipantAcceptance(BlueCatbirdChatDefs.SignedParticipantAcceptance)
-        case blueCatbirdChatDefsSignedDirectRequestAcceptance(BlueCatbirdChatDefs.SignedDirectRequestAcceptance)
-        case unexpected(ATProtocolValueContainer)
-        public init(_ value: BlueCatbirdChatDefs.SignedParticipantAcceptance) {
-            self = .blueCatbirdChatDefsSignedParticipantAcceptance(value)
-        }
-
-        public init(_ value: BlueCatbirdChatDefs.SignedDirectRequestAcceptance) {
-            self = .blueCatbirdChatDefsSignedDirectRequestAcceptance(value)
-        }
-
-        public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let typeValue = try container.decode(String.self, forKey: .type)
-
-            switch typeValue {
-            case "blue.catbird.chat.defs#signedParticipantAcceptance":
-                let value = try BlueCatbirdChatDefs.SignedParticipantAcceptance(from: decoder)
-                self = .blueCatbirdChatDefsSignedParticipantAcceptance(value)
-            case "blue.catbird.chat.defs#signedDirectRequestAcceptance":
-                let value = try BlueCatbirdChatDefs.SignedDirectRequestAcceptance(from: decoder)
-                self = .blueCatbirdChatDefsSignedDirectRequestAcceptance(value)
-            default:
-                let unknownValue = try ATProtocolValueContainer(from: decoder)
-                self = .unexpected(unknownValue)
-            }
-        }
-
-        public func encode(to encoder: Encoder) throws {
-            var container = encoder.container(keyedBy: CodingKeys.self)
-
-            switch self {
-            case let .blueCatbirdChatDefsSignedParticipantAcceptance(value):
-                try container.encode("blue.catbird.chat.defs#signedParticipantAcceptance", forKey: .type)
-                try value.encode(to: encoder)
-            case let .blueCatbirdChatDefsSignedDirectRequestAcceptance(value):
-                try container.encode("blue.catbird.chat.defs#signedDirectRequestAcceptance", forKey: .type)
-                try value.encode(to: encoder)
-            case let .unexpected(container):
-                try container.encode(to: encoder)
-            }
-        }
-
-        public func hash(into hasher: inout Hasher) {
-            switch self {
-            case let .blueCatbirdChatDefsSignedParticipantAcceptance(value):
-                hasher.combine("blue.catbird.chat.defs#signedParticipantAcceptance")
-                hasher.combine(value)
-            case let .blueCatbirdChatDefsSignedDirectRequestAcceptance(value):
-                hasher.combine("blue.catbird.chat.defs#signedDirectRequestAcceptance")
-                hasher.combine(value)
-            case let .unexpected(container):
-                hasher.combine("unexpected")
-                hasher.combine(container)
-            }
-        }
-
-        private enum CodingKeys: String, CodingKey {
-            case type = "$type"
-        }
-
-        public static func == (lhs: InputSignedRequestUnion, rhs: InputSignedRequestUnion) -> Bool {
-            switch (lhs, rhs) {
-            case let (.blueCatbirdChatDefsSignedParticipantAcceptance(lhsValue),
-                      .blueCatbirdChatDefsSignedParticipantAcceptance(rhsValue)):
-                return lhsValue == rhsValue
-            case let (.blueCatbirdChatDefsSignedDirectRequestAcceptance(lhsValue),
-                      .blueCatbirdChatDefsSignedDirectRequestAcceptance(rhsValue)):
-                return lhsValue == rhsValue
-            case let (.unexpected(lhsValue), .unexpected(rhsValue)):
-                return lhsValue.isEqual(to: rhsValue)
-            default:
-                return false
-            }
-        }
-
-        public func isEqual(to other: any ATProtocolValue) -> Bool {
-            guard let other = other as? InputSignedRequestUnion else { return false }
-            return self == other
-        }
-
-        /// DAGCBOR encoding with field ordering
-        public func toCBORValue() throws -> Any {
-            // Create an ordered map to maintain field order
-            var map = OrderedCBORMap()
-
-            switch self {
-            case let .blueCatbirdChatDefsSignedParticipantAcceptance(value):
-                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedParticipantAcceptance")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
-            case let .blueCatbirdChatDefsSignedDirectRequestAcceptance(value):
-                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedDirectRequestAcceptance")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
-            case let .unexpected(container):
-                return try container.toCBORValue()
-            }
-        }
-    }
-
-    public enum OutputEntryUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-        case blueCatbirdChatDefsParticipantAcceptanceEntry(BlueCatbirdChatDefs.ParticipantAcceptanceEntry)
-        case blueCatbirdChatDefsDirectRequestAcceptanceEntry(BlueCatbirdChatDefs.DirectRequestAcceptanceEntry)
-        case unexpected(ATProtocolValueContainer)
-        public init(_ value: BlueCatbirdChatDefs.ParticipantAcceptanceEntry) {
-            self = .blueCatbirdChatDefsParticipantAcceptanceEntry(value)
-        }
-
-        public init(_ value: BlueCatbirdChatDefs.DirectRequestAcceptanceEntry) {
-            self = .blueCatbirdChatDefsDirectRequestAcceptanceEntry(value)
-        }
-
-        public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let typeValue = try container.decode(String.self, forKey: .type)
-
-            switch typeValue {
-            case "blue.catbird.chat.defs#participantAcceptanceEntry":
-                let value = try BlueCatbirdChatDefs.ParticipantAcceptanceEntry(from: decoder)
-                self = .blueCatbirdChatDefsParticipantAcceptanceEntry(value)
-            case "blue.catbird.chat.defs#directRequestAcceptanceEntry":
-                let value = try BlueCatbirdChatDefs.DirectRequestAcceptanceEntry(from: decoder)
-                self = .blueCatbirdChatDefsDirectRequestAcceptanceEntry(value)
-            default:
-                let unknownValue = try ATProtocolValueContainer(from: decoder)
-                self = .unexpected(unknownValue)
-            }
-        }
-
-        public func encode(to encoder: Encoder) throws {
-            var container = encoder.container(keyedBy: CodingKeys.self)
-
-            switch self {
-            case let .blueCatbirdChatDefsParticipantAcceptanceEntry(value):
-                try container.encode("blue.catbird.chat.defs#participantAcceptanceEntry", forKey: .type)
-                try value.encode(to: encoder)
-            case let .blueCatbirdChatDefsDirectRequestAcceptanceEntry(value):
-                try container.encode("blue.catbird.chat.defs#directRequestAcceptanceEntry", forKey: .type)
-                try value.encode(to: encoder)
-            case let .unexpected(container):
-                try container.encode(to: encoder)
-            }
-        }
-
-        public func hash(into hasher: inout Hasher) {
-            switch self {
-            case let .blueCatbirdChatDefsParticipantAcceptanceEntry(value):
-                hasher.combine("blue.catbird.chat.defs#participantAcceptanceEntry")
-                hasher.combine(value)
-            case let .blueCatbirdChatDefsDirectRequestAcceptanceEntry(value):
-                hasher.combine("blue.catbird.chat.defs#directRequestAcceptanceEntry")
-                hasher.combine(value)
-            case let .unexpected(container):
-                hasher.combine("unexpected")
-                hasher.combine(container)
-            }
-        }
-
-        private enum CodingKeys: String, CodingKey {
-            case type = "$type"
-        }
-
-        public static func == (lhs: OutputEntryUnion, rhs: OutputEntryUnion) -> Bool {
-            switch (lhs, rhs) {
-            case let (.blueCatbirdChatDefsParticipantAcceptanceEntry(lhsValue),
-                      .blueCatbirdChatDefsParticipantAcceptanceEntry(rhsValue)):
-                return lhsValue == rhsValue
-            case let (.blueCatbirdChatDefsDirectRequestAcceptanceEntry(lhsValue),
-                      .blueCatbirdChatDefsDirectRequestAcceptanceEntry(rhsValue)):
-                return lhsValue == rhsValue
-            case let (.unexpected(lhsValue), .unexpected(rhsValue)):
-                return lhsValue.isEqual(to: rhsValue)
-            default:
-                return false
-            }
-        }
-
-        public func isEqual(to other: any ATProtocolValue) -> Bool {
-            guard let other = other as? OutputEntryUnion else { return false }
-            return self == other
-        }
-
-        /// DAGCBOR encoding with field ordering
-        public func toCBORValue() throws -> Any {
-            // Create an ordered map to maintain field order
-            var map = OrderedCBORMap()
-
-            switch self {
-            case let .blueCatbirdChatDefsParticipantAcceptanceEntry(value):
-                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#participantAcceptanceEntry")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
-            case let .blueCatbirdChatDefsDirectRequestAcceptanceEntry(value):
-                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestAcceptanceEntry")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
-            case let .unexpected(container):
-                return try container.toCBORValue()
-            }
         }
     }
 }

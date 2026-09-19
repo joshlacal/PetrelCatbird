@@ -45,6 +45,14 @@ sealed class BlueCatbirdChatPublishDirectRequestError(val name: String, val desc
         object RequestNotAccepted: BlueCatbirdChatPublishDirectRequestError("RequestNotAccepted", null)
         object UnavailableIntroduction: BlueCatbirdChatPublishDirectRequestError("UnavailableIntroduction", null)
         object RateLimited: BlueCatbirdChatPublishDirectRequestError("RateLimited", null)
+        object AccountSessionExpired: BlueCatbirdChatPublishDirectRequestError("AccountSessionExpired", null)
+        object NotAuthorized: BlueCatbirdChatPublishDirectRequestError("NotAuthorized", null)
+        object DeviceBindingMismatch: BlueCatbirdChatPublishDirectRequestError("DeviceBindingMismatch", null)
+        object DeviceNotRegistered: BlueCatbirdChatPublishDirectRequestError("DeviceNotRegistered", null)
+        object DeviceRevoked: BlueCatbirdChatPublishDirectRequestError("DeviceRevoked", null)
+        object InvalidRequest: BlueCatbirdChatPublishDirectRequestError("InvalidRequest", null)
+        object CutoverRequired: BlueCatbirdChatPublishDirectRequestError("CutoverRequired", null)
+        object SignedOperationExpired: BlueCatbirdChatPublishDirectRequestError("SignedOperationExpired", null)
     }
 
 /**

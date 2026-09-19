@@ -5935,7 +5935,7 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
     }
 
     /**
-     * Canonical untagged snapshot. preparationDigest=SHA256(CATBIRD-DIRECT-REQUEST-PREPARATION-RECEIPT\0 || canonicalCBOR(snapshot)); preparationSignature=ES256 over those exact domain-prefixed bytes using did:web:chat.catbird.blue#mls-receipt-1. Includes exact SHA256 signed preparation transcript. View adds digest/signature, which are excluded from the snapshot projection.
+     * Canonical untagged snapshot. preparationDigest=SHA256(CATBIRD-DIRECT-REQUEST-PREPARATION-RECEIPT\0 || canonicalCBOR(snapshot)); preparationSignature=ES256 over those exact domain-prefixed bytes using the immutable versioned receiptKeyId. Includes exact SHA256 signed preparation transcript. View adds digest/signature, which are excluded from the snapshot projection.
      */
     @Serializable
     data class BlueCatbirdChatDefsDirectRequestPreparationView(
@@ -6388,7 +6388,7 @@ enum class BlueCatbirdChatDefsDirectRequestStateConsent {
     }
 
     /**
-     * Canonical untagged snapshot. preparationDigest=SHA256(CATBIRD-DIRECT-REQUEST-PREPARATION-RECEIPT\0 || canonicalCBOR(snapshot)); preparationSignature=ES256 over those exact domain-prefixed bytes using did:web:chat.catbird.blue#mls-receipt-1. Includes exact SHA256 signed preparation transcript.
+     * Canonical untagged snapshot. preparationDigest=SHA256(CATBIRD-DIRECT-REQUEST-PREPARATION-RECEIPT\0 || canonicalCBOR(snapshot)); preparationSignature=ES256 over those exact domain-prefixed bytes using the immutable versioned receiptKeyId. Includes exact SHA256 signed preparation transcript.
      */
     @Serializable
     data class BlueCatbirdChatDefsDirectRequestPreparationSnapshot(

@@ -45,6 +45,14 @@ sealed class BlueCatbirdChatCancelDirectRequestPreparationError(val name: String
         object RequestNotAccepted: BlueCatbirdChatCancelDirectRequestPreparationError("RequestNotAccepted", null)
         object UnavailableIntroduction: BlueCatbirdChatCancelDirectRequestPreparationError("UnavailableIntroduction", null)
         object RateLimited: BlueCatbirdChatCancelDirectRequestPreparationError("RateLimited", null)
+        object AccountSessionExpired: BlueCatbirdChatCancelDirectRequestPreparationError("AccountSessionExpired", null)
+        object NotAuthorized: BlueCatbirdChatCancelDirectRequestPreparationError("NotAuthorized", null)
+        object DeviceBindingMismatch: BlueCatbirdChatCancelDirectRequestPreparationError("DeviceBindingMismatch", null)
+        object DeviceNotRegistered: BlueCatbirdChatCancelDirectRequestPreparationError("DeviceNotRegistered", null)
+        object DeviceRevoked: BlueCatbirdChatCancelDirectRequestPreparationError("DeviceRevoked", null)
+        object InvalidRequest: BlueCatbirdChatCancelDirectRequestPreparationError("InvalidRequest", null)
+        object CutoverRequired: BlueCatbirdChatCancelDirectRequestPreparationError("CutoverRequired", null)
+        object SignedOperationExpired: BlueCatbirdChatCancelDirectRequestPreparationError("SignedOperationExpired", null)
     }
 
 /**
