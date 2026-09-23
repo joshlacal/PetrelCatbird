@@ -33639,6 +33639,7 @@ public enum BlueCatbirdChatDefs {
         case value_RequestNotAccepted = "RequestNotAccepted"
         case value_UnavailableIntroduction = "UnavailableIntroduction"
         case value_RateLimited = "RateLimited"
+        case value_RecipientAuthorityUnsupported = "RecipientAuthorityUnsupported"
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let otherValue = other as? DefsDirectRequestErrorCode else { return false }
