@@ -103,6 +103,7 @@ public enum BlueCatbirdChatActivateReset {
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case adminRequired = "AdminRequired"
+        case conversationNotAccepted = "ConversationNotAccepted"
         case conversationNotFound = "ConversationNotFound"
         case coordinateOverflow = "CoordinateOverflow"
         case cutoverRequired = "CutoverRequired"

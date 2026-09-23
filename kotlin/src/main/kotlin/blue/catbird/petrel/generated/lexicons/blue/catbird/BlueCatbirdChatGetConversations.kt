@@ -49,6 +49,7 @@ sealed class BlueCatbirdChatGetConversationsError(val name: String, val descript
         object DeviceRevoked: BlueCatbirdChatGetConversationsError("DeviceRevoked", null)
         object InvalidRequest: BlueCatbirdChatGetConversationsError("InvalidRequest", null)
         object AccountSessionExpired: BlueCatbirdChatGetConversationsError("AccountSessionExpired", null)
+        object InventorySessionMismatch: BlueCatbirdChatGetConversationsError("InventorySessionMismatch", null)
         object NotAuthorized: BlueCatbirdChatGetConversationsError("NotAuthorized", null)
         object DeviceBindingMismatch: BlueCatbirdChatGetConversationsError("DeviceBindingMismatch", null)
         object ProtocolUpgradeRequired: BlueCatbirdChatGetConversationsError("ProtocolUpgradeRequired", null)

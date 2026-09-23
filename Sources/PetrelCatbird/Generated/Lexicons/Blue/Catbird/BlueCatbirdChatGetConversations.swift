@@ -173,6 +173,7 @@ public enum BlueCatbirdChatGetConversations {
         case deviceRevoked = "DeviceRevoked"
         case invalidRequest = "InvalidRequest"
         case accountSessionExpired = "AccountSessionExpired"
+        case inventorySessionMismatch = "InventorySessionMismatch"
         case notAuthorized = "NotAuthorized"
         case deviceBindingMismatch = "DeviceBindingMismatch"
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"

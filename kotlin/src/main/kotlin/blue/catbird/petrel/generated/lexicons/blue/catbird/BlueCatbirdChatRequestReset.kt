@@ -28,6 +28,7 @@ object BlueCatbirdChatRequestResetDefs {
         val entry: BlueCatbirdChatDefsResetRequestEntry    )
 
 sealed class BlueCatbirdChatRequestResetError(val name: String, val description: String?) {
+        object ConversationNotAccepted: BlueCatbirdChatRequestResetError("ConversationNotAccepted", null)
         object ConversationNotFound: BlueCatbirdChatRequestResetError("ConversationNotFound", null)
         object CutoverRequired: BlueCatbirdChatRequestResetError("CutoverRequired", null)
         object DeviceNotRegistered: BlueCatbirdChatRequestResetError("DeviceNotRegistered", null)

@@ -74,6 +74,7 @@ public enum BlueCatbirdChatRequestLeave {
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case conversationNotAccepted = "ConversationNotAccepted"
         case conversationNotFound = "ConversationNotFound"
         case coordinateOverflow = "CoordinateOverflow"
         case cutoverRequired = "CutoverRequired"

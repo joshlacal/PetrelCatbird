@@ -90,6 +90,7 @@ public enum BlueCatbirdChatDeleteBlob {
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case blobBound = "BlobBound"
         case blobNotFound = "BlobNotFound"
+        case conversationNotAccepted = "ConversationNotAccepted"
         case cutoverRequired = "CutoverRequired"
         case deviceNotRegistered = "DeviceNotRegistered"
         case deviceRevoked = "DeviceRevoked"

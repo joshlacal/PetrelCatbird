@@ -88,6 +88,7 @@ public enum BlueCatbirdChatRequestReset {
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case conversationNotAccepted = "ConversationNotAccepted"
         case conversationNotFound = "ConversationNotFound"
         case cutoverRequired = "CutoverRequired"
         case deviceNotRegistered = "DeviceNotRegistered"

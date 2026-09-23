@@ -29,6 +29,7 @@ object BlueCatbirdChatCancelLeaveDefs {
 
 sealed class BlueCatbirdChatCancelLeaveError(val name: String, val description: String?) {
         object CancellationConflict: BlueCatbirdChatCancelLeaveError("CancellationConflict", null)
+        object ConversationNotAccepted: BlueCatbirdChatCancelLeaveError("ConversationNotAccepted", null)
         object CutoverRequired: BlueCatbirdChatCancelLeaveError("CutoverRequired", null)
         object DeviceNotRegistered: BlueCatbirdChatCancelLeaveError("DeviceNotRegistered", null)
         object DeviceRevoked: BlueCatbirdChatCancelLeaveError("DeviceRevoked", null)

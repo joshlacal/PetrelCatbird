@@ -30,6 +30,7 @@ object BlueCatbirdChatDeleteBlobDefs {
 sealed class BlueCatbirdChatDeleteBlobError(val name: String, val description: String?) {
         object BlobBound: BlueCatbirdChatDeleteBlobError("BlobBound", null)
         object BlobNotFound: BlueCatbirdChatDeleteBlobError("BlobNotFound", null)
+        object ConversationNotAccepted: BlueCatbirdChatDeleteBlobError("ConversationNotAccepted", null)
         object CutoverRequired: BlueCatbirdChatDeleteBlobError("CutoverRequired", null)
         object DeviceNotRegistered: BlueCatbirdChatDeleteBlobError("DeviceNotRegistered", null)
         object DeviceRevoked: BlueCatbirdChatDeleteBlobError("DeviceRevoked", null)

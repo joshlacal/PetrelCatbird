@@ -30,6 +30,7 @@ object BlueCatbirdChatActivateResetDefs {
 
 sealed class BlueCatbirdChatActivateResetError(val name: String, val description: String?) {
         object AdminRequired: BlueCatbirdChatActivateResetError("AdminRequired", null)
+        object ConversationNotAccepted: BlueCatbirdChatActivateResetError("ConversationNotAccepted", null)
         object ConversationNotFound: BlueCatbirdChatActivateResetError("ConversationNotFound", null)
         object CoordinateOverflow: BlueCatbirdChatActivateResetError("CoordinateOverflow", null)
         object CutoverRequired: BlueCatbirdChatActivateResetError("CutoverRequired", null)

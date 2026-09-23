@@ -28,6 +28,7 @@ object BlueCatbirdChatCancelLeafRecoveryDefs {
 
 sealed class BlueCatbirdChatCancelLeafRecoveryError(val name: String, val description: String?) {
         object CancellationConflict: BlueCatbirdChatCancelLeafRecoveryError("CancellationConflict", null)
+        object ConversationNotAccepted: BlueCatbirdChatCancelLeafRecoveryError("ConversationNotAccepted", null)
         object CutoverRequired: BlueCatbirdChatCancelLeafRecoveryError("CutoverRequired", null)
         object DeviceNotRegistered: BlueCatbirdChatCancelLeafRecoveryError("DeviceNotRegistered", null)
         object DeviceRevoked: BlueCatbirdChatCancelLeafRecoveryError("DeviceRevoked", null)

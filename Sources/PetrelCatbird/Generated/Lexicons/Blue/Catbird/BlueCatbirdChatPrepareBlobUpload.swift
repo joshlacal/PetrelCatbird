@@ -76,6 +76,7 @@ public enum BlueCatbirdChatPrepareBlobUpload {
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case blobAlreadyExists = "BlobAlreadyExists"
         case blobQuotaExceeded = "BlobQuotaExceeded"
+        case conversationNotAccepted = "ConversationNotAccepted"
         case conversationNotFound = "ConversationNotFound"
         case cutoverRequired = "CutoverRequired"
         case deviceNotLeaf = "DeviceNotLeaf"
