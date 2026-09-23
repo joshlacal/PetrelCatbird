@@ -89,6 +89,7 @@ public enum BlueCatbirdChatCancelLeave {
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case cancellationConflict = "CancellationConflict"
+        case conversationNotAccepted = "ConversationNotAccepted"
         case cutoverRequired = "CutoverRequired"
         case deviceNotRegistered = "DeviceNotRegistered"
         case deviceRevoked = "DeviceRevoked"

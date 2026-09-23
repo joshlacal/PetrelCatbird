@@ -106,6 +106,7 @@ public enum BlueCatbirdChatSubmitTransition {
         case blockedRelationship = "BlockedRelationship"
         case committerSelfRemovalForbidden = "CommitterSelfRemovalForbidden"
         case conversationLeafLimitReached = "ConversationLeafLimitReached"
+        case conversationNotAccepted = "ConversationNotAccepted"
         case conversationNotFound = "ConversationNotFound"
         case coordinateOverflow = "CoordinateOverflow"
         case cutoverRequired = "CutoverRequired"

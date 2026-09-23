@@ -29,6 +29,7 @@ object BlueCatbirdChatPrepareBlobUploadDefs {
 sealed class BlueCatbirdChatPrepareBlobUploadError(val name: String, val description: String?) {
         object BlobAlreadyExists: BlueCatbirdChatPrepareBlobUploadError("BlobAlreadyExists", null)
         object BlobQuotaExceeded: BlueCatbirdChatPrepareBlobUploadError("BlobQuotaExceeded", null)
+        object ConversationNotAccepted: BlueCatbirdChatPrepareBlobUploadError("ConversationNotAccepted", null)
         object ConversationNotFound: BlueCatbirdChatPrepareBlobUploadError("ConversationNotFound", null)
         object CutoverRequired: BlueCatbirdChatPrepareBlobUploadError("CutoverRequired", null)
         object DeviceNotLeaf: BlueCatbirdChatPrepareBlobUploadError("DeviceNotLeaf", null)

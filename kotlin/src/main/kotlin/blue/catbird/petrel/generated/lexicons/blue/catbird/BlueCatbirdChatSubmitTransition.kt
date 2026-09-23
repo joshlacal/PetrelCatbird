@@ -33,6 +33,7 @@ sealed class BlueCatbirdChatSubmitTransitionError(val name: String, val descript
         object BlockedRelationship: BlueCatbirdChatSubmitTransitionError("BlockedRelationship", null)
         object CommitterSelfRemovalForbidden: BlueCatbirdChatSubmitTransitionError("CommitterSelfRemovalForbidden", null)
         object ConversationLeafLimitReached: BlueCatbirdChatSubmitTransitionError("ConversationLeafLimitReached", null)
+        object ConversationNotAccepted: BlueCatbirdChatSubmitTransitionError("ConversationNotAccepted", null)
         object ConversationNotFound: BlueCatbirdChatSubmitTransitionError("ConversationNotFound", null)
         object CoordinateOverflow: BlueCatbirdChatSubmitTransitionError("CoordinateOverflow", null)
         object CutoverRequired: BlueCatbirdChatSubmitTransitionError("CutoverRequired", null)

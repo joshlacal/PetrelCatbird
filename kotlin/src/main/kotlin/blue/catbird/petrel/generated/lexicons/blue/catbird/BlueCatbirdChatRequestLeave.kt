@@ -27,6 +27,7 @@ object BlueCatbirdChatRequestLeaveDefs {
         val result: BlueCatbirdChatDefsLeaveOperationResult    )
 
 sealed class BlueCatbirdChatRequestLeaveError(val name: String, val description: String?) {
+        object ConversationNotAccepted: BlueCatbirdChatRequestLeaveError("ConversationNotAccepted", null)
         object ConversationNotFound: BlueCatbirdChatRequestLeaveError("ConversationNotFound", null)
         object CoordinateOverflow: BlueCatbirdChatRequestLeaveError("CoordinateOverflow", null)
         object CutoverRequired: BlueCatbirdChatRequestLeaveError("CutoverRequired", null)
