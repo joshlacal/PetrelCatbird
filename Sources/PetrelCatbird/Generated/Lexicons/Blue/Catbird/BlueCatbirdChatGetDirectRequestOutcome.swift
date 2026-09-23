@@ -75,6 +75,7 @@ public enum BlueCatbirdChatGetDirectRequestOutcome {
         case requestNotAccepted = "RequestNotAccepted"
         case unavailableIntroduction = "UnavailableIntroduction"
         case rateLimited = "RateLimited"
+        case recipientAuthorityUnsupported = "RecipientAuthorityUnsupported"
         case accountSessionExpired = "AccountSessionExpired"
         case notAuthorized = "NotAuthorized"
         case deviceBindingMismatch = "DeviceBindingMismatch"

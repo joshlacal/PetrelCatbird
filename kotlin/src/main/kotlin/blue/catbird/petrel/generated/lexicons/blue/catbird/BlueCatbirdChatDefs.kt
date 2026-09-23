@@ -3385,7 +3385,9 @@ enum class BlueCatbirdChatDefsDefsDirectRequestErrorCode {
     @SerialName("UnavailableIntroduction")
     value_UnavailableIntroduction,
     @SerialName("RateLimited")
-    value_RateLimited}
+    value_RateLimited,
+    @SerialName("RecipientAuthorityUnsupported")
+    value_RecipientAuthorityUnsupported}
 
 @Serializable
 enum class BlueCatbirdChatDefsDirectRequestRejectedReceiptRequestKind {

@@ -46,6 +46,7 @@ sealed class BlueCatbirdChatGetDirectRequestOutcomeError(val name: String, val d
         object RequestNotAccepted: BlueCatbirdChatGetDirectRequestOutcomeError("RequestNotAccepted", null)
         object UnavailableIntroduction: BlueCatbirdChatGetDirectRequestOutcomeError("UnavailableIntroduction", null)
         object RateLimited: BlueCatbirdChatGetDirectRequestOutcomeError("RateLimited", null)
+        object RecipientAuthorityUnsupported: BlueCatbirdChatGetDirectRequestOutcomeError("RecipientAuthorityUnsupported", null)
         object AccountSessionExpired: BlueCatbirdChatGetDirectRequestOutcomeError("AccountSessionExpired", null)
         object NotAuthorized: BlueCatbirdChatGetDirectRequestOutcomeError("NotAuthorized", null)
         object DeviceBindingMismatch: BlueCatbirdChatGetDirectRequestOutcomeError("DeviceBindingMismatch", null)

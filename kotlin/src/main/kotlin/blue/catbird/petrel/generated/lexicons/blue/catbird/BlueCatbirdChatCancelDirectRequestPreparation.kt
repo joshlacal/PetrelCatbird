@@ -45,6 +45,7 @@ sealed class BlueCatbirdChatCancelDirectRequestPreparationError(val name: String
         object RequestNotAccepted: BlueCatbirdChatCancelDirectRequestPreparationError("RequestNotAccepted", null)
         object UnavailableIntroduction: BlueCatbirdChatCancelDirectRequestPreparationError("UnavailableIntroduction", null)
         object RateLimited: BlueCatbirdChatCancelDirectRequestPreparationError("RateLimited", null)
+        object RecipientAuthorityUnsupported: BlueCatbirdChatCancelDirectRequestPreparationError("RecipientAuthorityUnsupported", null)
         object AccountSessionExpired: BlueCatbirdChatCancelDirectRequestPreparationError("AccountSessionExpired", null)
         object NotAuthorized: BlueCatbirdChatCancelDirectRequestPreparationError("NotAuthorized", null)
         object DeviceBindingMismatch: BlueCatbirdChatCancelDirectRequestPreparationError("DeviceBindingMismatch", null)
