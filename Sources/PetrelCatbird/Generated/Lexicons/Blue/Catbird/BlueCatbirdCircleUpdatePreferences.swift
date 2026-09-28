@@ -2,15 +2,11 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.circle.updatePreferences
 
-
-public struct BlueCatbirdCircleUpdatePreferences { 
-
+public enum BlueCatbirdCircleUpdatePreferences {
     public static let typeIdentifier = "blue.catbird.circle.updatePreferences"
-public struct Input: ATProtocolCodable {
+    public struct Input: ATProtocolCodable {
         public let space: SpaceRef
         public let muted: Bool
 
@@ -19,12 +15,11 @@ public struct Input: ATProtocolCodable {
             self.space = space
             self.muted = muted
         }
-        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.space = try container.decode(SpaceRef.self, forKey: .space)
-            self.muted = try container.decode(Bool.self, forKey: .muted)
+            space = try container.decode(SpaceRef.self, forKey: .space)
+            muted = try container.decode(Bool.self, forKey: .muted)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -47,122 +42,86 @@ public struct Input: ATProtocolCodable {
             case muted
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
         public let muted: Bool
-        
-        
-        
-        // Standard public initializer
+
+        /// Standard public initializer
         public init(
-            
-            
             muted: Bool
-            
-            
+
         ) {
-            
-            
             self.muted = muted
-            
-            
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            
-            self.muted = try container.decode(Bool.self, forKey: .muted)
-            
-            
-            
+
+            muted = try container.decode(Bool.self, forKey: .muted)
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(muted, forKey: .muted)
-            
-            
         }
 
         public func toCBORValue() throws -> Any {
-            
             var map = OrderedCBORMap()
 
-            
-            
             let mutedValue = try muted.toCBORValue()
             map = map.adding(key: "muted", value: mutedValue)
-            
-            
 
             return map
-            
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case muted
         }
-        
     }
-        
-public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                case authRequired = "AuthRequired"
-                case accessRemoved = "AccessRemoved"
-                case unsupportedPDS = "UnsupportedPDS"
-                case protocolRevisionMismatch = "ProtocolRevisionMismatch"
-                case upstreamUnavailable = "UpstreamUnavailable"
-            public var description: String {
-                return self.rawValue
-            }
 
-            public var errorName: String {
-                return self.rawValue
-            }
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case authRequired = "AuthRequired"
+        case accessRemoved = "AccessRemoved"
+        case unsupportedPDS = "UnsupportedPDS"
+        case protocolRevisionMismatch = "ProtocolRevisionMismatch"
+        case upstreamUnavailable = "UpstreamUnavailable"
+        public var description: String {
+            return rawValue
         }
 
-
-
+        public var errorName: String {
+            return rawValue
+        }
+    }
 }
 
-extension ATProtoClient.Blue.Catbird.Circle {
+public extension ATProtoClient.Blue.Catbird.Circle {
     // MARK: - updatePreferences
 
-    /// Update user preferences for a Circle Space
-    /// 
-    /// - Parameter input: The input parameters for the request
-    
-    /// 
+    // Update user preferences for a Circle Space
+    //
+    // - Parameter input: The input parameters for the request
+
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func updatePreferences(
-        
+    func updatePreferences(
         input: BlueCatbirdCircleUpdatePreferences.Input
-        
+
     ) async throws -> (responseCode: Int, data: BlueCatbirdCircleUpdatePreferences.Output?) {
         let endpoint = "blue.catbird.circle.updatePreferences"
-        
-        var headers: [String: String] = [:]
-        
-        headers["Content-Type"] = "application/json"
-        
-        
-        
-        headers["Accept"] = "application/json"
-        
 
-        
+        var headers: [String: String] = [:]
+
+        headers["Content-Type"] = "application/json"
+
+        headers["Accept"] = "application/json"
+
         let requestData: Data? = try JSONEncoder().encode(input)
-        
-        
+
         let queryItems: [URLQueryItem]? = nil
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -177,12 +136,10 @@ extension ATProtoClient.Blue.Catbird.Circle {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-            
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -190,13 +147,11 @@ extension ATProtoClient.Blue.Catbird.Circle {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
-                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdCircleUpdatePreferences.Output.self, from: responseData)
-                
+
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -212,14 +167,9 @@ extension ATProtoClient.Blue.Catbird.Circle {
             ) {
                 throw atprotoError
             }
-            
-            
+
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-        
     }
-    
 }
-                           
-

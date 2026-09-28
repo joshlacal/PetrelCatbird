@@ -2,15 +2,11 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.mlsDS.submitCommit
 
-
-public struct BlueCatbirdMlsDSSubmitCommit { 
-
+public enum BlueCatbirdMlsDSSubmitCommit {
     public static let typeIdentifier = "blue.catbird.mlsDS.submitCommit"
-public struct Input: ATProtocolCodable {
+    public struct Input: ATProtocolCodable {
         public let header: BlueCatbirdMlsDSDefs.EnvelopeHeaderV1
         public let signedRequestBytes: Bytes
 
@@ -19,12 +15,11 @@ public struct Input: ATProtocolCodable {
             self.header = header
             self.signedRequestBytes = signedRequestBytes
         }
-        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.header = try container.decode(BlueCatbirdMlsDSDefs.EnvelopeHeaderV1.self, forKey: .header)
-            self.signedRequestBytes = try container.decode(Bytes.self, forKey: .signedRequestBytes)
+            header = try container.decode(BlueCatbirdMlsDSDefs.EnvelopeHeaderV1.self, forKey: .header)
+            signedRequestBytes = try container.decode(Bytes.self, forKey: .signedRequestBytes)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -47,183 +42,129 @@ public struct Input: ATProtocolCodable {
             case signedRequestBytes
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
         public let coordinates: BlueCatbirdChatDefs.ConversationCoordinates
-        
+
         public let commitEntry: BlueCatbirdChatDefs.CommitEntry
-        
+
         public let welcomes: [BlueCatbirdChatDefs.WelcomeView]
-        
+
         public let receipt: BlueCatbirdMlsDSDefs.FederationReceiptV1
-        
-        
-        
-        // Standard public initializer
+
+        /// Standard public initializer
         public init(
-            
-            
             coordinates: BlueCatbirdChatDefs.ConversationCoordinates,
-            
+
             commitEntry: BlueCatbirdChatDefs.CommitEntry,
-            
+
             welcomes: [BlueCatbirdChatDefs.WelcomeView],
-            
+
             receipt: BlueCatbirdMlsDSDefs.FederationReceiptV1
-            
-            
+
         ) {
-            
-            
             self.coordinates = coordinates
-            
+
             self.commitEntry = commitEntry
-            
+
             self.welcomes = welcomes
-            
+
             self.receipt = receipt
-            
-            
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            
-            self.coordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .coordinates)
-            
-            
-            
-            
-            self.commitEntry = try container.decode(BlueCatbirdChatDefs.CommitEntry.self, forKey: .commitEntry)
-            
-            
-            
-            
-            self.welcomes = try container.decode([BlueCatbirdChatDefs.WelcomeView].self, forKey: .welcomes)
-            
-            
-            
-            
-            self.receipt = try container.decode(BlueCatbirdMlsDSDefs.FederationReceiptV1.self, forKey: .receipt)
-            
-            
-            
+
+            coordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .coordinates)
+
+            commitEntry = try container.decode(BlueCatbirdChatDefs.CommitEntry.self, forKey: .commitEntry)
+
+            welcomes = try container.decode([BlueCatbirdChatDefs.WelcomeView].self, forKey: .welcomes)
+
+            receipt = try container.decode(BlueCatbirdMlsDSDefs.FederationReceiptV1.self, forKey: .receipt)
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(coordinates, forKey: .coordinates)
-            
-            
+
             try container.encode(commitEntry, forKey: .commitEntry)
-            
-            
+
             try container.encode(welcomes, forKey: .welcomes)
-            
-            
+
             try container.encode(receipt, forKey: .receipt)
-            
-            
         }
 
         public func toCBORValue() throws -> Any {
-            
             var map = OrderedCBORMap()
 
-            
-            
             let coordinatesValue = try coordinates.toCBORValue()
             map = map.adding(key: "coordinates", value: coordinatesValue)
-            
-            
-            
+
             let commitEntryValue = try commitEntry.toCBORValue()
             map = map.adding(key: "commitEntry", value: commitEntryValue)
-            
-            
-            
+
             let welcomesValue = try welcomes.toCBORValue()
             map = map.adding(key: "welcomes", value: welcomesValue)
-            
-            
-            
+
             let receiptValue = try receipt.toCBORValue()
             map = map.adding(key: "receipt", value: receiptValue)
-            
-            
 
             return map
-            
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case coordinates
             case commitEntry
             case welcomes
             case receipt
         }
-        
     }
-        
-public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                case conversationNotFound = "ConversationNotFound"
-                case notSequencer = "NotSequencer"
-                case termStale = "TermStale"
-                case commitConflict = "CommitConflict"
-                case invalidEnvelope = "InvalidEnvelope"
-                case unauthorizedParticipantDs = "UnauthorizedParticipantDs"
-            public var description: String {
-                return self.rawValue
-            }
 
-            public var errorName: String {
-                return self.rawValue
-            }
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case conversationNotFound = "ConversationNotFound"
+        case notSequencer = "NotSequencer"
+        case termStale = "TermStale"
+        case commitConflict = "CommitConflict"
+        case invalidEnvelope = "InvalidEnvelope"
+        case unauthorizedParticipantDs = "UnauthorizedParticipantDs"
+        public var description: String {
+            return rawValue
         }
 
-
-
+        public var errorName: String {
+            return rawValue
+        }
+    }
 }
 
-extension ATProtoClient.Blue.Catbird.MlsDS {
+public extension ATProtoClient.Blue.Catbird.MlsDS {
     // MARK: - submitCommit
 
-    /// Submit an actor-signed MLS commit to the sequencer DS for canonical transition planning and execution. Submit a signed commit transition to the sequencer DS for execution through the canonical submitTransition planner and executor.
-    /// 
-    /// - Parameter input: The input parameters for the request
-    
-    /// 
+    // Submit an actor-signed MLS commit to the sequencer DS for canonical transition planning and execution. Submit a signed commit transition to the sequencer DS for execution through the canonical submitTransition planner and executor.
+    //
+    // - Parameter input: The input parameters for the request
+
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func submitCommit(
-        
+    func submitCommit(
         input: BlueCatbirdMlsDSSubmitCommit.Input
-        
+
     ) async throws -> (responseCode: Int, data: BlueCatbirdMlsDSSubmitCommit.Output?) {
         let endpoint = "blue.catbird.mlsDS.submitCommit"
-        
-        var headers: [String: String] = [:]
-        
-        headers["Content-Type"] = "application/json"
-        
-        
-        
-        headers["Accept"] = "application/json"
-        
 
-        
+        var headers: [String: String] = [:]
+
+        headers["Content-Type"] = "application/json"
+
+        headers["Accept"] = "application/json"
+
         let requestData: Data? = try JSONEncoder().encode(input)
-        
-        
+
         let queryItems: [URLQueryItem]? = nil
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -238,12 +179,10 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-            
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -251,13 +190,11 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
-                
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdMlsDSSubmitCommit.Output.self, from: responseData)
-                
+
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -273,14 +210,9 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
             ) {
                 throw atprotoError
             }
-            
-            
+
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-        
     }
-    
 }
-                           
-
