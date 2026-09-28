@@ -2,154 +2,110 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.circle.getPostThread
 
-
-public struct BlueCatbirdCircleGetPostThread { 
-
-    public static let typeIdentifier = "blue.catbird.circle.getPostThread"    
-public struct Parameters: Parametrizable {
+public enum BlueCatbirdCircleGetPostThread {
+    public static let typeIdentifier = "blue.catbird.circle.getPostThread"
+    public struct Parameters: Parametrizable {
         public let uri: ATProtocolURI
         public let space: SpaceRef
         public let depth: Int?
         public let parentHeight: Int?
-        
+
         public init(
-            uri: ATProtocolURI, 
-            space: SpaceRef, 
-            depth: Int? = nil, 
+            uri: ATProtocolURI,
+            space: SpaceRef,
+            depth: Int? = nil,
             parentHeight: Int? = nil
-            ) {
+        ) {
             self.uri = uri
             self.space = space
             self.depth = depth
             self.parentHeight = parentHeight
-            
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
         public let thread: AppBskyFeedDefs.ThreadViewPost
-        
+
         public let circle: BlueCatbirdCircleDefs.CircleSummary
-        
-        
-        
-        // Standard public initializer
+
+        /// Standard public initializer
         public init(
-            
-            
             thread: AppBskyFeedDefs.ThreadViewPost,
-            
+
             circle: BlueCatbirdCircleDefs.CircleSummary
-            
-            
+
         ) {
-            
-            
             self.thread = thread
-            
+
             self.circle = circle
-            
-            
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            
-            self.thread = try container.decode(AppBskyFeedDefs.ThreadViewPost.self, forKey: .thread)
-            
-            
-            
-            
-            self.circle = try container.decode(BlueCatbirdCircleDefs.CircleSummary.self, forKey: .circle)
-            
-            
-            
+
+            thread = try container.decode(AppBskyFeedDefs.ThreadViewPost.self, forKey: .thread)
+
+            circle = try container.decode(BlueCatbirdCircleDefs.CircleSummary.self, forKey: .circle)
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(thread, forKey: .thread)
-            
-            
+
             try container.encode(circle, forKey: .circle)
-            
-            
         }
 
         public func toCBORValue() throws -> Any {
-            
             var map = OrderedCBORMap()
 
-            
-            
             let threadValue = try thread.toCBORValue()
             map = map.adding(key: "thread", value: threadValue)
-            
-            
-            
+
             let circleValue = try circle.toCBORValue()
             map = map.adding(key: "circle", value: circleValue)
-            
-            
 
             return map
-            
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case thread
             case circle
         }
-        
     }
-        
-public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                case authRequired = "AuthRequired"
-                case accessRemoved = "AccessRemoved"
-                case unsupportedPDS = "UnsupportedPDS"
-                case protocolRevisionMismatch = "ProtocolRevisionMismatch"
-                case upstreamUnavailable = "UpstreamUnavailable"
-            public var description: String {
-                return self.rawValue
-            }
 
-            public var errorName: String {
-                return self.rawValue
-            }
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case authRequired = "AuthRequired"
+        case accessRemoved = "AccessRemoved"
+        case unsupportedPDS = "UnsupportedPDS"
+        case protocolRevisionMismatch = "ProtocolRevisionMismatch"
+        case upstreamUnavailable = "UpstreamUnavailable"
+        public var description: String {
+            return rawValue
         }
 
-
-
+        public var errorName: String {
+            return rawValue
+        }
+    }
 }
 
-
-
-extension ATProtoClient.Blue.Catbird.Circle {
+public extension ATProtoClient.Blue.Catbird.Circle {
     // MARK: - getPostThread
 
     /// Get a thread of posts within a Circle Space
-    /// 
+    ///
     /// - Parameter input: The input parameters for the request
-    /// 
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getPostThread(input: BlueCatbirdCircleGetPostThread.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdCircleGetPostThread.Output?) {
+    func getPostThread(input: BlueCatbirdCircleGetPostThread.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdCircleGetPostThread.Output?) {
         let endpoint = "blue.catbird.circle.getPostThread"
 
-        
         let queryItems = input.asQueryItems()
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -167,8 +123,7 @@ extension ATProtoClient.Blue.Catbird.Circle {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-            
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -176,7 +131,6 @@ extension ATProtoClient.Blue.Catbird.Circle {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
                 let decoder = JSONDecoder()
@@ -197,13 +151,10 @@ extension ATProtoClient.Blue.Catbird.Circle {
             ) {
                 throw atprotoError
             }
-            
-            
+
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
-                           
-

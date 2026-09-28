@@ -2,206 +2,150 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.chat.getOwnDevices
 
-
-public struct BlueCatbirdChatGetOwnDevices { 
-
-    public static let typeIdentifier = "blue.catbird.chat.getOwnDevices"    
-public struct Parameters: Parametrizable {
+public enum BlueCatbirdChatGetOwnDevices {
+    public static let typeIdentifier = "blue.catbird.chat.getOwnDevices"
+    public struct Parameters: Parametrizable {
         public let actorDeviceId: String
         public let pageCursor: String?
         public let limit: Int?
-        
+
         public init(
-            actorDeviceId: String, 
-            pageCursor: String? = nil, 
+            actorDeviceId: String,
+            pageCursor: String? = nil,
             limit: Int? = nil
-            ) {
+        ) {
             self.actorDeviceId = actorDeviceId
             self.pageCursor = pageCursor
             self.limit = limit
-            
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
         public let items: [BlueCatbirdChatDefs.OwnDeviceView]
-        
+
         public let nextPageCursor: String?
-        
+
         public let hasMore: Bool
-        
+
         public let snapshotExpiresAt: BlueCatbirdChatDefs.CanonicalDatetime
-        
-        
-        
-        // Standard public initializer
+
+        /// Standard public initializer
         public init(
-            
-            
             items: [BlueCatbirdChatDefs.OwnDeviceView],
-            
+
             nextPageCursor: String? = nil,
-            
+
             hasMore: Bool,
-            
+
             snapshotExpiresAt: BlueCatbirdChatDefs.CanonicalDatetime
-            
-            
+
         ) {
-            
-            
             self.items = items
-            
+
             self.nextPageCursor = nextPageCursor
-            
+
             self.hasMore = hasMore
-            
+
             self.snapshotExpiresAt = snapshotExpiresAt
-            
-            
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            
-            self.items = try container.decode([BlueCatbirdChatDefs.OwnDeviceView].self, forKey: .items)
-            
-            
-            
-            
+
+            items = try container.decode([BlueCatbirdChatDefs.OwnDeviceView].self, forKey: .items)
+
             do {
-                self.nextPageCursor = try container.decodeIfPresent(String.self, forKey: .nextPageCursor)
+                nextPageCursor = try container.decodeIfPresent(String.self, forKey: .nextPageCursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'nextPageCursor' — degrading to nil: \(error)")
-                self.nextPageCursor = nil
+                nextPageCursor = nil
             }
-            
-            
-            
-            
-            self.hasMore = try container.decode(Bool.self, forKey: .hasMore)
-            
-            
-            
-            
-            self.snapshotExpiresAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .snapshotExpiresAt)
-            
-            
-            
+
+            hasMore = try container.decode(Bool.self, forKey: .hasMore)
+
+            snapshotExpiresAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .snapshotExpiresAt)
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(items, forKey: .items)
-            
-            
+
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(nextPageCursor, forKey: .nextPageCursor)
-            
-            
+
             try container.encode(hasMore, forKey: .hasMore)
-            
-            
+
             try container.encode(snapshotExpiresAt, forKey: .snapshotExpiresAt)
-            
-            
         }
 
         public func toCBORValue() throws -> Any {
-            
             var map = OrderedCBORMap()
 
-            
-            
             let itemsValue = try items.toCBORValue()
             map = map.adding(key: "items", value: itemsValue)
-            
-            
-            
+
             if let value = nextPageCursor {
                 // Encode optional property even if it's an empty array for CBOR
                 let nextPageCursorValue = try value.toCBORValue()
                 map = map.adding(key: "nextPageCursor", value: nextPageCursorValue)
             }
-            
-            
-            
+
             let hasMoreValue = try hasMore.toCBORValue()
             map = map.adding(key: "hasMore", value: hasMoreValue)
-            
-            
-            
+
             let snapshotExpiresAtValue = try snapshotExpiresAt.toCBORValue()
             map = map.adding(key: "snapshotExpiresAt", value: snapshotExpiresAtValue)
-            
-            
 
             return map
-            
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case items
             case nextPageCursor
             case hasMore
             case snapshotExpiresAt
         }
-        
     }
-        
-public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                case invalidRequest = "InvalidRequest"
-                case cursorExpired = "CursorExpired"
-                case cutoverRequired = "CutoverRequired"
-                case deviceNotRegistered = "DeviceNotRegistered"
-                case deviceRevoked = "DeviceRevoked"
-                case accountSessionExpired = "AccountSessionExpired"
-                case notAuthorized = "NotAuthorized"
-                case deviceBindingMismatch = "DeviceBindingMismatch"
-                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
-                case rateLimited = "RateLimited"
-            public var description: String {
-                return self.rawValue
-            }
 
-            public var errorName: String {
-                return self.rawValue
-            }
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case invalidRequest = "InvalidRequest"
+        case cursorExpired = "CursorExpired"
+        case cutoverRequired = "CutoverRequired"
+        case deviceNotRegistered = "DeviceNotRegistered"
+        case deviceRevoked = "DeviceRevoked"
+        case accountSessionExpired = "AccountSessionExpired"
+        case notAuthorized = "NotAuthorized"
+        case deviceBindingMismatch = "DeviceBindingMismatch"
+        case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+        case rateLimited = "RateLimited"
+        public var description: String {
+            return rawValue
         }
 
-
-
+        public var errorName: String {
+            return rawValue
+        }
+    }
 }
 
-
-
-extension ATProtoClient.Blue.Catbird.Chat {
+public extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - getOwnDevices
 
     /// Authoritative fenced inventory of the authenticated bare DID's active and revoked/package-ineligible devices. Every page is evaluated as of one retained fence and uses a distinct principal-bound cursor domain.
-    /// 
+    ///
     /// - Parameter input: The input parameters for the request
-    /// 
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getOwnDevices(input: BlueCatbirdChatGetOwnDevices.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetOwnDevices.Output?) {
+    func getOwnDevices(input: BlueCatbirdChatGetOwnDevices.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetOwnDevices.Output?) {
         let endpoint = "blue.catbird.chat.getOwnDevices"
 
-        
         let queryItems = input.asQueryItems()
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -219,8 +163,7 @@ extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-            
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -228,7 +171,6 @@ extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
                 let decoder = JSONDecoder()
@@ -249,13 +191,10 @@ extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-            
-            
+
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
-                           
-

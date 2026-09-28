@@ -2,26 +2,22 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.circle.defs
 
-
-public struct BlueCatbirdCircleDefs { 
-
+public enum BlueCatbirdCircleDefs {
     public static let typeIdentifier = "blue.catbird.circle.defs"
-        
-public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.circle.defs#circleSummary"
-            public let uri: SpaceRef
-            public let circleId: TID
-            public let name: String
-            public let owner: DID
-            public let memberCount: Int?
-            public let muted: Bool?
+
+    public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.circle.defs#circleSummary"
+        public let uri: SpaceRef
+        public let circleId: TID
+        public let name: String
+        public let owner: DID
+        public let memberCount: Int?
+        public let muted: Bool?
 
         public init(
-            uri: SpaceRef, circleId: TID, name: String, owner: DID, memberCount: Int?, muted: Bool?
+            uri: SpaceRef, circleId: TID, name: String, owner: DID, memberCount: Int? = nil, muted: Bool? = nil
         ) {
             self.uri = uri
             self.circleId = circleId
@@ -34,44 +30,44 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.uri = try container.decode(SpaceRef.self, forKey: .uri)
+                uri = try container.decode(SpaceRef.self, forKey: .uri)
             } catch {
                 LogManager.logError("Decoding error for required property 'uri': \(error)")
                 throw error
             }
             do {
-                self.circleId = try container.decode(TID.self, forKey: .circleId)
+                circleId = try container.decode(TID.self, forKey: .circleId)
             } catch {
                 LogManager.logError("Decoding error for required property 'circleId': \(error)")
                 throw error
             }
             do {
-                self.name = try container.decode(String.self, forKey: .name)
+                name = try container.decode(String.self, forKey: .name)
             } catch {
                 LogManager.logError("Decoding error for required property 'name': \(error)")
                 throw error
             }
             do {
-                self.owner = try container.decode(DID.self, forKey: .owner)
+                owner = try container.decode(DID.self, forKey: .owner)
             } catch {
                 LogManager.logError("Decoding error for required property 'owner': \(error)")
                 throw error
             }
             do {
-                self.memberCount = try container.decodeIfPresent(Int.self, forKey: .memberCount)
+                memberCount = try container.decodeIfPresent(Int.self, forKey: .memberCount)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'memberCount' — degrading to nil: \(error)")
-                self.memberCount = nil
+                memberCount = nil
             }
             do {
-                self.muted = try container.decodeIfPresent(Bool.self, forKey: .muted)
+                muted = try container.decodeIfPresent(Bool.self, forKey: .muted)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'muted' — degrading to nil: \(error)")
-                self.muted = nil
+                muted = nil
             }
         }
 
@@ -162,11 +158,11 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
             case muted
         }
     }
-        
-public struct FeedItem: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.circle.defs#feedItem"
-            public let post: AppBskyFeedDefs.FeedViewPost
-            public let circle: CircleSummary
+
+    public struct FeedItem: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.circle.defs#feedItem"
+        public let post: AppBskyFeedDefs.FeedViewPost
+        public let circle: CircleSummary
 
         public init(
             post: AppBskyFeedDefs.FeedViewPost, circle: CircleSummary
@@ -178,13 +174,13 @@ public struct FeedItem: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.post = try container.decode(AppBskyFeedDefs.FeedViewPost.self, forKey: .post)
+                post = try container.decode(AppBskyFeedDefs.FeedViewPost.self, forKey: .post)
             } catch {
                 LogManager.logError("Decoding error for required property 'post': \(error)")
                 throw error
             }
             do {
-                self.circle = try container.decode(CircleSummary.self, forKey: .circle)
+                circle = try container.decode(CircleSummary.self, forKey: .circle)
             } catch {
                 LogManager.logError("Decoding error for required property 'circle': \(error)")
                 throw error
@@ -234,18 +230,18 @@ public struct FeedItem: ATProtocolCodable, ATProtocolValue {
             case circle
         }
     }
-        
-public struct Notification: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.circle.defs#notification"
-            public let id: String
-            public let reason: NotificationReason
-            public let actor: AppBskyActorDefs.ProfileViewBasic
-            public let subject: ATProtocolURI?
-            public let indexedAt: ATProtocolDate
-            public let circle: CircleSummary
+
+    public struct Notification: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.circle.defs#notification"
+        public let id: String
+        public let reason: NotificationReason
+        public let actor: AppBskyActorDefs.ProfileViewBasic
+        public let subject: ATProtocolURI?
+        public let indexedAt: ATProtocolDate
+        public let circle: CircleSummary
 
         public init(
-            id: String, reason: NotificationReason, actor: AppBskyActorDefs.ProfileViewBasic, subject: ATProtocolURI?, indexedAt: ATProtocolDate, circle: CircleSummary
+            id: String, reason: NotificationReason, actor: AppBskyActorDefs.ProfileViewBasic, subject: ATProtocolURI? = nil, indexedAt: ATProtocolDate, circle: CircleSummary
         ) {
             self.id = id
             self.reason = reason
@@ -258,39 +254,39 @@ public struct Notification: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.id = try container.decode(String.self, forKey: .id)
+                id = try container.decode(String.self, forKey: .id)
             } catch {
                 LogManager.logError("Decoding error for required property 'id': \(error)")
                 throw error
             }
             do {
-                self.reason = try container.decode(NotificationReason.self, forKey: .reason)
+                reason = try container.decode(NotificationReason.self, forKey: .reason)
             } catch {
                 LogManager.logError("Decoding error for required property 'reason': \(error)")
                 throw error
             }
             do {
-                self.actor = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .actor)
+                actor = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .actor)
             } catch {
                 LogManager.logError("Decoding error for required property 'actor': \(error)")
                 throw error
             }
             do {
-                self.subject = try container.decodeIfPresent(ATProtocolURI.self, forKey: .subject)
+                subject = try container.decodeIfPresent(ATProtocolURI.self, forKey: .subject)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'subject' — degrading to nil: \(error)")
-                self.subject = nil
+                subject = nil
             }
             do {
-                self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
+                indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'indexedAt': \(error)")
                 throw error
             }
             do {
-                self.circle = try container.decode(CircleSummary.self, forKey: .circle)
+                circle = try container.decode(CircleSummary.self, forKey: .circle)
             } catch {
                 LogManager.logError("Decoding error for required property 'circle': \(error)")
                 throw error
@@ -379,26 +375,18 @@ public struct Notification: ATProtocolCodable, ATProtocolValue {
         }
     }
 
+    public enum NotificationReason: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_reply = "reply"
+        case value_like = "like"
+        case value_invite = "invite"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? NotificationReason else { return false }
+            return self == otherValue
+        }
 
-public enum NotificationReason: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_reply = "reply"
-    case value_like = "like"
-    case value_invite = "invite"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? NotificationReason else { return false }
-        return self == otherValue
-    }
-
-    public func toCBORValue() throws -> Any {
-        return rawValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 }
-
-
-}
-
-
-                           
-
