@@ -5970,7 +5970,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val leaseExpiresAt: BlueCatbirdChatDefsCanonicalDatetime,/** Request-specific whole-second timestamp rendered with canonical .000Z. Nonzero fractional seconds are rejected as InvalidBootstrap; they are never truncated. */        @SerialName("minimumImportUntil")
         val minimumImportUntil: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("preparationRequestDigest")
         val preparationRequestDigest: BlueCatbirdChatDefsArtifactHash,        @SerialName("authorityDid")
-        val authorityDid: String,        @SerialName("receiptKeyId")
+        val authorityDid: BlueCatbirdChatDefsBareDid,        @SerialName("receiptKeyId")
         val receiptKeyId: BlueCatbirdChatDefsDirectRequestReceiptKeyId    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestPreparationView"
@@ -6299,7 +6299,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("signatureDomain")
         val signatureDomain: String,        @SerialName("protocolVersion")
         val protocolVersion: String,        @SerialName("authorityDid")
-        val authorityDid: String,        @SerialName("keyId")
+        val authorityDid: BlueCatbirdChatDefsBareDid,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsDirectRequestReceiptKeyId,        @SerialName("receipt")
         val receipt: BlueCatbirdChatDefsDirectRequestTerminalReceipt    ) {
         companion object {
@@ -6421,7 +6421,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val leaseExpiresAt: BlueCatbirdChatDefsCanonicalDatetime,/** Request-specific whole-second timestamp rendered with canonical .000Z. Nonzero fractional seconds are rejected as InvalidBootstrap; they are never truncated. */        @SerialName("minimumImportUntil")
         val minimumImportUntil: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("preparationRequestDigest")
         val preparationRequestDigest: BlueCatbirdChatDefsArtifactHash,        @SerialName("authorityDid")
-        val authorityDid: String,        @SerialName("receiptKeyId")
+        val authorityDid: BlueCatbirdChatDefsBareDid,        @SerialName("receiptKeyId")
         val receiptKeyId: BlueCatbirdChatDefsDirectRequestReceiptKeyId    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestPreparationSnapshot"
@@ -6429,7 +6429,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     }
 
     /**
-     * Exact did:web:chat.catbird.blue#chat-request-receipt- plus lowercase hex SHA256 of compressed P256 SEC1 public key. Resolve authenticated authority DID document unique method/controller/P256 Multikey. Retain historical verification methods across key rotation.
+     * Exact expected coordinator authority DID plus #chat-request-receipt- and lowercase hex SHA256 of compressed P256 SEC1 public key. Resolve authenticated authority DID document unique method/controller/P256 Multikey. Retain historical verification methods across key rotation.
      */
     typealias BlueCatbirdChatDefsDirectRequestReceiptKeyId = String
 
@@ -6438,7 +6438,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("signatureDomain")
         val signatureDomain: String,        @SerialName("protocolVersion")
         val protocolVersion: String,        @SerialName("authorityDid")
-        val authorityDid: String,        @SerialName("keyId")
+        val authorityDid: BlueCatbirdChatDefsBareDid,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsDirectRequestReceiptKeyId,        @SerialName("requestId")
         val requestId: BlueCatbirdChatDefsOperationId,        @SerialName("acceptanceDigest")
         val acceptanceDigest: BlueCatbirdChatDefsArtifactHash,        @SerialName("entryHash")
