@@ -6,6 +6,7 @@ import Petrel
 
 public enum BlueCatbirdMlsDSUpsertFederationPeer {
     public static let typeIdentifier = "blue.catbird.mlsDS.upsertFederationPeer"
+
     public struct Input: ATProtocolCodable {
         public let dsDid: String
         public let status: String
@@ -37,18 +38,18 @@ public enum BlueCatbirdMlsDSUpsertFederationPeer {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 4)
             let dsDidValue = try dsDid.toCBORValue()
-            map = map.adding(key: "dsDid", value: dsDidValue)
+            map.append(key: "dsDid", value: dsDidValue)
             let statusValue = try status.toCBORValue()
-            map = map.adding(key: "status", value: statusValue)
+            map.append(key: "status", value: statusValue)
             if let value = maxRequestsPerMinute {
                 let maxRequestsPerMinuteValue = try value.toCBORValue()
-                map = map.adding(key: "maxRequestsPerMinute", value: maxRequestsPerMinuteValue)
+                map.append(key: "maxRequestsPerMinute", value: maxRequestsPerMinuteValue)
             }
             if let value = note {
                 let noteValue = try value.toCBORValue()
-                map = map.adding(key: "note", value: noteValue)
+                map.append(key: "note", value: noteValue)
             }
             return map
         }
@@ -95,13 +96,13 @@ public enum BlueCatbirdMlsDSUpsertFederationPeer {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
 
             let updatedValue = try updated.toCBORValue()
-            map = map.adding(key: "updated", value: updatedValue)
+            map.append(key: "updated", value: updatedValue)
 
             let peerValue = try peer.toCBORValue()
-            map = map.adding(key: "peer", value: peerValue)
+            map.append(key: "peer", value: peerValue)
 
             return map
         }
@@ -165,16 +166,10 @@ public extension ATProtoClient.Blue.Catbird.MlsDS {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSUpsertFederationPeer.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.upsertFederationPeer: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdMlsDSUpsertFederationPeer.Output.self, from: responseData, endpoint: "blue.catbird.mlsDS.upsertFederationPeer")
+            return (responseCode, decodedData)
         } else {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)

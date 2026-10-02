@@ -19,15 +19,20 @@ public struct PlaceStreamMultistreamTarget: ATProtocolCodable, ATProtocolValue {
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        url = try container.decode(URI.self, forKey: .url)
-        active = try container.decode(Bool.self, forKey: .active)
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+    }
+
+    /// Decodes from an already-opened keyed container. Generated unions pass the
+    /// container they read `$type` from, so the object's keys are materialized once.
+    public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
+        url = try container.decode(URI.self, forKey: "url")
+        active = try container.decode(Bool.self, forKey: "active")
+        createdAt = try container.decode(ATProtocolDate.self, forKey: "createdAt")
         do {
-            name = try container.decodeIfPresent(String.self, forKey: .name)
+            name = try container.decodeIfPresent(String.self, forKey: "name")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'name' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("name", error)
             name = nil
         }
     }
@@ -42,24 +47,24 @@ public struct PlaceStreamMultistreamTarget: ATProtocolCodable, ATProtocolValue {
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
+        if lhs.url != rhs.url {
+            return false
+        }
+        if lhs.active != rhs.active {
+            return false
+        }
+        if lhs.createdAt != rhs.createdAt {
+            return false
+        }
+        if lhs.name != rhs.name {
+            return false
+        }
+        return true
     }
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if url != other.url {
-            return false
-        }
-        if active != other.active {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        if name != other.name {
-            return false
-        }
-        return true
+        return self == other
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -74,17 +79,17 @@ public struct PlaceStreamMultistreamTarget: ATProtocolCodable, ATProtocolValue {
     }
 
     public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
-        map = map.adding(key: "$type", value: Self.typeIdentifier)
+        var map = OrderedCBORMap(minimumCapacity: 5)
+        map.append(key: "$type", value: Self.typeIdentifier)
         let urlValue = try url.toCBORValue()
-        map = map.adding(key: "url", value: urlValue)
+        map.append(key: "url", value: urlValue)
         let activeValue = try active.toCBORValue()
-        map = map.adding(key: "active", value: activeValue)
+        map.append(key: "active", value: activeValue)
         let createdAtValue = try createdAt.toCBORValue()
-        map = map.adding(key: "createdAt", value: createdAtValue)
+        map.append(key: "createdAt", value: createdAtValue)
         if let value = name {
             let nameValue = try value.toCBORValue()
-            map = map.adding(key: "name", value: nameValue)
+            map.append(key: "name", value: nameValue)
         }
         return map
     }

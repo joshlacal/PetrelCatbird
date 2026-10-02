@@ -6,6 +6,7 @@ import Petrel
 
 public enum PlaceStreamBrandingDeleteBlob {
     public static let typeIdentifier = "place.stream.branding.deleteBlob"
+
     public struct Input: ATProtocolCodable {
         public let key: String
         public let broadcaster: DID?
@@ -29,12 +30,12 @@ public enum PlaceStreamBrandingDeleteBlob {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
             let keyValue = try key.toCBORValue()
-            map = map.adding(key: "key", value: keyValue)
+            map.append(key: "key", value: keyValue)
             if let value = broadcaster {
                 let broadcasterValue = try value.toCBORValue()
-                map = map.adding(key: "broadcaster", value: broadcasterValue)
+                map.append(key: "broadcaster", value: broadcasterValue)
             }
             return map
         }
@@ -69,10 +70,10 @@ public enum PlaceStreamBrandingDeleteBlob {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
 
             let successValue = try success.toCBORValue()
-            map = map.adding(key: "success", value: successValue)
+            map.append(key: "success", value: successValue)
 
             return map
         }
@@ -149,16 +150,10 @@ public extension ATProtoClient.Place.Stream.Branding {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamBrandingDeleteBlob.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.branding.deleteBlob: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamBrandingDeleteBlob.Output.self, from: responseData, endpoint: "place.stream.branding.deleteBlob")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

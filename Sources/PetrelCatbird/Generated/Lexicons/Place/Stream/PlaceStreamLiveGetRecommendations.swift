@@ -20,17 +20,22 @@ public enum PlaceStreamLiveGetRecommendations {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                did = try container.decode(DID.self, forKey: .did)
+                did = try container.decode(DID.self, forKey: "did")
             } catch {
-                LogManager.logError("Decoding error for required property 'did': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("did", error)
                 throw error
             }
             do {
-                source = try container.decode(LivestreamRecommendationSource.self, forKey: .source)
+                source = try container.decode(LivestreamRecommendationSource.self, forKey: "source")
             } catch {
-                LogManager.logError("Decoding error for required property 'source': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("source", error)
                 throw error
             }
         }
@@ -49,26 +54,26 @@ public enum PlaceStreamLiveGetRecommendations {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if did != other.did {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.did != rhs.did {
                 return false
             }
-            if source != other.source {
+            if lhs.source != rhs.source {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 3)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let didValue = try did.toCBORValue()
-            map = map.adding(key: "did", value: didValue)
+            map.append(key: "did", value: didValue)
             let sourceValue = try source.toCBORValue()
-            map = map.adding(key: "source", value: sourceValue)
+            map.append(key: "source", value: sourceValue)
             return map
         }
 
@@ -89,7 +94,7 @@ public enum PlaceStreamLiveGetRecommendations {
         }
     }
 
-    public struct Output: ATProtocolCodable {
+    public struct Output: ATProtocolCodable, XRPCParallelArrayDecodable {
         public let recommendations: [OutputRecommendationsUnion]
 
         public let userDID: DID?
@@ -115,7 +120,7 @@ public enum PlaceStreamLiveGetRecommendations {
                 userDID = try container.decodeIfPresent(DID.self, forKey: .userDID)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'userDID' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("userDID", error)
                 userDID = nil
             }
         }
@@ -130,18 +135,31 @@ public enum PlaceStreamLiveGetRecommendations {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
 
             let recommendationsValue = try recommendations.toCBORValue()
-            map = map.adding(key: "recommendations", value: recommendationsValue)
+            map.append(key: "recommendations", value: recommendationsValue)
 
             if let value = userDID {
                 // Encode optional property even if it's an empty array for CBOR
                 let userDIDValue = try value.toCBORValue()
-                map = map.adding(key: "userDID", value: userDIDValue)
+                map.append(key: "userDID", value: userDIDValue)
             }
 
             return map
+        }
+
+        // MARK: - Parallel array decoding support (used only by XRPCResponseDecoding's opt-in parallel path)
+
+        public typealias ParallelArrayElement = OutputRecommendationsUnion
+
+        public static var parallelArrayKey: String {
+            "recommendations"
+        }
+
+        public init(parallelArrayPrototype prototype: Output, parallelArrayElements elements: [ParallelArrayElement]) {
+            recommendations = elements
+            userDID = prototype.userDID
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -158,12 +176,14 @@ public enum PlaceStreamLiveGetRecommendations {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let typeValue = try container.decode(String.self, forKey: .type)
+            // One keyed container serves both the `$type` read and object variants
+            // (`init(_lexiconContainer:)`), so the object's keys are materialized once.
+            let container = try decoder.container(keyedBy: LexiconCodingKey.self)
+            let typeValue = try container.decode(String.self, forKey: "$type")
 
             switch typeValue {
             case "place.stream.live.getRecommendations#livestreamRecommendation":
-                let value = try PlaceStreamLiveGetRecommendations.LivestreamRecommendation(from: decoder)
+                let value = try PlaceStreamLiveGetRecommendations.LivestreamRecommendation(_lexiconContainer: container)
                 self = .placeStreamLiveGetRecommendationsLivestreamRecommendation(value)
             default:
                 let unknownValue = try ATProtocolValueContainer(from: decoder)
@@ -206,7 +226,7 @@ public enum PlaceStreamLiveGetRecommendations {
             ):
                 return lhsValue == rhsValue
             case let (.unexpected(lhsValue), .unexpected(rhsValue)):
-                return lhsValue.isEqual(to: rhsValue)
+                return lhsValue == rhsValue
             default:
                 return false
             }
@@ -217,29 +237,15 @@ public enum PlaceStreamLiveGetRecommendations {
             return self == other
         }
 
-        /// DAGCBOR encoding with field ordering
+        /// DAGCBOR encoding with field ordering: `$type` first, then the variant's
+        /// own entries in order (see OrderedCBORMap.unionVariant).
         public func toCBORValue() throws -> Any {
-            // Create an ordered map to maintain field order
-            var map = OrderedCBORMap()
-
             switch self {
             case let .placeStreamLiveGetRecommendationsLivestreamRecommendation(value):
-                map = map.adding(key: "$type", value: "place.stream.live.getRecommendations#livestreamRecommendation")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
+                return try OrderedCBORMap.unionVariant(
+                    typeIdentifier: "place.stream.live.getRecommendations#livestreamRecommendation",
+                    payload: value.toCBORValue()
+                )
             case let .unexpected(container):
                 return try container.toCBORValue()
             }
@@ -302,16 +308,10 @@ public extension ATProtoClient.Place.Stream.Live {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamLiveGetRecommendations.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.live.getRecommendations: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamLiveGetRecommendations.Output.self, from: responseData, endpoint: "place.stream.live.getRecommendations")
+            return (responseCode, decodedData)
         } else {
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)

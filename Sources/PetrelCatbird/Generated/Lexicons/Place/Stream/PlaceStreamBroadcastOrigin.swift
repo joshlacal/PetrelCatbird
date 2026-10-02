@@ -23,29 +23,34 @@ public struct PlaceStreamBroadcastOrigin: ATProtocolCodable, ATProtocolValue {
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        streamer = try container.decode(DID.self, forKey: .streamer)
-        server = try container.decode(DID.self, forKey: .server)
+        self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+    }
+
+    /// Decodes from an already-opened keyed container. Generated unions pass the
+    /// container they read `$type` from, so the object's keys are materialized once.
+    public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
+        streamer = try container.decode(DID.self, forKey: "streamer")
+        server = try container.decode(DID.self, forKey: "server")
         do {
-            broadcaster = try container.decodeIfPresent(DID.self, forKey: .broadcaster)
+            broadcaster = try container.decodeIfPresent(DID.self, forKey: "broadcaster")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'broadcaster' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("broadcaster", error)
             broadcaster = nil
         }
-        updatedAt = try container.decode(ATProtocolDate.self, forKey: .updatedAt)
+        updatedAt = try container.decode(ATProtocolDate.self, forKey: "updatedAt")
         do {
-            irohTicket = try container.decodeIfPresent(String.self, forKey: .irohTicket)
+            irohTicket = try container.decodeIfPresent(String.self, forKey: "irohTicket")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'irohTicket' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("irohTicket", error)
             irohTicket = nil
         }
         do {
-            websocketURL = try container.decodeIfPresent(URI.self, forKey: .websocketURL)
+            websocketURL = try container.decodeIfPresent(URI.self, forKey: "websocketURL")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'websocketURL' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("websocketURL", error)
             websocketURL = nil
         }
     }
@@ -62,30 +67,30 @@ public struct PlaceStreamBroadcastOrigin: ATProtocolCodable, ATProtocolValue {
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
+        if lhs.streamer != rhs.streamer {
+            return false
+        }
+        if lhs.server != rhs.server {
+            return false
+        }
+        if lhs.broadcaster != rhs.broadcaster {
+            return false
+        }
+        if lhs.updatedAt != rhs.updatedAt {
+            return false
+        }
+        if lhs.irohTicket != rhs.irohTicket {
+            return false
+        }
+        if lhs.websocketURL != rhs.websocketURL {
+            return false
+        }
+        return true
     }
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if streamer != other.streamer {
-            return false
-        }
-        if server != other.server {
-            return false
-        }
-        if broadcaster != other.broadcaster {
-            return false
-        }
-        if updatedAt != other.updatedAt {
-            return false
-        }
-        if irohTicket != other.irohTicket {
-            return false
-        }
-        if websocketURL != other.websocketURL {
-            return false
-        }
-        return true
+        return self == other
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -110,25 +115,25 @@ public struct PlaceStreamBroadcastOrigin: ATProtocolCodable, ATProtocolValue {
     }
 
     public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
-        map = map.adding(key: "$type", value: Self.typeIdentifier)
+        var map = OrderedCBORMap(minimumCapacity: 7)
+        map.append(key: "$type", value: Self.typeIdentifier)
         let streamerValue = try streamer.toCBORValue()
-        map = map.adding(key: "streamer", value: streamerValue)
+        map.append(key: "streamer", value: streamerValue)
         let serverValue = try server.toCBORValue()
-        map = map.adding(key: "server", value: serverValue)
+        map.append(key: "server", value: serverValue)
         if let value = broadcaster {
             let broadcasterValue = try value.toCBORValue()
-            map = map.adding(key: "broadcaster", value: broadcasterValue)
+            map.append(key: "broadcaster", value: broadcasterValue)
         }
         let updatedAtValue = try updatedAt.toCBORValue()
-        map = map.adding(key: "updatedAt", value: updatedAtValue)
+        map.append(key: "updatedAt", value: updatedAtValue)
         if let value = irohTicket {
             let irohTicketValue = try value.toCBORValue()
-            map = map.adding(key: "irohTicket", value: irohTicketValue)
+            map.append(key: "irohTicket", value: irohTicketValue)
         }
         if let value = websocketURL {
             let websocketURLValue = try value.toCBORValue()
-            map = map.adding(key: "websocketURL", value: websocketURLValue)
+            map.append(key: "websocketURL", value: websocketURLValue)
         }
         return map
     }

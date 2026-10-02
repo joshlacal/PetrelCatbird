@@ -61,7 +61,7 @@ public enum BlueCatbirdChatGetConversationState {
                 pendingLeafRecoveryRequests = try container.decodeIfPresent([BlueCatbirdChatDefs.LeafRecoveryView].self, forKey: .pendingLeafRecoveryRequests)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'pendingLeafRecoveryRequests' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("pendingLeafRecoveryRequests", error)
                 pendingLeafRecoveryRequests = nil
             }
         }
@@ -80,21 +80,21 @@ public enum BlueCatbirdChatGetConversationState {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 4)
 
             let stateValue = try state.toCBORValue()
-            map = map.adding(key: "state", value: stateValue)
+            map.append(key: "state", value: stateValue)
 
             let pendingResetRequestsValue = try pendingResetRequests.toCBORValue()
-            map = map.adding(key: "pendingResetRequests", value: pendingResetRequestsValue)
+            map.append(key: "pendingResetRequests", value: pendingResetRequestsValue)
 
             let pendingLeaveRequestsValue = try pendingLeaveRequests.toCBORValue()
-            map = map.adding(key: "pendingLeaveRequests", value: pendingLeaveRequestsValue)
+            map.append(key: "pendingLeaveRequests", value: pendingLeaveRequestsValue)
 
             if let value = pendingLeafRecoveryRequests {
                 // Encode optional property even if it's an empty array for CBOR
                 let pendingLeafRecoveryRequestsValue = try value.toCBORValue()
-                map = map.adding(key: "pendingLeafRecoveryRequests", value: pendingLeafRecoveryRequestsValue)
+                map.append(key: "pendingLeafRecoveryRequests", value: pendingLeafRecoveryRequestsValue)
             }
 
             return map
@@ -171,16 +171,10 @@ public extension ATProtoClient.Blue.Catbird.Chat {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatGetConversationState.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.getConversationState: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdChatGetConversationState.Output.self, from: responseData, endpoint: "blue.catbird.chat.getConversationState")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

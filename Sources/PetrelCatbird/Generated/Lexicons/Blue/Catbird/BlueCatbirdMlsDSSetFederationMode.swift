@@ -6,6 +6,7 @@ import Petrel
 
 public enum BlueCatbirdMlsDSSetFederationMode {
     public static let typeIdentifier = "blue.catbird.mlsDS.setFederationMode"
+
     public struct Input: ATProtocolCodable {
         public let mode: String
 
@@ -25,9 +26,9 @@ public enum BlueCatbirdMlsDSSetFederationMode {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
             let modeValue = try mode.toCBORValue()
-            map = map.adding(key: "mode", value: modeValue)
+            map.append(key: "mode", value: modeValue)
             return map
         }
 
@@ -76,7 +77,7 @@ public enum BlueCatbirdMlsDSSetFederationMode {
                 overrideMode = try container.decodeIfPresent(String.self, forKey: .overrideMode)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'overrideMode' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("overrideMode", error)
                 overrideMode = nil
             }
 
@@ -97,22 +98,22 @@ public enum BlueCatbirdMlsDSSetFederationMode {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 4)
 
             let updatedValue = try updated.toCBORValue()
-            map = map.adding(key: "updated", value: updatedValue)
+            map.append(key: "updated", value: updatedValue)
 
             let effectiveModeValue = try effectiveMode.toCBORValue()
-            map = map.adding(key: "effectiveMode", value: effectiveModeValue)
+            map.append(key: "effectiveMode", value: effectiveModeValue)
 
             if let value = overrideMode {
                 // Encode optional property even if it's an empty array for CBOR
                 let overrideModeValue = try value.toCBORValue()
-                map = map.adding(key: "overrideMode", value: overrideModeValue)
+                map.append(key: "overrideMode", value: overrideModeValue)
             }
 
             let envModeValue = try envMode.toCBORValue()
-            map = map.adding(key: "envMode", value: envModeValue)
+            map.append(key: "envMode", value: envModeValue)
 
             return map
         }
@@ -178,16 +179,10 @@ public extension ATProtoClient.Blue.Catbird.MlsDS {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSSetFederationMode.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.setFederationMode: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdMlsDSSetFederationMode.Output.self, from: responseData, endpoint: "blue.catbird.mlsDS.setFederationMode")
+            return (responseCode, decodedData)
         } else {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)

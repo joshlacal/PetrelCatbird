@@ -40,87 +40,92 @@ public enum BlueCatbirdMlsDSGetConvoEvents {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                seq = try container.decode(Int.self, forKey: .seq)
+                seq = try container.decode(Int.self, forKey: "seq")
             } catch {
-                LogManager.logError("Decoding error for required property 'seq': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("seq", error)
                 throw error
             }
             do {
-                epoch = try container.decode(Int.self, forKey: .epoch)
+                epoch = try container.decode(Int.self, forKey: "epoch")
             } catch {
-                LogManager.logError("Decoding error for required property 'epoch': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("epoch", error)
                 throw error
             }
             do {
-                msgId = try container.decode(String.self, forKey: .msgId)
+                msgId = try container.decode(String.self, forKey: "msgId")
             } catch {
-                LogManager.logError("Decoding error for required property 'msgId': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("msgId", error)
                 throw error
             }
             do {
-                messageType = try container.decode(String.self, forKey: .messageType)
+                messageType = try container.decode(String.self, forKey: "messageType")
             } catch {
-                LogManager.logError("Decoding error for required property 'messageType': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("messageType", error)
                 throw error
             }
             do {
-                ciphertext = try container.decode(Bytes.self, forKey: .ciphertext)
+                ciphertext = try container.decode(Bytes.self, forKey: "ciphertext")
             } catch {
-                LogManager.logError("Decoding error for required property 'ciphertext': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("ciphertext", error)
                 throw error
             }
             do {
-                paddedSize = try container.decode(Int.self, forKey: .paddedSize)
+                paddedSize = try container.decode(Int.self, forKey: "paddedSize")
             } catch {
-                LogManager.logError("Decoding error for required property 'paddedSize': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("paddedSize", error)
                 throw error
             }
             do {
-                createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+                createdAt = try container.decode(ATProtocolDate.self, forKey: "createdAt")
             } catch {
-                LogManager.logError("Decoding error for required property 'createdAt': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("createdAt", error)
                 throw error
             }
             do {
-                entryId = try container.decodeIfPresent(String.self, forKey: .entryId)
+                entryId = try container.decodeIfPresent(String.self, forKey: "entryId")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'entryId' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("entryId", error)
                 entryId = nil
             }
             do {
-                entryKind = try container.decodeIfPresent(String.self, forKey: .entryKind)
+                entryKind = try container.decodeIfPresent(String.self, forKey: "entryKind")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'entryKind' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("entryKind", error)
                 entryKind = nil
             }
             do {
-                acceptedPayloadSha256 = try container.decodeIfPresent(Bytes.self, forKey: .acceptedPayloadSha256)
+                acceptedPayloadSha256 = try container.decodeIfPresent(Bytes.self, forKey: "acceptedPayloadSha256")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'acceptedPayloadSha256' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("acceptedPayloadSha256", error)
                 acceptedPayloadSha256 = nil
             }
             do {
-                signedRequest = try container.decodeIfPresent(Bytes.self, forKey: .signedRequest)
+                signedRequest = try container.decodeIfPresent(Bytes.self, forKey: "signedRequest")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'signedRequest' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("signedRequest", error)
                 signedRequest = nil
             }
             do {
-                outerFingerprint = try container.decodeIfPresent(Bytes.self, forKey: .outerFingerprint)
+                outerFingerprint = try container.decodeIfPresent(Bytes.self, forKey: "outerFingerprint")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'outerFingerprint' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("outerFingerprint", error)
                 outerFingerprint = nil
             }
         }
@@ -179,85 +184,85 @@ public enum BlueCatbirdMlsDSGetConvoEvents {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if seq != other.seq {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.seq != rhs.seq {
                 return false
             }
-            if epoch != other.epoch {
+            if lhs.epoch != rhs.epoch {
                 return false
             }
-            if msgId != other.msgId {
+            if lhs.msgId != rhs.msgId {
                 return false
             }
-            if messageType != other.messageType {
+            if lhs.messageType != rhs.messageType {
                 return false
             }
-            if ciphertext != other.ciphertext {
+            if lhs.ciphertext != rhs.ciphertext {
                 return false
             }
-            if paddedSize != other.paddedSize {
+            if lhs.paddedSize != rhs.paddedSize {
                 return false
             }
-            if createdAt != other.createdAt {
+            if lhs.createdAt != rhs.createdAt {
                 return false
             }
-            if entryId != other.entryId {
+            if lhs.entryId != rhs.entryId {
                 return false
             }
-            if entryKind != other.entryKind {
+            if lhs.entryKind != rhs.entryKind {
                 return false
             }
-            if acceptedPayloadSha256 != other.acceptedPayloadSha256 {
+            if lhs.acceptedPayloadSha256 != rhs.acceptedPayloadSha256 {
                 return false
             }
-            if signedRequest != other.signedRequest {
+            if lhs.signedRequest != rhs.signedRequest {
                 return false
             }
-            if outerFingerprint != other.outerFingerprint {
+            if lhs.outerFingerprint != rhs.outerFingerprint {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 13)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let seqValue = try seq.toCBORValue()
-            map = map.adding(key: "seq", value: seqValue)
+            map.append(key: "seq", value: seqValue)
             let epochValue = try epoch.toCBORValue()
-            map = map.adding(key: "epoch", value: epochValue)
+            map.append(key: "epoch", value: epochValue)
             let msgIdValue = try msgId.toCBORValue()
-            map = map.adding(key: "msgId", value: msgIdValue)
+            map.append(key: "msgId", value: msgIdValue)
             let messageTypeValue = try messageType.toCBORValue()
-            map = map.adding(key: "messageType", value: messageTypeValue)
+            map.append(key: "messageType", value: messageTypeValue)
             let ciphertextValue = try ciphertext.toCBORValue()
-            map = map.adding(key: "ciphertext", value: ciphertextValue)
+            map.append(key: "ciphertext", value: ciphertextValue)
             let paddedSizeValue = try paddedSize.toCBORValue()
-            map = map.adding(key: "paddedSize", value: paddedSizeValue)
+            map.append(key: "paddedSize", value: paddedSizeValue)
             let createdAtValue = try createdAt.toCBORValue()
-            map = map.adding(key: "createdAt", value: createdAtValue)
+            map.append(key: "createdAt", value: createdAtValue)
             if let value = entryId {
                 let entryIdValue = try value.toCBORValue()
-                map = map.adding(key: "entryId", value: entryIdValue)
+                map.append(key: "entryId", value: entryIdValue)
             }
             if let value = entryKind {
                 let entryKindValue = try value.toCBORValue()
-                map = map.adding(key: "entryKind", value: entryKindValue)
+                map.append(key: "entryKind", value: entryKindValue)
             }
             if let value = acceptedPayloadSha256 {
                 let acceptedPayloadSha256Value = try value.toCBORValue()
-                map = map.adding(key: "acceptedPayloadSha256", value: acceptedPayloadSha256Value)
+                map.append(key: "acceptedPayloadSha256", value: acceptedPayloadSha256Value)
             }
             if let value = signedRequest {
                 let signedRequestValue = try value.toCBORValue()
-                map = map.adding(key: "signedRequest", value: signedRequestValue)
+                map.append(key: "signedRequest", value: signedRequestValue)
             }
             if let value = outerFingerprint {
                 let outerFingerprintValue = try value.toCBORValue()
-                map = map.adding(key: "outerFingerprint", value: outerFingerprintValue)
+                map.append(key: "outerFingerprint", value: outerFingerprintValue)
             }
             return map
         }
@@ -295,7 +300,7 @@ public enum BlueCatbirdMlsDSGetConvoEvents {
         }
     }
 
-    public struct Output: ATProtocolCodable {
+    public struct Output: ATProtocolCodable, XRPCParallelArrayDecodable {
         public let convoId: String
 
         public let fromSeqExclusive: Int
@@ -349,21 +354,36 @@ public enum BlueCatbirdMlsDSGetConvoEvents {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 4)
 
             let convoIdValue = try convoId.toCBORValue()
-            map = map.adding(key: "convoId", value: convoIdValue)
+            map.append(key: "convoId", value: convoIdValue)
 
             let fromSeqExclusiveValue = try fromSeqExclusive.toCBORValue()
-            map = map.adding(key: "fromSeqExclusive", value: fromSeqExclusiveValue)
+            map.append(key: "fromSeqExclusive", value: fromSeqExclusiveValue)
 
             let toSeqInclusiveValue = try toSeqInclusive.toCBORValue()
-            map = map.adding(key: "toSeqInclusive", value: toSeqInclusiveValue)
+            map.append(key: "toSeqInclusive", value: toSeqInclusiveValue)
 
             let eventsValue = try events.toCBORValue()
-            map = map.adding(key: "events", value: eventsValue)
+            map.append(key: "events", value: eventsValue)
 
             return map
+        }
+
+        // MARK: - Parallel array decoding support (used only by XRPCResponseDecoding's opt-in parallel path)
+
+        public typealias ParallelArrayElement = ConvoEventEntry
+
+        public static var parallelArrayKey: String {
+            "events"
+        }
+
+        public init(parallelArrayPrototype prototype: Output, parallelArrayElements elements: [ParallelArrayElement]) {
+            convoId = prototype.convoId
+            fromSeqExclusive = prototype.fromSeqExclusive
+            toSeqInclusive = prototype.toSeqInclusive
+            events = elements
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -427,16 +447,10 @@ public extension ATProtoClient.Blue.Catbird.MlsDS {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSGetConvoEvents.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.getConvoEvents: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdMlsDSGetConvoEvents.Output.self, from: responseData, endpoint: "blue.catbird.mlsDS.getConvoEvents")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

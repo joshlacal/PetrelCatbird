@@ -22,7 +22,7 @@ public enum BlueCatbirdCircleGetFeed {
         }
     }
 
-    public struct Output: ATProtocolCodable {
+    public struct Output: ATProtocolCodable, XRPCParallelArrayDecodable {
         public let feed: [BlueCatbirdCircleDefs.FeedItem]
 
         public let cursor: String?
@@ -48,7 +48,7 @@ public enum BlueCatbirdCircleGetFeed {
                 cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("cursor", error)
                 cursor = nil
             }
         }
@@ -63,18 +63,31 @@ public enum BlueCatbirdCircleGetFeed {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
 
             let feedValue = try feed.toCBORValue()
-            map = map.adding(key: "feed", value: feedValue)
+            map.append(key: "feed", value: feedValue)
 
             if let value = cursor {
                 // Encode optional property even if it's an empty array for CBOR
                 let cursorValue = try value.toCBORValue()
-                map = map.adding(key: "cursor", value: cursorValue)
+                map.append(key: "cursor", value: cursorValue)
             }
 
             return map
+        }
+
+        // MARK: - Parallel array decoding support (used only by XRPCResponseDecoding's opt-in parallel path)
+
+        public typealias ParallelArrayElement = BlueCatbirdCircleDefs.FeedItem
+
+        public static var parallelArrayKey: String {
+            "feed"
+        }
+
+        public init(parallelArrayPrototype prototype: Output, parallelArrayElements elements: [ParallelArrayElement]) {
+            feed = elements
+            cursor = prototype.cursor
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -139,16 +152,10 @@ public extension ATProtoClient.Blue.Catbird.Circle {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdCircleGetFeed.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.circle.getFeed: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdCircleGetFeed.Output.self, from: responseData, endpoint: "blue.catbird.circle.getFeed")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

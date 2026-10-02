@@ -6,6 +6,7 @@ import Petrel
 
 public enum BlueCatbirdChatAcceptConversation {
     public static let typeIdentifier = "blue.catbird.chat.acceptConversation"
+
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedParticipantAcceptance?
         public let directRequest: BlueCatbirdChatDefs.SignedDirectRequestAcceptance?
@@ -29,14 +30,14 @@ public enum BlueCatbirdChatAcceptConversation {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
             if let value = signedRequest {
                 let signedRequestValue = try value.toCBORValue()
-                map = map.adding(key: "signedRequest", value: signedRequestValue)
+                map.append(key: "signedRequest", value: signedRequestValue)
             }
             if let value = directRequest {
                 let directRequestValue = try value.toCBORValue()
-                map = map.adding(key: "directRequest", value: directRequestValue)
+                map.append(key: "directRequest", value: directRequestValue)
             }
             return map
         }
@@ -85,7 +86,7 @@ public enum BlueCatbirdChatAcceptConversation {
                 entry = try container.decodeIfPresent(BlueCatbirdChatDefs.ParticipantAcceptanceEntry.self, forKey: .entry)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'entry' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("entry", error)
                 entry = nil
             }
 
@@ -93,7 +94,7 @@ public enum BlueCatbirdChatAcceptConversation {
                 recovery = try container.decodeIfPresent(BlueCatbirdChatDefs.LeafRecoveryView.self, forKey: .recovery)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'recovery' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("recovery", error)
                 recovery = nil
             }
 
@@ -101,7 +102,7 @@ public enum BlueCatbirdChatAcceptConversation {
                 acceptanceProof = try container.decodeIfPresent(BlueCatbirdChatDefs.DirectRequestAcceptanceProof.self, forKey: .acceptanceProof)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'acceptanceProof' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("acceptanceProof", error)
                 acceptanceProof = nil
             }
         }
@@ -122,27 +123,27 @@ public enum BlueCatbirdChatAcceptConversation {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 4)
 
             let coordinatesValue = try coordinates.toCBORValue()
-            map = map.adding(key: "coordinates", value: coordinatesValue)
+            map.append(key: "coordinates", value: coordinatesValue)
 
             if let value = entry {
                 // Encode optional property even if it's an empty array for CBOR
                 let entryValue = try value.toCBORValue()
-                map = map.adding(key: "entry", value: entryValue)
+                map.append(key: "entry", value: entryValue)
             }
 
             if let value = recovery {
                 // Encode optional property even if it's an empty array for CBOR
                 let recoveryValue = try value.toCBORValue()
-                map = map.adding(key: "recovery", value: recoveryValue)
+                map.append(key: "recovery", value: recoveryValue)
             }
 
             if let value = acceptanceProof {
                 // Encode optional property even if it's an empty array for CBOR
                 let acceptanceProofValue = try value.toCBORValue()
-                map = map.adding(key: "acceptanceProof", value: acceptanceProofValue)
+                map.append(key: "acceptanceProof", value: acceptanceProofValue)
             }
 
             return map
@@ -245,16 +246,10 @@ public extension ATProtoClient.Blue.Catbird.Chat {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatAcceptConversation.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.acceptConversation: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdChatAcceptConversation.Output.self, from: responseData, endpoint: "blue.catbird.chat.acceptConversation")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

@@ -28,49 +28,54 @@ public enum PlaceStreamBrandingGetBranding {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                key = try container.decode(String.self, forKey: .key)
+                key = try container.decode(String.self, forKey: "key")
             } catch {
-                LogManager.logError("Decoding error for required property 'key': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("key", error)
                 throw error
             }
             do {
-                mimeType = try container.decode(String.self, forKey: .mimeType)
+                mimeType = try container.decode(String.self, forKey: "mimeType")
             } catch {
-                LogManager.logError("Decoding error for required property 'mimeType': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("mimeType", error)
                 throw error
             }
             do {
-                url = try container.decodeIfPresent(String.self, forKey: .url)
+                url = try container.decodeIfPresent(String.self, forKey: "url")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'url' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("url", error)
                 url = nil
             }
             do {
-                data = try container.decodeIfPresent(String.self, forKey: .data)
+                data = try container.decodeIfPresent(String.self, forKey: "data")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'data' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("data", error)
                 data = nil
             }
             do {
-                width = try container.decodeIfPresent(Int.self, forKey: .width)
+                width = try container.decodeIfPresent(Int.self, forKey: "width")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'width' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("width", error)
                 width = nil
             }
             do {
-                height = try container.decodeIfPresent(Int.self, forKey: .height)
+                height = try container.decodeIfPresent(Int.self, forKey: "height")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'height' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("height", error)
                 height = nil
             }
         }
@@ -113,53 +118,53 @@ public enum PlaceStreamBrandingGetBranding {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if key != other.key {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.key != rhs.key {
                 return false
             }
-            if mimeType != other.mimeType {
+            if lhs.mimeType != rhs.mimeType {
                 return false
             }
-            if url != other.url {
+            if lhs.url != rhs.url {
                 return false
             }
-            if data != other.data {
+            if lhs.data != rhs.data {
                 return false
             }
-            if width != other.width {
+            if lhs.width != rhs.width {
                 return false
             }
-            if height != other.height {
+            if lhs.height != rhs.height {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 7)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let keyValue = try key.toCBORValue()
-            map = map.adding(key: "key", value: keyValue)
+            map.append(key: "key", value: keyValue)
             let mimeTypeValue = try mimeType.toCBORValue()
-            map = map.adding(key: "mimeType", value: mimeTypeValue)
+            map.append(key: "mimeType", value: mimeTypeValue)
             if let value = url {
                 let urlValue = try value.toCBORValue()
-                map = map.adding(key: "url", value: urlValue)
+                map.append(key: "url", value: urlValue)
             }
             if let value = data {
                 let dataValue = try value.toCBORValue()
-                map = map.adding(key: "data", value: dataValue)
+                map.append(key: "data", value: dataValue)
             }
             if let value = width {
                 let widthValue = try value.toCBORValue()
-                map = map.adding(key: "width", value: widthValue)
+                map.append(key: "width", value: widthValue)
             }
             if let value = height {
                 let heightValue = try value.toCBORValue()
-                map = map.adding(key: "height", value: heightValue)
+                map.append(key: "height", value: heightValue)
             }
             return map
         }
@@ -185,7 +190,7 @@ public enum PlaceStreamBrandingGetBranding {
         }
     }
 
-    public struct Output: ATProtocolCodable {
+    public struct Output: ATProtocolCodable, XRPCParallelArrayDecodable {
         public let assets: [BrandingAsset]
 
         /// Standard public initializer
@@ -209,12 +214,24 @@ public enum PlaceStreamBrandingGetBranding {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
 
             let assetsValue = try assets.toCBORValue()
-            map = map.adding(key: "assets", value: assetsValue)
+            map.append(key: "assets", value: assetsValue)
 
             return map
+        }
+
+        // MARK: - Parallel array decoding support (used only by XRPCResponseDecoding's opt-in parallel path)
+
+        public typealias ParallelArrayElement = BrandingAsset
+
+        public static var parallelArrayKey: String {
+            "assets"
+        }
+
+        public init(parallelArrayPrototype prototype: Output, parallelArrayElements elements: [ParallelArrayElement]) {
+            assets = elements
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -263,16 +280,10 @@ public extension ATProtoClient.Place.Stream.Branding {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamBrandingGetBranding.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.branding.getBranding: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamBrandingGetBranding.Output.self, from: responseData, endpoint: "place.stream.branding.getBranding")
+            return (responseCode, decodedData)
         } else {
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)

@@ -20,17 +20,22 @@ public enum PlaceStreamLiveSearchActorsTypeahead {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                did = try container.decode(DID.self, forKey: .did)
+                did = try container.decode(DID.self, forKey: "did")
             } catch {
-                LogManager.logError("Decoding error for required property 'did': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("did", error)
                 throw error
             }
             do {
-                handle = try container.decode(Handle.self, forKey: .handle)
+                handle = try container.decode(Handle.self, forKey: "handle")
             } catch {
-                LogManager.logError("Decoding error for required property 'handle': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("handle", error)
                 throw error
             }
         }
@@ -49,26 +54,26 @@ public enum PlaceStreamLiveSearchActorsTypeahead {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if did != other.did {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.did != rhs.did {
                 return false
             }
-            if handle != other.handle {
+            if lhs.handle != rhs.handle {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 3)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let didValue = try did.toCBORValue()
-            map = map.adding(key: "did", value: didValue)
+            map.append(key: "did", value: didValue)
             let handleValue = try handle.toCBORValue()
-            map = map.adding(key: "handle", value: handleValue)
+            map.append(key: "handle", value: handleValue)
             return map
         }
 
@@ -92,7 +97,7 @@ public enum PlaceStreamLiveSearchActorsTypeahead {
         }
     }
 
-    public struct Output: ATProtocolCodable {
+    public struct Output: ATProtocolCodable, XRPCParallelArrayDecodable {
         public let actors: [Actor]
 
         /// Standard public initializer
@@ -116,12 +121,24 @@ public enum PlaceStreamLiveSearchActorsTypeahead {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
 
             let actorsValue = try actors.toCBORValue()
-            map = map.adding(key: "actors", value: actorsValue)
+            map.append(key: "actors", value: actorsValue)
 
             return map
+        }
+
+        // MARK: - Parallel array decoding support (used only by XRPCResponseDecoding's opt-in parallel path)
+
+        public typealias ParallelArrayElement = Actor
+
+        public static var parallelArrayKey: String {
+            "actors"
+        }
+
+        public init(parallelArrayPrototype prototype: Output, parallelArrayElements elements: [ParallelArrayElement]) {
+            actors = elements
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -170,16 +187,10 @@ public extension ATProtoClient.Place.Stream.Live {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamLiveSearchActorsTypeahead.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.live.searchActorsTypeahead: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamLiveSearchActorsTypeahead.Output.self, from: responseData, endpoint: "place.stream.live.searchActorsTypeahead")
+            return (responseCode, decodedData)
         } else {
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)

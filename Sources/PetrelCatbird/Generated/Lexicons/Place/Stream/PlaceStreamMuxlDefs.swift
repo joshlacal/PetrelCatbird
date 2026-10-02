@@ -28,49 +28,54 @@ public enum PlaceStreamMuxlDefs {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                id = try container.decode(Int.self, forKey: .id)
+                id = try container.decode(Int.self, forKey: "id")
             } catch {
-                LogManager.logError("Decoding error for required property 'id': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("id", error)
                 throw error
             }
             do {
-                codec = try container.decode(String.self, forKey: .codec)
+                codec = try container.decode(String.self, forKey: "codec")
             } catch {
-                LogManager.logError("Decoding error for required property 'codec': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("codec", error)
                 throw error
             }
             do {
-                width = try container.decodeIfPresent(Int.self, forKey: .width)
+                width = try container.decodeIfPresent(Int.self, forKey: "width")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'width' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("width", error)
                 width = nil
             }
             do {
-                height = try container.decodeIfPresent(Int.self, forKey: .height)
+                height = try container.decodeIfPresent(Int.self, forKey: "height")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'height' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("height", error)
                 height = nil
             }
             do {
-                rate = try container.decodeIfPresent(Int.self, forKey: .rate)
+                rate = try container.decodeIfPresent(Int.self, forKey: "rate")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'rate' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("rate", error)
                 rate = nil
             }
             do {
-                channels = try container.decodeIfPresent(Int.self, forKey: .channels)
+                channels = try container.decodeIfPresent(Int.self, forKey: "channels")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'channels' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("channels", error)
                 channels = nil
             }
         }
@@ -113,53 +118,53 @@ public enum PlaceStreamMuxlDefs {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if id != other.id {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.id != rhs.id {
                 return false
             }
-            if codec != other.codec {
+            if lhs.codec != rhs.codec {
                 return false
             }
-            if width != other.width {
+            if lhs.width != rhs.width {
                 return false
             }
-            if height != other.height {
+            if lhs.height != rhs.height {
                 return false
             }
-            if rate != other.rate {
+            if lhs.rate != rhs.rate {
                 return false
             }
-            if channels != other.channels {
+            if lhs.channels != rhs.channels {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 7)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let idValue = try id.toCBORValue()
-            map = map.adding(key: "id", value: idValue)
+            map.append(key: "id", value: idValue)
             let codecValue = try codec.toCBORValue()
-            map = map.adding(key: "codec", value: codecValue)
+            map.append(key: "codec", value: codecValue)
             if let value = width {
                 let widthValue = try value.toCBORValue()
-                map = map.adding(key: "width", value: widthValue)
+                map.append(key: "width", value: widthValue)
             }
             if let value = height {
                 let heightValue = try value.toCBORValue()
-                map = map.adding(key: "height", value: heightValue)
+                map.append(key: "height", value: heightValue)
             }
             if let value = rate {
                 let rateValue = try value.toCBORValue()
-                map = map.adding(key: "rate", value: rateValue)
+                map.append(key: "rate", value: rateValue)
             }
             if let value = channels {
                 let channelsValue = try value.toCBORValue()
-                map = map.adding(key: "channels", value: channelsValue)
+                map.append(key: "channels", value: channelsValue)
             }
             return map
         }

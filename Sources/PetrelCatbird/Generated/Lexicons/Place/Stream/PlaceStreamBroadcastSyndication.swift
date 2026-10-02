@@ -17,10 +17,15 @@ public struct PlaceStreamBroadcastSyndication: ATProtocolCodable, ATProtocolValu
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        broadcaster = try container.decode(DID.self, forKey: .broadcaster)
-        streamer = try container.decode(DID.self, forKey: .streamer)
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+    }
+
+    /// Decodes from an already-opened keyed container. Generated unions pass the
+    /// container they read `$type` from, so the object's keys are materialized once.
+    public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
+        broadcaster = try container.decode(DID.self, forKey: "broadcaster")
+        streamer = try container.decode(DID.self, forKey: "streamer")
+        createdAt = try container.decode(ATProtocolDate.self, forKey: "createdAt")
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -32,21 +37,21 @@ public struct PlaceStreamBroadcastSyndication: ATProtocolCodable, ATProtocolValu
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
+        if lhs.broadcaster != rhs.broadcaster {
+            return false
+        }
+        if lhs.streamer != rhs.streamer {
+            return false
+        }
+        if lhs.createdAt != rhs.createdAt {
+            return false
+        }
+        return true
     }
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if broadcaster != other.broadcaster {
-            return false
-        }
-        if streamer != other.streamer {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        return true
+        return self == other
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -56,14 +61,14 @@ public struct PlaceStreamBroadcastSyndication: ATProtocolCodable, ATProtocolValu
     }
 
     public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
-        map = map.adding(key: "$type", value: Self.typeIdentifier)
+        var map = OrderedCBORMap(minimumCapacity: 4)
+        map.append(key: "$type", value: Self.typeIdentifier)
         let broadcasterValue = try broadcaster.toCBORValue()
-        map = map.adding(key: "broadcaster", value: broadcasterValue)
+        map.append(key: "broadcaster", value: broadcasterValue)
         let streamerValue = try streamer.toCBORValue()
-        map = map.adding(key: "streamer", value: streamerValue)
+        map.append(key: "streamer", value: streamerValue)
         let createdAtValue = try createdAt.toCBORValue()
-        map = map.adding(key: "createdAt", value: createdAtValue)
+        map.append(key: "createdAt", value: createdAtValue)
         return map
     }
 

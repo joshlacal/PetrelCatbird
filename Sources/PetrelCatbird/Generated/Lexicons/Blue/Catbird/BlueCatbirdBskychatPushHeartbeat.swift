@@ -6,6 +6,7 @@ import Petrel
 
 public enum BlueCatbirdBskychatPushHeartbeat {
     public static let typeIdentifier = "blue.catbird.bskychat.pushHeartbeat"
+
     public struct Input: ATProtocolCodable {
         public let platform: String
 
@@ -25,9 +26,9 @@ public enum BlueCatbirdBskychatPushHeartbeat {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
             let platformValue = try platform.toCBORValue()
-            map = map.adding(key: "platform", value: platformValue)
+            map.append(key: "platform", value: platformValue)
             return map
         }
 
@@ -60,10 +61,10 @@ public enum BlueCatbirdBskychatPushHeartbeat {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
 
             let leaseExpiresAtValue = try leaseExpiresAt.toCBORValue()
-            map = map.adding(key: "leaseExpiresAt", value: leaseExpiresAtValue)
+            map.append(key: "leaseExpiresAt", value: leaseExpiresAtValue)
 
             return map
         }
@@ -126,16 +127,10 @@ public extension ATProtoClient.Blue.Catbird.Bskychat {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdBskychatPushHeartbeat.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.bskychat.pushHeartbeat: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdBskychatPushHeartbeat.Output.self, from: responseData, endpoint: "blue.catbird.bskychat.pushHeartbeat")
+            return (responseCode, decodedData)
         } else {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)

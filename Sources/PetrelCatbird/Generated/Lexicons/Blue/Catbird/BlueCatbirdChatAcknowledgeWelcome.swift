@@ -6,6 +6,7 @@ import Petrel
 
 public enum BlueCatbirdChatAcknowledgeWelcome {
     public static let typeIdentifier = "blue.catbird.chat.acknowledgeWelcome"
+
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedWelcomeAcknowledgement
 
@@ -25,9 +26,9 @@ public enum BlueCatbirdChatAcknowledgeWelcome {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
             let signedRequestValue = try signedRequest.toCBORValue()
-            map = map.adding(key: "signedRequest", value: signedRequestValue)
+            map.append(key: "signedRequest", value: signedRequestValue)
             return map
         }
 
@@ -70,13 +71,13 @@ public enum BlueCatbirdChatAcknowledgeWelcome {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
 
             let statusValue = try status.toCBORValue()
-            map = map.adding(key: "status", value: statusValue)
+            map.append(key: "status", value: statusValue)
 
             let acknowledgedAtValue = try acknowledgedAt.toCBORValue()
-            map = map.adding(key: "acknowledgedAt", value: acknowledgedAtValue)
+            map.append(key: "acknowledgedAt", value: acknowledgedAtValue)
 
             return map
         }
@@ -166,16 +167,10 @@ public extension ATProtoClient.Blue.Catbird.Chat {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatAcknowledgeWelcome.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.acknowledgeWelcome: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdChatAcknowledgeWelcome.Output.self, from: responseData, endpoint: "blue.catbird.chat.acknowledgeWelcome")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

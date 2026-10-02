@@ -6,6 +6,7 @@ import Petrel
 
 public enum PlaceStreamModerationCreateBlock {
     public static let typeIdentifier = "place.stream.moderation.createBlock"
+
     public struct Input: ATProtocolCodable {
         public let streamer: DID
         public let subject: DID
@@ -33,14 +34,14 @@ public enum PlaceStreamModerationCreateBlock {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 3)
             let streamerValue = try streamer.toCBORValue()
-            map = map.adding(key: "streamer", value: streamerValue)
+            map.append(key: "streamer", value: streamerValue)
             let subjectValue = try subject.toCBORValue()
-            map = map.adding(key: "subject", value: subjectValue)
+            map.append(key: "subject", value: subjectValue)
             if let value = reason {
                 let reasonValue = try value.toCBORValue()
-                map = map.adding(key: "reason", value: reasonValue)
+                map.append(key: "reason", value: reasonValue)
             }
             return map
         }
@@ -86,13 +87,13 @@ public enum PlaceStreamModerationCreateBlock {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
 
             let uriValue = try uri.toCBORValue()
-            map = map.adding(key: "uri", value: uriValue)
+            map.append(key: "uri", value: uriValue)
 
             let cidValue = try cid.toCBORValue()
-            map = map.adding(key: "cid", value: cidValue)
+            map.append(key: "cid", value: cidValue)
 
             return map
         }
@@ -172,16 +173,10 @@ public extension ATProtoClient.Place.Stream.Moderation {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamModerationCreateBlock.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.moderation.createBlock: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamModerationCreateBlock.Output.self, from: responseData, endpoint: "place.stream.moderation.createBlock")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

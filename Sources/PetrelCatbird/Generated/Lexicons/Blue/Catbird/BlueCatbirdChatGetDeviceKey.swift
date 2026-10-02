@@ -79,19 +79,19 @@ public enum BlueCatbirdChatGetDeviceKey {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 4)
 
             let ownerDidValue = try ownerDid.toCBORValue()
-            map = map.adding(key: "ownerDid", value: ownerDidValue)
+            map.append(key: "ownerDid", value: ownerDidValue)
 
             let deviceIdValue = try deviceId.toCBORValue()
-            map = map.adding(key: "deviceId", value: deviceIdValue)
+            map.append(key: "deviceId", value: deviceIdValue)
 
             let keyIdValue = try keyId.toCBORValue()
-            map = map.adding(key: "keyId", value: keyIdValue)
+            map.append(key: "keyId", value: keyIdValue)
 
             let signaturePublicKeyValue = try signaturePublicKey.toCBORValue()
-            map = map.adding(key: "signaturePublicKey", value: signaturePublicKeyValue)
+            map.append(key: "signaturePublicKey", value: signaturePublicKeyValue)
 
             return map
         }
@@ -165,16 +165,10 @@ public extension ATProtoClient.Blue.Catbird.Chat {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatGetDeviceKey.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.getDeviceKey: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdChatGetDeviceKey.Output.self, from: responseData, endpoint: "blue.catbird.chat.getDeviceKey")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

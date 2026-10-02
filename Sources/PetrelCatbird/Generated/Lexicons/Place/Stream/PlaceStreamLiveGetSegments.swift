@@ -40,7 +40,7 @@ public enum PlaceStreamLiveGetSegments {
                 segments = try container.decodeIfPresent([PlaceStreamSegment.SegmentView].self, forKey: .segments)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'segments' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("segments", error)
                 segments = nil
             }
         }
@@ -53,12 +53,12 @@ public enum PlaceStreamLiveGetSegments {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
 
             if let value = segments {
                 // Encode optional property even if it's an empty array for CBOR
                 let segmentsValue = try value.toCBORValue()
-                map = map.adding(key: "segments", value: segmentsValue)
+                map.append(key: "segments", value: segmentsValue)
             }
 
             return map
@@ -110,16 +110,10 @@ public extension ATProtoClient.Place.Stream.Live {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamLiveGetSegments.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.live.getSegments: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamLiveGetSegments.Output.self, from: responseData, endpoint: "place.stream.live.getSegments")
+            return (responseCode, decodedData)
         } else {
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)

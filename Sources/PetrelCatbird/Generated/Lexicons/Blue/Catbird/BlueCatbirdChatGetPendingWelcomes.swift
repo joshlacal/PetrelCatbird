@@ -28,7 +28,7 @@ public enum BlueCatbirdChatGetPendingWelcomes {
         }
     }
 
-    public struct Output: ATProtocolCodable {
+    public struct Output: ATProtocolCodable, XRPCParallelArrayDecodable {
         public let items: [OutputItemsUnion]
 
         public let inventorySessionId: String
@@ -88,7 +88,7 @@ public enum BlueCatbirdChatGetPendingWelcomes {
                 nextPageCursor = try container.decodeIfPresent(String.self, forKey: .nextPageCursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'nextPageCursor' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("nextPageCursor", error)
                 nextPageCursor = nil
             }
 
@@ -100,7 +100,7 @@ public enum BlueCatbirdChatGetPendingWelcomes {
                 inventoryScope = try container.decodeIfPresent(BlueCatbirdChatDefs.DirectRequestInventoryScope.self, forKey: .inventoryScope)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'inventoryScope' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("inventoryScope", error)
                 inventoryScope = nil
             }
         }
@@ -126,36 +126,54 @@ public enum BlueCatbirdChatGetPendingWelcomes {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 7)
 
             let itemsValue = try items.toCBORValue()
-            map = map.adding(key: "items", value: itemsValue)
+            map.append(key: "items", value: itemsValue)
 
             let inventorySessionIdValue = try inventorySessionId.toCBORValue()
-            map = map.adding(key: "inventorySessionId", value: inventorySessionIdValue)
+            map.append(key: "inventorySessionId", value: inventorySessionIdValue)
 
             let snapshotEventCursorValue = try snapshotEventCursor.toCBORValue()
-            map = map.adding(key: "snapshotEventCursor", value: snapshotEventCursorValue)
+            map.append(key: "snapshotEventCursor", value: snapshotEventCursorValue)
 
             if let value = nextPageCursor {
                 // Encode optional property even if it's an empty array for CBOR
                 let nextPageCursorValue = try value.toCBORValue()
-                map = map.adding(key: "nextPageCursor", value: nextPageCursorValue)
+                map.append(key: "nextPageCursor", value: nextPageCursorValue)
             }
 
             let hasMoreValue = try hasMore.toCBORValue()
-            map = map.adding(key: "hasMore", value: hasMoreValue)
+            map.append(key: "hasMore", value: hasMoreValue)
 
             let snapshotExpiresAtValue = try snapshotExpiresAt.toCBORValue()
-            map = map.adding(key: "snapshotExpiresAt", value: snapshotExpiresAtValue)
+            map.append(key: "snapshotExpiresAt", value: snapshotExpiresAtValue)
 
             if let value = inventoryScope {
                 // Encode optional property even if it's an empty array for CBOR
                 let inventoryScopeValue = try value.toCBORValue()
-                map = map.adding(key: "inventoryScope", value: inventoryScopeValue)
+                map.append(key: "inventoryScope", value: inventoryScopeValue)
             }
 
             return map
+        }
+
+        // MARK: - Parallel array decoding support (used only by XRPCResponseDecoding's opt-in parallel path)
+
+        public typealias ParallelArrayElement = OutputItemsUnion
+
+        public static var parallelArrayKey: String {
+            "items"
+        }
+
+        public init(parallelArrayPrototype prototype: Output, parallelArrayElements elements: [ParallelArrayElement]) {
+            items = elements
+            inventorySessionId = prototype.inventorySessionId
+            snapshotEventCursor = prototype.snapshotEventCursor
+            nextPageCursor = prototype.nextPageCursor
+            hasMore = prototype.hasMore
+            snapshotExpiresAt = prototype.snapshotExpiresAt
+            inventoryScope = prototype.inventoryScope
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -218,15 +236,17 @@ public enum BlueCatbirdChatGetPendingWelcomes {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let typeValue = try container.decode(String.self, forKey: .type)
+            // One keyed container serves both the `$type` read and object variants
+            // (`init(_lexiconContainer:)`), so the object's keys are materialized once.
+            let container = try decoder.container(keyedBy: LexiconCodingKey.self)
+            let typeValue = try container.decode(String.self, forKey: "$type")
 
             switch typeValue {
             case "blue.catbird.chat.defs#welcomeView":
-                let value = try BlueCatbirdChatDefs.WelcomeView(from: decoder)
+                let value = try BlueCatbirdChatDefs.WelcomeView(_lexiconContainer: container)
                 self = .blueCatbirdChatDefsWelcomeView(value)
             case "blue.catbird.chat.defs#directRequestWelcomeView":
-                let value = try BlueCatbirdChatDefs.DirectRequestWelcomeView(from: decoder)
+                let value = try BlueCatbirdChatDefs.DirectRequestWelcomeView(_lexiconContainer: container)
                 self = .blueCatbirdChatDefsDirectRequestWelcomeView(value)
             default:
                 let unknownValue = try ATProtocolValueContainer(from: decoder)
@@ -280,7 +300,7 @@ public enum BlueCatbirdChatGetPendingWelcomes {
             ):
                 return lhsValue == rhsValue
             case let (.unexpected(lhsValue), .unexpected(rhsValue)):
-                return lhsValue.isEqual(to: rhsValue)
+                return lhsValue == rhsValue
             default:
                 return false
             }
@@ -291,46 +311,20 @@ public enum BlueCatbirdChatGetPendingWelcomes {
             return self == other
         }
 
-        /// DAGCBOR encoding with field ordering
+        /// DAGCBOR encoding with field ordering: `$type` first, then the variant's
+        /// own entries in order (see OrderedCBORMap.unionVariant).
         public func toCBORValue() throws -> Any {
-            // Create an ordered map to maintain field order
-            var map = OrderedCBORMap()
-
             switch self {
             case let .blueCatbirdChatDefsWelcomeView(value):
-                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#welcomeView")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
+                return try OrderedCBORMap.unionVariant(
+                    typeIdentifier: "blue.catbird.chat.defs#welcomeView",
+                    payload: value.toCBORValue()
+                )
             case let .blueCatbirdChatDefsDirectRequestWelcomeView(value):
-                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestWelcomeView")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
+                return try OrderedCBORMap.unionVariant(
+                    typeIdentifier: "blue.catbird.chat.defs#directRequestWelcomeView",
+                    payload: value.toCBORValue()
+                )
             case let .unexpected(container):
                 return try container.toCBORValue()
             }
@@ -392,16 +386,10 @@ public extension ATProtoClient.Blue.Catbird.Chat {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatGetPendingWelcomes.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.getPendingWelcomes: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdChatGetPendingWelcomes.Output.self, from: responseData, endpoint: "blue.catbird.chat.getPendingWelcomes")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

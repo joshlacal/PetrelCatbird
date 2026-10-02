@@ -38,89 +38,94 @@ public enum BlueCatbirdMlsDSGetFederationPeers {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                dsDid = try container.decode(String.self, forKey: .dsDid)
+                dsDid = try container.decode(String.self, forKey: "dsDid")
             } catch {
-                LogManager.logError("Decoding error for required property 'dsDid': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("dsDid", error)
                 throw error
             }
             do {
-                status = try container.decode(String.self, forKey: .status)
+                status = try container.decode(String.self, forKey: "status")
             } catch {
-                LogManager.logError("Decoding error for required property 'status': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("status", error)
                 throw error
             }
             do {
-                trustScore = try container.decodeIfPresent(Int.self, forKey: .trustScore)
+                trustScore = try container.decodeIfPresent(Int.self, forKey: "trustScore")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'trustScore' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("trustScore", error)
                 trustScore = nil
             }
             do {
-                maxRequestsPerMinute = try container.decodeIfPresent(Int.self, forKey: .maxRequestsPerMinute)
+                maxRequestsPerMinute = try container.decodeIfPresent(Int.self, forKey: "maxRequestsPerMinute")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'maxRequestsPerMinute' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("maxRequestsPerMinute", error)
                 maxRequestsPerMinute = nil
             }
             do {
-                note = try container.decodeIfPresent(String.self, forKey: .note)
+                note = try container.decodeIfPresent(String.self, forKey: "note")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'note' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("note", error)
                 note = nil
             }
             do {
-                invalidTokenCount = try container.decodeIfPresent(Int.self, forKey: .invalidTokenCount)
+                invalidTokenCount = try container.decodeIfPresent(Int.self, forKey: "invalidTokenCount")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'invalidTokenCount' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("invalidTokenCount", error)
                 invalidTokenCount = nil
             }
             do {
-                rejectedRequestCount = try container.decodeIfPresent(Int.self, forKey: .rejectedRequestCount)
+                rejectedRequestCount = try container.decodeIfPresent(Int.self, forKey: "rejectedRequestCount")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'rejectedRequestCount' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("rejectedRequestCount", error)
                 rejectedRequestCount = nil
             }
             do {
-                successfulRequestCount = try container.decodeIfPresent(Int.self, forKey: .successfulRequestCount)
+                successfulRequestCount = try container.decodeIfPresent(Int.self, forKey: "successfulRequestCount")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'successfulRequestCount' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("successfulRequestCount", error)
                 successfulRequestCount = nil
             }
             do {
-                lastSeenAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastSeenAt)
+                lastSeenAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: "lastSeenAt")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'lastSeenAt' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("lastSeenAt", error)
                 lastSeenAt = nil
             }
             do {
-                createdAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .createdAt)
+                createdAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: "createdAt")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'createdAt' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("createdAt", error)
                 createdAt = nil
             }
             do {
-                updatedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .updatedAt)
+                updatedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: "updatedAt")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'updatedAt' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("updatedAt", error)
                 updatedAt = nil
             }
         }
@@ -193,88 +198,88 @@ public enum BlueCatbirdMlsDSGetFederationPeers {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if dsDid != other.dsDid {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.dsDid != rhs.dsDid {
                 return false
             }
-            if status != other.status {
+            if lhs.status != rhs.status {
                 return false
             }
-            if trustScore != other.trustScore {
+            if lhs.trustScore != rhs.trustScore {
                 return false
             }
-            if maxRequestsPerMinute != other.maxRequestsPerMinute {
+            if lhs.maxRequestsPerMinute != rhs.maxRequestsPerMinute {
                 return false
             }
-            if note != other.note {
+            if lhs.note != rhs.note {
                 return false
             }
-            if invalidTokenCount != other.invalidTokenCount {
+            if lhs.invalidTokenCount != rhs.invalidTokenCount {
                 return false
             }
-            if rejectedRequestCount != other.rejectedRequestCount {
+            if lhs.rejectedRequestCount != rhs.rejectedRequestCount {
                 return false
             }
-            if successfulRequestCount != other.successfulRequestCount {
+            if lhs.successfulRequestCount != rhs.successfulRequestCount {
                 return false
             }
-            if lastSeenAt != other.lastSeenAt {
+            if lhs.lastSeenAt != rhs.lastSeenAt {
                 return false
             }
-            if createdAt != other.createdAt {
+            if lhs.createdAt != rhs.createdAt {
                 return false
             }
-            if updatedAt != other.updatedAt {
+            if lhs.updatedAt != rhs.updatedAt {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 12)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let dsDidValue = try dsDid.toCBORValue()
-            map = map.adding(key: "dsDid", value: dsDidValue)
+            map.append(key: "dsDid", value: dsDidValue)
             let statusValue = try status.toCBORValue()
-            map = map.adding(key: "status", value: statusValue)
+            map.append(key: "status", value: statusValue)
             if let value = trustScore {
                 let trustScoreValue = try value.toCBORValue()
-                map = map.adding(key: "trustScore", value: trustScoreValue)
+                map.append(key: "trustScore", value: trustScoreValue)
             }
             if let value = maxRequestsPerMinute {
                 let maxRequestsPerMinuteValue = try value.toCBORValue()
-                map = map.adding(key: "maxRequestsPerMinute", value: maxRequestsPerMinuteValue)
+                map.append(key: "maxRequestsPerMinute", value: maxRequestsPerMinuteValue)
             }
             if let value = note {
                 let noteValue = try value.toCBORValue()
-                map = map.adding(key: "note", value: noteValue)
+                map.append(key: "note", value: noteValue)
             }
             if let value = invalidTokenCount {
                 let invalidTokenCountValue = try value.toCBORValue()
-                map = map.adding(key: "invalidTokenCount", value: invalidTokenCountValue)
+                map.append(key: "invalidTokenCount", value: invalidTokenCountValue)
             }
             if let value = rejectedRequestCount {
                 let rejectedRequestCountValue = try value.toCBORValue()
-                map = map.adding(key: "rejectedRequestCount", value: rejectedRequestCountValue)
+                map.append(key: "rejectedRequestCount", value: rejectedRequestCountValue)
             }
             if let value = successfulRequestCount {
                 let successfulRequestCountValue = try value.toCBORValue()
-                map = map.adding(key: "successfulRequestCount", value: successfulRequestCountValue)
+                map.append(key: "successfulRequestCount", value: successfulRequestCountValue)
             }
             if let value = lastSeenAt {
                 let lastSeenAtValue = try value.toCBORValue()
-                map = map.adding(key: "lastSeenAt", value: lastSeenAtValue)
+                map.append(key: "lastSeenAt", value: lastSeenAtValue)
             }
             if let value = createdAt {
                 let createdAtValue = try value.toCBORValue()
-                map = map.adding(key: "createdAt", value: createdAtValue)
+                map.append(key: "createdAt", value: createdAtValue)
             }
             if let value = updatedAt {
                 let updatedAtValue = try value.toCBORValue()
-                map = map.adding(key: "updatedAt", value: updatedAtValue)
+                map.append(key: "updatedAt", value: updatedAtValue)
             }
             return map
         }
@@ -308,7 +313,7 @@ public enum BlueCatbirdMlsDSGetFederationPeers {
         }
     }
 
-    public struct Output: ATProtocolCodable {
+    public struct Output: ATProtocolCodable, XRPCParallelArrayDecodable {
         public let peers: [PeerRecord]
 
         /// Standard public initializer
@@ -332,12 +337,24 @@ public enum BlueCatbirdMlsDSGetFederationPeers {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
 
             let peersValue = try peers.toCBORValue()
-            map = map.adding(key: "peers", value: peersValue)
+            map.append(key: "peers", value: peersValue)
 
             return map
+        }
+
+        // MARK: - Parallel array decoding support (used only by XRPCResponseDecoding's opt-in parallel path)
+
+        public typealias ParallelArrayElement = PeerRecord
+
+        public static var parallelArrayKey: String {
+            "peers"
+        }
+
+        public init(parallelArrayPrototype prototype: Output, parallelArrayElements elements: [ParallelArrayElement]) {
+            peers = elements
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -386,16 +403,10 @@ public extension ATProtoClient.Blue.Catbird.MlsDS {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSGetFederationPeers.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.getFederationPeers: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdMlsDSGetFederationPeers.Output.self, from: responseData, endpoint: "blue.catbird.mlsDS.getFederationPeers")
+            return (responseCode, decodedData)
         } else {
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)

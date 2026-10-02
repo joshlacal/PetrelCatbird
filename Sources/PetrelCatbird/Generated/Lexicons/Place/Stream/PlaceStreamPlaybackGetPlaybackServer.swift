@@ -30,7 +30,7 @@ public enum PlaceStreamPlaybackGetPlaybackServer {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            servers = try container.decode([String].self, forKey: .servers)
+            servers = try container.decode(_LexiconStringArray.self, forKey: .servers).values
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -40,10 +40,10 @@ public enum PlaceStreamPlaybackGetPlaybackServer {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
 
             let serversValue = try servers.toCBORValue()
-            map = map.adding(key: "servers", value: serversValue)
+            map.append(key: "servers", value: serversValue)
 
             return map
         }
@@ -94,16 +94,10 @@ public extension ATProtoClient.Place.Stream.Playback {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamPlaybackGetPlaybackServer.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.playback.getPlaybackServer: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamPlaybackGetPlaybackServer.Output.self, from: responseData, endpoint: "place.stream.playback.getPlaybackServer")
+            return (responseCode, decodedData)
         } else {
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)

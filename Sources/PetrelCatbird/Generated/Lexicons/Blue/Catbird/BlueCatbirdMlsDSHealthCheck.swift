@@ -45,7 +45,7 @@ public enum BlueCatbirdMlsDSHealthCheck {
 
             uptime = try container.decode(Int.self, forKey: .uptime)
 
-            federationCapabilities = try container.decode([String].self, forKey: .federationCapabilities)
+            federationCapabilities = try container.decode(_LexiconStringArray.self, forKey: .federationCapabilities).values
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -61,19 +61,19 @@ public enum BlueCatbirdMlsDSHealthCheck {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 4)
 
             let didValue = try did.toCBORValue()
-            map = map.adding(key: "did", value: didValue)
+            map.append(key: "did", value: didValue)
 
             let versionValue = try version.toCBORValue()
-            map = map.adding(key: "version", value: versionValue)
+            map.append(key: "version", value: versionValue)
 
             let uptimeValue = try uptime.toCBORValue()
-            map = map.adding(key: "uptime", value: uptimeValue)
+            map.append(key: "uptime", value: uptimeValue)
 
             let federationCapabilitiesValue = try federationCapabilities.toCBORValue()
-            map = map.adding(key: "federationCapabilities", value: federationCapabilitiesValue)
+            map.append(key: "federationCapabilities", value: federationCapabilitiesValue)
 
             return map
         }
@@ -125,16 +125,10 @@ public extension ATProtoClient.Blue.Catbird.MlsDS {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSHealthCheck.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.healthCheck: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdMlsDSHealthCheck.Output.self, from: responseData, endpoint: "blue.catbird.mlsDS.healthCheck")
+            return (responseCode, decodedData)
         } else {
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)

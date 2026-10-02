@@ -6,6 +6,7 @@ import Petrel
 
 public enum PlaceStreamLiveStopLivestream {
     public static let typeIdentifier = "place.stream.live.stopLivestream"
+
     public struct Input: ATProtocolCodable {
         /// Standard public initializer
         public init() {}
@@ -49,13 +50,13 @@ public enum PlaceStreamLiveStopLivestream {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
 
             let uriValue = try uri.toCBORValue()
-            map = map.adding(key: "uri", value: uriValue)
+            map.append(key: "uri", value: uriValue)
 
             let cidValue = try cid.toCBORValue()
-            map = map.adding(key: "cid", value: cidValue)
+            map.append(key: "cid", value: cidValue)
 
             return map
         }
@@ -119,16 +120,10 @@ public extension ATProtoClient.Place.Stream.Live {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamLiveStopLivestream.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.live.stopLivestream: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamLiveStopLivestream.Output.self, from: responseData, endpoint: "place.stream.live.stopLivestream")
+            return (responseCode, decodedData)
         } else {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)

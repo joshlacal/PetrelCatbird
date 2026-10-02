@@ -6,6 +6,7 @@ import Petrel
 
 public enum BlueCatbirdCircleActivateCircle {
     public static let typeIdentifier = "blue.catbird.circle.activateCircle"
+
     public struct Input: ATProtocolCodable {
         public let space: SpaceRef
 
@@ -25,9 +26,9 @@ public enum BlueCatbirdCircleActivateCircle {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
             let spaceValue = try space.toCBORValue()
-            map = map.adding(key: "space", value: spaceValue)
+            map.append(key: "space", value: spaceValue)
             return map
         }
 
@@ -60,10 +61,10 @@ public enum BlueCatbirdCircleActivateCircle {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
 
             let circleValue = try circle.toCBORValue()
-            map = map.adding(key: "circle", value: circleValue)
+            map.append(key: "circle", value: circleValue)
 
             return map
         }
@@ -146,16 +147,10 @@ public extension ATProtoClient.Blue.Catbird.Circle {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdCircleActivateCircle.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.circle.activateCircle: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdCircleActivateCircle.Output.self, from: responseData, endpoint: "blue.catbird.circle.activateCircle")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

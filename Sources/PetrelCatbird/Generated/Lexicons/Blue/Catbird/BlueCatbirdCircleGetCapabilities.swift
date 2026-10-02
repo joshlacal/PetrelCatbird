@@ -51,16 +51,16 @@ public enum BlueCatbirdCircleGetCapabilities {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 3)
 
             let enabledValue = try enabled.toCBORValue()
-            map = map.adding(key: "enabled", value: enabledValue)
+            map.append(key: "enabled", value: enabledValue)
 
             let protocolRevisionValue = try protocolRevision.toCBORValue()
-            map = map.adding(key: "protocolRevision", value: protocolRevisionValue)
+            map.append(key: "protocolRevision", value: protocolRevisionValue)
 
             let supportsImagesValue = try supportsImages.toCBORValue()
-            map = map.adding(key: "supportsImages", value: supportsImagesValue)
+            map.append(key: "supportsImages", value: supportsImagesValue)
 
             return map
         }
@@ -126,16 +126,10 @@ public extension ATProtoClient.Blue.Catbird.Circle {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdCircleGetCapabilities.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.circle.getCapabilities: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdCircleGetCapabilities.Output.self, from: responseData, endpoint: "blue.catbird.circle.getCapabilities")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

@@ -6,6 +6,7 @@ import Petrel
 
 public enum PlaceStreamModerationDeletePin {
     public static let typeIdentifier = "place.stream.moderation.deletePin"
+
     public struct Input: ATProtocolCodable {
         public let streamer: DID
         public let pinUri: ATProtocolURI
@@ -29,11 +30,11 @@ public enum PlaceStreamModerationDeletePin {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
             let streamerValue = try streamer.toCBORValue()
-            map = map.adding(key: "streamer", value: streamerValue)
+            map.append(key: "streamer", value: streamerValue)
             let pinUriValue = try pinUri.toCBORValue()
-            map = map.adding(key: "pinUri", value: pinUriValue)
+            map.append(key: "pinUri", value: pinUriValue)
             return map
         }
 
@@ -134,16 +135,10 @@ public extension ATProtoClient.Place.Stream.Moderation {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamModerationDeletePin.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.moderation.deletePin: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamModerationDeletePin.Output.self, from: responseData, endpoint: "place.stream.moderation.deletePin")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

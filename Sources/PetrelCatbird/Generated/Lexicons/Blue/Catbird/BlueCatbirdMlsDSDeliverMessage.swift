@@ -6,6 +6,7 @@ import Petrel
 
 public enum BlueCatbirdMlsDSDeliverMessage {
     public static let typeIdentifier = "blue.catbird.mlsDS.deliverMessage"
+
     public struct Input: ATProtocolCodable {
         public let header: BlueCatbirdMlsDSDefs.EnvelopeHeaderV1
         public let entryBytes: Bytes
@@ -41,17 +42,17 @@ public enum BlueCatbirdMlsDSDeliverMessage {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 5)
             let headerValue = try header.toCBORValue()
-            map = map.adding(key: "header", value: headerValue)
+            map.append(key: "header", value: headerValue)
             let entryBytesValue = try entryBytes.toCBORValue()
-            map = map.adding(key: "entryBytes", value: entryBytesValue)
+            map.append(key: "entryBytes", value: entryBytesValue)
             let signedRequestBytesValue = try signedRequestBytes.toCBORValue()
-            map = map.adding(key: "signedRequestBytes", value: signedRequestBytesValue)
+            map.append(key: "signedRequestBytes", value: signedRequestBytesValue)
             let recipientDidValue = try recipientDid.toCBORValue()
-            map = map.adding(key: "recipientDid", value: recipientDidValue)
+            map.append(key: "recipientDid", value: recipientDidValue)
             let entryLocatorValue = try entryLocator.toCBORValue()
-            map = map.adding(key: "entryLocator", value: entryLocatorValue)
+            map.append(key: "entryLocator", value: entryLocatorValue)
             return map
         }
 
@@ -98,13 +99,13 @@ public enum BlueCatbirdMlsDSDeliverMessage {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
 
             let acceptedValue = try accepted.toCBORValue()
-            map = map.adding(key: "accepted", value: acceptedValue)
+            map.append(key: "accepted", value: acceptedValue)
 
             let receiptValue = try receipt.toCBORValue()
-            map = map.adding(key: "receipt", value: receiptValue)
+            map.append(key: "receipt", value: receiptValue)
 
             return map
         }
@@ -185,16 +186,10 @@ public extension ATProtoClient.Blue.Catbird.MlsDS {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSDeliverMessage.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.deliverMessage: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdMlsDSDeliverMessage.Output.self, from: responseData, endpoint: "blue.catbird.mlsDS.deliverMessage")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

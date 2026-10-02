@@ -39,7 +39,7 @@ public enum BlueCatbirdMlsDSGetFederationMode {
                 overrideMode = try container.decodeIfPresent(String.self, forKey: .overrideMode)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'overrideMode' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("overrideMode", error)
                 overrideMode = nil
             }
 
@@ -58,19 +58,19 @@ public enum BlueCatbirdMlsDSGetFederationMode {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 3)
 
             let effectiveModeValue = try effectiveMode.toCBORValue()
-            map = map.adding(key: "effectiveMode", value: effectiveModeValue)
+            map.append(key: "effectiveMode", value: effectiveModeValue)
 
             if let value = overrideMode {
                 // Encode optional property even if it's an empty array for CBOR
                 let overrideModeValue = try value.toCBORValue()
-                map = map.adding(key: "overrideMode", value: overrideModeValue)
+                map.append(key: "overrideMode", value: overrideModeValue)
             }
 
             let envModeValue = try envMode.toCBORValue()
-            map = map.adding(key: "envMode", value: envModeValue)
+            map.append(key: "envMode", value: envModeValue)
 
             return map
         }
@@ -121,16 +121,10 @@ public extension ATProtoClient.Blue.Catbird.MlsDS {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSGetFederationMode.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.getFederationMode: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdMlsDSGetFederationMode.Output.self, from: responseData, endpoint: "blue.catbird.mlsDS.getFederationMode")
+            return (responseCode, decodedData)
         } else {
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)

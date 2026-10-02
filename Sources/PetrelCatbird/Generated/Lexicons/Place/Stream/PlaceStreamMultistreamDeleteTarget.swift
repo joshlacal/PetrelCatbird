@@ -6,6 +6,7 @@ import Petrel
 
 public enum PlaceStreamMultistreamDeleteTarget {
     public static let typeIdentifier = "place.stream.multistream.deleteTarget"
+
     public struct Input: ATProtocolCodable {
         public let rkey: RecordKey
 
@@ -25,9 +26,9 @@ public enum PlaceStreamMultistreamDeleteTarget {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
             let rkeyValue = try rkey.toCBORValue()
-            map = map.adding(key: "rkey", value: rkeyValue)
+            map.append(key: "rkey", value: rkeyValue)
             return map
         }
 
@@ -111,16 +112,10 @@ public extension ATProtoClient.Place.Stream.Multistream {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamMultistreamDeleteTarget.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.multistream.deleteTarget: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamMultistreamDeleteTarget.Output.self, from: responseData, endpoint: "place.stream.multistream.deleteTarget")
+            return (responseCode, decodedData)
         } else {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)

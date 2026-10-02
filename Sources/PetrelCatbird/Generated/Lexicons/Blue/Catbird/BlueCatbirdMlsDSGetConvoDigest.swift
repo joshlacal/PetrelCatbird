@@ -110,31 +110,31 @@ public enum BlueCatbirdMlsDSGetConvoDigest {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 8)
 
             let convoIdValue = try convoId.toCBORValue()
-            map = map.adding(key: "convoId", value: convoIdValue)
+            map.append(key: "convoId", value: convoIdValue)
 
             let sequencerDsDidValue = try sequencerDsDid.toCBORValue()
-            map = map.adding(key: "sequencerDsDid", value: sequencerDsDidValue)
+            map.append(key: "sequencerDsDid", value: sequencerDsDidValue)
 
             let sequencerTermValue = try sequencerTerm.toCBORValue()
-            map = map.adding(key: "sequencerTerm", value: sequencerTermValue)
+            map.append(key: "sequencerTerm", value: sequencerTermValue)
 
             let epochValue = try epoch.toCBORValue()
-            map = map.adding(key: "epoch", value: epochValue)
+            map.append(key: "epoch", value: epochValue)
 
             let lastSeqValue = try lastSeq.toCBORValue()
-            map = map.adding(key: "lastSeq", value: lastSeqValue)
+            map.append(key: "lastSeq", value: lastSeqValue)
 
             let eventCountValue = try eventCount.toCBORValue()
-            map = map.adding(key: "eventCount", value: eventCountValue)
+            map.append(key: "eventCount", value: eventCountValue)
 
             let digestSha256Value = try digestSha256.toCBORValue()
-            map = map.adding(key: "digestSha256", value: digestSha256Value)
+            map.append(key: "digestSha256", value: digestSha256Value)
 
             let generatedAtValue = try generatedAt.toCBORValue()
-            map = map.adding(key: "generatedAt", value: generatedAtValue)
+            map.append(key: "generatedAt", value: generatedAtValue)
 
             return map
         }
@@ -204,16 +204,10 @@ public extension ATProtoClient.Blue.Catbird.MlsDS {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSGetConvoDigest.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.getConvoDigest: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdMlsDSGetConvoDigest.Output.self, from: responseData, endpoint: "blue.catbird.mlsDS.getConvoDigest")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

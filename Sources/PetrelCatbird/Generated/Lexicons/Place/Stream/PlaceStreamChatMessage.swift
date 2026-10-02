@@ -21,22 +21,27 @@ public struct PlaceStreamChatMessage: ATProtocolCodable, ATProtocolValue {
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        text = try container.decode(String.self, forKey: .text)
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+    }
+
+    /// Decodes from an already-opened keyed container. Generated unions pass the
+    /// container they read `$type` from, so the object's keys are materialized once.
+    public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
+        text = try container.decode(String.self, forKey: "text")
+        createdAt = try container.decode(ATProtocolDate.self, forKey: "createdAt")
         do {
-            facets = try container.decodeIfPresent([PlaceStreamRichtextFacet].self, forKey: .facets)
+            facets = try container.decodeIfPresent([PlaceStreamRichtextFacet].self, forKey: "facets")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'facets' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("facets", error)
             facets = nil
         }
-        streamer = try container.decode(DID.self, forKey: .streamer)
+        streamer = try container.decode(DID.self, forKey: "streamer")
         do {
-            reply = try container.decodeIfPresent(ReplyRef.self, forKey: .reply)
+            reply = try container.decodeIfPresent(ReplyRef.self, forKey: "reply")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'reply' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("reply", error)
             reply = nil
         }
     }
@@ -52,27 +57,27 @@ public struct PlaceStreamChatMessage: ATProtocolCodable, ATProtocolValue {
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
+        if lhs.text != rhs.text {
+            return false
+        }
+        if lhs.createdAt != rhs.createdAt {
+            return false
+        }
+        if lhs.facets != rhs.facets {
+            return false
+        }
+        if lhs.streamer != rhs.streamer {
+            return false
+        }
+        if lhs.reply != rhs.reply {
+            return false
+        }
+        return true
     }
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if text != other.text {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        if facets != other.facets {
-            return false
-        }
-        if streamer != other.streamer {
-            return false
-        }
-        if reply != other.reply {
-            return false
-        }
-        return true
+        return self == other
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -92,21 +97,21 @@ public struct PlaceStreamChatMessage: ATProtocolCodable, ATProtocolValue {
     }
 
     public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
-        map = map.adding(key: "$type", value: Self.typeIdentifier)
+        var map = OrderedCBORMap(minimumCapacity: 6)
+        map.append(key: "$type", value: Self.typeIdentifier)
         let textValue = try text.toCBORValue()
-        map = map.adding(key: "text", value: textValue)
+        map.append(key: "text", value: textValue)
         let createdAtValue = try createdAt.toCBORValue()
-        map = map.adding(key: "createdAt", value: createdAtValue)
+        map.append(key: "createdAt", value: createdAtValue)
         if let value = facets {
             let facetsValue = try value.toCBORValue()
-            map = map.adding(key: "facets", value: facetsValue)
+            map.append(key: "facets", value: facetsValue)
         }
         let streamerValue = try streamer.toCBORValue()
-        map = map.adding(key: "streamer", value: streamerValue)
+        map.append(key: "streamer", value: streamerValue)
         if let value = reply {
             let replyValue = try value.toCBORValue()
-            map = map.adding(key: "reply", value: replyValue)
+            map.append(key: "reply", value: replyValue)
         }
         return map
     }
@@ -133,17 +138,22 @@ public struct PlaceStreamChatMessage: ATProtocolCodable, ATProtocolValue {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                root = try container.decode(ComAtprotoRepoStrongRef.self, forKey: .root)
+                root = try container.decode(ComAtprotoRepoStrongRef.self, forKey: "root")
             } catch {
-                LogManager.logError("Decoding error for required property 'root': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("root", error)
                 throw error
             }
             do {
-                parent = try container.decode(ComAtprotoRepoStrongRef.self, forKey: .parent)
+                parent = try container.decode(ComAtprotoRepoStrongRef.self, forKey: "parent")
             } catch {
-                LogManager.logError("Decoding error for required property 'parent': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("parent", error)
                 throw error
             }
         }
@@ -162,26 +172,26 @@ public struct PlaceStreamChatMessage: ATProtocolCodable, ATProtocolValue {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if root != other.root {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.root != rhs.root {
                 return false
             }
-            if parent != other.parent {
+            if lhs.parent != rhs.parent {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 3)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let rootValue = try root.toCBORValue()
-            map = map.adding(key: "root", value: rootValue)
+            map.append(key: "root", value: rootValue)
             let parentValue = try parent.toCBORValue()
-            map = map.adding(key: "parent", value: parentValue)
+            map.append(key: "parent", value: parentValue)
             return map
         }
 

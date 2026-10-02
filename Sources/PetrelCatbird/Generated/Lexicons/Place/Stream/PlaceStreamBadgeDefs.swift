@@ -24,31 +24,36 @@ public enum PlaceStreamBadgeDefs {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                badgeType = try container.decode(String.self, forKey: .badgeType)
+                badgeType = try container.decode(String.self, forKey: "badgeType")
             } catch {
-                LogManager.logError("Decoding error for required property 'badgeType': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("badgeType", error)
                 throw error
             }
             do {
-                issuer = try container.decode(DID.self, forKey: .issuer)
+                issuer = try container.decode(DID.self, forKey: "issuer")
             } catch {
-                LogManager.logError("Decoding error for required property 'issuer': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("issuer", error)
                 throw error
             }
             do {
-                recipient = try container.decode(DID.self, forKey: .recipient)
+                recipient = try container.decode(DID.self, forKey: "recipient")
             } catch {
-                LogManager.logError("Decoding error for required property 'recipient': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("recipient", error)
                 throw error
             }
             do {
-                signature = try container.decodeIfPresent(String.self, forKey: .signature)
+                signature = try container.decodeIfPresent(String.self, forKey: "signature")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'signature' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("signature", error)
                 signature = nil
             }
         }
@@ -75,37 +80,37 @@ public enum PlaceStreamBadgeDefs {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if badgeType != other.badgeType {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.badgeType != rhs.badgeType {
                 return false
             }
-            if issuer != other.issuer {
+            if lhs.issuer != rhs.issuer {
                 return false
             }
-            if recipient != other.recipient {
+            if lhs.recipient != rhs.recipient {
                 return false
             }
-            if signature != other.signature {
+            if lhs.signature != rhs.signature {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 5)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let badgeTypeValue = try badgeType.toCBORValue()
-            map = map.adding(key: "badgeType", value: badgeTypeValue)
+            map.append(key: "badgeType", value: badgeTypeValue)
             let issuerValue = try issuer.toCBORValue()
-            map = map.adding(key: "issuer", value: issuerValue)
+            map.append(key: "issuer", value: issuerValue)
             let recipientValue = try recipient.toCBORValue()
-            map = map.adding(key: "recipient", value: recipientValue)
+            map.append(key: "recipient", value: recipientValue)
             if let value = signature {
                 let signatureValue = try value.toCBORValue()
-                map = map.adding(key: "signature", value: signatureValue)
+                map.append(key: "signature", value: signatureValue)
             }
             return map
         }

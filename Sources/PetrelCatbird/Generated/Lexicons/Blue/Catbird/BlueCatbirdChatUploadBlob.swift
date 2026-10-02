@@ -38,9 +38,9 @@ public enum BlueCatbirdChatUploadBlob {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
             let dataValue = try data.toCBORValue()
-            map = map.adding(key: "data", value: dataValue)
+            map.append(key: "data", value: dataValue)
             return map
         }
 
@@ -83,13 +83,13 @@ public enum BlueCatbirdChatUploadBlob {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
 
             let bindingValue = try binding.toCBORValue()
-            map = map.adding(key: "binding", value: bindingValue)
+            map.append(key: "binding", value: bindingValue)
 
             let uploadedAtValue = try uploadedAt.toCBORValue()
-            map = map.adding(key: "uploadedAt", value: uploadedAtValue)
+            map.append(key: "uploadedAt", value: uploadedAtValue)
 
             return map
         }
@@ -176,16 +176,10 @@ public extension ATProtoClient.Blue.Catbird.Chat {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatUploadBlob.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.uploadBlob: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdChatUploadBlob.Output.self, from: responseData, endpoint: "blue.catbird.chat.uploadBlob")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

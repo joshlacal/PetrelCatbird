@@ -15,9 +15,14 @@ public struct PlaceStreamLiveRecommendations: ATProtocolCodable, ATProtocolValue
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        streamers = try container.decode([DID].self, forKey: .streamers)
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+    }
+
+    /// Decodes from an already-opened keyed container. Generated unions pass the
+    /// container they read `$type` from, so the object's keys are materialized once.
+    public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
+        streamers = try container.decode([DID].self, forKey: "streamers")
+        createdAt = try container.decode(ATProtocolDate.self, forKey: "createdAt")
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -28,18 +33,18 @@ public struct PlaceStreamLiveRecommendations: ATProtocolCodable, ATProtocolValue
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
+        if lhs.streamers != rhs.streamers {
+            return false
+        }
+        if lhs.createdAt != rhs.createdAt {
+            return false
+        }
+        return true
     }
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if streamers != other.streamers {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        return true
+        return self == other
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -48,12 +53,12 @@ public struct PlaceStreamLiveRecommendations: ATProtocolCodable, ATProtocolValue
     }
 
     public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
-        map = map.adding(key: "$type", value: Self.typeIdentifier)
+        var map = OrderedCBORMap(minimumCapacity: 3)
+        map.append(key: "$type", value: Self.typeIdentifier)
         let streamersValue = try streamers.toCBORValue()
-        map = map.adding(key: "streamers", value: streamersValue)
+        map.append(key: "streamers", value: streamersValue)
         let createdAtValue = try createdAt.toCBORValue()
-        map = map.adding(key: "createdAt", value: createdAtValue)
+        map.append(key: "createdAt", value: createdAtValue)
         return map
     }
 

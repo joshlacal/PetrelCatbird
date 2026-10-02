@@ -6,6 +6,7 @@ import Petrel
 
 public enum BlueCatbirdChatCancelLeafRecovery {
     public static let typeIdentifier = "blue.catbird.chat.cancelLeafRecovery"
+
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedLeafRecoveryCancellation
 
@@ -25,9 +26,9 @@ public enum BlueCatbirdChatCancelLeafRecovery {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
             let signedRequestValue = try signedRequest.toCBORValue()
-            map = map.adding(key: "signedRequest", value: signedRequestValue)
+            map.append(key: "signedRequest", value: signedRequestValue)
             return map
         }
 
@@ -60,10 +61,10 @@ public enum BlueCatbirdChatCancelLeafRecovery {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
 
             let recoveryValue = try recovery.toCBORValue()
-            map = map.adding(key: "recovery", value: recoveryValue)
+            map.append(key: "recovery", value: recoveryValue)
 
             return map
         }
@@ -150,16 +151,10 @@ public extension ATProtoClient.Blue.Catbird.Chat {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatCancelLeafRecovery.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.cancelLeafRecovery: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdChatCancelLeafRecovery.Output.self, from: responseData, endpoint: "blue.catbird.chat.cancelLeafRecovery")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

@@ -13,12 +13,17 @@ public struct PlaceStreamChatProfile: ATProtocolCodable, ATProtocolValue {
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+    }
+
+    /// Decodes from an already-opened keyed container. Generated unions pass the
+    /// container they read `$type` from, so the object's keys are materialized once.
+    public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
         do {
-            color = try container.decodeIfPresent(Color.self, forKey: .color)
+            color = try container.decodeIfPresent(Color.self, forKey: "color")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'color' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("color", error)
             color = nil
         }
     }
@@ -30,15 +35,15 @@ public struct PlaceStreamChatProfile: ATProtocolCodable, ATProtocolValue {
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
+        if lhs.color != rhs.color {
+            return false
+        }
+        return true
     }
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if color != other.color {
-            return false
-        }
-        return true
+        return self == other
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -50,11 +55,11 @@ public struct PlaceStreamChatProfile: ATProtocolCodable, ATProtocolValue {
     }
 
     public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
-        map = map.adding(key: "$type", value: Self.typeIdentifier)
+        var map = OrderedCBORMap(minimumCapacity: 2)
+        map.append(key: "$type", value: Self.typeIdentifier)
         if let value = color {
             let colorValue = try value.toCBORValue()
-            map = map.adding(key: "color", value: colorValue)
+            map.append(key: "color", value: colorValue)
         }
         return map
     }
@@ -79,23 +84,28 @@ public struct PlaceStreamChatProfile: ATProtocolCodable, ATProtocolValue {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                red = try container.decode(Int.self, forKey: .red)
+                red = try container.decode(Int.self, forKey: "red")
             } catch {
-                LogManager.logError("Decoding error for required property 'red': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("red", error)
                 throw error
             }
             do {
-                green = try container.decode(Int.self, forKey: .green)
+                green = try container.decode(Int.self, forKey: "green")
             } catch {
-                LogManager.logError("Decoding error for required property 'green': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("green", error)
                 throw error
             }
             do {
-                blue = try container.decode(Int.self, forKey: .blue)
+                blue = try container.decode(Int.self, forKey: "blue")
             } catch {
-                LogManager.logError("Decoding error for required property 'blue': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("blue", error)
                 throw error
             }
         }
@@ -116,31 +126,31 @@ public struct PlaceStreamChatProfile: ATProtocolCodable, ATProtocolValue {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if red != other.red {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.red != rhs.red {
                 return false
             }
-            if green != other.green {
+            if lhs.green != rhs.green {
                 return false
             }
-            if blue != other.blue {
+            if lhs.blue != rhs.blue {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 4)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let redValue = try red.toCBORValue()
-            map = map.adding(key: "red", value: redValue)
+            map.append(key: "red", value: redValue)
             let greenValue = try green.toCBORValue()
-            map = map.adding(key: "green", value: greenValue)
+            map.append(key: "green", value: greenValue)
             let blueValue = try blue.toCBORValue()
-            map = map.adding(key: "blue", value: blueValue)
+            map.append(key: "blue", value: blueValue)
             return map
         }
 

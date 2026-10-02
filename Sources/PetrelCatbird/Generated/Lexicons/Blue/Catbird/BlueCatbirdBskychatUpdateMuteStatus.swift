@@ -6,6 +6,7 @@ import Petrel
 
 public enum BlueCatbirdBskychatUpdateMuteStatus {
     public static let typeIdentifier = "blue.catbird.bskychat.updateMuteStatus"
+
     public struct Input: ATProtocolCodable {
         public let convoId: String
         public let muted: Bool
@@ -29,11 +30,11 @@ public enum BlueCatbirdBskychatUpdateMuteStatus {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
             let convoIdValue = try convoId.toCBORValue()
-            map = map.adding(key: "convoId", value: convoIdValue)
+            map.append(key: "convoId", value: convoIdValue)
             let mutedValue = try muted.toCBORValue()
-            map = map.adding(key: "muted", value: mutedValue)
+            map.append(key: "muted", value: mutedValue)
             return map
         }
 
@@ -67,10 +68,10 @@ public enum BlueCatbirdBskychatUpdateMuteStatus {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
 
             let successValue = try success.toCBORValue()
-            map = map.adding(key: "success", value: successValue)
+            map.append(key: "success", value: successValue)
 
             return map
         }
@@ -133,16 +134,10 @@ public extension ATProtoClient.Blue.Catbird.Bskychat {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdBskychatUpdateMuteStatus.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.bskychat.updateMuteStatus: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdBskychatUpdateMuteStatus.Output.self, from: responseData, endpoint: "blue.catbird.bskychat.updateMuteStatus")
+            return (responseCode, decodedData)
         } else {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)

@@ -6,6 +6,7 @@ import Petrel
 
 public enum PlaceStreamModerationCreateGate {
     public static let typeIdentifier = "place.stream.moderation.createGate"
+
     public struct Input: ATProtocolCodable {
         public let streamer: DID
         public let messageUri: ATProtocolURI
@@ -29,11 +30,11 @@ public enum PlaceStreamModerationCreateGate {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
             let streamerValue = try streamer.toCBORValue()
-            map = map.adding(key: "streamer", value: streamerValue)
+            map.append(key: "streamer", value: streamerValue)
             let messageUriValue = try messageUri.toCBORValue()
-            map = map.adding(key: "messageUri", value: messageUriValue)
+            map.append(key: "messageUri", value: messageUriValue)
             return map
         }
 
@@ -77,13 +78,13 @@ public enum PlaceStreamModerationCreateGate {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
 
             let uriValue = try uri.toCBORValue()
-            map = map.adding(key: "uri", value: uriValue)
+            map.append(key: "uri", value: uriValue)
 
             let cidValue = try cid.toCBORValue()
-            map = map.adding(key: "cid", value: cidValue)
+            map.append(key: "cid", value: cidValue)
 
             return map
         }
@@ -163,16 +164,10 @@ public extension ATProtoClient.Place.Stream.Moderation {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamModerationCreateGate.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.moderation.createGate: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamModerationCreateGate.Output.self, from: responseData, endpoint: "place.stream.moderation.createGate")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

@@ -20,17 +20,22 @@ public enum PlaceStreamIngestDefs {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                type = try container.decode(String.self, forKey: .type)
+                type = try container.decode(String.self, forKey: "type")
             } catch {
-                LogManager.logError("Decoding error for required property 'type': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("type", error)
                 throw error
             }
             do {
-                url = try container.decode(URI.self, forKey: .url)
+                url = try container.decode(URI.self, forKey: "url")
             } catch {
-                LogManager.logError("Decoding error for required property 'url': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("url", error)
                 throw error
             }
         }
@@ -49,26 +54,26 @@ public enum PlaceStreamIngestDefs {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if type != other.type {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.type != rhs.type {
                 return false
             }
-            if url != other.url {
+            if lhs.url != rhs.url {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 3)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let typeValue = try type.toCBORValue()
-            map = map.adding(key: "type", value: typeValue)
+            map.append(key: "type", value: typeValue)
             let urlValue = try url.toCBORValue()
-            map = map.adding(key: "url", value: urlValue)
+            map.append(key: "url", value: urlValue)
             return map
         }
 

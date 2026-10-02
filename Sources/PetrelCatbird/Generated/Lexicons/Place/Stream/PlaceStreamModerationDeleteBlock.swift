@@ -6,6 +6,7 @@ import Petrel
 
 public enum PlaceStreamModerationDeleteBlock {
     public static let typeIdentifier = "place.stream.moderation.deleteBlock"
+
     public struct Input: ATProtocolCodable {
         public let streamer: DID
         public let blockUri: ATProtocolURI
@@ -29,11 +30,11 @@ public enum PlaceStreamModerationDeleteBlock {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
             let streamerValue = try streamer.toCBORValue()
-            map = map.adding(key: "streamer", value: streamerValue)
+            map.append(key: "streamer", value: streamerValue)
             let blockUriValue = try blockUri.toCBORValue()
-            map = map.adding(key: "blockUri", value: blockUriValue)
+            map.append(key: "blockUri", value: blockUriValue)
             return map
         }
 
@@ -134,16 +135,10 @@ public extension ATProtoClient.Place.Stream.Moderation {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamModerationDeleteBlock.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.moderation.deleteBlock: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamModerationDeleteBlock.Output.self, from: responseData, endpoint: "place.stream.moderation.deleteBlock")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

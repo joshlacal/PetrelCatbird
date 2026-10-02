@@ -13,12 +13,17 @@ public struct PlaceStreamServerSettings: ATProtocolCodable, ATProtocolValue {
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+    }
+
+    /// Decodes from an already-opened keyed container. Generated unions pass the
+    /// container they read `$type` from, so the object's keys are materialized once.
+    public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
         do {
-            debugRecording = try container.decodeIfPresent(Bool.self, forKey: .debugRecording)
+            debugRecording = try container.decodeIfPresent(Bool.self, forKey: "debugRecording")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'debugRecording' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("debugRecording", error)
             debugRecording = nil
         }
     }
@@ -30,15 +35,15 @@ public struct PlaceStreamServerSettings: ATProtocolCodable, ATProtocolValue {
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
+        if lhs.debugRecording != rhs.debugRecording {
+            return false
+        }
+        return true
     }
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if debugRecording != other.debugRecording {
-            return false
-        }
-        return true
+        return self == other
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -50,11 +55,11 @@ public struct PlaceStreamServerSettings: ATProtocolCodable, ATProtocolValue {
     }
 
     public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
-        map = map.adding(key: "$type", value: Self.typeIdentifier)
+        var map = OrderedCBORMap(minimumCapacity: 2)
+        map.append(key: "$type", value: Self.typeIdentifier)
         if let value = debugRecording {
             let debugRecordingValue = try value.toCBORValue()
-            map = map.adding(key: "debugRecording", value: debugRecordingValue)
+            map.append(key: "debugRecording", value: debugRecordingValue)
         }
         return map
     }

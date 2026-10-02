@@ -19,15 +19,20 @@ public struct PlaceStreamModerationPermission: ATProtocolCodable, ATProtocolValu
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        moderator = try container.decode(DID.self, forKey: .moderator)
-        permissions = try container.decode([PlaceStreamModerationPermissionPermissions].self, forKey: .permissions)
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+    }
+
+    /// Decodes from an already-opened keyed container. Generated unions pass the
+    /// container they read `$type` from, so the object's keys are materialized once.
+    public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
+        moderator = try container.decode(DID.self, forKey: "moderator")
+        permissions = try container.decode([PlaceStreamModerationPermissionPermissions].self, forKey: "permissions")
+        createdAt = try container.decode(ATProtocolDate.self, forKey: "createdAt")
         do {
-            expirationTime = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expirationTime)
+            expirationTime = try container.decodeIfPresent(ATProtocolDate.self, forKey: "expirationTime")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'expirationTime' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("expirationTime", error)
             expirationTime = nil
         }
     }
@@ -42,24 +47,24 @@ public struct PlaceStreamModerationPermission: ATProtocolCodable, ATProtocolValu
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
+        if lhs.moderator != rhs.moderator {
+            return false
+        }
+        if lhs.permissions != rhs.permissions {
+            return false
+        }
+        if lhs.createdAt != rhs.createdAt {
+            return false
+        }
+        if lhs.expirationTime != rhs.expirationTime {
+            return false
+        }
+        return true
     }
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if moderator != other.moderator {
-            return false
-        }
-        if permissions != other.permissions {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        if expirationTime != other.expirationTime {
-            return false
-        }
-        return true
+        return self == other
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -74,17 +79,17 @@ public struct PlaceStreamModerationPermission: ATProtocolCodable, ATProtocolValu
     }
 
     public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
-        map = map.adding(key: "$type", value: Self.typeIdentifier)
+        var map = OrderedCBORMap(minimumCapacity: 5)
+        map.append(key: "$type", value: Self.typeIdentifier)
         let moderatorValue = try moderator.toCBORValue()
-        map = map.adding(key: "moderator", value: moderatorValue)
+        map.append(key: "moderator", value: moderatorValue)
         let permissionsValue = try permissions.toCBORValue()
-        map = map.adding(key: "permissions", value: permissionsValue)
+        map.append(key: "permissions", value: permissionsValue)
         let createdAtValue = try createdAt.toCBORValue()
-        map = map.adding(key: "createdAt", value: createdAtValue)
+        map.append(key: "createdAt", value: createdAtValue)
         if let value = expirationTime {
             let expirationTimeValue = try value.toCBORValue()
-            map = map.adding(key: "expirationTime", value: expirationTimeValue)
+            map.append(key: "expirationTime", value: expirationTimeValue)
         }
         return map
     }

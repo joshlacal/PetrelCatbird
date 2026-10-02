@@ -59,13 +59,13 @@ public enum BlueCatbirdCircleGetPostThread {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
 
             let threadValue = try thread.toCBORValue()
-            map = map.adding(key: "thread", value: threadValue)
+            map.append(key: "thread", value: threadValue)
 
             let circleValue = try circle.toCBORValue()
-            map = map.adding(key: "circle", value: circleValue)
+            map.append(key: "circle", value: circleValue)
 
             return map
         }
@@ -132,16 +132,10 @@ public extension ATProtoClient.Blue.Catbird.Circle {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdCircleGetPostThread.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.circle.getPostThread: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdCircleGetPostThread.Output.self, from: responseData, endpoint: "blue.catbird.circle.getPostThread")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

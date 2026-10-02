@@ -6,6 +6,7 @@ import Petrel
 
 public enum BlueCatbirdChatSubmitTransition {
     public static let typeIdentifier = "blue.catbird.chat.submitTransition"
+
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedTransition
 
@@ -25,9 +26,9 @@ public enum BlueCatbirdChatSubmitTransition {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
             let signedRequestValue = try signedRequest.toCBORValue()
-            map = map.adding(key: "signedRequest", value: signedRequestValue)
+            map.append(key: "signedRequest", value: signedRequestValue)
             return map
         }
 
@@ -36,7 +37,7 @@ public enum BlueCatbirdChatSubmitTransition {
         }
     }
 
-    public struct Output: ATProtocolCodable {
+    public struct Output: ATProtocolCodable, XRPCParallelArrayDecodable {
         public let coordinates: BlueCatbirdChatDefs.ConversationCoordinates
 
         public let entry: BlueCatbirdChatDefs.ConversationEntry
@@ -80,18 +81,32 @@ public enum BlueCatbirdChatSubmitTransition {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 3)
 
             let coordinatesValue = try coordinates.toCBORValue()
-            map = map.adding(key: "coordinates", value: coordinatesValue)
+            map.append(key: "coordinates", value: coordinatesValue)
 
             let entryValue = try entry.toCBORValue()
-            map = map.adding(key: "entry", value: entryValue)
+            map.append(key: "entry", value: entryValue)
 
             let welcomesValue = try welcomes.toCBORValue()
-            map = map.adding(key: "welcomes", value: welcomesValue)
+            map.append(key: "welcomes", value: welcomesValue)
 
             return map
+        }
+
+        // MARK: - Parallel array decoding support (used only by XRPCResponseDecoding's opt-in parallel path)
+
+        public typealias ParallelArrayElement = BlueCatbirdChatDefs.WelcomeView
+
+        public static var parallelArrayKey: String {
+            "welcomes"
+        }
+
+        public init(parallelArrayPrototype prototype: Output, parallelArrayElements elements: [ParallelArrayElement]) {
+            coordinates = prototype.coordinates
+            entry = prototype.entry
+            welcomes = elements
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -212,16 +227,10 @@ public extension ATProtoClient.Blue.Catbird.Chat {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatSubmitTransition.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.submitTransition: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdChatSubmitTransition.Output.self, from: responseData, endpoint: "blue.catbird.chat.submitTransition")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

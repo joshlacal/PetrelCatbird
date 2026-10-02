@@ -44,9 +44,9 @@ public enum PlaceStreamPlaybackWhep {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
             let dataValue = try data.toCBORValue()
-            map = map.adding(key: "data", value: dataValue)
+            map.append(key: "data", value: dataValue)
             return map
         }
 
@@ -79,10 +79,10 @@ public enum PlaceStreamPlaybackWhep {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
 
             let dataValue = try data.toCBORValue()
-            map = map.adding(key: "data", value: dataValue)
+            map.append(key: "data", value: dataValue)
 
             return map
         }
@@ -172,7 +172,7 @@ extension ATProtoClient.Place.Stream.Playback {
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.playback.whep: \(error)")
+                _LexiconDecodeDiagnostics.successfulResponseDecodeFailed("place.stream.playback.whep", error)
                 return (responseCode, nil)
             }
         } else {

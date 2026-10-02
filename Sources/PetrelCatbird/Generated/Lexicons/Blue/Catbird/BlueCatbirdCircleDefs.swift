@@ -28,45 +28,50 @@ public enum BlueCatbirdCircleDefs {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                uri = try container.decode(SpaceRef.self, forKey: .uri)
+                uri = try container.decode(SpaceRef.self, forKey: "uri")
             } catch {
-                LogManager.logError("Decoding error for required property 'uri': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("uri", error)
                 throw error
             }
             do {
-                circleId = try container.decode(TID.self, forKey: .circleId)
+                circleId = try container.decode(TID.self, forKey: "circleId")
             } catch {
-                LogManager.logError("Decoding error for required property 'circleId': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("circleId", error)
                 throw error
             }
             do {
-                name = try container.decode(String.self, forKey: .name)
+                name = try container.decode(String.self, forKey: "name")
             } catch {
-                LogManager.logError("Decoding error for required property 'name': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("name", error)
                 throw error
             }
             do {
-                owner = try container.decode(DID.self, forKey: .owner)
+                owner = try container.decode(DID.self, forKey: "owner")
             } catch {
-                LogManager.logError("Decoding error for required property 'owner': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("owner", error)
                 throw error
             }
             do {
-                memberCount = try container.decodeIfPresent(Int.self, forKey: .memberCount)
+                memberCount = try container.decodeIfPresent(Int.self, forKey: "memberCount")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'memberCount' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("memberCount", error)
                 memberCount = nil
             }
             do {
-                muted = try container.decodeIfPresent(Bool.self, forKey: .muted)
+                muted = try container.decodeIfPresent(Bool.self, forKey: "muted")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'muted' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("muted", error)
                 muted = nil
             }
         }
@@ -101,49 +106,49 @@ public enum BlueCatbirdCircleDefs {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if uri != other.uri {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.uri != rhs.uri {
                 return false
             }
-            if circleId != other.circleId {
+            if lhs.circleId != rhs.circleId {
                 return false
             }
-            if name != other.name {
+            if lhs.name != rhs.name {
                 return false
             }
-            if owner != other.owner {
+            if lhs.owner != rhs.owner {
                 return false
             }
-            if memberCount != other.memberCount {
+            if lhs.memberCount != rhs.memberCount {
                 return false
             }
-            if muted != other.muted {
+            if lhs.muted != rhs.muted {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 7)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let uriValue = try uri.toCBORValue()
-            map = map.adding(key: "uri", value: uriValue)
+            map.append(key: "uri", value: uriValue)
             let circleIdValue = try circleId.toCBORValue()
-            map = map.adding(key: "circleId", value: circleIdValue)
+            map.append(key: "circleId", value: circleIdValue)
             let nameValue = try name.toCBORValue()
-            map = map.adding(key: "name", value: nameValue)
+            map.append(key: "name", value: nameValue)
             let ownerValue = try owner.toCBORValue()
-            map = map.adding(key: "owner", value: ownerValue)
+            map.append(key: "owner", value: ownerValue)
             if let value = memberCount {
                 let memberCountValue = try value.toCBORValue()
-                map = map.adding(key: "memberCount", value: memberCountValue)
+                map.append(key: "memberCount", value: memberCountValue)
             }
             if let value = muted {
                 let mutedValue = try value.toCBORValue()
-                map = map.adding(key: "muted", value: mutedValue)
+                map.append(key: "muted", value: mutedValue)
             }
             return map
         }
@@ -172,17 +177,22 @@ public enum BlueCatbirdCircleDefs {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                post = try container.decode(AppBskyFeedDefs.FeedViewPost.self, forKey: .post)
+                post = try container.decode(AppBskyFeedDefs.FeedViewPost.self, forKey: "post")
             } catch {
-                LogManager.logError("Decoding error for required property 'post': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("post", error)
                 throw error
             }
             do {
-                circle = try container.decode(CircleSummary.self, forKey: .circle)
+                circle = try container.decode(CircleSummary.self, forKey: "circle")
             } catch {
-                LogManager.logError("Decoding error for required property 'circle': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("circle", error)
                 throw error
             }
         }
@@ -201,26 +211,26 @@ public enum BlueCatbirdCircleDefs {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if post != other.post {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.post != rhs.post {
                 return false
             }
-            if circle != other.circle {
+            if lhs.circle != rhs.circle {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 3)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let postValue = try post.toCBORValue()
-            map = map.adding(key: "post", value: postValue)
+            map.append(key: "post", value: postValue)
             let circleValue = try circle.toCBORValue()
-            map = map.adding(key: "circle", value: circleValue)
+            map.append(key: "circle", value: circleValue)
             return map
         }
 
@@ -252,43 +262,48 @@ public enum BlueCatbirdCircleDefs {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                id = try container.decode(String.self, forKey: .id)
+                id = try container.decode(String.self, forKey: "id")
             } catch {
-                LogManager.logError("Decoding error for required property 'id': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("id", error)
                 throw error
             }
             do {
-                reason = try container.decode(NotificationReason.self, forKey: .reason)
+                reason = try container.decode(NotificationReason.self, forKey: "reason")
             } catch {
-                LogManager.logError("Decoding error for required property 'reason': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("reason", error)
                 throw error
             }
             do {
-                actor = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .actor)
+                actor = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: "actor")
             } catch {
-                LogManager.logError("Decoding error for required property 'actor': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("actor", error)
                 throw error
             }
             do {
-                subject = try container.decodeIfPresent(ATProtocolURI.self, forKey: .subject)
+                subject = try container.decodeIfPresent(ATProtocolURI.self, forKey: "subject")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'subject' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("subject", error)
                 subject = nil
             }
             do {
-                indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
+                indexedAt = try container.decode(ATProtocolDate.self, forKey: "indexedAt")
             } catch {
-                LogManager.logError("Decoding error for required property 'indexedAt': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("indexedAt", error)
                 throw error
             }
             do {
-                circle = try container.decode(CircleSummary.self, forKey: .circle)
+                circle = try container.decode(CircleSummary.self, forKey: "circle")
             } catch {
-                LogManager.logError("Decoding error for required property 'circle': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("circle", error)
                 throw error
             }
         }
@@ -319,48 +334,48 @@ public enum BlueCatbirdCircleDefs {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if id != other.id {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.id != rhs.id {
                 return false
             }
-            if reason != other.reason {
+            if lhs.reason != rhs.reason {
                 return false
             }
-            if actor != other.actor {
+            if lhs.actor != rhs.actor {
                 return false
             }
-            if subject != other.subject {
+            if lhs.subject != rhs.subject {
                 return false
             }
-            if indexedAt != other.indexedAt {
+            if lhs.indexedAt != rhs.indexedAt {
                 return false
             }
-            if circle != other.circle {
+            if lhs.circle != rhs.circle {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 7)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let idValue = try id.toCBORValue()
-            map = map.adding(key: "id", value: idValue)
+            map.append(key: "id", value: idValue)
             let reasonValue = try reason.toCBORValue()
-            map = map.adding(key: "reason", value: reasonValue)
+            map.append(key: "reason", value: reasonValue)
             let actorValue = try actor.toCBORValue()
-            map = map.adding(key: "actor", value: actorValue)
+            map.append(key: "actor", value: actorValue)
             if let value = subject {
                 let subjectValue = try value.toCBORValue()
-                map = map.adding(key: "subject", value: subjectValue)
+                map.append(key: "subject", value: subjectValue)
             }
             let indexedAtValue = try indexedAt.toCBORValue()
-            map = map.adding(key: "indexedAt", value: indexedAtValue)
+            map.append(key: "indexedAt", value: indexedAtValue)
             let circleValue = try circle.toCBORValue()
-            map = map.adding(key: "circle", value: circleValue)
+            map.append(key: "circle", value: circleValue)
             return map
         }
 

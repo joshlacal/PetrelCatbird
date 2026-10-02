@@ -6,6 +6,7 @@ import Petrel
 
 public enum BlueCatbirdMlsDSDeleteFederationPeer {
     public static let typeIdentifier = "blue.catbird.mlsDS.deleteFederationPeer"
+
     public struct Input: ATProtocolCodable {
         public let dsDid: String
 
@@ -25,9 +26,9 @@ public enum BlueCatbirdMlsDSDeleteFederationPeer {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
             let dsDidValue = try dsDid.toCBORValue()
-            map = map.adding(key: "dsDid", value: dsDidValue)
+            map.append(key: "dsDid", value: dsDidValue)
             return map
         }
 
@@ -70,13 +71,13 @@ public enum BlueCatbirdMlsDSDeleteFederationPeer {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
 
             let deletedValue = try deleted.toCBORValue()
-            map = map.adding(key: "deleted", value: deletedValue)
+            map.append(key: "deleted", value: deletedValue)
 
             let dsDidValue = try dsDid.toCBORValue()
-            map = map.adding(key: "dsDid", value: dsDidValue)
+            map.append(key: "dsDid", value: dsDidValue)
 
             return map
         }
@@ -140,16 +141,10 @@ public extension ATProtoClient.Blue.Catbird.MlsDS {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSDeleteFederationPeer.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.deleteFederationPeer: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdMlsDSDeleteFederationPeer.Output.self, from: responseData, endpoint: "blue.catbird.mlsDS.deleteFederationPeer")
+            return (responseCode, decodedData)
         } else {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)

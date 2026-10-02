@@ -24,31 +24,36 @@ public enum PlaceStreamMultistreamDefs {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                uri = try container.decode(ATProtocolURI.self, forKey: "uri")
             } catch {
-                LogManager.logError("Decoding error for required property 'uri': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("uri", error)
                 throw error
             }
             do {
-                cid = try container.decode(CID.self, forKey: .cid)
+                cid = try container.decode(CID.self, forKey: "cid")
             } catch {
-                LogManager.logError("Decoding error for required property 'cid': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("cid", error)
                 throw error
             }
             do {
-                record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+                record = try container.decode(ATProtocolValueContainer.self, forKey: "record")
             } catch {
-                LogManager.logError("Decoding error for required property 'record': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("record", error)
                 throw error
             }
             do {
-                latestEvent = try container.decodeIfPresent(PlaceStreamMultistreamDefs.Event.self, forKey: .latestEvent)
+                latestEvent = try container.decodeIfPresent(PlaceStreamMultistreamDefs.Event.self, forKey: "latestEvent")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'latestEvent' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("latestEvent", error)
                 latestEvent = nil
             }
         }
@@ -75,37 +80,37 @@ public enum PlaceStreamMultistreamDefs {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if uri != other.uri {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.uri != rhs.uri {
                 return false
             }
-            if cid != other.cid {
+            if lhs.cid != rhs.cid {
                 return false
             }
-            if record != other.record {
+            if lhs.record != rhs.record {
                 return false
             }
-            if latestEvent != other.latestEvent {
+            if lhs.latestEvent != rhs.latestEvent {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 5)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let uriValue = try uri.toCBORValue()
-            map = map.adding(key: "uri", value: uriValue)
+            map.append(key: "uri", value: uriValue)
             let cidValue = try cid.toCBORValue()
-            map = map.adding(key: "cid", value: cidValue)
+            map.append(key: "cid", value: cidValue)
             let recordValue = try record.toCBORValue()
-            map = map.adding(key: "record", value: recordValue)
+            map.append(key: "record", value: recordValue)
             if let value = latestEvent {
                 let latestEventValue = try value.toCBORValue()
-                map = map.adding(key: "latestEvent", value: latestEventValue)
+                map.append(key: "latestEvent", value: latestEventValue)
             }
             return map
         }
@@ -134,23 +139,28 @@ public enum PlaceStreamMultistreamDefs {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                message = try container.decode(String.self, forKey: .message)
+                message = try container.decode(String.self, forKey: "message")
             } catch {
-                LogManager.logError("Decoding error for required property 'message': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("message", error)
                 throw error
             }
             do {
-                status = try container.decode(EventStatus.self, forKey: .status)
+                status = try container.decode(EventStatus.self, forKey: "status")
             } catch {
-                LogManager.logError("Decoding error for required property 'status': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("status", error)
                 throw error
             }
             do {
-                createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+                createdAt = try container.decode(ATProtocolDate.self, forKey: "createdAt")
             } catch {
-                LogManager.logError("Decoding error for required property 'createdAt': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("createdAt", error)
                 throw error
             }
         }
@@ -171,31 +181,31 @@ public enum PlaceStreamMultistreamDefs {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if message != other.message {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.message != rhs.message {
                 return false
             }
-            if status != other.status {
+            if lhs.status != rhs.status {
                 return false
             }
-            if createdAt != other.createdAt {
+            if lhs.createdAt != rhs.createdAt {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 4)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let messageValue = try message.toCBORValue()
-            map = map.adding(key: "message", value: messageValue)
+            map.append(key: "message", value: messageValue)
             let statusValue = try status.toCBORValue()
-            map = map.adding(key: "status", value: statusValue)
+            map.append(key: "status", value: statusValue)
             let createdAtValue = try createdAt.toCBORValue()
-            map = map.adding(key: "createdAt", value: createdAtValue)
+            map.append(key: "createdAt", value: createdAtValue)
             return map
         }
 

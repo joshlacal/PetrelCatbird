@@ -6,6 +6,7 @@ import Petrel
 
 public enum PlaceStreamBrandingUpdateBlob {
     public static let typeIdentifier = "place.stream.branding.updateBlob"
+
     public struct Input: ATProtocolCodable {
         public let key: String
         public let broadcaster: DID?
@@ -45,24 +46,24 @@ public enum PlaceStreamBrandingUpdateBlob {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 6)
             let keyValue = try key.toCBORValue()
-            map = map.adding(key: "key", value: keyValue)
+            map.append(key: "key", value: keyValue)
             if let value = broadcaster {
                 let broadcasterValue = try value.toCBORValue()
-                map = map.adding(key: "broadcaster", value: broadcasterValue)
+                map.append(key: "broadcaster", value: broadcasterValue)
             }
             let dataValue = try data.toCBORValue()
-            map = map.adding(key: "data", value: dataValue)
+            map.append(key: "data", value: dataValue)
             let mimeTypeValue = try mimeType.toCBORValue()
-            map = map.adding(key: "mimeType", value: mimeTypeValue)
+            map.append(key: "mimeType", value: mimeTypeValue)
             if let value = width {
                 let widthValue = try value.toCBORValue()
-                map = map.adding(key: "width", value: widthValue)
+                map.append(key: "width", value: widthValue)
             }
             if let value = height {
                 let heightValue = try value.toCBORValue()
-                map = map.adding(key: "height", value: heightValue)
+                map.append(key: "height", value: heightValue)
             }
             return map
         }
@@ -101,10 +102,10 @@ public enum PlaceStreamBrandingUpdateBlob {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
 
             let successValue = try success.toCBORValue()
-            map = map.adding(key: "success", value: successValue)
+            map.append(key: "success", value: successValue)
 
             return map
         }
@@ -181,16 +182,10 @@ public extension ATProtoClient.Place.Stream.Branding {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamBrandingUpdateBlob.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.branding.updateBlob: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamBrandingUpdateBlob.Output.self, from: responseData, endpoint: "place.stream.branding.updateBlob")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

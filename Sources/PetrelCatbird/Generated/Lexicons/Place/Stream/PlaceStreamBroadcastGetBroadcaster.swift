@@ -42,7 +42,7 @@ public enum PlaceStreamBroadcastGetBroadcaster {
                 server = try container.decodeIfPresent(DID.self, forKey: .server)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'server' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("server", error)
                 server = nil
             }
 
@@ -50,7 +50,7 @@ public enum PlaceStreamBroadcastGetBroadcaster {
                 admins = try container.decodeIfPresent([DID].self, forKey: .admins)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'admins' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("admins", error)
                 admins = nil
             }
         }
@@ -68,21 +68,21 @@ public enum PlaceStreamBroadcastGetBroadcaster {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 3)
 
             let broadcasterValue = try broadcaster.toCBORValue()
-            map = map.adding(key: "broadcaster", value: broadcasterValue)
+            map.append(key: "broadcaster", value: broadcasterValue)
 
             if let value = server {
                 // Encode optional property even if it's an empty array for CBOR
                 let serverValue = try value.toCBORValue()
-                map = map.adding(key: "server", value: serverValue)
+                map.append(key: "server", value: serverValue)
             }
 
             if let value = admins {
                 // Encode optional property even if it's an empty array for CBOR
                 let adminsValue = try value.toCBORValue()
-                map = map.adding(key: "admins", value: adminsValue)
+                map.append(key: "admins", value: adminsValue)
             }
 
             return map
@@ -136,16 +136,10 @@ public extension ATProtoClient.Place.Stream.Broadcast {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamBroadcastGetBroadcaster.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.broadcast.getBroadcaster: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamBroadcastGetBroadcaster.Output.self, from: responseData, endpoint: "place.stream.broadcast.getBroadcaster")
+            return (responseCode, decodedData)
         } else {
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)

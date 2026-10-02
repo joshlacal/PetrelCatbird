@@ -6,6 +6,7 @@ import Petrel
 
 public enum PlaceStreamLiveStartLivestream {
     public static let typeIdentifier = "place.stream.live.startLivestream"
+
     public struct Input: ATProtocolCodable {
         public let livestream: PlaceStreamLivestream
         public let streamer: DID
@@ -33,14 +34,14 @@ public enum PlaceStreamLiveStartLivestream {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 3)
             let livestreamValue = try livestream.toCBORValue()
-            map = map.adding(key: "livestream", value: livestreamValue)
+            map.append(key: "livestream", value: livestreamValue)
             let streamerValue = try streamer.toCBORValue()
-            map = map.adding(key: "streamer", value: streamerValue)
+            map.append(key: "streamer", value: streamerValue)
             if let value = createBlueskyPost {
                 let createBlueskyPostValue = try value.toCBORValue()
-                map = map.adding(key: "createBlueskyPost", value: createBlueskyPostValue)
+                map.append(key: "createBlueskyPost", value: createBlueskyPostValue)
             }
             return map
         }
@@ -86,13 +87,13 @@ public enum PlaceStreamLiveStartLivestream {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
 
             let uriValue = try uri.toCBORValue()
-            map = map.adding(key: "uri", value: uriValue)
+            map.append(key: "uri", value: uriValue)
 
             let cidValue = try cid.toCBORValue()
-            map = map.adding(key: "cid", value: cidValue)
+            map.append(key: "cid", value: cidValue)
 
             return map
         }
@@ -156,16 +157,10 @@ public extension ATProtoClient.Place.Stream.Live {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamLiveStartLivestream.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.live.startLivestream: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamLiveStartLivestream.Output.self, from: responseData, endpoint: "place.stream.live.startLivestream")
+            return (responseCode, decodedData)
         } else {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)

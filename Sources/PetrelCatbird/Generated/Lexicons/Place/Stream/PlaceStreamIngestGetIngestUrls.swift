@@ -10,7 +10,7 @@ public enum PlaceStreamIngestGetIngestUrls {
         public init() {}
     }
 
-    public struct Output: ATProtocolCodable {
+    public struct Output: ATProtocolCodable, XRPCParallelArrayDecodable {
         public let ingests: [OutputIngestsUnion]
 
         /// Standard public initializer
@@ -34,12 +34,24 @@ public enum PlaceStreamIngestGetIngestUrls {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 1)
 
             let ingestsValue = try ingests.toCBORValue()
-            map = map.adding(key: "ingests", value: ingestsValue)
+            map.append(key: "ingests", value: ingestsValue)
 
             return map
+        }
+
+        // MARK: - Parallel array decoding support (used only by XRPCResponseDecoding's opt-in parallel path)
+
+        public typealias ParallelArrayElement = OutputIngestsUnion
+
+        public static var parallelArrayKey: String {
+            "ingests"
+        }
+
+        public init(parallelArrayPrototype prototype: Output, parallelArrayElements elements: [ParallelArrayElement]) {
+            ingests = elements
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -55,12 +67,14 @@ public enum PlaceStreamIngestGetIngestUrls {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let typeValue = try container.decode(String.self, forKey: .type)
+            // One keyed container serves both the `$type` read and object variants
+            // (`init(_lexiconContainer:)`), so the object's keys are materialized once.
+            let container = try decoder.container(keyedBy: LexiconCodingKey.self)
+            let typeValue = try container.decode(String.self, forKey: "$type")
 
             switch typeValue {
             case "place.stream.ingest.defs#ingest":
-                let value = try PlaceStreamIngestDefs.Ingest(from: decoder)
+                let value = try PlaceStreamIngestDefs.Ingest(_lexiconContainer: container)
                 self = .placeStreamIngestDefsIngest(value)
             default:
                 let unknownValue = try ATProtocolValueContainer(from: decoder)
@@ -103,7 +117,7 @@ public enum PlaceStreamIngestGetIngestUrls {
             ):
                 return lhsValue == rhsValue
             case let (.unexpected(lhsValue), .unexpected(rhsValue)):
-                return lhsValue.isEqual(to: rhsValue)
+                return lhsValue == rhsValue
             default:
                 return false
             }
@@ -114,29 +128,15 @@ public enum PlaceStreamIngestGetIngestUrls {
             return self == other
         }
 
-        /// DAGCBOR encoding with field ordering
+        /// DAGCBOR encoding with field ordering: `$type` first, then the variant's
+        /// own entries in order (see OrderedCBORMap.unionVariant).
         public func toCBORValue() throws -> Any {
-            // Create an ordered map to maintain field order
-            var map = OrderedCBORMap()
-
             switch self {
             case let .placeStreamIngestDefsIngest(value):
-                map = map.adding(key: "$type", value: "place.stream.ingest.defs#ingest")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
+                return try OrderedCBORMap.unionVariant(
+                    typeIdentifier: "place.stream.ingest.defs#ingest",
+                    payload: value.toCBORValue()
+                )
             case let .unexpected(container):
                 return try container.toCBORValue()
             }
@@ -184,16 +184,10 @@ public extension ATProtoClient.Place.Stream.Ingest {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamIngestGetIngestUrls.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.ingest.getIngestUrls: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamIngestGetIngestUrls.Output.self, from: responseData, endpoint: "place.stream.ingest.getIngestUrls")
+            return (responseCode, decodedData)
         } else {
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)

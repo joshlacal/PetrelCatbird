@@ -6,6 +6,7 @@ import Petrel
 
 public enum BlueCatbirdChatUpdatePushToken {
     public static let typeIdentifier = "blue.catbird.chat.updatePushToken"
+
     public struct Input: ATProtocolCodable {
         public let token: String?
         public let registration: BlueCatbirdChatDefs.SignedPushRegistration?
@@ -29,14 +30,14 @@ public enum BlueCatbirdChatUpdatePushToken {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
             if let value = token {
                 let tokenValue = try value.toCBORValue()
-                map = map.adding(key: "token", value: tokenValue)
+                map.append(key: "token", value: tokenValue)
             }
             if let value = registration {
                 let registrationValue = try value.toCBORValue()
-                map = map.adding(key: "registration", value: registrationValue)
+                map.append(key: "registration", value: registrationValue)
             }
             return map
         }
@@ -73,7 +74,7 @@ public enum BlueCatbirdChatUpdatePushToken {
                 pushBinding = try container.decodeIfPresent(BlueCatbirdChatDefs.PushRegistrationBinding.self, forKey: .pushBinding)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'pushBinding' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("pushBinding", error)
                 pushBinding = nil
             }
         }
@@ -88,15 +89,15 @@ public enum BlueCatbirdChatUpdatePushToken {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
 
             let deviceValue = try device.toCBORValue()
-            map = map.adding(key: "device", value: deviceValue)
+            map.append(key: "device", value: deviceValue)
 
             if let value = pushBinding {
                 // Encode optional property even if it's an empty array for CBOR
                 let pushBindingValue = try value.toCBORValue()
-                map = map.adding(key: "pushBinding", value: pushBindingValue)
+                map.append(key: "pushBinding", value: pushBindingValue)
             }
 
             return map
@@ -183,16 +184,10 @@ public extension ATProtoClient.Blue.Catbird.Chat {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatUpdatePushToken.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.updatePushToken: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdChatUpdatePushToken.Output.self, from: responseData, endpoint: "blue.catbird.chat.updatePushToken")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

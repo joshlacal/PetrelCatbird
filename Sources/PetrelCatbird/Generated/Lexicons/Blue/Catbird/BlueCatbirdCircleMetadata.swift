@@ -21,22 +21,27 @@ public struct BlueCatbirdCircleMetadata: ATProtocolCodable, ATProtocolValue {
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        circleId = try container.decode(TID.self, forKey: .circleId)
-        name = try container.decode(String.self, forKey: .name)
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+    }
+
+    /// Decodes from an already-opened keyed container. Generated unions pass the
+    /// container they read `$type` from, so the object's keys are materialized once.
+    public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
+        circleId = try container.decode(TID.self, forKey: "circleId")
+        name = try container.decode(String.self, forKey: "name")
+        createdAt = try container.decode(ATProtocolDate.self, forKey: "createdAt")
         do {
-            migratedFrom = try container.decodeIfPresent(SpaceRef.self, forKey: .migratedFrom)
+            migratedFrom = try container.decodeIfPresent(SpaceRef.self, forKey: "migratedFrom")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'migratedFrom' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("migratedFrom", error)
             migratedFrom = nil
         }
         do {
-            migratedTo = try container.decodeIfPresent(SpaceRef.self, forKey: .migratedTo)
+            migratedTo = try container.decodeIfPresent(SpaceRef.self, forKey: "migratedTo")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'migratedTo' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("migratedTo", error)
             migratedTo = nil
         }
     }
@@ -52,27 +57,27 @@ public struct BlueCatbirdCircleMetadata: ATProtocolCodable, ATProtocolValue {
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
+        if lhs.circleId != rhs.circleId {
+            return false
+        }
+        if lhs.name != rhs.name {
+            return false
+        }
+        if lhs.createdAt != rhs.createdAt {
+            return false
+        }
+        if lhs.migratedFrom != rhs.migratedFrom {
+            return false
+        }
+        if lhs.migratedTo != rhs.migratedTo {
+            return false
+        }
+        return true
     }
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if circleId != other.circleId {
-            return false
-        }
-        if name != other.name {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        if migratedFrom != other.migratedFrom {
-            return false
-        }
-        if migratedTo != other.migratedTo {
-            return false
-        }
-        return true
+        return self == other
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -92,21 +97,21 @@ public struct BlueCatbirdCircleMetadata: ATProtocolCodable, ATProtocolValue {
     }
 
     public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
-        map = map.adding(key: "$type", value: Self.typeIdentifier)
+        var map = OrderedCBORMap(minimumCapacity: 6)
+        map.append(key: "$type", value: Self.typeIdentifier)
         let circleIdValue = try circleId.toCBORValue()
-        map = map.adding(key: "circleId", value: circleIdValue)
+        map.append(key: "circleId", value: circleIdValue)
         let nameValue = try name.toCBORValue()
-        map = map.adding(key: "name", value: nameValue)
+        map.append(key: "name", value: nameValue)
         let createdAtValue = try createdAt.toCBORValue()
-        map = map.adding(key: "createdAt", value: createdAtValue)
+        map.append(key: "createdAt", value: createdAtValue)
         if let value = migratedFrom {
             let migratedFromValue = try value.toCBORValue()
-            map = map.adding(key: "migratedFrom", value: migratedFromValue)
+            map.append(key: "migratedFrom", value: migratedFromValue)
         }
         if let value = migratedTo {
             let migratedToValue = try value.toCBORValue()
-            map = map.adding(key: "migratedTo", value: migratedToValue)
+            map.append(key: "migratedTo", value: migratedToValue)
         }
         return map
     }

@@ -17,26 +17,31 @@ public struct PlaceStreamMetadataConfiguration: ATProtocolCodable, ATProtocolVal
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+    }
+
+    /// Decodes from an already-opened keyed container. Generated unions pass the
+    /// container they read `$type` from, so the object's keys are materialized once.
+    public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
         do {
-            contentWarnings = try container.decodeIfPresent(PlaceStreamMetadataContentWarnings.self, forKey: .contentWarnings)
+            contentWarnings = try container.decodeIfPresent(PlaceStreamMetadataContentWarnings.self, forKey: "contentWarnings")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'contentWarnings' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("contentWarnings", error)
             contentWarnings = nil
         }
         do {
-            contentRights = try container.decodeIfPresent(PlaceStreamMetadataContentRights.self, forKey: .contentRights)
+            contentRights = try container.decodeIfPresent(PlaceStreamMetadataContentRights.self, forKey: "contentRights")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'contentRights' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("contentRights", error)
             contentRights = nil
         }
         do {
-            distributionPolicy = try container.decodeIfPresent(PlaceStreamMetadataDistributionPolicy.self, forKey: .distributionPolicy)
+            distributionPolicy = try container.decodeIfPresent(PlaceStreamMetadataDistributionPolicy.self, forKey: "distributionPolicy")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'distributionPolicy' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("distributionPolicy", error)
             distributionPolicy = nil
         }
     }
@@ -50,21 +55,21 @@ public struct PlaceStreamMetadataConfiguration: ATProtocolCodable, ATProtocolVal
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
+        if lhs.contentWarnings != rhs.contentWarnings {
+            return false
+        }
+        if lhs.contentRights != rhs.contentRights {
+            return false
+        }
+        if lhs.distributionPolicy != rhs.distributionPolicy {
+            return false
+        }
+        return true
     }
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if contentWarnings != other.contentWarnings {
-            return false
-        }
-        if contentRights != other.contentRights {
-            return false
-        }
-        if distributionPolicy != other.distributionPolicy {
-            return false
-        }
-        return true
+        return self == other
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -86,19 +91,19 @@ public struct PlaceStreamMetadataConfiguration: ATProtocolCodable, ATProtocolVal
     }
 
     public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
-        map = map.adding(key: "$type", value: Self.typeIdentifier)
+        var map = OrderedCBORMap(minimumCapacity: 4)
+        map.append(key: "$type", value: Self.typeIdentifier)
         if let value = contentWarnings {
             let contentWarningsValue = try value.toCBORValue()
-            map = map.adding(key: "contentWarnings", value: contentWarningsValue)
+            map.append(key: "contentWarnings", value: contentWarningsValue)
         }
         if let value = contentRights {
             let contentRightsValue = try value.toCBORValue()
-            map = map.adding(key: "contentRights", value: contentRightsValue)
+            map.append(key: "contentRights", value: contentRightsValue)
         }
         if let value = distributionPolicy {
             let distributionPolicyValue = try value.toCBORValue()
-            map = map.adding(key: "distributionPolicy", value: distributionPolicyValue)
+            map.append(key: "distributionPolicy", value: distributionPolicyValue)
         }
         return map
     }

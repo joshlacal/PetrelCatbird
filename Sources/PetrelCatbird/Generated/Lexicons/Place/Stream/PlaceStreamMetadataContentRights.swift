@@ -21,12 +21,17 @@ public struct PlaceStreamMetadataContentRights: ATProtocolCodable, ATProtocolVal
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        creator = try container.decodeIfPresent(String.self, forKey: .creator)
-        copyrightNotice = try container.decodeIfPresent(String.self, forKey: .copyrightNotice)
-        copyrightYear = try container.decodeIfPresent(Int.self, forKey: .copyrightYear)
-        license = try container.decodeIfPresent(String.self, forKey: .license)
-        creditLine = try container.decodeIfPresent(String.self, forKey: .creditLine)
+        self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+    }
+
+    /// Decodes from an already-opened keyed container. Generated unions pass the
+    /// container they read `$type` from, so the object's keys are materialized once.
+    public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
+        creator = try container.decodeIfPresent(String.self, forKey: "creator")
+        copyrightNotice = try container.decodeIfPresent(String.self, forKey: "copyrightNotice")
+        copyrightYear = try container.decodeIfPresent(Int.self, forKey: "copyrightYear")
+        license = try container.decodeIfPresent(String.self, forKey: "license")
+        creditLine = try container.decodeIfPresent(String.self, forKey: "creditLine")
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -68,49 +73,49 @@ public struct PlaceStreamMetadataContentRights: ATProtocolCodable, ATProtocolVal
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if creator != other.creator {
+        return self == other
+    }
+
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        if lhs.creator != rhs.creator {
             return false
         }
-        if copyrightNotice != other.copyrightNotice {
+        if lhs.copyrightNotice != rhs.copyrightNotice {
             return false
         }
-        if copyrightYear != other.copyrightYear {
+        if lhs.copyrightYear != rhs.copyrightYear {
             return false
         }
-        if license != other.license {
+        if lhs.license != rhs.license {
             return false
         }
-        if creditLine != other.creditLine {
+        if lhs.creditLine != rhs.creditLine {
             return false
         }
         return true
     }
 
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
-    }
-
     public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
+        var map = OrderedCBORMap(minimumCapacity: 5)
         if let value = creator {
             let creatorValue = try value.toCBORValue()
-            map = map.adding(key: "creator", value: creatorValue)
+            map.append(key: "creator", value: creatorValue)
         }
         if let value = copyrightNotice {
             let copyrightNoticeValue = try value.toCBORValue()
-            map = map.adding(key: "copyrightNotice", value: copyrightNoticeValue)
+            map.append(key: "copyrightNotice", value: copyrightNoticeValue)
         }
         if let value = copyrightYear {
             let copyrightYearValue = try value.toCBORValue()
-            map = map.adding(key: "copyrightYear", value: copyrightYearValue)
+            map.append(key: "copyrightYear", value: copyrightYearValue)
         }
         if let value = license {
             let licenseValue = try value.toCBORValue()
-            map = map.adding(key: "license", value: licenseValue)
+            map.append(key: "license", value: licenseValue)
         }
         if let value = creditLine {
             let creditLineValue = try value.toCBORValue()
-            map = map.adding(key: "creditLine", value: creditLineValue)
+            map.append(key: "creditLine", value: creditLineValue)
         }
         return map
     }

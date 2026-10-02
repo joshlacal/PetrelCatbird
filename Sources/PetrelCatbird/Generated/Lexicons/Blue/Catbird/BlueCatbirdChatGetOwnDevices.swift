@@ -22,7 +22,7 @@ public enum BlueCatbirdChatGetOwnDevices {
         }
     }
 
-    public struct Output: ATProtocolCodable {
+    public struct Output: ATProtocolCodable, XRPCParallelArrayDecodable {
         public let items: [BlueCatbirdChatDefs.OwnDeviceView]
 
         public let nextPageCursor: String?
@@ -60,7 +60,7 @@ public enum BlueCatbirdChatGetOwnDevices {
                 nextPageCursor = try container.decodeIfPresent(String.self, forKey: .nextPageCursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'nextPageCursor' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("nextPageCursor", error)
                 nextPageCursor = nil
             }
 
@@ -83,24 +83,39 @@ public enum BlueCatbirdChatGetOwnDevices {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 4)
 
             let itemsValue = try items.toCBORValue()
-            map = map.adding(key: "items", value: itemsValue)
+            map.append(key: "items", value: itemsValue)
 
             if let value = nextPageCursor {
                 // Encode optional property even if it's an empty array for CBOR
                 let nextPageCursorValue = try value.toCBORValue()
-                map = map.adding(key: "nextPageCursor", value: nextPageCursorValue)
+                map.append(key: "nextPageCursor", value: nextPageCursorValue)
             }
 
             let hasMoreValue = try hasMore.toCBORValue()
-            map = map.adding(key: "hasMore", value: hasMoreValue)
+            map.append(key: "hasMore", value: hasMoreValue)
 
             let snapshotExpiresAtValue = try snapshotExpiresAt.toCBORValue()
-            map = map.adding(key: "snapshotExpiresAt", value: snapshotExpiresAtValue)
+            map.append(key: "snapshotExpiresAt", value: snapshotExpiresAtValue)
 
             return map
+        }
+
+        // MARK: - Parallel array decoding support (used only by XRPCResponseDecoding's opt-in parallel path)
+
+        public typealias ParallelArrayElement = BlueCatbirdChatDefs.OwnDeviceView
+
+        public static var parallelArrayKey: String {
+            "items"
+        }
+
+        public init(parallelArrayPrototype prototype: Output, parallelArrayElements elements: [ParallelArrayElement]) {
+            items = elements
+            nextPageCursor = prototype.nextPageCursor
+            hasMore = prototype.hasMore
+            snapshotExpiresAt = prototype.snapshotExpiresAt
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -172,16 +187,10 @@ public extension ATProtoClient.Blue.Catbird.Chat {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatGetOwnDevices.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.getOwnDevices: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdChatGetOwnDevices.Output.self, from: responseData, endpoint: "blue.catbird.chat.getOwnDevices")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

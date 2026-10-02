@@ -88,7 +88,7 @@ public enum BlueCatbirdChatGetLeafRecoveryInbox {
                 nextPageCursor = try container.decodeIfPresent(String.self, forKey: .nextPageCursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'nextPageCursor' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("nextPageCursor", error)
                 nextPageCursor = nil
             }
 
@@ -100,7 +100,7 @@ public enum BlueCatbirdChatGetLeafRecoveryInbox {
                 inventoryScope = try container.decodeIfPresent(BlueCatbirdChatDefs.DirectRequestInventoryScope.self, forKey: .inventoryScope)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'inventoryScope' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("inventoryScope", error)
                 inventoryScope = nil
             }
         }
@@ -126,33 +126,33 @@ public enum BlueCatbirdChatGetLeafRecoveryInbox {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 7)
 
             let itemsValue = try items.toCBORValue()
-            map = map.adding(key: "items", value: itemsValue)
+            map.append(key: "items", value: itemsValue)
 
             let inventorySessionIdValue = try inventorySessionId.toCBORValue()
-            map = map.adding(key: "inventorySessionId", value: inventorySessionIdValue)
+            map.append(key: "inventorySessionId", value: inventorySessionIdValue)
 
             let snapshotEventCursorValue = try snapshotEventCursor.toCBORValue()
-            map = map.adding(key: "snapshotEventCursor", value: snapshotEventCursorValue)
+            map.append(key: "snapshotEventCursor", value: snapshotEventCursorValue)
 
             if let value = nextPageCursor {
                 // Encode optional property even if it's an empty array for CBOR
                 let nextPageCursorValue = try value.toCBORValue()
-                map = map.adding(key: "nextPageCursor", value: nextPageCursorValue)
+                map.append(key: "nextPageCursor", value: nextPageCursorValue)
             }
 
             let hasMoreValue = try hasMore.toCBORValue()
-            map = map.adding(key: "hasMore", value: hasMoreValue)
+            map.append(key: "hasMore", value: hasMoreValue)
 
             let snapshotExpiresAtValue = try snapshotExpiresAt.toCBORValue()
-            map = map.adding(key: "snapshotExpiresAt", value: snapshotExpiresAtValue)
+            map.append(key: "snapshotExpiresAt", value: snapshotExpiresAtValue)
 
             if let value = inventoryScope {
                 // Encode optional property even if it's an empty array for CBOR
                 let inventoryScopeValue = try value.toCBORValue()
-                map = map.adding(key: "inventoryScope", value: inventoryScopeValue)
+                map.append(key: "inventoryScope", value: inventoryScopeValue)
             }
 
             return map
@@ -260,16 +260,10 @@ public extension ATProtoClient.Blue.Catbird.Chat {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatGetLeafRecoveryInbox.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.getLeafRecoveryInbox: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdChatGetLeafRecoveryInbox.Output.self, from: responseData, endpoint: "blue.catbird.chat.getLeafRecoveryInbox")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

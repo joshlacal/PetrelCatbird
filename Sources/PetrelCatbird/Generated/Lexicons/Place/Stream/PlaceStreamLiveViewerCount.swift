@@ -19,15 +19,20 @@ public struct PlaceStreamLiveViewerCount: ATProtocolCodable, ATProtocolValue {
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        streamer = try container.decode(DID.self, forKey: .streamer)
-        server = try container.decode(DID.self, forKey: .server)
-        count = try container.decode(Int.self, forKey: .count)
+        self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+    }
+
+    /// Decodes from an already-opened keyed container. Generated unions pass the
+    /// container they read `$type` from, so the object's keys are materialized once.
+    public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
+        streamer = try container.decode(DID.self, forKey: "streamer")
+        server = try container.decode(DID.self, forKey: "server")
+        count = try container.decode(Int.self, forKey: "count")
         do {
-            updatedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .updatedAt)
+            updatedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: "updatedAt")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'updatedAt' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("updatedAt", error)
             updatedAt = nil
         }
     }
@@ -42,24 +47,24 @@ public struct PlaceStreamLiveViewerCount: ATProtocolCodable, ATProtocolValue {
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
+        if lhs.streamer != rhs.streamer {
+            return false
+        }
+        if lhs.server != rhs.server {
+            return false
+        }
+        if lhs.count != rhs.count {
+            return false
+        }
+        if lhs.updatedAt != rhs.updatedAt {
+            return false
+        }
+        return true
     }
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if streamer != other.streamer {
-            return false
-        }
-        if server != other.server {
-            return false
-        }
-        if count != other.count {
-            return false
-        }
-        if updatedAt != other.updatedAt {
-            return false
-        }
-        return true
+        return self == other
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -74,17 +79,17 @@ public struct PlaceStreamLiveViewerCount: ATProtocolCodable, ATProtocolValue {
     }
 
     public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
-        map = map.adding(key: "$type", value: Self.typeIdentifier)
+        var map = OrderedCBORMap(minimumCapacity: 5)
+        map.append(key: "$type", value: Self.typeIdentifier)
         let streamerValue = try streamer.toCBORValue()
-        map = map.adding(key: "streamer", value: streamerValue)
+        map.append(key: "streamer", value: streamerValue)
         let serverValue = try server.toCBORValue()
-        map = map.adding(key: "server", value: serverValue)
+        map.append(key: "server", value: serverValue)
         let countValue = try count.toCBORValue()
-        map = map.adding(key: "count", value: countValue)
+        map.append(key: "count", value: countValue)
         if let value = updatedAt {
             let updatedAtValue = try value.toCBORValue()
-            map = map.adding(key: "updatedAt", value: updatedAtValue)
+            map.append(key: "updatedAt", value: updatedAtValue)
         }
         return map
     }

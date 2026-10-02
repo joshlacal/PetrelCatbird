@@ -13,8 +13,13 @@ public struct PlaceStreamMetadataContentWarnings: ATProtocolCodable, ATProtocolV
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        warnings = try container.decodeIfPresent([String].self, forKey: .warnings)
+        self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+    }
+
+    /// Decodes from an already-opened keyed container. Generated unions pass the
+    /// container they read `$type` from, so the object's keys are materialized once.
+    public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
+        warnings = try container.decodeIfPresent(_LexiconStringArray.self, forKey: "warnings")?.values
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -32,21 +37,21 @@ public struct PlaceStreamMetadataContentWarnings: ATProtocolCodable, ATProtocolV
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if warnings != other.warnings {
+        return self == other
+    }
+
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        if lhs.warnings != rhs.warnings {
             return false
         }
         return true
     }
 
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
-    }
-
     public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
+        var map = OrderedCBORMap(minimumCapacity: 1)
         if let value = warnings {
             let warningsValue = try value.toCBORValue()
-            map = map.adding(key: "warnings", value: warningsValue)
+            map.append(key: "warnings", value: warningsValue)
         }
         return map
     }

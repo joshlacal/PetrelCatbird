@@ -33,70 +33,75 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        title = try container.decode(String.self, forKey: .title)
+        self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+    }
+
+    /// Decodes from an already-opened keyed container. Generated unions pass the
+    /// container they read `$type` from, so the object's keys are materialized once.
+    public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
+        title = try container.decode(String.self, forKey: "title")
         do {
-            url = try container.decodeIfPresent(URI.self, forKey: .url)
+            url = try container.decodeIfPresent(URI.self, forKey: "url")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'url' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("url", error)
             url = nil
         }
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        createdAt = try container.decode(ATProtocolDate.self, forKey: "createdAt")
         do {
-            lastSeenAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastSeenAt)
+            lastSeenAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: "lastSeenAt")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'lastSeenAt' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("lastSeenAt", error)
             lastSeenAt = nil
         }
         do {
-            endedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .endedAt)
+            endedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: "endedAt")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'endedAt' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("endedAt", error)
             endedAt = nil
         }
         do {
-            idleTimeoutSeconds = try container.decodeIfPresent(Int.self, forKey: .idleTimeoutSeconds)
+            idleTimeoutSeconds = try container.decodeIfPresent(Int.self, forKey: "idleTimeoutSeconds")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'idleTimeoutSeconds' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("idleTimeoutSeconds", error)
             idleTimeoutSeconds = nil
         }
         do {
-            post = try container.decodeIfPresent(ComAtprotoRepoStrongRef.self, forKey: .post)
+            post = try container.decodeIfPresent(ComAtprotoRepoStrongRef.self, forKey: "post")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'post' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("post", error)
             post = nil
         }
         do {
-            agent = try container.decodeIfPresent(String.self, forKey: .agent)
+            agent = try container.decodeIfPresent(String.self, forKey: "agent")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'agent' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("agent", error)
             agent = nil
         }
         do {
-            canonicalUrl = try container.decodeIfPresent(URI.self, forKey: .canonicalUrl)
+            canonicalUrl = try container.decodeIfPresent(URI.self, forKey: "canonicalUrl")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'canonicalUrl' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("canonicalUrl", error)
             canonicalUrl = nil
         }
         do {
-            thumb = try container.decodeIfPresent(Blob.self, forKey: .thumb)
+            thumb = try container.decodeIfPresent(Blob.self, forKey: "thumb")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'thumb' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("thumb", error)
             thumb = nil
         }
         do {
-            notificationSettings = try container.decodeIfPresent(PlaceStreamLivestream.NotificationSettings.self, forKey: .notificationSettings)
+            notificationSettings = try container.decodeIfPresent(PlaceStreamLivestream.NotificationSettings.self, forKey: "notificationSettings")
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
-            LogManager.logWarning("Decoding error for optional property 'notificationSettings' — degrading to nil: \(error)")
+            _LexiconDecodeDiagnostics.optionalPropertyDegraded("notificationSettings", error)
             notificationSettings = nil
         }
     }
@@ -118,45 +123,45 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
+        if lhs.title != rhs.title {
+            return false
+        }
+        if lhs.url != rhs.url {
+            return false
+        }
+        if lhs.createdAt != rhs.createdAt {
+            return false
+        }
+        if lhs.lastSeenAt != rhs.lastSeenAt {
+            return false
+        }
+        if lhs.endedAt != rhs.endedAt {
+            return false
+        }
+        if lhs.idleTimeoutSeconds != rhs.idleTimeoutSeconds {
+            return false
+        }
+        if lhs.post != rhs.post {
+            return false
+        }
+        if lhs.agent != rhs.agent {
+            return false
+        }
+        if lhs.canonicalUrl != rhs.canonicalUrl {
+            return false
+        }
+        if lhs.thumb != rhs.thumb {
+            return false
+        }
+        if lhs.notificationSettings != rhs.notificationSettings {
+            return false
+        }
+        return true
     }
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if title != other.title {
-            return false
-        }
-        if url != other.url {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        if lastSeenAt != other.lastSeenAt {
-            return false
-        }
-        if endedAt != other.endedAt {
-            return false
-        }
-        if idleTimeoutSeconds != other.idleTimeoutSeconds {
-            return false
-        }
-        if post != other.post {
-            return false
-        }
-        if agent != other.agent {
-            return false
-        }
-        if canonicalUrl != other.canonicalUrl {
-            return false
-        }
-        if thumb != other.thumb {
-            return false
-        }
-        if notificationSettings != other.notificationSettings {
-            return false
-        }
-        return true
+        return self == other
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -210,47 +215,47 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
     }
 
     public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
-        map = map.adding(key: "$type", value: Self.typeIdentifier)
+        var map = OrderedCBORMap(minimumCapacity: 12)
+        map.append(key: "$type", value: Self.typeIdentifier)
         let titleValue = try title.toCBORValue()
-        map = map.adding(key: "title", value: titleValue)
+        map.append(key: "title", value: titleValue)
         if let value = url {
             let urlValue = try value.toCBORValue()
-            map = map.adding(key: "url", value: urlValue)
+            map.append(key: "url", value: urlValue)
         }
         let createdAtValue = try createdAt.toCBORValue()
-        map = map.adding(key: "createdAt", value: createdAtValue)
+        map.append(key: "createdAt", value: createdAtValue)
         if let value = lastSeenAt {
             let lastSeenAtValue = try value.toCBORValue()
-            map = map.adding(key: "lastSeenAt", value: lastSeenAtValue)
+            map.append(key: "lastSeenAt", value: lastSeenAtValue)
         }
         if let value = endedAt {
             let endedAtValue = try value.toCBORValue()
-            map = map.adding(key: "endedAt", value: endedAtValue)
+            map.append(key: "endedAt", value: endedAtValue)
         }
         if let value = idleTimeoutSeconds {
             let idleTimeoutSecondsValue = try value.toCBORValue()
-            map = map.adding(key: "idleTimeoutSeconds", value: idleTimeoutSecondsValue)
+            map.append(key: "idleTimeoutSeconds", value: idleTimeoutSecondsValue)
         }
         if let value = post {
             let postValue = try value.toCBORValue()
-            map = map.adding(key: "post", value: postValue)
+            map.append(key: "post", value: postValue)
         }
         if let value = agent {
             let agentValue = try value.toCBORValue()
-            map = map.adding(key: "agent", value: agentValue)
+            map.append(key: "agent", value: agentValue)
         }
         if let value = canonicalUrl {
             let canonicalUrlValue = try value.toCBORValue()
-            map = map.adding(key: "canonicalUrl", value: canonicalUrlValue)
+            map.append(key: "canonicalUrl", value: canonicalUrlValue)
         }
         if let value = thumb {
             let thumbValue = try value.toCBORValue()
-            map = map.adding(key: "thumb", value: thumbValue)
+            map.append(key: "thumb", value: thumbValue)
         }
         if let value = notificationSettings {
             let notificationSettingsValue = try value.toCBORValue()
-            map = map.adding(key: "notificationSettings", value: notificationSettingsValue)
+            map.append(key: "notificationSettings", value: notificationSettingsValue)
         }
         return map
     }
@@ -281,13 +286,18 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                pushNotification = try container.decodeIfPresent(Bool.self, forKey: .pushNotification)
+                pushNotification = try container.decodeIfPresent(Bool.self, forKey: "pushNotification")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'pushNotification' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("pushNotification", error)
                 pushNotification = nil
             }
         }
@@ -308,22 +318,22 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if pushNotification != other.pushNotification {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.pushNotification != rhs.pushNotification {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 2)
+            map.append(key: "$type", value: Self.typeIdentifier)
             if let value = pushNotification {
                 let pushNotificationValue = try value.toCBORValue()
-                map = map.adding(key: "pushNotification", value: pushNotificationValue)
+                map.append(key: "pushNotification", value: pushNotificationValue)
             }
             return map
         }
@@ -355,43 +365,48 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                uri = try container.decode(ATProtocolURI.self, forKey: "uri")
             } catch {
-                LogManager.logError("Decoding error for required property 'uri': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("uri", error)
                 throw error
             }
             do {
-                cid = try container.decode(CID.self, forKey: .cid)
+                cid = try container.decode(CID.self, forKey: "cid")
             } catch {
-                LogManager.logError("Decoding error for required property 'cid': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("cid", error)
                 throw error
             }
             do {
-                author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .author)
+                author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: "author")
             } catch {
-                LogManager.logError("Decoding error for required property 'author': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("author", error)
                 throw error
             }
             do {
-                record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+                record = try container.decode(ATProtocolValueContainer.self, forKey: "record")
             } catch {
-                LogManager.logError("Decoding error for required property 'record': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("record", error)
                 throw error
             }
             do {
-                indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
+                indexedAt = try container.decode(ATProtocolDate.self, forKey: "indexedAt")
             } catch {
-                LogManager.logError("Decoding error for required property 'indexedAt': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("indexedAt", error)
                 throw error
             }
             do {
-                viewerCount = try container.decodeIfPresent(ViewerCount.self, forKey: .viewerCount)
+                viewerCount = try container.decodeIfPresent(ViewerCount.self, forKey: "viewerCount")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'viewerCount' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("viewerCount", error)
                 viewerCount = nil
             }
         }
@@ -422,47 +437,47 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if uri != other.uri {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.uri != rhs.uri {
                 return false
             }
-            if cid != other.cid {
+            if lhs.cid != rhs.cid {
                 return false
             }
-            if author != other.author {
+            if lhs.author != rhs.author {
                 return false
             }
-            if record != other.record {
+            if lhs.record != rhs.record {
                 return false
             }
-            if indexedAt != other.indexedAt {
+            if lhs.indexedAt != rhs.indexedAt {
                 return false
             }
-            if viewerCount != other.viewerCount {
+            if lhs.viewerCount != rhs.viewerCount {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 7)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let uriValue = try uri.toCBORValue()
-            map = map.adding(key: "uri", value: uriValue)
+            map.append(key: "uri", value: uriValue)
             let cidValue = try cid.toCBORValue()
-            map = map.adding(key: "cid", value: cidValue)
+            map.append(key: "cid", value: cidValue)
             let authorValue = try author.toCBORValue()
-            map = map.adding(key: "author", value: authorValue)
+            map.append(key: "author", value: authorValue)
             let recordValue = try record.toCBORValue()
-            map = map.adding(key: "record", value: recordValue)
+            map.append(key: "record", value: recordValue)
             let indexedAtValue = try indexedAt.toCBORValue()
-            map = map.adding(key: "indexedAt", value: indexedAtValue)
+            map.append(key: "indexedAt", value: indexedAtValue)
             if let value = viewerCount {
                 let viewerCountValue = try value.toCBORValue()
-                map = map.adding(key: "viewerCount", value: viewerCountValue)
+                map.append(key: "viewerCount", value: viewerCountValue)
             }
             return map
         }
@@ -489,11 +504,16 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                count = try container.decode(Int.self, forKey: .count)
+                count = try container.decode(Int.self, forKey: "count")
             } catch {
-                LogManager.logError("Decoding error for required property 'count': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("count", error)
                 throw error
             }
         }
@@ -510,21 +530,21 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if count != other.count {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.count != rhs.count {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 2)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let countValue = try count.toCBORValue()
-            map = map.adding(key: "count", value: countValue)
+            map.append(key: "count", value: countValue)
             return map
         }
 
@@ -553,37 +573,42 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                teleportUri = try container.decode(ATProtocolURI.self, forKey: .teleportUri)
+                teleportUri = try container.decode(ATProtocolURI.self, forKey: "teleportUri")
             } catch {
-                LogManager.logError("Decoding error for required property 'teleportUri': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("teleportUri", error)
                 throw error
             }
             do {
-                source = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .source)
+                source = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: "source")
             } catch {
-                LogManager.logError("Decoding error for required property 'source': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("source", error)
                 throw error
             }
             do {
-                chatProfile = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: .chatProfile)
+                chatProfile = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: "chatProfile")
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'chatProfile' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("chatProfile", error)
                 chatProfile = nil
             }
             do {
-                viewerCount = try container.decode(Int.self, forKey: .viewerCount)
+                viewerCount = try container.decode(Int.self, forKey: "viewerCount")
             } catch {
-                LogManager.logError("Decoding error for required property 'viewerCount': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("viewerCount", error)
                 throw error
             }
             do {
-                startsAt = try container.decode(ATProtocolDate.self, forKey: .startsAt)
+                startsAt = try container.decode(ATProtocolDate.self, forKey: "startsAt")
             } catch {
-                LogManager.logError("Decoding error for required property 'startsAt': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("startsAt", error)
                 throw error
             }
         }
@@ -612,43 +637,43 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if teleportUri != other.teleportUri {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.teleportUri != rhs.teleportUri {
                 return false
             }
-            if source != other.source {
+            if lhs.source != rhs.source {
                 return false
             }
-            if chatProfile != other.chatProfile {
+            if lhs.chatProfile != rhs.chatProfile {
                 return false
             }
-            if viewerCount != other.viewerCount {
+            if lhs.viewerCount != rhs.viewerCount {
                 return false
             }
-            if startsAt != other.startsAt {
+            if lhs.startsAt != rhs.startsAt {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 6)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let teleportUriValue = try teleportUri.toCBORValue()
-            map = map.adding(key: "teleportUri", value: teleportUriValue)
+            map.append(key: "teleportUri", value: teleportUriValue)
             let sourceValue = try source.toCBORValue()
-            map = map.adding(key: "source", value: sourceValue)
+            map.append(key: "source", value: sourceValue)
             if let value = chatProfile {
                 let chatProfileValue = try value.toCBORValue()
-                map = map.adding(key: "chatProfile", value: chatProfileValue)
+                map.append(key: "chatProfile", value: chatProfileValue)
             }
             let viewerCountValue = try viewerCount.toCBORValue()
-            map = map.adding(key: "viewerCount", value: viewerCountValue)
+            map.append(key: "viewerCount", value: viewerCountValue)
             let startsAtValue = try startsAt.toCBORValue()
-            map = map.adding(key: "startsAt", value: startsAtValue)
+            map.append(key: "startsAt", value: startsAtValue)
             return map
         }
 
@@ -675,17 +700,22 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                teleportUri = try container.decode(ATProtocolURI.self, forKey: .teleportUri)
+                teleportUri = try container.decode(ATProtocolURI.self, forKey: "teleportUri")
             } catch {
-                LogManager.logError("Decoding error for required property 'teleportUri': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("teleportUri", error)
                 throw error
             }
             do {
-                reason = try container.decode(TeleportCanceledReason.self, forKey: .reason)
+                reason = try container.decode(TeleportCanceledReason.self, forKey: "reason")
             } catch {
-                LogManager.logError("Decoding error for required property 'reason': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("reason", error)
                 throw error
             }
         }
@@ -704,26 +734,26 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if teleportUri != other.teleportUri {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.teleportUri != rhs.teleportUri {
                 return false
             }
-            if reason != other.reason {
+            if lhs.reason != rhs.reason {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 3)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let teleportUriValue = try teleportUri.toCBORValue()
-            map = map.adding(key: "teleportUri", value: teleportUriValue)
+            map.append(key: "teleportUri", value: teleportUriValue)
             let reasonValue = try reason.toCBORValue()
-            map = map.adding(key: "reason", value: reasonValue)
+            map.append(key: "reason", value: reasonValue)
             return map
         }
 
@@ -745,11 +775,16 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                livestream = try container.decode(StreamplaceAnythingLivestreamUnion.self, forKey: .livestream)
+                livestream = try container.decode(StreamplaceAnythingLivestreamUnion.self, forKey: "livestream")
             } catch {
-                LogManager.logError("Decoding error for required property 'livestream': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("livestream", error)
                 throw error
             }
         }
@@ -766,21 +801,21 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if livestream != other.livestream {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.livestream != rhs.livestream {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 2)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let livestreamValue = try livestream.toCBORValue()
-            map = map.adding(key: "livestream", value: livestreamValue)
+            map.append(key: "livestream", value: livestreamValue)
             return map
         }
 
@@ -853,36 +888,38 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let typeValue = try container.decode(String.self, forKey: .type)
+            // One keyed container serves both the `$type` read and object variants
+            // (`init(_lexiconContainer:)`), so the object's keys are materialized once.
+            let container = try decoder.container(keyedBy: LexiconCodingKey.self)
+            let typeValue = try container.decode(String.self, forKey: "$type")
 
             switch typeValue {
             case "place.stream.livestream#livestreamView":
-                let value = try PlaceStreamLivestream.LivestreamView(from: decoder)
+                let value = try PlaceStreamLivestream.LivestreamView(_lexiconContainer: container)
                 self = .placeStreamLivestreamLivestreamView(value)
             case "place.stream.livestream#viewerCount":
-                let value = try PlaceStreamLivestream.ViewerCount(from: decoder)
+                let value = try PlaceStreamLivestream.ViewerCount(_lexiconContainer: container)
                 self = .placeStreamLivestreamViewerCount(value)
             case "place.stream.livestream#teleportArrival":
-                let value = try PlaceStreamLivestream.TeleportArrival(from: decoder)
+                let value = try PlaceStreamLivestream.TeleportArrival(_lexiconContainer: container)
                 self = .placeStreamLivestreamTeleportArrival(value)
             case "place.stream.livestream#teleportCanceled":
-                let value = try PlaceStreamLivestream.TeleportCanceled(from: decoder)
+                let value = try PlaceStreamLivestream.TeleportCanceled(_lexiconContainer: container)
                 self = .placeStreamLivestreamTeleportCanceled(value)
             case "place.stream.defs#blockView":
-                let value = try PlaceStreamDefs.BlockView(from: decoder)
+                let value = try PlaceStreamDefs.BlockView(_lexiconContainer: container)
                 self = .placeStreamDefsBlockView(value)
             case "place.stream.defs#renditions":
-                let value = try PlaceStreamDefs.Renditions(from: decoder)
+                let value = try PlaceStreamDefs.Renditions(_lexiconContainer: container)
                 self = .placeStreamDefsRenditions(value)
             case "place.stream.defs#rendition":
-                let value = try PlaceStreamDefs.Rendition(from: decoder)
+                let value = try PlaceStreamDefs.Rendition(_lexiconContainer: container)
                 self = .placeStreamDefsRendition(value)
             case "place.stream.chat.defs#messageView":
-                let value = try PlaceStreamChatDefs.MessageView(from: decoder)
+                let value = try PlaceStreamChatDefs.MessageView(_lexiconContainer: container)
                 self = .placeStreamChatDefsMessageView(value)
             case "place.stream.chat.defs#pinnedRecordView":
-                let value = try PlaceStreamChatDefs.PinnedRecordView(from: decoder)
+                let value = try PlaceStreamChatDefs.PinnedRecordView(_lexiconContainer: container)
                 self = .placeStreamChatDefsPinnedRecordView(value)
             default:
                 let unknownValue = try ATProtocolValueContainer(from: decoder)
@@ -1013,7 +1050,7 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
             ):
                 return lhsValue == rhsValue
             case let (.unexpected(lhsValue), .unexpected(rhsValue)):
-                return lhsValue.isEqual(to: rhsValue)
+                return lhsValue == rhsValue
             default:
                 return false
             }
@@ -1024,165 +1061,55 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
             return self == other
         }
 
-        /// DAGCBOR encoding with field ordering
+        /// DAGCBOR encoding with field ordering: `$type` first, then the variant's
+        /// own entries in order (see OrderedCBORMap.unionVariant).
         public func toCBORValue() throws -> Any {
-            // Create an ordered map to maintain field order
-            var map = OrderedCBORMap()
-
             switch self {
             case let .placeStreamLivestreamLivestreamView(value):
-                map = map.adding(key: "$type", value: "place.stream.livestream#livestreamView")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
+                return try OrderedCBORMap.unionVariant(
+                    typeIdentifier: "place.stream.livestream#livestreamView",
+                    payload: value.toCBORValue()
+                )
             case let .placeStreamLivestreamViewerCount(value):
-                map = map.adding(key: "$type", value: "place.stream.livestream#viewerCount")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
+                return try OrderedCBORMap.unionVariant(
+                    typeIdentifier: "place.stream.livestream#viewerCount",
+                    payload: value.toCBORValue()
+                )
             case let .placeStreamLivestreamTeleportArrival(value):
-                map = map.adding(key: "$type", value: "place.stream.livestream#teleportArrival")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
+                return try OrderedCBORMap.unionVariant(
+                    typeIdentifier: "place.stream.livestream#teleportArrival",
+                    payload: value.toCBORValue()
+                )
             case let .placeStreamLivestreamTeleportCanceled(value):
-                map = map.adding(key: "$type", value: "place.stream.livestream#teleportCanceled")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
+                return try OrderedCBORMap.unionVariant(
+                    typeIdentifier: "place.stream.livestream#teleportCanceled",
+                    payload: value.toCBORValue()
+                )
             case let .placeStreamDefsBlockView(value):
-                map = map.adding(key: "$type", value: "place.stream.defs#blockView")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
+                return try OrderedCBORMap.unionVariant(
+                    typeIdentifier: "place.stream.defs#blockView",
+                    payload: value.toCBORValue()
+                )
             case let .placeStreamDefsRenditions(value):
-                map = map.adding(key: "$type", value: "place.stream.defs#renditions")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
+                return try OrderedCBORMap.unionVariant(
+                    typeIdentifier: "place.stream.defs#renditions",
+                    payload: value.toCBORValue()
+                )
             case let .placeStreamDefsRendition(value):
-                map = map.adding(key: "$type", value: "place.stream.defs#rendition")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
+                return try OrderedCBORMap.unionVariant(
+                    typeIdentifier: "place.stream.defs#rendition",
+                    payload: value.toCBORValue()
+                )
             case let .placeStreamChatDefsMessageView(value):
-                map = map.adding(key: "$type", value: "place.stream.chat.defs#messageView")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
+                return try OrderedCBORMap.unionVariant(
+                    typeIdentifier: "place.stream.chat.defs#messageView",
+                    payload: value.toCBORValue()
+                )
             case let .placeStreamChatDefsPinnedRecordView(value):
-                map = map.adding(key: "$type", value: "place.stream.chat.defs#pinnedRecordView")
-
-                let valueDict = try value.toCBORValue()
-
-                // If the value is already an OrderedCBORMap, merge its entries
-                if let orderedMap = valueDict as? OrderedCBORMap {
-                    for (key, value) in orderedMap.entries where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                } else if let dict = valueDict as? [String: Any] {
-                    // Otherwise add each key-value pair from the dictionary
-                    for (key, value) in dict where key != "$type" {
-                        map = map.adding(key: key, value: value)
-                    }
-                }
-                return map
+                return try OrderedCBORMap.unionVariant(
+                    typeIdentifier: "place.stream.chat.defs#pinnedRecordView",
+                    payload: value.toCBORValue()
+                )
             case let .unexpected(container):
                 return try container.toCBORValue()
             }

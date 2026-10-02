@@ -15,9 +15,14 @@ public struct PlaceStreamMetadataDistributionPolicy: ATProtocolCodable, ATProtoc
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        deleteAfter = try container.decodeIfPresent(Int.self, forKey: .deleteAfter)
-        allowedBroadcasters = try container.decodeIfPresent([String].self, forKey: .allowedBroadcasters)
+        self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+    }
+
+    /// Decodes from an already-opened keyed container. Generated unions pass the
+    /// container they read `$type` from, so the object's keys are materialized once.
+    public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
+        deleteAfter = try container.decodeIfPresent(Int.self, forKey: "deleteAfter")
+        allowedBroadcasters = try container.decodeIfPresent(_LexiconStringArray.self, forKey: "allowedBroadcasters")?.values
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -41,28 +46,28 @@ public struct PlaceStreamMetadataDistributionPolicy: ATProtocolCodable, ATProtoc
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if deleteAfter != other.deleteAfter {
+        return self == other
+    }
+
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        if lhs.deleteAfter != rhs.deleteAfter {
             return false
         }
-        if allowedBroadcasters != other.allowedBroadcasters {
+        if lhs.allowedBroadcasters != rhs.allowedBroadcasters {
             return false
         }
         return true
     }
 
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.isEqual(to: rhs)
-    }
-
     public func toCBORValue() throws -> Any {
-        var map = OrderedCBORMap()
+        var map = OrderedCBORMap(minimumCapacity: 2)
         if let value = deleteAfter {
             let deleteAfterValue = try value.toCBORValue()
-            map = map.adding(key: "deleteAfter", value: deleteAfterValue)
+            map.append(key: "deleteAfter", value: deleteAfterValue)
         }
         if let value = allowedBroadcasters {
             let allowedBroadcastersValue = try value.toCBORValue()
-            map = map.adding(key: "allowedBroadcasters", value: allowedBroadcastersValue)
+            map.append(key: "allowedBroadcasters", value: allowedBroadcastersValue)
         }
         return map
     }

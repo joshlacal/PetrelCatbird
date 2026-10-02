@@ -25,7 +25,7 @@ public enum PlaceStreamServerListWebhooks {
         }
     }
 
-    public struct Output: ATProtocolCodable {
+    public struct Output: ATProtocolCodable, XRPCParallelArrayDecodable {
         public let webhooks: [PlaceStreamServerDefs.Webhook]
 
         public let cursor: String?
@@ -51,7 +51,7 @@ public enum PlaceStreamServerListWebhooks {
                 cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
+                _LexiconDecodeDiagnostics.optionalPropertyDegraded("cursor", error)
                 cursor = nil
             }
         }
@@ -66,18 +66,31 @@ public enum PlaceStreamServerListWebhooks {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 2)
 
             let webhooksValue = try webhooks.toCBORValue()
-            map = map.adding(key: "webhooks", value: webhooksValue)
+            map.append(key: "webhooks", value: webhooksValue)
 
             if let value = cursor {
                 // Encode optional property even if it's an empty array for CBOR
                 let cursorValue = try value.toCBORValue()
-                map = map.adding(key: "cursor", value: cursorValue)
+                map.append(key: "cursor", value: cursorValue)
             }
 
             return map
+        }
+
+        // MARK: - Parallel array decoding support (used only by XRPCResponseDecoding's opt-in parallel path)
+
+        public typealias ParallelArrayElement = PlaceStreamServerDefs.Webhook
+
+        public static var parallelArrayKey: String {
+            "webhooks"
+        }
+
+        public init(parallelArrayPrototype prototype: Output, parallelArrayElements elements: [ParallelArrayElement]) {
+            webhooks = elements
+            cursor = prototype.cursor
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -171,16 +184,10 @@ public extension ATProtoClient.Place.Stream.Server {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamServerListWebhooks.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.server.listWebhooks: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(PlaceStreamServerListWebhooks.Output.self, from: responseData, endpoint: "place.stream.server.listWebhooks")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(

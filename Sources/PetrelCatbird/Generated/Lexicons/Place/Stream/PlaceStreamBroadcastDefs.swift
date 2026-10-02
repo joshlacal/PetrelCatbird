@@ -24,29 +24,34 @@ public enum PlaceStreamBroadcastDefs {
         }
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self = try .init(_lexiconContainer: decoder.container(keyedBy: LexiconCodingKey.self))
+        }
+
+        /// Decodes from an already-opened keyed container. Generated unions pass the
+        /// container they read `$type` from, so the object's keys are materialized once.
+        public init(_lexiconContainer container: KeyedDecodingContainer<LexiconCodingKey>) throws {
             do {
-                uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                uri = try container.decode(ATProtocolURI.self, forKey: "uri")
             } catch {
-                LogManager.logError("Decoding error for required property 'uri': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("uri", error)
                 throw error
             }
             do {
-                cid = try container.decode(CID.self, forKey: .cid)
+                cid = try container.decode(CID.self, forKey: "cid")
             } catch {
-                LogManager.logError("Decoding error for required property 'cid': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("cid", error)
                 throw error
             }
             do {
-                author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .author)
+                author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: "author")
             } catch {
-                LogManager.logError("Decoding error for required property 'author': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("author", error)
                 throw error
             }
             do {
-                record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+                record = try container.decode(ATProtocolValueContainer.self, forKey: "record")
             } catch {
-                LogManager.logError("Decoding error for required property 'record': \(error)")
+                _LexiconDecodeDiagnostics.requiredPropertyFailed("record", error)
                 throw error
             }
         }
@@ -69,36 +74,36 @@ public enum PlaceStreamBroadcastDefs {
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if uri != other.uri {
+            return self == other
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            if lhs.uri != rhs.uri {
                 return false
             }
-            if cid != other.cid {
+            if lhs.cid != rhs.cid {
                 return false
             }
-            if author != other.author {
+            if lhs.author != rhs.author {
                 return false
             }
-            if record != other.record {
+            if lhs.record != rhs.record {
                 return false
             }
             return true
         }
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            return lhs.isEqual(to: rhs)
-        }
-
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            var map = OrderedCBORMap(minimumCapacity: 5)
+            map.append(key: "$type", value: Self.typeIdentifier)
             let uriValue = try uri.toCBORValue()
-            map = map.adding(key: "uri", value: uriValue)
+            map.append(key: "uri", value: uriValue)
             let cidValue = try cid.toCBORValue()
-            map = map.adding(key: "cid", value: cidValue)
+            map.append(key: "cid", value: cidValue)
             let authorValue = try author.toCBORValue()
-            map = map.adding(key: "author", value: authorValue)
+            map.append(key: "author", value: authorValue)
             let recordValue = try record.toCBORValue()
-            map = map.adding(key: "record", value: recordValue)
+            map.append(key: "record", value: recordValue)
             return map
         }
 

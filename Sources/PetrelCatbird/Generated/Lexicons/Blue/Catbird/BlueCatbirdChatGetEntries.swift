@@ -69,16 +69,16 @@ public enum BlueCatbirdChatGetEntries {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
+            var map = OrderedCBORMap(minimumCapacity: 3)
 
             let entriesValue = try entries.toCBORValue()
-            map = map.adding(key: "entries", value: entriesValue)
+            map.append(key: "entries", value: entriesValue)
 
             let nextAfterSeqValue = try nextAfterSeq.toCBORValue()
-            map = map.adding(key: "nextAfterSeq", value: nextAfterSeqValue)
+            map.append(key: "nextAfterSeq", value: nextAfterSeqValue)
 
             let hasMoreValue = try hasMore.toCBORValue()
-            map = map.adding(key: "hasMore", value: hasMoreValue)
+            map.append(key: "hasMore", value: hasMoreValue)
 
             return map
         }
@@ -153,16 +153,10 @@ public extension ATProtoClient.Blue.Catbird.Chat {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
 
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatGetEntries.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.getEntries: \(error)")
-                return (responseCode, nil)
-            }
+            // A decode failure is logged and returned as a nil body (the response code is still returned);
+            // a caller cancelled while the request was in flight gets CancellationError instead of a decode.
+            let decodedData = try await XRPCResponseDecoding.decodeSuccessfulResponse(BlueCatbirdChatGetEntries.Output.self, from: responseData, endpoint: "blue.catbird.chat.getEntries")
+            return (responseCode, decodedData)
         } else {
             // Try to parse a declared structured error response
             if let atprotoError = ATProtoErrorParser.parse(
