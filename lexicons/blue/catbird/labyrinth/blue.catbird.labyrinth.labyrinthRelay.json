@@ -23,7 +23,7 @@
                 "appendBatch",
                 "findMeks",
                 "listBatches",
-                "redactMessages",
+                "redactMessage",
                 "messageLive",
                 "purgeAuthor"
               ],

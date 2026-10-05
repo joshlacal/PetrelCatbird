@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "procedure",
-      "description": "Account deletion (decision J1): delete the mailbox exactly as deleteMailbox does (which also deletes every ORF state), redact every thread item the DID authored (as redactMessages, in every conversation, including remote ones through their sequencer DSes), and delete the DID's idempotency records. MEK records stay, because other members' batches may be sealed under them. Idempotent. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.",
+      "description": "Account deletion (decision J1): purge the mailbox exactly as purgeMailbox does (including every ORF state), redact every thread item the DID authored in every conversation (remote ones through their sequencer DSes) the way redactMessage does but without a client signature (the redaction carries only redactedAt), and delete the DID's idempotency records. MEK records stay, because other members' batches may be sealed under them. Idempotent. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.",
       "input": {
         "encoding": "application/json",
         "schema": {
