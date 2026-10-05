@@ -1958,15 +1958,17 @@ public enum BlueCatbirdChatDefs {
         public let status: DefsParticipantStatus
         public let invitationProvenance: InvitationProvenance?
         public let leafCount: Int
+        public let labyrinthHead: LabyrinthHead?
 
         public init(
-            userDid: BareDid, role: DefsMemberRole, status: DefsParticipantStatus, invitationProvenance: InvitationProvenance? = nil, leafCount: Int
+            userDid: BareDid, role: DefsMemberRole, status: DefsParticipantStatus, invitationProvenance: InvitationProvenance? = nil, leafCount: Int, labyrinthHead: LabyrinthHead? = nil
         ) {
             self.userDid = userDid
             self.role = role
             self.status = status
             self.invitationProvenance = invitationProvenance
             self.leafCount = leafCount
+            self.labyrinthHead = labyrinthHead
         }
 
         public init(from decoder: Decoder) throws {
@@ -2003,6 +2005,14 @@ public enum BlueCatbirdChatDefs {
                 LogManager.logError("Decoding error for required property 'leafCount': \(error)")
                 throw error
             }
+            do {
+                labyrinthHead = try container.decodeIfPresent(LabyrinthHead.self, forKey: .labyrinthHead)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'labyrinthHead' — degrading to nil: \(error)")
+                labyrinthHead = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -2013,6 +2023,7 @@ public enum BlueCatbirdChatDefs {
             try container.encode(status, forKey: .status)
             try container.encodeIfPresent(invitationProvenance, forKey: .invitationProvenance)
             try container.encode(leafCount, forKey: .leafCount)
+            try container.encodeIfPresent(labyrinthHead, forKey: .labyrinthHead)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -2025,6 +2036,11 @@ public enum BlueCatbirdChatDefs {
                 hasher.combine(nil as Int?)
             }
             hasher.combine(leafCount)
+            if let value = labyrinthHead {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
@@ -2042,6 +2058,9 @@ public enum BlueCatbirdChatDefs {
                 return false
             }
             if leafCount != other.leafCount {
+                return false
+            }
+            if labyrinthHead != other.labyrinthHead {
                 return false
             }
             return true
@@ -2066,6 +2085,10 @@ public enum BlueCatbirdChatDefs {
             }
             let leafCountValue = try leafCount.toCBORValue()
             map = map.adding(key: "leafCount", value: leafCountValue)
+            if let value = labyrinthHead {
+                let labyrinthHeadValue = try value.toCBORValue()
+                map = map.adding(key: "labyrinthHead", value: labyrinthHeadValue)
+            }
             return map
         }
 
@@ -2076,6 +2099,95 @@ public enum BlueCatbirdChatDefs {
             case status
             case invitationProvenance
             case leafCount
+            case labyrinthHead
+        }
+    }
+
+    public struct LabyrinthHead: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#labyrinthHead"
+        public let epochNumber: Int
+        public let epochHead: Bytes
+        public let attestationKeyId: String
+
+        public init(
+            epochNumber: Int, epochHead: Bytes, attestationKeyId: String
+        ) {
+            self.epochNumber = epochNumber
+            self.epochHead = epochHead
+            self.attestationKeyId = attestationKeyId
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                epochNumber = try container.decode(Int.self, forKey: .epochNumber)
+            } catch {
+                LogManager.logError("Decoding error for required property 'epochNumber': \(error)")
+                throw error
+            }
+            do {
+                epochHead = try container.decode(Bytes.self, forKey: .epochHead)
+            } catch {
+                LogManager.logError("Decoding error for required property 'epochHead': \(error)")
+                throw error
+            }
+            do {
+                attestationKeyId = try container.decode(String.self, forKey: .attestationKeyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'attestationKeyId': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(epochNumber, forKey: .epochNumber)
+            try container.encode(epochHead, forKey: .epochHead)
+            try container.encode(attestationKeyId, forKey: .attestationKeyId)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(epochNumber)
+            hasher.combine(epochHead)
+            hasher.combine(attestationKeyId)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if epochNumber != other.epochNumber {
+                return false
+            }
+            if epochHead != other.epochHead {
+                return false
+            }
+            if attestationKeyId != other.attestationKeyId {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let epochNumberValue = try epochNumber.toCBORValue()
+            map = map.adding(key: "epochNumber", value: epochNumberValue)
+            let epochHeadValue = try epochHead.toCBORValue()
+            map = map.adding(key: "epochHead", value: epochHeadValue)
+            let attestationKeyIdValue = try attestationKeyId.toCBORValue()
+            map = map.adding(key: "attestationKeyId", value: attestationKeyIdValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case epochNumber
+            case epochHead
+            case attestationKeyId
         }
     }
 

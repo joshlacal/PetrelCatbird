@@ -35,26 +35,54 @@ object BlueCatbirdChatDefsParticipantChangeSerializer : kotlinx.serialization.KS
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsParticipantChange")
 
+    private val TYPE_AddParticipant = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#addParticipant")
+    private val TYPE_RemoveParticipant = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#removeParticipant")
+    private val TYPE_ChangeParticipantRole = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#changeParticipantRole")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsParticipantChange) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsParticipantChange.AddParticipant -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsAddParticipant.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#addParticipant")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsAddParticipant.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_AddParticipant
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_AddParticipant)
+                }
+                obj
             }
             is BlueCatbirdChatDefsParticipantChange.RemoveParticipant -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRemoveParticipant.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#removeParticipant")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsRemoveParticipant.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_RemoveParticipant
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_RemoveParticipant)
+                }
+                obj
             }
             is BlueCatbirdChatDefsParticipantChange.ChangeParticipantRole -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsChangeParticipantRole.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#changeParticipantRole")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsChangeParticipantRole.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ChangeParticipantRole
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ChangeParticipantRole)
+                }
+                obj
             }
             is BlueCatbirdChatDefsParticipantChange.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -69,10 +97,14 @@ object BlueCatbirdChatDefsParticipantChangeSerializer : kotlinx.serialization.KS
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsParticipantChange {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsParticipantChange can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsParticipantChange.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsParticipantChange.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#addParticipant" -> BlueCatbirdChatDefsParticipantChange.AddParticipant(
@@ -105,20 +137,39 @@ object BlueCatbirdChatDefsLeafChangeSerializer : kotlinx.serialization.KSerializ
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsLeafChange")
 
+    private val TYPE_AddLeafByRecovery = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#addLeafByRecovery")
+    private val TYPE_RemoveLeaf = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#removeLeaf")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsLeafChange) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsLeafChange.AddLeafByRecovery -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsAddLeafByRecovery.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#addLeafByRecovery")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsAddLeafByRecovery.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_AddLeafByRecovery
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_AddLeafByRecovery)
+                }
+                obj
             }
             is BlueCatbirdChatDefsLeafChange.RemoveLeaf -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRemoveLeaf.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#removeLeaf")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsRemoveLeaf.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_RemoveLeaf
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_RemoveLeaf)
+                }
+                obj
             }
             is BlueCatbirdChatDefsLeafChange.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -133,10 +184,14 @@ object BlueCatbirdChatDefsLeafChangeSerializer : kotlinx.serialization.KSerializ
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsLeafChange {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsLeafChange can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsLeafChange.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsLeafChange.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#addLeafByRecovery" -> BlueCatbirdChatDefsLeafChange.AddLeafByRecovery(
@@ -172,32 +227,69 @@ object BlueCatbirdChatDefsApplicationEmbedSerializer : kotlinx.serialization.KSe
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsApplicationEmbed")
 
+    private val TYPE_EncryptedImageEmbedVariant = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#encryptedImageEmbedVariant")
+    private val TYPE_EncryptedAudioEmbedVariant = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#encryptedAudioEmbedVariant")
+    private val TYPE_AtprotoRecordEmbedVariant = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#atprotoRecordEmbedVariant")
+    private val TYPE_ExternalLinkEmbedVariant = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#externalLinkEmbedVariant")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsApplicationEmbed) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsApplicationEmbed.EncryptedImageEmbedVariant -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsEncryptedImageEmbedVariant.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#encryptedImageEmbedVariant")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsEncryptedImageEmbedVariant.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_EncryptedImageEmbedVariant
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_EncryptedImageEmbedVariant)
+                }
+                obj
             }
             is BlueCatbirdChatDefsApplicationEmbed.EncryptedAudioEmbedVariant -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsEncryptedAudioEmbedVariant.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#encryptedAudioEmbedVariant")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsEncryptedAudioEmbedVariant.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_EncryptedAudioEmbedVariant
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_EncryptedAudioEmbedVariant)
+                }
+                obj
             }
             is BlueCatbirdChatDefsApplicationEmbed.AtprotoRecordEmbedVariant -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsAtprotoRecordEmbedVariant.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#atprotoRecordEmbedVariant")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsAtprotoRecordEmbedVariant.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_AtprotoRecordEmbedVariant
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_AtprotoRecordEmbedVariant)
+                }
+                obj
             }
             is BlueCatbirdChatDefsApplicationEmbed.ExternalLinkEmbedVariant -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsExternalLinkEmbedVariant.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#externalLinkEmbedVariant")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsExternalLinkEmbedVariant.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ExternalLinkEmbedVariant
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ExternalLinkEmbedVariant)
+                }
+                obj
             }
             is BlueCatbirdChatDefsApplicationEmbed.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -212,10 +304,14 @@ object BlueCatbirdChatDefsApplicationEmbedSerializer : kotlinx.serialization.KSe
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsApplicationEmbed {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsApplicationEmbed can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsApplicationEmbed.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsApplicationEmbed.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#encryptedImageEmbedVariant" -> BlueCatbirdChatDefsApplicationEmbed.EncryptedImageEmbedVariant(
@@ -260,38 +356,84 @@ object BlueCatbirdChatDefsApplicationFrameBodySerializer : kotlinx.serialization
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsApplicationFrameBody")
 
+    private val TYPE_MessageFrameVariant = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#messageFrameVariant")
+    private val TYPE_ReactionFrameVariant = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#reactionFrameVariant")
+    private val TYPE_EditFrameVariant = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#editFrameVariant")
+    private val TYPE_TombstoneFrameVariant = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#tombstoneFrameVariant")
+    private val TYPE_ReadStateFrameVariant = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#readStateFrameVariant")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsApplicationFrameBody) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsApplicationFrameBody.MessageFrameVariant -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsMessageFrameVariant.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#messageFrameVariant")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsMessageFrameVariant.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_MessageFrameVariant
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_MessageFrameVariant)
+                }
+                obj
             }
             is BlueCatbirdChatDefsApplicationFrameBody.ReactionFrameVariant -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsReactionFrameVariant.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#reactionFrameVariant")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsReactionFrameVariant.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ReactionFrameVariant
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ReactionFrameVariant)
+                }
+                obj
             }
             is BlueCatbirdChatDefsApplicationFrameBody.EditFrameVariant -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsEditFrameVariant.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#editFrameVariant")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsEditFrameVariant.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_EditFrameVariant
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_EditFrameVariant)
+                }
+                obj
             }
             is BlueCatbirdChatDefsApplicationFrameBody.TombstoneFrameVariant -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsTombstoneFrameVariant.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#tombstoneFrameVariant")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsTombstoneFrameVariant.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_TombstoneFrameVariant
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_TombstoneFrameVariant)
+                }
+                obj
             }
             is BlueCatbirdChatDefsApplicationFrameBody.ReadStateFrameVariant -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsReadStateFrameVariant.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#readStateFrameVariant")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsReadStateFrameVariant.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ReadStateFrameVariant
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ReadStateFrameVariant)
+                }
+                obj
             }
             is BlueCatbirdChatDefsApplicationFrameBody.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -306,10 +448,14 @@ object BlueCatbirdChatDefsApplicationFrameBodySerializer : kotlinx.serialization
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsApplicationFrameBody {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsApplicationFrameBody can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsApplicationFrameBody.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsApplicationFrameBody.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#messageFrameVariant" -> BlueCatbirdChatDefsApplicationFrameBody.MessageFrameVariant(
@@ -354,32 +500,69 @@ object BlueCatbirdChatDefsRecoveryWorkViewSerializer : kotlinx.serialization.KSe
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsRecoveryWorkView")
 
+    private val TYPE_RecoveryWorkPendingView = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkPendingView")
+    private val TYPE_RecoveryWorkCompletedByTransitionView = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView")
+    private val TYPE_RecoveryWorkSupersededByTransitionView = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView")
+    private val TYPE_RecoveryWorkSupersededByRevocationView = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsRecoveryWorkView) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsRecoveryWorkView.RecoveryWorkPendingView -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkPendingView.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkPendingView")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkPendingView.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_RecoveryWorkPendingView
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_RecoveryWorkPendingView)
+                }
+                obj
             }
             is BlueCatbirdChatDefsRecoveryWorkView.RecoveryWorkCompletedByTransitionView -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkCompletedByTransitionView.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkCompletedByTransitionView.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_RecoveryWorkCompletedByTransitionView
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_RecoveryWorkCompletedByTransitionView)
+                }
+                obj
             }
             is BlueCatbirdChatDefsRecoveryWorkView.RecoveryWorkSupersededByTransitionView -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByTransitionView.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByTransitionView.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_RecoveryWorkSupersededByTransitionView
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_RecoveryWorkSupersededByTransitionView)
+                }
+                obj
             }
             is BlueCatbirdChatDefsRecoveryWorkView.RecoveryWorkSupersededByRevocationView -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByRevocationView.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByRevocationView.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_RecoveryWorkSupersededByRevocationView
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_RecoveryWorkSupersededByRevocationView)
+                }
+                obj
             }
             is BlueCatbirdChatDefsRecoveryWorkView.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -394,10 +577,14 @@ object BlueCatbirdChatDefsRecoveryWorkViewSerializer : kotlinx.serialization.KSe
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsRecoveryWorkView {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsRecoveryWorkView can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsRecoveryWorkView.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsRecoveryWorkView.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#recoveryWorkPendingView" -> BlueCatbirdChatDefsRecoveryWorkView.RecoveryWorkPendingView(
@@ -442,38 +629,84 @@ object BlueCatbirdChatDefsLeafRecoveryInboxItemSerializer : kotlinx.serializatio
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsLeafRecoveryInboxItem")
 
+    private val TYPE_LeafRecoveryView = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leafRecoveryView")
+    private val TYPE_RecoveryWorkPendingView = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkPendingView")
+    private val TYPE_RecoveryWorkCompletedByTransitionView = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView")
+    private val TYPE_RecoveryWorkSupersededByTransitionView = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView")
+    private val TYPE_RecoveryWorkSupersededByRevocationView = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsLeafRecoveryInboxItem) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsLeafRecoveryInboxItem.LeafRecoveryView -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryView.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leafRecoveryView")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryView.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_LeafRecoveryView
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_LeafRecoveryView)
+                }
+                obj
             }
             is BlueCatbirdChatDefsLeafRecoveryInboxItem.RecoveryWorkPendingView -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkPendingView.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkPendingView")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkPendingView.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_RecoveryWorkPendingView
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_RecoveryWorkPendingView)
+                }
+                obj
             }
             is BlueCatbirdChatDefsLeafRecoveryInboxItem.RecoveryWorkCompletedByTransitionView -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkCompletedByTransitionView.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkCompletedByTransitionView.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_RecoveryWorkCompletedByTransitionView
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_RecoveryWorkCompletedByTransitionView)
+                }
+                obj
             }
             is BlueCatbirdChatDefsLeafRecoveryInboxItem.RecoveryWorkSupersededByTransitionView -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByTransitionView.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByTransitionView.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_RecoveryWorkSupersededByTransitionView
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_RecoveryWorkSupersededByTransitionView)
+                }
+                obj
             }
             is BlueCatbirdChatDefsLeafRecoveryInboxItem.RecoveryWorkSupersededByRevocationView -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByRevocationView.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsRecoveryWorkSupersededByRevocationView.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_RecoveryWorkSupersededByRevocationView
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_RecoveryWorkSupersededByRevocationView)
+                }
+                obj
             }
             is BlueCatbirdChatDefsLeafRecoveryInboxItem.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -488,10 +721,14 @@ object BlueCatbirdChatDefsLeafRecoveryInboxItemSerializer : kotlinx.serializatio
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsLeafRecoveryInboxItem {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsLeafRecoveryInboxItem can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsLeafRecoveryInboxItem.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsLeafRecoveryInboxItem.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#leafRecoveryView" -> BlueCatbirdChatDefsLeafRecoveryInboxItem.LeafRecoveryView(
@@ -530,20 +767,39 @@ object BlueCatbirdChatDefsLeaveOperationResultSerializer : kotlinx.serialization
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsLeaveOperationResult")
 
+    private val TYPE_DurableLeaveRequestResult = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#durableLeaveRequestResult")
+    private val TYPE_ZeroLeafLeaveResult = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#zeroLeafLeaveResult")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsLeaveOperationResult) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsLeaveOperationResult.DurableLeaveRequestResult -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDurableLeaveRequestResult.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#durableLeaveRequestResult")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDurableLeaveRequestResult.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DurableLeaveRequestResult
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DurableLeaveRequestResult)
+                }
+                obj
             }
             is BlueCatbirdChatDefsLeaveOperationResult.ZeroLeafLeaveResult -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsZeroLeafLeaveResult.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#zeroLeafLeaveResult")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsZeroLeafLeaveResult.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ZeroLeafLeaveResult
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ZeroLeafLeaveResult)
+                }
+                obj
             }
             is BlueCatbirdChatDefsLeaveOperationResult.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -558,10 +814,14 @@ object BlueCatbirdChatDefsLeaveOperationResultSerializer : kotlinx.serialization
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsLeaveOperationResult {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsLeaveOperationResult can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsLeaveOperationResult.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsLeaveOperationResult.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#durableLeaveRequestResult" -> BlueCatbirdChatDefsLeaveOperationResult.DurableLeaveRequestResult(
@@ -591,20 +851,39 @@ object BlueCatbirdChatDefsConversationCreationResultSerializer : kotlinx.seriali
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsConversationCreationResult")
 
+    private val TYPE_ConversationCreatedResult = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationCreatedResult")
+    private val TYPE_ExistingDirectConversationResult = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#existingDirectConversationResult")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsConversationCreationResult) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsConversationCreationResult.ConversationCreatedResult -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCreatedResult.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationCreatedResult")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCreatedResult.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ConversationCreatedResult
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ConversationCreatedResult)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationCreationResult.ExistingDirectConversationResult -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsExistingDirectConversationResult.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#existingDirectConversationResult")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsExistingDirectConversationResult.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ExistingDirectConversationResult
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ExistingDirectConversationResult)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationCreationResult.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -619,10 +898,14 @@ object BlueCatbirdChatDefsConversationCreationResultSerializer : kotlinx.seriali
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsConversationCreationResult {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsConversationCreationResult can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsConversationCreationResult.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsConversationCreationResult.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#conversationCreatedResult" -> BlueCatbirdChatDefsConversationCreationResult.ConversationCreatedResult(
@@ -649,14 +932,24 @@ object BlueCatbirdChatDefsSignedDeviceEnrollmentBodyUnionSerializer : kotlinx.se
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedDeviceEnrollmentBodyUnion")
 
+    private val TYPE_DeviceEnrollmentBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#deviceEnrollmentBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedDeviceEnrollmentBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedDeviceEnrollmentBodyUnion.DeviceEnrollmentBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDeviceEnrollmentBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#deviceEnrollmentBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDeviceEnrollmentBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DeviceEnrollmentBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DeviceEnrollmentBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedDeviceEnrollmentBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -671,10 +964,14 @@ object BlueCatbirdChatDefsSignedDeviceEnrollmentBodyUnionSerializer : kotlinx.se
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedDeviceEnrollmentBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedDeviceEnrollmentBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedDeviceEnrollmentBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedDeviceEnrollmentBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#deviceEnrollmentBody" -> BlueCatbirdChatDefsSignedDeviceEnrollmentBodyUnion.DeviceEnrollmentBody(
@@ -698,14 +995,24 @@ object BlueCatbirdChatDefsSignedKeyPackageReplenishmentBodyUnionSerializer : kot
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedKeyPackageReplenishmentBodyUnion")
 
+    private val TYPE_KeyPackageReplenishmentBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#keyPackageReplenishmentBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedKeyPackageReplenishmentBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedKeyPackageReplenishmentBodyUnion.KeyPackageReplenishmentBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsKeyPackageReplenishmentBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#keyPackageReplenishmentBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsKeyPackageReplenishmentBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_KeyPackageReplenishmentBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_KeyPackageReplenishmentBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedKeyPackageReplenishmentBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -720,10 +1027,14 @@ object BlueCatbirdChatDefsSignedKeyPackageReplenishmentBodyUnionSerializer : kot
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedKeyPackageReplenishmentBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedKeyPackageReplenishmentBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedKeyPackageReplenishmentBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedKeyPackageReplenishmentBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#keyPackageReplenishmentBody" -> BlueCatbirdChatDefsSignedKeyPackageReplenishmentBodyUnion.KeyPackageReplenishmentBody(
@@ -747,14 +1058,24 @@ object BlueCatbirdChatDefsSignedDeviceRevocationBodyUnionSerializer : kotlinx.se
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedDeviceRevocationBodyUnion")
 
+    private val TYPE_DeviceRevocationBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#deviceRevocationBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedDeviceRevocationBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedDeviceRevocationBodyUnion.DeviceRevocationBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDeviceRevocationBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#deviceRevocationBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDeviceRevocationBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DeviceRevocationBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DeviceRevocationBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedDeviceRevocationBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -769,10 +1090,14 @@ object BlueCatbirdChatDefsSignedDeviceRevocationBodyUnionSerializer : kotlinx.se
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedDeviceRevocationBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedDeviceRevocationBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedDeviceRevocationBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedDeviceRevocationBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#deviceRevocationBody" -> BlueCatbirdChatDefsSignedDeviceRevocationBodyUnion.DeviceRevocationBody(
@@ -796,14 +1121,24 @@ object BlueCatbirdChatDefsSignedBlobUploadPreparationBodyUnionSerializer : kotli
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedBlobUploadPreparationBodyUnion")
 
+    private val TYPE_BlobUploadPreparationBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#blobUploadPreparationBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedBlobUploadPreparationBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedBlobUploadPreparationBodyUnion.BlobUploadPreparationBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsBlobUploadPreparationBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#blobUploadPreparationBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsBlobUploadPreparationBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_BlobUploadPreparationBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_BlobUploadPreparationBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedBlobUploadPreparationBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -818,10 +1153,14 @@ object BlueCatbirdChatDefsSignedBlobUploadPreparationBodyUnionSerializer : kotli
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedBlobUploadPreparationBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedBlobUploadPreparationBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedBlobUploadPreparationBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedBlobUploadPreparationBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#blobUploadPreparationBody" -> BlueCatbirdChatDefsSignedBlobUploadPreparationBodyUnion.BlobUploadPreparationBody(
@@ -845,14 +1184,24 @@ object BlueCatbirdChatDefsSignedBlobDeletionBodyUnionSerializer : kotlinx.serial
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedBlobDeletionBodyUnion")
 
+    private val TYPE_BlobDeletionBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#blobDeletionBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedBlobDeletionBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedBlobDeletionBodyUnion.BlobDeletionBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsBlobDeletionBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#blobDeletionBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsBlobDeletionBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_BlobDeletionBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_BlobDeletionBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedBlobDeletionBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -867,10 +1216,14 @@ object BlueCatbirdChatDefsSignedBlobDeletionBodyUnionSerializer : kotlinx.serial
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedBlobDeletionBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedBlobDeletionBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedBlobDeletionBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedBlobDeletionBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#blobDeletionBody" -> BlueCatbirdChatDefsSignedBlobDeletionBodyUnion.BlobDeletionBody(
@@ -894,14 +1247,24 @@ object BlueCatbirdChatDefsSignedCreationBodyUnionSerializer : kotlinx.serializat
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedCreationBodyUnion")
 
+    private val TYPE_CreationBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#creationBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedCreationBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedCreationBodyUnion.CreationBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsCreationBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#creationBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsCreationBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_CreationBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_CreationBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedCreationBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -916,10 +1279,14 @@ object BlueCatbirdChatDefsSignedCreationBodyUnionSerializer : kotlinx.serializat
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedCreationBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedCreationBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedCreationBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedCreationBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#creationBody" -> BlueCatbirdChatDefsSignedCreationBodyUnion.CreationBody(
@@ -943,14 +1310,24 @@ object BlueCatbirdChatDefsSignedCommitTransitionBodyUnionSerializer : kotlinx.se
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedCommitTransitionBodyUnion")
 
+    private val TYPE_CommitTransitionBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#commitTransitionBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedCommitTransitionBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedCommitTransitionBodyUnion.CommitTransitionBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsCommitTransitionBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#commitTransitionBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsCommitTransitionBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_CommitTransitionBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_CommitTransitionBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedCommitTransitionBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -965,10 +1342,14 @@ object BlueCatbirdChatDefsSignedCommitTransitionBodyUnionSerializer : kotlinx.se
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedCommitTransitionBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedCommitTransitionBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedCommitTransitionBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedCommitTransitionBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#commitTransitionBody" -> BlueCatbirdChatDefsSignedCommitTransitionBodyUnion.CommitTransitionBody(
@@ -992,14 +1373,24 @@ object BlueCatbirdChatDefsSignedPolicyTransitionBodyUnionSerializer : kotlinx.se
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedPolicyTransitionBodyUnion")
 
+    private val TYPE_PolicyTransitionBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#policyTransitionBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedPolicyTransitionBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedPolicyTransitionBodyUnion.PolicyTransitionBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsPolicyTransitionBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#policyTransitionBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsPolicyTransitionBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_PolicyTransitionBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_PolicyTransitionBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedPolicyTransitionBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1014,10 +1405,14 @@ object BlueCatbirdChatDefsSignedPolicyTransitionBodyUnionSerializer : kotlinx.se
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedPolicyTransitionBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedPolicyTransitionBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedPolicyTransitionBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedPolicyTransitionBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#policyTransitionBody" -> BlueCatbirdChatDefsSignedPolicyTransitionBodyUnion.PolicyTransitionBody(
@@ -1041,14 +1436,24 @@ object BlueCatbirdChatDefsSignedParticipantAcceptanceBodyUnionSerializer : kotli
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedParticipantAcceptanceBodyUnion")
 
+    private val TYPE_ParticipantAcceptanceBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#participantAcceptanceBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedParticipantAcceptanceBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedParticipantAcceptanceBodyUnion.ParticipantAcceptanceBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsParticipantAcceptanceBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#participantAcceptanceBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsParticipantAcceptanceBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ParticipantAcceptanceBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ParticipantAcceptanceBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedParticipantAcceptanceBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1063,10 +1468,14 @@ object BlueCatbirdChatDefsSignedParticipantAcceptanceBodyUnionSerializer : kotli
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedParticipantAcceptanceBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedParticipantAcceptanceBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedParticipantAcceptanceBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedParticipantAcceptanceBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#participantAcceptanceBody" -> BlueCatbirdChatDefsSignedParticipantAcceptanceBodyUnion.ParticipantAcceptanceBody(
@@ -1090,14 +1499,24 @@ object BlueCatbirdChatDefsSignedApplicationSendBodyUnionSerializer : kotlinx.ser
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedApplicationSendBodyUnion")
 
+    private val TYPE_ApplicationSendBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#applicationSendBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedApplicationSendBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedApplicationSendBodyUnion.ApplicationSendBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsApplicationSendBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#applicationSendBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsApplicationSendBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ApplicationSendBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ApplicationSendBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedApplicationSendBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1112,10 +1531,14 @@ object BlueCatbirdChatDefsSignedApplicationSendBodyUnionSerializer : kotlinx.ser
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedApplicationSendBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedApplicationSendBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedApplicationSendBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedApplicationSendBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#applicationSendBody" -> BlueCatbirdChatDefsSignedApplicationSendBodyUnion.ApplicationSendBody(
@@ -1139,14 +1562,24 @@ object BlueCatbirdChatDefsSignedTypingBodyUnionSerializer : kotlinx.serializatio
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedTypingBodyUnion")
 
+    private val TYPE_TypingBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#typingBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedTypingBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedTypingBodyUnion.TypingBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsTypingBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#typingBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsTypingBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_TypingBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_TypingBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedTypingBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1161,10 +1594,14 @@ object BlueCatbirdChatDefsSignedTypingBodyUnionSerializer : kotlinx.serializatio
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedTypingBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedTypingBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedTypingBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedTypingBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#typingBody" -> BlueCatbirdChatDefsSignedTypingBodyUnion.TypingBody(
@@ -1188,14 +1625,24 @@ object BlueCatbirdChatDefsSignedMetadataTransitionBodyUnionSerializer : kotlinx.
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedMetadataTransitionBodyUnion")
 
+    private val TYPE_MetadataTransitionBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#metadataTransitionBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedMetadataTransitionBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedMetadataTransitionBodyUnion.MetadataTransitionBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsMetadataTransitionBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#metadataTransitionBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsMetadataTransitionBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_MetadataTransitionBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_MetadataTransitionBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedMetadataTransitionBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1210,10 +1657,14 @@ object BlueCatbirdChatDefsSignedMetadataTransitionBodyUnionSerializer : kotlinx.
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedMetadataTransitionBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedMetadataTransitionBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedMetadataTransitionBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedMetadataTransitionBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#metadataTransitionBody" -> BlueCatbirdChatDefsSignedMetadataTransitionBodyUnion.MetadataTransitionBody(
@@ -1237,14 +1688,24 @@ object BlueCatbirdChatDefsSignedResetRequestBodyUnionSerializer : kotlinx.serial
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedResetRequestBodyUnion")
 
+    private val TYPE_ResetRequestBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#resetRequestBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedResetRequestBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedResetRequestBodyUnion.ResetRequestBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsResetRequestBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#resetRequestBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsResetRequestBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ResetRequestBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ResetRequestBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedResetRequestBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1259,10 +1720,14 @@ object BlueCatbirdChatDefsSignedResetRequestBodyUnionSerializer : kotlinx.serial
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedResetRequestBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedResetRequestBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedResetRequestBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedResetRequestBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#resetRequestBody" -> BlueCatbirdChatDefsSignedResetRequestBodyUnion.ResetRequestBody(
@@ -1286,14 +1751,24 @@ object BlueCatbirdChatDefsSignedResetActivationBodyUnionSerializer : kotlinx.ser
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedResetActivationBodyUnion")
 
+    private val TYPE_ResetActivationBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#resetActivationBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedResetActivationBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedResetActivationBodyUnion.ResetActivationBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsResetActivationBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#resetActivationBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsResetActivationBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ResetActivationBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ResetActivationBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedResetActivationBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1308,10 +1783,14 @@ object BlueCatbirdChatDefsSignedResetActivationBodyUnionSerializer : kotlinx.ser
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedResetActivationBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedResetActivationBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedResetActivationBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedResetActivationBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#resetActivationBody" -> BlueCatbirdChatDefsSignedResetActivationBodyUnion.ResetActivationBody(
@@ -1335,14 +1814,24 @@ object BlueCatbirdChatDefsSignedLeafRecoveryRequestBodyUnionSerializer : kotlinx
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedLeafRecoveryRequestBodyUnion")
 
+    private val TYPE_LeafRecoveryRequestBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leafRecoveryRequestBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedLeafRecoveryRequestBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedLeafRecoveryRequestBodyUnion.LeafRecoveryRequestBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryRequestBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leafRecoveryRequestBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryRequestBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_LeafRecoveryRequestBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_LeafRecoveryRequestBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedLeafRecoveryRequestBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1357,10 +1846,14 @@ object BlueCatbirdChatDefsSignedLeafRecoveryRequestBodyUnionSerializer : kotlinx
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedLeafRecoveryRequestBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedLeafRecoveryRequestBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedLeafRecoveryRequestBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedLeafRecoveryRequestBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#leafRecoveryRequestBody" -> BlueCatbirdChatDefsSignedLeafRecoveryRequestBodyUnion.LeafRecoveryRequestBody(
@@ -1384,14 +1877,24 @@ object BlueCatbirdChatDefsSignedLeafRecoveryCancellationBodyUnionSerializer : ko
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedLeafRecoveryCancellationBodyUnion")
 
+    private val TYPE_LeafRecoveryCancellationBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leafRecoveryCancellationBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedLeafRecoveryCancellationBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedLeafRecoveryCancellationBodyUnion.LeafRecoveryCancellationBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryCancellationBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leafRecoveryCancellationBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryCancellationBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_LeafRecoveryCancellationBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_LeafRecoveryCancellationBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedLeafRecoveryCancellationBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1406,10 +1909,14 @@ object BlueCatbirdChatDefsSignedLeafRecoveryCancellationBodyUnionSerializer : ko
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedLeafRecoveryCancellationBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedLeafRecoveryCancellationBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedLeafRecoveryCancellationBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedLeafRecoveryCancellationBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#leafRecoveryCancellationBody" -> BlueCatbirdChatDefsSignedLeafRecoveryCancellationBodyUnion.LeafRecoveryCancellationBody(
@@ -1433,14 +1940,24 @@ object BlueCatbirdChatDefsSignedLeafRecoveryFulfillmentBodyUnionSerializer : kot
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedLeafRecoveryFulfillmentBodyUnion")
 
+    private val TYPE_LeafRecoveryFulfillmentBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leafRecoveryFulfillmentBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedLeafRecoveryFulfillmentBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedLeafRecoveryFulfillmentBodyUnion.LeafRecoveryFulfillmentBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryFulfillmentBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leafRecoveryFulfillmentBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryFulfillmentBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_LeafRecoveryFulfillmentBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_LeafRecoveryFulfillmentBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedLeafRecoveryFulfillmentBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1455,10 +1972,14 @@ object BlueCatbirdChatDefsSignedLeafRecoveryFulfillmentBodyUnionSerializer : kot
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedLeafRecoveryFulfillmentBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedLeafRecoveryFulfillmentBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedLeafRecoveryFulfillmentBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedLeafRecoveryFulfillmentBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#leafRecoveryFulfillmentBody" -> BlueCatbirdChatDefsSignedLeafRecoveryFulfillmentBodyUnion.LeafRecoveryFulfillmentBody(
@@ -1482,14 +2003,24 @@ object BlueCatbirdChatDefsSignedConversationCloseBodyUnionSerializer : kotlinx.s
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedConversationCloseBodyUnion")
 
+    private val TYPE_ConversationCloseBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationCloseBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedConversationCloseBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedConversationCloseBodyUnion.ConversationCloseBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCloseBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationCloseBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCloseBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ConversationCloseBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ConversationCloseBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedConversationCloseBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1504,10 +2035,14 @@ object BlueCatbirdChatDefsSignedConversationCloseBodyUnionSerializer : kotlinx.s
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedConversationCloseBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedConversationCloseBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedConversationCloseBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedConversationCloseBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#conversationCloseBody" -> BlueCatbirdChatDefsSignedConversationCloseBodyUnion.ConversationCloseBody(
@@ -1531,14 +2066,24 @@ object BlueCatbirdChatDefsSignedLeaveRequestBodyUnionSerializer : kotlinx.serial
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedLeaveRequestBodyUnion")
 
+    private val TYPE_LeaveRequestBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveRequestBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedLeaveRequestBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedLeaveRequestBodyUnion.LeaveRequestBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveRequestBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveRequestBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveRequestBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_LeaveRequestBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_LeaveRequestBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedLeaveRequestBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1553,10 +2098,14 @@ object BlueCatbirdChatDefsSignedLeaveRequestBodyUnionSerializer : kotlinx.serial
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedLeaveRequestBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedLeaveRequestBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedLeaveRequestBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedLeaveRequestBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#leaveRequestBody" -> BlueCatbirdChatDefsSignedLeaveRequestBodyUnion.LeaveRequestBody(
@@ -1580,14 +2129,24 @@ object BlueCatbirdChatDefsSignedZeroLeafLeaveBodyUnionSerializer : kotlinx.seria
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedZeroLeafLeaveBodyUnion")
 
+    private val TYPE_ZeroLeafLeaveBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#zeroLeafLeaveBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedZeroLeafLeaveBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedZeroLeafLeaveBodyUnion.ZeroLeafLeaveBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsZeroLeafLeaveBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#zeroLeafLeaveBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsZeroLeafLeaveBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ZeroLeafLeaveBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ZeroLeafLeaveBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedZeroLeafLeaveBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1602,10 +2161,14 @@ object BlueCatbirdChatDefsSignedZeroLeafLeaveBodyUnionSerializer : kotlinx.seria
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedZeroLeafLeaveBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedZeroLeafLeaveBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedZeroLeafLeaveBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedZeroLeafLeaveBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#zeroLeafLeaveBody" -> BlueCatbirdChatDefsSignedZeroLeafLeaveBodyUnion.ZeroLeafLeaveBody(
@@ -1632,20 +2195,39 @@ object BlueCatbirdChatDefsSignedLeaveOperationSerializer : kotlinx.serialization
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedLeaveOperation")
 
+    private val TYPE_SignedLeaveRequest = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedLeaveRequest")
+    private val TYPE_SignedZeroLeafLeave = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedZeroLeafLeave")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedLeaveOperation) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedLeaveOperation.SignedLeaveRequest -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedLeaveRequest.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedLeaveRequest")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedLeaveRequest.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_SignedLeaveRequest
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_SignedLeaveRequest)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedLeaveOperation.SignedZeroLeafLeave -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedZeroLeafLeave.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedZeroLeafLeave")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedZeroLeafLeave.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_SignedZeroLeafLeave
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_SignedZeroLeafLeave)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedLeaveOperation.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1660,10 +2242,14 @@ object BlueCatbirdChatDefsSignedLeaveOperationSerializer : kotlinx.serialization
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedLeaveOperation {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedLeaveOperation can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedLeaveOperation.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedLeaveOperation.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#signedLeaveRequest" -> BlueCatbirdChatDefsSignedLeaveOperation.SignedLeaveRequest(
@@ -1690,14 +2276,24 @@ object BlueCatbirdChatDefsSignedLeaveCancellationBodyUnionSerializer : kotlinx.s
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedLeaveCancellationBodyUnion")
 
+    private val TYPE_LeaveCancellationBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveCancellationBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedLeaveCancellationBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedLeaveCancellationBodyUnion.LeaveCancellationBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveCancellationBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveCancellationBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveCancellationBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_LeaveCancellationBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_LeaveCancellationBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedLeaveCancellationBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1712,10 +2308,14 @@ object BlueCatbirdChatDefsSignedLeaveCancellationBodyUnionSerializer : kotlinx.s
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedLeaveCancellationBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedLeaveCancellationBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedLeaveCancellationBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedLeaveCancellationBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#leaveCancellationBody" -> BlueCatbirdChatDefsSignedLeaveCancellationBodyUnion.LeaveCancellationBody(
@@ -1739,14 +2339,24 @@ object BlueCatbirdChatDefsSignedLeaveCommitFulfillmentBodyUnionSerializer : kotl
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedLeaveCommitFulfillmentBodyUnion")
 
+    private val TYPE_LeaveCommitFulfillmentBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveCommitFulfillmentBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedLeaveCommitFulfillmentBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedLeaveCommitFulfillmentBodyUnion.LeaveCommitFulfillmentBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveCommitFulfillmentBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveCommitFulfillmentBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveCommitFulfillmentBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_LeaveCommitFulfillmentBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_LeaveCommitFulfillmentBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedLeaveCommitFulfillmentBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1761,10 +2371,14 @@ object BlueCatbirdChatDefsSignedLeaveCommitFulfillmentBodyUnionSerializer : kotl
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedLeaveCommitFulfillmentBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedLeaveCommitFulfillmentBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedLeaveCommitFulfillmentBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedLeaveCommitFulfillmentBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#leaveCommitFulfillmentBody" -> BlueCatbirdChatDefsSignedLeaveCommitFulfillmentBodyUnion.LeaveCommitFulfillmentBody(
@@ -1788,14 +2402,24 @@ object BlueCatbirdChatDefsSignedWelcomeAcknowledgementBodyUnionSerializer : kotl
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedWelcomeAcknowledgementBodyUnion")
 
+    private val TYPE_WelcomeAcknowledgementBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#welcomeAcknowledgementBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedWelcomeAcknowledgementBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedWelcomeAcknowledgementBodyUnion.WelcomeAcknowledgementBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeAcknowledgementBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#welcomeAcknowledgementBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeAcknowledgementBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_WelcomeAcknowledgementBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_WelcomeAcknowledgementBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedWelcomeAcknowledgementBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1810,10 +2434,14 @@ object BlueCatbirdChatDefsSignedWelcomeAcknowledgementBodyUnionSerializer : kotl
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedWelcomeAcknowledgementBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedWelcomeAcknowledgementBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedWelcomeAcknowledgementBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedWelcomeAcknowledgementBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#welcomeAcknowledgementBody" -> BlueCatbirdChatDefsSignedWelcomeAcknowledgementBodyUnion.WelcomeAcknowledgementBody(
@@ -1837,14 +2465,24 @@ object BlueCatbirdChatDefsSignedWelcomeRejectionBodyUnionSerializer : kotlinx.se
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedWelcomeRejectionBodyUnion")
 
+    private val TYPE_WelcomeRejectionBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#welcomeRejectionBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedWelcomeRejectionBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedWelcomeRejectionBodyUnion.WelcomeRejectionBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeRejectionBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#welcomeRejectionBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeRejectionBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_WelcomeRejectionBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_WelcomeRejectionBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedWelcomeRejectionBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1859,10 +2497,14 @@ object BlueCatbirdChatDefsSignedWelcomeRejectionBodyUnionSerializer : kotlinx.se
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedWelcomeRejectionBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedWelcomeRejectionBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedWelcomeRejectionBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedWelcomeRejectionBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#welcomeRejectionBody" -> BlueCatbirdChatDefsSignedWelcomeRejectionBodyUnion.WelcomeRejectionBody(
@@ -1898,38 +2540,84 @@ object BlueCatbirdChatDefsSignedTransitionSerializer : kotlinx.serialization.KSe
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedTransition")
 
+    private val TYPE_SignedCommitTransition = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedCommitTransition")
+    private val TYPE_SignedPolicyTransition = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedPolicyTransition")
+    private val TYPE_SignedLeafRecoveryFulfillment = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedLeafRecoveryFulfillment")
+    private val TYPE_SignedMetadataTransition = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedMetadataTransition")
+    private val TYPE_SignedLeaveCommitFulfillment = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedLeaveCommitFulfillment")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedTransition) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedTransition.SignedCommitTransition -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedCommitTransition.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedCommitTransition")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedCommitTransition.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_SignedCommitTransition
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_SignedCommitTransition)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedTransition.SignedPolicyTransition -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedPolicyTransition.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedPolicyTransition")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedPolicyTransition.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_SignedPolicyTransition
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_SignedPolicyTransition)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedTransition.SignedLeafRecoveryFulfillment -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedLeafRecoveryFulfillment.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedLeafRecoveryFulfillment")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedLeafRecoveryFulfillment.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_SignedLeafRecoveryFulfillment
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_SignedLeafRecoveryFulfillment)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedTransition.SignedMetadataTransition -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedMetadataTransition.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedMetadataTransition")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedMetadataTransition.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_SignedMetadataTransition
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_SignedMetadataTransition)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedTransition.SignedLeaveCommitFulfillment -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedLeaveCommitFulfillment.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedLeaveCommitFulfillment")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedLeaveCommitFulfillment.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_SignedLeaveCommitFulfillment
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_SignedLeaveCommitFulfillment)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedTransition.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -1944,10 +2632,14 @@ object BlueCatbirdChatDefsSignedTransitionSerializer : kotlinx.serialization.KSe
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedTransition {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedTransition can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedTransition.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedTransition.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#signedCommitTransition" -> BlueCatbirdChatDefsSignedTransition.SignedCommitTransition(
@@ -1989,26 +2681,54 @@ object BlueCatbirdChatDefsConversationInventoryItemSerializer : kotlinx.serializ
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsConversationInventoryItem")
 
+    private val TYPE_ConversationInventoryState = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationInventoryState")
+    private val TYPE_ConversationRemovalTombstone = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationRemovalTombstone")
+    private val TYPE_ConversationCloseTombstone = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationCloseTombstone")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsConversationInventoryItem) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsConversationInventoryItem.ConversationInventoryState -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationInventoryState.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationInventoryState")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationInventoryState.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ConversationInventoryState
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ConversationInventoryState)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationInventoryItem.ConversationRemovalTombstone -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationRemovalTombstone.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationRemovalTombstone")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationRemovalTombstone.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ConversationRemovalTombstone
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ConversationRemovalTombstone)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationInventoryItem.ConversationCloseTombstone -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCloseTombstone.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationCloseTombstone")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCloseTombstone.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ConversationCloseTombstone
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ConversationCloseTombstone)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationInventoryItem.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -2023,10 +2743,14 @@ object BlueCatbirdChatDefsConversationInventoryItemSerializer : kotlinx.serializ
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsConversationInventoryItem {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsConversationInventoryItem can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsConversationInventoryItem.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsConversationInventoryItem.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#conversationInventoryState" -> BlueCatbirdChatDefsConversationInventoryItem.ConversationInventoryState(
@@ -2101,104 +2825,249 @@ object BlueCatbirdChatDefsConversationEntrySerializer : kotlinx.serialization.KS
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsConversationEntry")
 
+    private val TYPE_ApplicationEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#applicationEntry")
+    private val TYPE_CommitEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#commitEntry")
+    private val TYPE_PolicyEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#policyEntry")
+    private val TYPE_MetadataEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#metadataEntry")
+    private val TYPE_CreationEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#creationEntry")
+    private val TYPE_ParticipantAcceptanceEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#participantAcceptanceEntry")
+    private val TYPE_ConversationCloseEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationCloseEntry")
+    private val TYPE_ResetRequestEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#resetRequestEntry")
+    private val TYPE_ResetActivationEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#resetActivationEntry")
+    private val TYPE_LeafRecoveryFulfillmentEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leafRecoveryFulfillmentEntry")
+    private val TYPE_LeaveRequestEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveRequestEntry")
+    private val TYPE_ZeroLeafLeaveEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#zeroLeafLeaveEntry")
+    private val TYPE_LeaveCancellationEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveCancellationEntry")
+    private val TYPE_LeaveCommitFulfillmentEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveCommitFulfillmentEntry")
+    private val TYPE_DirectRequestEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestEntry")
+    private val TYPE_DirectRequestAcceptanceEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestAcceptanceEntry")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsConversationEntry) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsConversationEntry.ApplicationEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsApplicationEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#applicationEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsApplicationEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ApplicationEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ApplicationEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.CommitEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsCommitEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#commitEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsCommitEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_CommitEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_CommitEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.PolicyEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsPolicyEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#policyEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsPolicyEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_PolicyEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_PolicyEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.MetadataEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsMetadataEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#metadataEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsMetadataEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_MetadataEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_MetadataEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.CreationEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsCreationEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#creationEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsCreationEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_CreationEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_CreationEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.ParticipantAcceptanceEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsParticipantAcceptanceEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#participantAcceptanceEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsParticipantAcceptanceEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ParticipantAcceptanceEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ParticipantAcceptanceEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.ConversationCloseEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCloseEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationCloseEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationCloseEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ConversationCloseEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ConversationCloseEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.ResetRequestEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsResetRequestEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#resetRequestEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsResetRequestEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ResetRequestEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ResetRequestEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.ResetActivationEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsResetActivationEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#resetActivationEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsResetActivationEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ResetActivationEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ResetActivationEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.LeafRecoveryFulfillmentEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryFulfillmentEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leafRecoveryFulfillmentEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryFulfillmentEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_LeafRecoveryFulfillmentEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_LeafRecoveryFulfillmentEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.LeaveRequestEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveRequestEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveRequestEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveRequestEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_LeaveRequestEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_LeaveRequestEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.ZeroLeafLeaveEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsZeroLeafLeaveEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#zeroLeafLeaveEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsZeroLeafLeaveEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ZeroLeafLeaveEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ZeroLeafLeaveEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.LeaveCancellationEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveCancellationEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveCancellationEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveCancellationEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_LeaveCancellationEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_LeaveCancellationEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.LeaveCommitFulfillmentEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveCommitFulfillmentEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveCommitFulfillmentEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveCommitFulfillmentEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_LeaveCommitFulfillmentEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_LeaveCommitFulfillmentEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.DirectRequestEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.DirectRequestAcceptanceEntry -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestAcceptanceEntry.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestAcceptanceEntry")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestAcceptanceEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestAcceptanceEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestAcceptanceEntry)
+                }
+                obj
             }
             is BlueCatbirdChatDefsConversationEntry.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -2213,10 +3082,14 @@ object BlueCatbirdChatDefsConversationEntrySerializer : kotlinx.serialization.KS
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsConversationEntry {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsConversationEntry can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsConversationEntry.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsConversationEntry.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#applicationEntry" -> BlueCatbirdChatDefsConversationEntry.ApplicationEntry(
@@ -2312,68 +3185,159 @@ object BlueCatbirdChatDefsProtocolEventPayloadSerializer : kotlinx.serialization
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsProtocolEventPayload")
 
+    private val TYPE_ConversationChangedEvent = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationChangedEvent")
+    private val TYPE_ConversationClosedEvent = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationClosedEvent")
+    private val TYPE_MessageAvailableEvent = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#messageAvailableEvent")
+    private val TYPE_WelcomeAvailableEvent = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#welcomeAvailableEvent")
+    private val TYPE_WelcomeDispositionEvent = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#welcomeDispositionEvent")
+    private val TYPE_ResetRequestedEvent = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#resetRequestedEvent")
+    private val TYPE_LeafRecoveryEvent = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leafRecoveryEvent")
+    private val TYPE_LeaveRequestEvent = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveRequestEvent")
+    private val TYPE_AccessEndedEvent = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#accessEndedEvent")
+    private val TYPE_WatermarkEvent = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#watermarkEvent")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsProtocolEventPayload) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsProtocolEventPayload.ConversationChangedEvent -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationChangedEvent.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationChangedEvent")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationChangedEvent.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ConversationChangedEvent
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ConversationChangedEvent)
+                }
+                obj
             }
             is BlueCatbirdChatDefsProtocolEventPayload.ConversationClosedEvent -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationClosedEvent.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#conversationClosedEvent")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsConversationClosedEvent.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ConversationClosedEvent
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ConversationClosedEvent)
+                }
+                obj
             }
             is BlueCatbirdChatDefsProtocolEventPayload.MessageAvailableEvent -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsMessageAvailableEvent.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#messageAvailableEvent")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsMessageAvailableEvent.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_MessageAvailableEvent
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_MessageAvailableEvent)
+                }
+                obj
             }
             is BlueCatbirdChatDefsProtocolEventPayload.WelcomeAvailableEvent -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeAvailableEvent.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#welcomeAvailableEvent")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeAvailableEvent.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_WelcomeAvailableEvent
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_WelcomeAvailableEvent)
+                }
+                obj
             }
             is BlueCatbirdChatDefsProtocolEventPayload.WelcomeDispositionEvent -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeDispositionEvent.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#welcomeDispositionEvent")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeDispositionEvent.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_WelcomeDispositionEvent
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_WelcomeDispositionEvent)
+                }
+                obj
             }
             is BlueCatbirdChatDefsProtocolEventPayload.ResetRequestedEvent -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsResetRequestedEvent.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#resetRequestedEvent")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsResetRequestedEvent.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_ResetRequestedEvent
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_ResetRequestedEvent)
+                }
+                obj
             }
             is BlueCatbirdChatDefsProtocolEventPayload.LeafRecoveryEvent -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryEvent.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leafRecoveryEvent")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsLeafRecoveryEvent.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_LeafRecoveryEvent
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_LeafRecoveryEvent)
+                }
+                obj
             }
             is BlueCatbirdChatDefsProtocolEventPayload.LeaveRequestEvent -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveRequestEvent.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveRequestEvent")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsLeaveRequestEvent.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_LeaveRequestEvent
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_LeaveRequestEvent)
+                }
+                obj
             }
             is BlueCatbirdChatDefsProtocolEventPayload.AccessEndedEvent -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsAccessEndedEvent.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#accessEndedEvent")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsAccessEndedEvent.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_AccessEndedEvent
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_AccessEndedEvent)
+                }
+                obj
             }
             is BlueCatbirdChatDefsProtocolEventPayload.WatermarkEvent -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsWatermarkEvent.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#watermarkEvent")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsWatermarkEvent.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_WatermarkEvent
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_WatermarkEvent)
+                }
+                obj
             }
             is BlueCatbirdChatDefsProtocolEventPayload.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -2388,10 +3352,14 @@ object BlueCatbirdChatDefsProtocolEventPayloadSerializer : kotlinx.serialization
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsProtocolEventPayload {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsProtocolEventPayload can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsProtocolEventPayload.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsProtocolEventPayload.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#conversationChangedEvent" -> BlueCatbirdChatDefsProtocolEventPayload.ConversationChangedEvent(
@@ -2445,20 +3413,39 @@ object BlueCatbirdChatDefsSubscriptionMessageSerializer : kotlinx.serialization.
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSubscriptionMessage")
 
+    private val TYPE_EventEnvelope = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#eventEnvelope")
+    private val TYPE_TypingEvent = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#typingEvent")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSubscriptionMessage) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSubscriptionMessage.EventEnvelope -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsEventEnvelope.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#eventEnvelope")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsEventEnvelope.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_EventEnvelope
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_EventEnvelope)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSubscriptionMessage.TypingEvent -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsTypingEvent.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#typingEvent")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsTypingEvent.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_TypingEvent
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_TypingEvent)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSubscriptionMessage.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -2473,10 +3460,14 @@ object BlueCatbirdChatDefsSubscriptionMessageSerializer : kotlinx.serialization.
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSubscriptionMessage {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSubscriptionMessage can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSubscriptionMessage.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSubscriptionMessage.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#eventEnvelope" -> BlueCatbirdChatDefsSubscriptionMessage.EventEnvelope(
@@ -2506,20 +3497,39 @@ object BlueCatbirdChatDefsDirectRequestOriginSerializer : kotlinx.serialization.
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsDirectRequestOrigin")
 
+    private val TYPE_FreshDirectOrigin = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#freshDirectOrigin")
+    private val TYPE_LegacyPendingDirectOrigin = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#legacyPendingDirectOrigin")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsDirectRequestOrigin) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsDirectRequestOrigin.FreshDirectOrigin -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsFreshDirectOrigin.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#freshDirectOrigin")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsFreshDirectOrigin.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_FreshDirectOrigin
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_FreshDirectOrigin)
+                }
+                obj
             }
             is BlueCatbirdChatDefsDirectRequestOrigin.LegacyPendingDirectOrigin -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsLegacyPendingDirectOrigin.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#legacyPendingDirectOrigin")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsLegacyPendingDirectOrigin.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_LegacyPendingDirectOrigin
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_LegacyPendingDirectOrigin)
+                }
+                obj
             }
             is BlueCatbirdChatDefsDirectRequestOrigin.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -2534,10 +3544,14 @@ object BlueCatbirdChatDefsDirectRequestOriginSerializer : kotlinx.serialization.
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsDirectRequestOrigin {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsDirectRequestOrigin can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsDirectRequestOrigin.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsDirectRequestOrigin.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#freshDirectOrigin" -> BlueCatbirdChatDefsDirectRequestOrigin.FreshDirectOrigin(
@@ -2564,14 +3578,24 @@ object BlueCatbirdChatDefsSignedDirectRequestGrantBodyUnionSerializer : kotlinx.
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedDirectRequestGrantBodyUnion")
 
+    private val TYPE_DirectRequestGrantBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestGrantBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedDirectRequestGrantBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedDirectRequestGrantBodyUnion.DirectRequestGrantBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestGrantBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestGrantBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestGrantBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestGrantBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestGrantBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedDirectRequestGrantBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -2586,10 +3610,14 @@ object BlueCatbirdChatDefsSignedDirectRequestGrantBodyUnionSerializer : kotlinx.
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedDirectRequestGrantBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedDirectRequestGrantBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedDirectRequestGrantBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedDirectRequestGrantBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#directRequestGrantBody" -> BlueCatbirdChatDefsSignedDirectRequestGrantBodyUnion.DirectRequestGrantBody(
@@ -2613,14 +3641,24 @@ object BlueCatbirdChatDefsSignedDirectRequestKeysPublicationBodyUnionSerializer 
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedDirectRequestKeysPublicationBodyUnion")
 
+    private val TYPE_DirectRequestKeysPublicationBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestKeysPublicationBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedDirectRequestKeysPublicationBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedDirectRequestKeysPublicationBodyUnion.DirectRequestKeysPublicationBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestKeysPublicationBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestKeysPublicationBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestKeysPublicationBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestKeysPublicationBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestKeysPublicationBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedDirectRequestKeysPublicationBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -2635,10 +3673,14 @@ object BlueCatbirdChatDefsSignedDirectRequestKeysPublicationBodyUnionSerializer 
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedDirectRequestKeysPublicationBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedDirectRequestKeysPublicationBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedDirectRequestKeysPublicationBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedDirectRequestKeysPublicationBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#directRequestKeysPublicationBody" -> BlueCatbirdChatDefsSignedDirectRequestKeysPublicationBodyUnion.DirectRequestKeysPublicationBody(
@@ -2662,14 +3704,24 @@ object BlueCatbirdChatDefsSignedDirectRequestPreparationBodyUnionSerializer : ko
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedDirectRequestPreparationBodyUnion")
 
+    private val TYPE_DirectRequestPreparationBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestPreparationBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedDirectRequestPreparationBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedDirectRequestPreparationBodyUnion.DirectRequestPreparationBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestPreparationBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestPreparationBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestPreparationBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestPreparationBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestPreparationBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedDirectRequestPreparationBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -2684,10 +3736,14 @@ object BlueCatbirdChatDefsSignedDirectRequestPreparationBodyUnionSerializer : ko
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedDirectRequestPreparationBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedDirectRequestPreparationBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedDirectRequestPreparationBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedDirectRequestPreparationBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#directRequestPreparationBody" -> BlueCatbirdChatDefsSignedDirectRequestPreparationBodyUnion.DirectRequestPreparationBody(
@@ -2711,14 +3767,24 @@ object BlueCatbirdChatDefsSignedDirectRequestPublicationBodyUnionSerializer : ko
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedDirectRequestPublicationBodyUnion")
 
+    private val TYPE_DirectRequestPublicationBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestPublicationBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedDirectRequestPublicationBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedDirectRequestPublicationBodyUnion.DirectRequestPublicationBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestPublicationBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestPublicationBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestPublicationBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestPublicationBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestPublicationBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedDirectRequestPublicationBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -2733,10 +3799,14 @@ object BlueCatbirdChatDefsSignedDirectRequestPublicationBodyUnionSerializer : ko
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedDirectRequestPublicationBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedDirectRequestPublicationBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedDirectRequestPublicationBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedDirectRequestPublicationBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#directRequestPublicationBody" -> BlueCatbirdChatDefsSignedDirectRequestPublicationBodyUnion.DirectRequestPublicationBody(
@@ -2760,14 +3830,24 @@ object BlueCatbirdChatDefsSignedDirectRequestCancellationBodyUnionSerializer : k
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedDirectRequestCancellationBodyUnion")
 
+    private val TYPE_DirectRequestCancellationBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestCancellationBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedDirectRequestCancellationBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedDirectRequestCancellationBodyUnion.DirectRequestCancellationBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestCancellationBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestCancellationBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestCancellationBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestCancellationBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestCancellationBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedDirectRequestCancellationBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -2782,10 +3862,14 @@ object BlueCatbirdChatDefsSignedDirectRequestCancellationBodyUnionSerializer : k
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedDirectRequestCancellationBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedDirectRequestCancellationBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedDirectRequestCancellationBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedDirectRequestCancellationBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#directRequestCancellationBody" -> BlueCatbirdChatDefsSignedDirectRequestCancellationBodyUnion.DirectRequestCancellationBody(
@@ -2809,14 +3893,24 @@ object BlueCatbirdChatDefsSignedDirectRequestAcceptanceBodyUnionSerializer : kot
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedDirectRequestAcceptanceBodyUnion")
 
+    private val TYPE_DirectRequestAcceptanceBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestAcceptanceBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedDirectRequestAcceptanceBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedDirectRequestAcceptanceBodyUnion.DirectRequestAcceptanceBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestAcceptanceBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestAcceptanceBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestAcceptanceBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestAcceptanceBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestAcceptanceBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedDirectRequestAcceptanceBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -2831,10 +3925,14 @@ object BlueCatbirdChatDefsSignedDirectRequestAcceptanceBodyUnionSerializer : kot
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedDirectRequestAcceptanceBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedDirectRequestAcceptanceBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedDirectRequestAcceptanceBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedDirectRequestAcceptanceBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#directRequestAcceptanceBody" -> BlueCatbirdChatDefsSignedDirectRequestAcceptanceBodyUnion.DirectRequestAcceptanceBody(
@@ -2870,38 +3968,84 @@ object BlueCatbirdChatDefsDirectRequestTerminalReceiptSerializer : kotlinx.seria
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsDirectRequestTerminalReceipt")
 
+    private val TYPE_DirectRequestPublishedReceipt = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestPublishedReceipt")
+    private val TYPE_DirectRequestCancelledReceipt = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestCancelledReceipt")
+    private val TYPE_DirectRequestExpiredReceipt = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestExpiredReceipt")
+    private val TYPE_DirectRequestRejectedReceipt = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestRejectedReceipt")
+    private val TYPE_DirectRequestExistingDirectReceipt = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestExistingDirectReceipt")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsDirectRequestTerminalReceipt) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsDirectRequestTerminalReceipt.DirectRequestPublishedReceipt -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestPublishedReceipt.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestPublishedReceipt")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestPublishedReceipt.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestPublishedReceipt
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestPublishedReceipt)
+                }
+                obj
             }
             is BlueCatbirdChatDefsDirectRequestTerminalReceipt.DirectRequestCancelledReceipt -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestCancelledReceipt.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestCancelledReceipt")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestCancelledReceipt.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestCancelledReceipt
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestCancelledReceipt)
+                }
+                obj
             }
             is BlueCatbirdChatDefsDirectRequestTerminalReceipt.DirectRequestExpiredReceipt -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestExpiredReceipt.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestExpiredReceipt")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestExpiredReceipt.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestExpiredReceipt
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestExpiredReceipt)
+                }
+                obj
             }
             is BlueCatbirdChatDefsDirectRequestTerminalReceipt.DirectRequestRejectedReceipt -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestRejectedReceipt.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestRejectedReceipt")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestRejectedReceipt.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestRejectedReceipt
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestRejectedReceipt)
+                }
+                obj
             }
             is BlueCatbirdChatDefsDirectRequestTerminalReceipt.DirectRequestExistingDirectReceipt -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestExistingDirectReceipt.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestExistingDirectReceipt")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestExistingDirectReceipt.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestExistingDirectReceipt
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestExistingDirectReceipt)
+                }
+                obj
             }
             is BlueCatbirdChatDefsDirectRequestTerminalReceipt.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -2916,10 +4060,14 @@ object BlueCatbirdChatDefsDirectRequestTerminalReceiptSerializer : kotlinx.seria
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsDirectRequestTerminalReceipt {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsDirectRequestTerminalReceipt can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsDirectRequestTerminalReceipt.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsDirectRequestTerminalReceipt.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#directRequestPublishedReceipt" -> BlueCatbirdChatDefsDirectRequestTerminalReceipt.DirectRequestPublishedReceipt(
@@ -2955,14 +4103,24 @@ object BlueCatbirdChatDefsSignedDirectRequestReceiptBodyUnionSerializer : kotlin
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedDirectRequestReceiptBodyUnion")
 
+    private val TYPE_DirectRequestReceiptBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestReceiptBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedDirectRequestReceiptBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedDirectRequestReceiptBodyUnion.DirectRequestReceiptBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestReceiptBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestReceiptBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestReceiptBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestReceiptBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestReceiptBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedDirectRequestReceiptBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -2977,10 +4135,14 @@ object BlueCatbirdChatDefsSignedDirectRequestReceiptBodyUnionSerializer : kotlin
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedDirectRequestReceiptBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedDirectRequestReceiptBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedDirectRequestReceiptBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedDirectRequestReceiptBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#directRequestReceiptBody" -> BlueCatbirdChatDefsSignedDirectRequestReceiptBodyUnion.DirectRequestReceiptBody(
@@ -3010,26 +4172,54 @@ object BlueCatbirdChatDefsDirectRequestOutcomeSerializer : kotlinx.serialization
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsDirectRequestOutcome")
 
+    private val TYPE_DirectRequestUnknownOutcome = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestUnknownOutcome")
+    private val TYPE_DirectRequestPreparedOutcome = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestPreparedOutcome")
+    private val TYPE_SignedDirectRequestReceipt = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedDirectRequestReceipt")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsDirectRequestOutcome) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsDirectRequestOutcome.DirectRequestUnknownOutcome -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestUnknownOutcome.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestUnknownOutcome")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestUnknownOutcome.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestUnknownOutcome
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestUnknownOutcome)
+                }
+                obj
             }
             is BlueCatbirdChatDefsDirectRequestOutcome.DirectRequestPreparedOutcome -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestPreparedOutcome.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestPreparedOutcome")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestPreparedOutcome.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestPreparedOutcome
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestPreparedOutcome)
+                }
+                obj
             }
             is BlueCatbirdChatDefsDirectRequestOutcome.SignedDirectRequestReceipt -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedDirectRequestReceipt.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#signedDirectRequestReceipt")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsSignedDirectRequestReceipt.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_SignedDirectRequestReceipt
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_SignedDirectRequestReceipt)
+                }
+                obj
             }
             is BlueCatbirdChatDefsDirectRequestOutcome.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -3044,10 +4234,14 @@ object BlueCatbirdChatDefsDirectRequestOutcomeSerializer : kotlinx.serialization
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsDirectRequestOutcome {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsDirectRequestOutcome can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsDirectRequestOutcome.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsDirectRequestOutcome.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#directRequestUnknownOutcome" -> BlueCatbirdChatDefsDirectRequestOutcome.DirectRequestUnknownOutcome(
@@ -3077,14 +4271,24 @@ object BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnionSer
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion")
 
+    private val TYPE_DirectRequestAcceptanceCommitReceiptBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion.DirectRequestAcceptanceCommitReceiptBody -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestAcceptanceCommitReceiptBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestAcceptanceCommitReceiptBody)
+                }
+                obj
             }
             is BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -3099,10 +4303,14 @@ object BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnionSer
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody" -> BlueCatbirdChatDefsSignedDirectRequestAcceptanceCommitReceiptBodyUnion.DirectRequestAcceptanceCommitReceiptBody(
@@ -3684,9 +4892,24 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val role: BlueCatbirdChatDefsDefsMemberRole,        @SerialName("status")
         val status: BlueCatbirdChatDefsDefsParticipantStatus,        @SerialName("invitationProvenance")
         val invitationProvenance: BlueCatbirdChatDefsInvitationProvenance? = null,        @SerialName("leafCount")
-        val leafCount: Int    ) {
+        val leafCount: Int,        @SerialName("labyrinthHead")
+        val labyrinthHead: BlueCatbirdChatDefsLabyrinthHead? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsParticipantView"
+        }
+    }
+
+    /**
+     * The participant's latest Labyrinth epoch head in the mls-ds head directory (blue.catbird.labyrinth.getEpochHead serves the full record). attestationKeyId is the chat device keyId whose key attested the head. Absent when the participant has published no head.
+     */
+    @Serializable
+    data class BlueCatbirdChatDefsLabyrinthHead(
+        @SerialName("epochNumber")
+        val epochNumber: Int,        @SerialName("epochHead")
+        val epochHead: Bytes,        @SerialName("attestationKeyId")
+        val attestationKeyId: String    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsLabyrinthHead"
         }
     }
 
