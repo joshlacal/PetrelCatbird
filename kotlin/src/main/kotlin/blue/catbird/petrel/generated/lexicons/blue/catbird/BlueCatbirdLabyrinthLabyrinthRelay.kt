@@ -18,7 +18,7 @@ object BlueCatbirdLabyrinthLabyrinthRelayDefs {
 
 @Serializable
     data class BlueCatbirdLabyrinthLabyrinthRelayInput(
-// The relayed operation. messageLive answers whether a message of the conversation is stored unredacted and readable by the actor; it gates attachment access. purgeAuthor redacts every item the actor authored in conversations the receiver sequences; it is the remote part of deleteAccountData. Both exist only on the relay.        @SerialName("op")
+// The relayed operation. messageLive answers whether a message of the conversation is stored unredacted and readable by the actor; it gates attachment access. purgeAuthor redacts every item the actor authored in conversations the receiver sequences; it is the remote part of deleteAccountData. Both exist only on the relay. listThreads carries no threadId: the receiver lists only conversations it sequences in which the requesting DS is the actor's home DS.        @SerialName("op")
         val op: String,        @SerialName("actorDid")
         val actorDid: DID,// The actor's chat device (canonical UUIDv4).        @SerialName("actorDeviceId")
         val actorDeviceId: String,// Reads: the original query string.        @SerialName("query")

@@ -116,6 +116,9 @@ public enum BlueCatbirdLabyrinthListBatches {
         public let sender: DID?
         public let fromMs: Int?
         public let untilMs: Int?
+        public let since: ATProtocolDate?
+        public let until: ATProtocolDate?
+        public let reverse: Bool?
         public let cursor: String?
         public let limit: Int?
 
@@ -124,6 +127,9 @@ public enum BlueCatbirdLabyrinthListBatches {
             sender: DID? = nil,
             fromMs: Int? = nil,
             untilMs: Int? = nil,
+            since: ATProtocolDate? = nil,
+            until: ATProtocolDate? = nil,
+            reverse: Bool? = nil,
             cursor: String? = nil,
             limit: Int? = nil
         ) {
@@ -131,6 +137,9 @@ public enum BlueCatbirdLabyrinthListBatches {
             self.sender = sender
             self.fromMs = fromMs
             self.untilMs = untilMs
+            self.since = since
+            self.until = until
+            self.reverse = reverse
             self.cursor = cursor
             self.limit = limit
         }
@@ -212,7 +221,7 @@ public enum BlueCatbirdLabyrinthListBatches {
 public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - listBatches
 
-    /// Batches holding a message in [fromMs, untilMs), in seq order, filtered to those sealed under a MEK the caller wrote or received. Thread endpoint on the conversation's sequencer DS; threadId is the chat conversation id ([CB-2]). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    /// Batches holding a message in [fromMs, untilMs) by sender timestamp and received in [since, until) by the server clock, in server seq order (descending when reverse), filtered to those sealed under a MEK the caller wrote or received. Thread endpoint on the conversation's sequencer DS; threadId is the chat conversation id ([CB-2]). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
     ///

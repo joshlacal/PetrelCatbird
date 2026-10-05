@@ -99,6 +99,9 @@ public enum BlueCatbirdLabyrinthListOwnerBatches {
         public let threadId: String
         public let fromMs: Int?
         public let untilMs: Int?
+        public let since: ATProtocolDate?
+        public let until: ATProtocolDate?
+        public let reverse: Bool?
         public let cursor: String?
         public let limit: Int?
 
@@ -106,12 +109,18 @@ public enum BlueCatbirdLabyrinthListOwnerBatches {
             threadId: String,
             fromMs: Int? = nil,
             untilMs: Int? = nil,
+            since: ATProtocolDate? = nil,
+            until: ATProtocolDate? = nil,
+            reverse: Bool? = nil,
             cursor: String? = nil,
             limit: Int? = nil
         ) {
             self.threadId = threadId
             self.fromMs = fromMs
             self.untilMs = untilMs
+            self.since = since
+            self.until = until
+            self.reverse = reverse
             self.cursor = cursor
             self.limit = limit
         }
@@ -182,7 +191,7 @@ public enum BlueCatbirdLabyrinthListOwnerBatches {
 public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - listOwnerBatches
 
-    /// Owner batches of one thread holding a message in [fromMs, untilMs), oldest first. Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    /// Owner batches of one thread holding a message in [fromMs, untilMs) by sender timestamp and received in [since, until) by the server clock, in mailbox seq order (oldest first; newest first when reverse). Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
     ///
