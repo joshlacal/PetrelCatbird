@@ -1,0 +1,65 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.labyrinth.redactMessages",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Unsend (decision J1): redact the caller's own sender copies of these messages in a conversation's thread records. Each matching item keeps its batch, server order, messageId, timestamp, mekId and senderTransportPubkey; its signedEncMessage is removed and redactedAt is set (defs#sealedMessage). Author-only: items written by other DIDs are never touched, even under a reused messageId ([CB-31]). Every attachment reference to a redacted message is invalidated. Current membership is not required. Thread endpoint on the conversation's sequencer DS; a device homed elsewhere is relayed (labyrinthRelay). Idempotent: unknown or already-redacted ids count zero. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "threadId",
+            "messageIds"
+          ],
+          "properties": {
+            "threadId": {
+              "type": "string",
+              "maxLength": 64,
+              "description": "The chat conversation id ([CB-2])."
+            },
+            "messageIds": {
+              "type": "array",
+              "minLength": 1,
+              "maxLength": 100,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "description": "Message ids (each at most 128 bytes)."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "redacted"
+          ],
+          "properties": {
+            "redacted": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "How many stored items were redacted by this call."
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "NotParticipant"
+        },
+        {
+          "name": "ConversationMoved"
+        },
+        {
+          "name": "RelayUnavailable"
+        }
+      ]
+    }
+  }
+}

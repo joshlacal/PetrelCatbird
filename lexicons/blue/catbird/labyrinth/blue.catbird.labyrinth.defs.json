@@ -93,13 +93,12 @@
     },
     "sealedMessage": {
       "type": "object",
-      "description": "One v1.1 sender-encrypted message (SPEC \u00a77.2).",
+      "description": "One v1.1 sender-encrypted message (SPEC \u00a77.2). A redacted item (unsend, redactMessages) has no signedEncMessage and carries redactedAt; writers always send signedEncMessage and never redactedAt.",
       "required": [
         "messageId",
         "timestamp",
         "mekId",
-        "senderTransportPubkey",
-        "signedEncMessage"
+        "senderTransportPubkey"
       ],
       "properties": {
         "messageId": {
@@ -126,9 +125,14 @@
         },
         "signedEncMessage": {
           "type": "bytes",
-          "description": "Ed25519 sig(64) || suite-tagged AEAD ciphertext of the padded frame.",
+          "description": "Ed25519 sig(64) || suite-tagged AEAD ciphertext of the padded frame. Absent exactly when redactedAt is present.",
           "maxLength": 262144,
           "minLength": 64
+        },
+        "redactedAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Server time the author redacted this item. Set only by the server."
         }
       }
     },

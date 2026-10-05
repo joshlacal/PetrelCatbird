@@ -4,13 +4,16 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "Read an attachment blob with the ORF access token, for a restored device that has no application interval at the attachment's entry. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one.",
+      "description": "Read an attachment blob with the ORF access token, for a restored device that has no application interval at the attachment's entry. The caller presents the ids the token was minted over; the server checks them against the reference's keyed digests, checks that the blob is still bound to that message and not deleted or expired, and that the message still exists: an unredacted thread item readable by the caller, or an item in the caller's own owner batches (whitepaper p.42). ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.",
       "parameters": {
         "type": "params",
         "required": [
           "deviceKeyPubkey",
           "blindedIndex",
-          "blindedToken"
+          "blindedToken",
+          "conversationId",
+          "messageId",
+          "blobId"
         ],
         "properties": {
           "deviceKeyPubkey": {
@@ -30,6 +33,21 @@
             "minLength": 64,
             "maxLength": 64,
             "description": "blinded token (lowercase hex)."
+          },
+          "conversationId": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Conversation id."
+          },
+          "messageId": {
+            "type": "string",
+            "maxLength": 128,
+            "description": "Message id."
+          },
+          "blobId": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "chat.blobs id."
           }
         }
       },
@@ -42,6 +60,12 @@
         },
         {
           "name": "NotFound"
+        },
+        {
+          "name": "AttachmentsUnavailable"
+        },
+        {
+          "name": "RelayUnavailable"
         }
       ]
     }

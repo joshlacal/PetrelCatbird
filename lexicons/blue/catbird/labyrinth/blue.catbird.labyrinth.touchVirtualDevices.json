@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.labyrinth.touchVirtualDevices",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Record that recovery bundles are still in use (decision J2): sets lastUsedAt to the server time. Bundles with mechanism keychain or passkey that go unused for 180 days are deleted by the server, together with their ORF state; code and otc bundles never expire. Any enrolled device's sync should touch the bundles it can still open. getVirtualDevice also touches the bundle it returns. Unknown ids are ignored. Mailbox endpoint. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "vdeviceIds"
+          ],
+          "properties": {
+            "vdeviceIds": {
+              "type": "array",
+              "minLength": 1,
+              "maxLength": 64,
+              "items": {
+                "type": "bytes",
+                "minLength": 16,
+                "maxLength": 16
+              }
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "touched"
+          ],
+          "properties": {
+            "touched": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+  }
+}
