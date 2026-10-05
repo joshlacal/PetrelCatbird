@@ -75,6 +75,7 @@ public enum BlueCatbirdLabyrinthCreateDevice {
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case recordAlreadyExists = "RecordAlreadyExists"
+        case invalidChatBinding = "InvalidChatBinding"
         public var description: String {
             return rawValue
         }

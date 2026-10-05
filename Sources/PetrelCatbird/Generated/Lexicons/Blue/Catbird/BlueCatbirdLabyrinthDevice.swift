@@ -12,16 +12,18 @@ public struct BlueCatbirdLabyrinthDevice: ATProtocolCodable, ATProtocolValue {
     public let epochStorageAuthKeyPubkey: Bytes?
     public let epochStorageAuthKeySig: Bytes?
     public let virtual: Bool
+    public let chatBinding: BlueCatbirdLabyrinthDefs.TransportAttestation?
     public let revokedAt: ATProtocolDate?
     public let createdAt: ATProtocolDate
 
-    public init(deviceKeyPubkey: Bytes, epochStorageKeyPubkey: Bytes, epochStorageKeySig: Bytes, epochStorageAuthKeyPubkey: Bytes? = nil, epochStorageAuthKeySig: Bytes? = nil, virtual: Bool, revokedAt: ATProtocolDate? = nil, createdAt: ATProtocolDate) {
+    public init(deviceKeyPubkey: Bytes, epochStorageKeyPubkey: Bytes, epochStorageKeySig: Bytes, epochStorageAuthKeyPubkey: Bytes? = nil, epochStorageAuthKeySig: Bytes? = nil, virtual: Bool, chatBinding: BlueCatbirdLabyrinthDefs.TransportAttestation? = nil, revokedAt: ATProtocolDate? = nil, createdAt: ATProtocolDate) {
         self.deviceKeyPubkey = deviceKeyPubkey
         self.epochStorageKeyPubkey = epochStorageKeyPubkey
         self.epochStorageKeySig = epochStorageKeySig
         self.epochStorageAuthKeyPubkey = epochStorageAuthKeyPubkey
         self.epochStorageAuthKeySig = epochStorageAuthKeySig
         self.virtual = virtual
+        self.chatBinding = chatBinding
         self.revokedAt = revokedAt
         self.createdAt = createdAt
     }
@@ -47,6 +49,13 @@ public struct BlueCatbirdLabyrinthDevice: ATProtocolCodable, ATProtocolValue {
         }
         virtual = try container.decode(Bool.self, forKey: .virtual)
         do {
+            chatBinding = try container.decodeIfPresent(BlueCatbirdLabyrinthDefs.TransportAttestation.self, forKey: .chatBinding)
+        } catch {
+            // Forward compatibility: a malformed optional field must not fail the whole record.
+            LogManager.logWarning("Decoding error for optional property 'chatBinding' — degrading to nil: \(error)")
+            chatBinding = nil
+        }
+        do {
             revokedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .revokedAt)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
@@ -65,6 +74,7 @@ public struct BlueCatbirdLabyrinthDevice: ATProtocolCodable, ATProtocolValue {
         try container.encodeIfPresent(epochStorageAuthKeyPubkey, forKey: .epochStorageAuthKeyPubkey)
         try container.encodeIfPresent(epochStorageAuthKeySig, forKey: .epochStorageAuthKeySig)
         try container.encode(virtual, forKey: .virtual)
+        try container.encodeIfPresent(chatBinding, forKey: .chatBinding)
         try container.encodeIfPresent(revokedAt, forKey: .revokedAt)
         try container.encode(createdAt, forKey: .createdAt)
     }
@@ -93,6 +103,9 @@ public struct BlueCatbirdLabyrinthDevice: ATProtocolCodable, ATProtocolValue {
         if virtual != other.virtual {
             return false
         }
+        if chatBinding != other.chatBinding {
+            return false
+        }
         if revokedAt != other.revokedAt {
             return false
         }
@@ -117,6 +130,11 @@ public struct BlueCatbirdLabyrinthDevice: ATProtocolCodable, ATProtocolValue {
             hasher.combine(nil as Int?)
         }
         hasher.combine(virtual)
+        if let value = chatBinding {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
         if let value = revokedAt {
             hasher.combine(value)
         } else {
@@ -144,6 +162,10 @@ public struct BlueCatbirdLabyrinthDevice: ATProtocolCodable, ATProtocolValue {
         }
         let virtualValue = try virtual.toCBORValue()
         map = map.adding(key: "virtual", value: virtualValue)
+        if let value = chatBinding {
+            let chatBindingValue = try value.toCBORValue()
+            map = map.adding(key: "chatBinding", value: chatBindingValue)
+        }
         if let value = revokedAt {
             let revokedAtValue = try value.toCBORValue()
             map = map.adding(key: "revokedAt", value: revokedAtValue)
@@ -161,6 +183,7 @@ public struct BlueCatbirdLabyrinthDevice: ATProtocolCodable, ATProtocolValue {
         case epochStorageAuthKeyPubkey
         case epochStorageAuthKeySig
         case virtual
+        case chatBinding
         case revokedAt
         case createdAt
     }

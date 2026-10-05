@@ -98,6 +98,8 @@ public enum BlueCatbirdLabyrinthCreateEpoch {
         case recordAlreadyExists = "RecordAlreadyExists"
         case invalidEpochChain = "InvalidEpochChain"
         case attestationNotCurrent = "AttestationNotCurrent"
+        case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
+        case memberDeviceNotRegistered = "MemberDeviceNotRegistered"
         public var description: String {
             return rawValue
         }

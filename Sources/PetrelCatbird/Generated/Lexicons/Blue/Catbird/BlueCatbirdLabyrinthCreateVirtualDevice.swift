@@ -151,6 +151,8 @@ public enum BlueCatbirdLabyrinthCreateVirtualDevice {
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case recordAlreadyExists = "RecordAlreadyExists"
+        case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
+        case memberDeviceNotRegistered = "MemberDeviceNotRegistered"
         public var description: String {
             return rawValue
         }

@@ -27,6 +27,7 @@ object BlueCatbirdLabyrinthMarkDeviceRevokedDefs {
 
 sealed class BlueCatbirdLabyrinthMarkDeviceRevokedError(val name: String, val description: String?) {
         object DeviceNotFound: BlueCatbirdLabyrinthMarkDeviceRevokedError("DeviceNotFound", null)
+        object LabyrinthDeviceNotBound: BlueCatbirdLabyrinthMarkDeviceRevokedError("LabyrinthDeviceNotBound", null)
     }
 
 /**

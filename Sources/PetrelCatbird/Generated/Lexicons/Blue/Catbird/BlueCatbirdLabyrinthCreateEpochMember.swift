@@ -61,6 +61,8 @@ public enum BlueCatbirdLabyrinthCreateEpochMember {
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case recordAlreadyExists = "RecordAlreadyExists"
         case epochNotFound = "EpochNotFound"
+        case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
+        case memberDeviceNotRegistered = "MemberDeviceNotRegistered"
         public var description: String {
             return rawValue
         }

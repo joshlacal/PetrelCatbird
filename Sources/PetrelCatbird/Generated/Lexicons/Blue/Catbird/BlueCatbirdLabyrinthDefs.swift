@@ -285,18 +285,18 @@ public enum BlueCatbirdLabyrinthDefs {
         public let timestamp: Int
         public let mekId: Bytes
         public let senderTransportPubkey: Bytes
-        public let signedEncMessage: Bytes?
-        public let redactedAt: ATProtocolDate?
+        public let signedEncMessage: Bytes
+        public let redaction: Redaction?
 
         public init(
-            messageId: String, timestamp: Int, mekId: Bytes, senderTransportPubkey: Bytes, signedEncMessage: Bytes? = nil, redactedAt: ATProtocolDate? = nil
+            messageId: String, timestamp: Int, mekId: Bytes, senderTransportPubkey: Bytes, signedEncMessage: Bytes, redaction: Redaction? = nil
         ) {
             self.messageId = messageId
             self.timestamp = timestamp
             self.mekId = mekId
             self.senderTransportPubkey = senderTransportPubkey
             self.signedEncMessage = signedEncMessage
-            self.redactedAt = redactedAt
+            self.redaction = redaction
         }
 
         public init(from decoder: Decoder) throws {
@@ -326,20 +326,18 @@ public enum BlueCatbirdLabyrinthDefs {
                 throw error
             }
             do {
-                signedEncMessage = try container.decodeIfPresent(Bytes.self, forKey: .signedEncMessage)
+                signedEncMessage = try container.decode(Bytes.self, forKey: .signedEncMessage)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'signedEncMessage' — degrading to nil: \(error)")
-                signedEncMessage = nil
+                LogManager.logError("Decoding error for required property 'signedEncMessage': \(error)")
+                throw error
             }
             do {
-                redactedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .redactedAt)
+                redaction = try container.decodeIfPresent(Redaction.self, forKey: .redaction)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'redactedAt' — degrading to nil: \(error)")
-                redactedAt = nil
+                LogManager.logWarning("Decoding error for optional property 'redaction' — degrading to nil: \(error)")
+                redaction = nil
             }
         }
 
@@ -350,8 +348,8 @@ public enum BlueCatbirdLabyrinthDefs {
             try container.encode(timestamp, forKey: .timestamp)
             try container.encode(mekId, forKey: .mekId)
             try container.encode(senderTransportPubkey, forKey: .senderTransportPubkey)
-            try container.encodeIfPresent(signedEncMessage, forKey: .signedEncMessage)
-            try container.encodeIfPresent(redactedAt, forKey: .redactedAt)
+            try container.encode(signedEncMessage, forKey: .signedEncMessage)
+            try container.encodeIfPresent(redaction, forKey: .redaction)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -359,12 +357,8 @@ public enum BlueCatbirdLabyrinthDefs {
             hasher.combine(timestamp)
             hasher.combine(mekId)
             hasher.combine(senderTransportPubkey)
-            if let value = signedEncMessage {
-                hasher.combine(value)
-            } else {
-                hasher.combine(nil as Int?)
-            }
-            if let value = redactedAt {
+            hasher.combine(signedEncMessage)
+            if let value = redaction {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
@@ -388,7 +382,7 @@ public enum BlueCatbirdLabyrinthDefs {
             if signedEncMessage != other.signedEncMessage {
                 return false
             }
-            if redactedAt != other.redactedAt {
+            if redaction != other.redaction {
                 return false
             }
             return true
@@ -409,13 +403,11 @@ public enum BlueCatbirdLabyrinthDefs {
             map = map.adding(key: "mekId", value: mekIdValue)
             let senderTransportPubkeyValue = try senderTransportPubkey.toCBORValue()
             map = map.adding(key: "senderTransportPubkey", value: senderTransportPubkeyValue)
-            if let value = signedEncMessage {
-                let signedEncMessageValue = try value.toCBORValue()
-                map = map.adding(key: "signedEncMessage", value: signedEncMessageValue)
-            }
-            if let value = redactedAt {
-                let redactedAtValue = try value.toCBORValue()
-                map = map.adding(key: "redactedAt", value: redactedAtValue)
+            let signedEncMessageValue = try signedEncMessage.toCBORValue()
+            map = map.adding(key: "signedEncMessage", value: signedEncMessageValue)
+            if let value = redaction {
+                let redactionValue = try value.toCBORValue()
+                map = map.adding(key: "redaction", value: redactionValue)
             }
             return map
         }
@@ -427,7 +419,7 @@ public enum BlueCatbirdLabyrinthDefs {
             case mekId
             case senderTransportPubkey
             case signedEncMessage
-            case redactedAt
+            case redaction
         }
     }
 
@@ -748,6 +740,118 @@ public enum BlueCatbirdLabyrinthDefs {
             case seq
             case chatSeq
             case receivedAt
+        }
+    }
+
+    public struct Redaction: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.labyrinth.defs#redaction"
+        public let transportPubkey: Bytes?
+        public let sig: Bytes?
+        public let redactedAt: ATProtocolDate?
+
+        public init(
+            transportPubkey: Bytes? = nil, sig: Bytes? = nil, redactedAt: ATProtocolDate? = nil
+        ) {
+            self.transportPubkey = transportPubkey
+            self.sig = sig
+            self.redactedAt = redactedAt
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                transportPubkey = try container.decodeIfPresent(Bytes.self, forKey: .transportPubkey)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'transportPubkey' — degrading to nil: \(error)")
+                transportPubkey = nil
+            }
+            do {
+                sig = try container.decodeIfPresent(Bytes.self, forKey: .sig)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sig' — degrading to nil: \(error)")
+                sig = nil
+            }
+            do {
+                redactedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .redactedAt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'redactedAt' — degrading to nil: \(error)")
+                redactedAt = nil
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encodeIfPresent(transportPubkey, forKey: .transportPubkey)
+            try container.encodeIfPresent(sig, forKey: .sig)
+            try container.encodeIfPresent(redactedAt, forKey: .redactedAt)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            if let value = transportPubkey {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = sig {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = redactedAt {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if transportPubkey != other.transportPubkey {
+                return false
+            }
+            if sig != other.sig {
+                return false
+            }
+            if redactedAt != other.redactedAt {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            if let value = transportPubkey {
+                let transportPubkeyValue = try value.toCBORValue()
+                map = map.adding(key: "transportPubkey", value: transportPubkeyValue)
+            }
+            if let value = sig {
+                let sigValue = try value.toCBORValue()
+                map = map.adding(key: "sig", value: sigValue)
+            }
+            if let value = redactedAt {
+                let redactedAtValue = try value.toCBORValue()
+                map = map.adding(key: "redactedAt", value: redactedAtValue)
+            }
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case transportPubkey
+            case sig
+            case redactedAt
         }
     }
 }

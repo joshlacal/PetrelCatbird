@@ -38,6 +38,8 @@ object BlueCatbirdLabyrinthCreateVirtualDeviceDefs {
 
 sealed class BlueCatbirdLabyrinthCreateVirtualDeviceError(val name: String, val description: String?) {
         object RecordAlreadyExists: BlueCatbirdLabyrinthCreateVirtualDeviceError("RecordAlreadyExists", null)
+        object LabyrinthDeviceNotBound: BlueCatbirdLabyrinthCreateVirtualDeviceError("LabyrinthDeviceNotBound", null)
+        object MemberDeviceNotRegistered: BlueCatbirdLabyrinthCreateVirtualDeviceError("MemberDeviceNotRegistered", null)
     }
 
 /**

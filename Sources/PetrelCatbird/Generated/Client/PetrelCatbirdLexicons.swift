@@ -246,6 +246,7 @@ public enum PetrelCatbirdLexicons {
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.labyrinth.defs#ownerMessage", as: BlueCatbirdLabyrinthDefs.OwnerMessage.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.labyrinth.defs#mekRecipient", as: BlueCatbirdLabyrinthDefs.MekRecipient.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.labyrinth.defs#serverOrder", as: BlueCatbirdLabyrinthDefs.ServerOrder.self)
+        ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.labyrinth.defs#redaction", as: BlueCatbirdLabyrinthDefs.Redaction.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.labyrinth.device", as: BlueCatbirdLabyrinthDevice.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.labyrinth.epoch", as: BlueCatbirdLabyrinthEpoch.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.labyrinth.epochMember", as: BlueCatbirdLabyrinthEpochMember.self)

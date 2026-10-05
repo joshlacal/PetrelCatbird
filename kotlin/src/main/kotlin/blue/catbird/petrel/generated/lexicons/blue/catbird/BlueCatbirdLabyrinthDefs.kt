@@ -50,7 +50,7 @@ object BlueCatbirdLabyrinthDefsDefs {
     }
 
     /**
-     * One v1.1 sender-encrypted message (SPEC §7.2). A redacted item (unsend, redactMessages) has no signedEncMessage and carries redactedAt; writers always send signedEncMessage and never redactedAt.
+     * One v1.1 sender-encrypted message (SPEC §7.2). A redacted item ([CB-38]) keeps messageId, timestamp, mekId and senderTransportPubkey, carries redaction, and has an empty signedEncMessage.
      */
     @Serializable
     data class BlueCatbirdLabyrinthDefsSealedMessage(
@@ -58,16 +58,16 @@ object BlueCatbirdLabyrinthDefsDefs {
         val messageId: String,/** Milliseconds since Unix epoch. */        @SerialName("timestamp")
         val timestamp: Int,/** 12-byte MEK id. */        @SerialName("mekId")
         val mekId: Bytes,/** Sender chat device Ed25519 key. */        @SerialName("senderTransportPubkey")
-        val senderTransportPubkey: Bytes,/** Ed25519 sig(64) || suite-tagged AEAD ciphertext of the padded frame. Absent exactly when redactedAt is present. */        @SerialName("signedEncMessage")
-        val signedEncMessage: Bytes? = null,/** Server time the author redacted this item. Set only by the server. */        @SerialName("redactedAt")
-        val redactedAt: ATProtocolDate? = null    ) {
+        val senderTransportPubkey: Bytes,/** Ed25519 sig(64) || suite-tagged AEAD ciphertext of the padded frame; empty once redacted. */        @SerialName("signedEncMessage")
+        val signedEncMessage: Bytes,/** Present when the author unsent the message ([CB-38]). */        @SerialName("redaction")
+        val redaction: BlueCatbirdLabyrinthDefsRedaction? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsSealedMessage"
         }
     }
 
     /**
-     * One v1.0 owner-encrypted message (SPEC §7.1).
+     * One owner-encrypted message or delete-for-me tombstone (SPEC §7.1, [CB-37], [CB-38]).
      */
     @Serializable
     data class BlueCatbirdLabyrinthDefsOwnerMessage(
@@ -75,7 +75,7 @@ object BlueCatbirdLabyrinthDefsDefs {
         val threadId: String,/** Message id. */        @SerialName("messageId")
         val messageId: String,/** ms since Unix epoch. */        @SerialName("timestamp")
         val timestamp: Int,/** Epoch whose root key derived the message key. */        @SerialName("epochNumber")
-        val epochNumber: Int,/** Cipher version. Writers use 3; readers also accept 0, 2 and 4 (SPEC §7.1). */        @SerialName("version")
+        val epochNumber: Int,/** Cipher version. Writers use 5 ([CB-37]: binds messageId and timestamp; content kind byte for delete-for-me tombstones); readers also accept 0, 2, 3 and 4 (SPEC §7.1). */        @SerialName("version")
         val version: Int,/** Suite-tagged AEAD ciphertext of the padded frame. */        @SerialName("encrypted")
         val encrypted: Bytes    ) {
         companion object {
@@ -105,5 +105,19 @@ object BlueCatbirdLabyrinthDefsDefs {
         val receivedAt: ATProtocolDate    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsServerOrder"
+        }
+    }
+
+    /**
+     * [CB-38] An author's unsend request: Ed25519 by one of the author's chat device keys over 'catbird.labyrinth.redaction:did=' || did || ';message_id=' || messageId || ';thread_id=' || hex(threadId). transportPubkey and sig are absent exactly when the server redacted the item for an account deletion (deleteAccountData); readers show such items as deleted (account removed), never as an author unsend.
+     */
+    @Serializable
+    data class BlueCatbirdLabyrinthDefsRedaction(
+/** The author's chat device Ed25519 key. */        @SerialName("transportPubkey")
+        val transportPubkey: Bytes? = null,/** Ed25519 signature. */        @SerialName("sig")
+        val sig: Bytes? = null,/** Set by the server when it applied the redaction. */        @SerialName("redactedAt")
+        val redactedAt: ATProtocolDate? = null    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsRedaction"
         }
     }

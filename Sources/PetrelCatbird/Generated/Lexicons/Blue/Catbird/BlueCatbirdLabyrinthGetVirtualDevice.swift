@@ -19,58 +19,24 @@ public enum BlueCatbirdLabyrinthGetVirtualDevice {
     public struct Output: ATProtocolCodable {
         public let record: ATProtocolValueContainer
 
-        public let lastUsedAt: ATProtocolDate?
-
-        public let expiresAt: ATProtocolDate?
-
         /// Standard public initializer
         public init(
-            record: ATProtocolValueContainer,
-
-            lastUsedAt: ATProtocolDate? = nil,
-
-            expiresAt: ATProtocolDate? = nil
+            record: ATProtocolValueContainer
 
         ) {
             self.record = record
-
-            self.lastUsedAt = lastUsedAt
-
-            self.expiresAt = expiresAt
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
             record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
-
-            do {
-                lastUsedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastUsedAt)
-            } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'lastUsedAt' — degrading to nil: \(error)")
-                lastUsedAt = nil
-            }
-
-            do {
-                expiresAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expiresAt)
-            } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'expiresAt' — degrading to nil: \(error)")
-                expiresAt = nil
-            }
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(record, forKey: .record)
-
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(lastUsedAt, forKey: .lastUsedAt)
-
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(expiresAt, forKey: .expiresAt)
         }
 
         public func toCBORValue() throws -> Any {
@@ -79,25 +45,11 @@ public enum BlueCatbirdLabyrinthGetVirtualDevice {
             let recordValue = try record.toCBORValue()
             map = map.adding(key: "record", value: recordValue)
 
-            if let value = lastUsedAt {
-                // Encode optional property even if it's an empty array for CBOR
-                let lastUsedAtValue = try value.toCBORValue()
-                map = map.adding(key: "lastUsedAt", value: lastUsedAtValue)
-            }
-
-            if let value = expiresAt {
-                // Encode optional property even if it's an empty array for CBOR
-                let expiresAtValue = try value.toCBORValue()
-                map = map.adding(key: "expiresAt", value: expiresAtValue)
-            }
-
             return map
         }
 
         private enum CodingKeys: String, CodingKey {
             case record
-            case lastUsedAt
-            case expiresAt
         }
     }
 
@@ -116,7 +68,7 @@ public enum BlueCatbirdLabyrinthGetVirtualDevice {
 public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - getVirtualDevice
 
-    /// One recovery bundle by vdeviceId. Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded. Reading a bundle also records it as used (touchVirtualDevices).
+    /// One recovery bundle by vdeviceId. Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded. Reading a bundle also records it as used (touchVirtualDevice); the returned record carries the server's lastUsedAt.
     ///
     /// - Parameter input: The input parameters for the request
     ///

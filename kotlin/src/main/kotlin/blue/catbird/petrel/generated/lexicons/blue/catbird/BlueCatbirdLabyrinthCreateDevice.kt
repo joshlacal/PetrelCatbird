@@ -28,6 +28,7 @@ object BlueCatbirdLabyrinthCreateDeviceDefs {
 
 sealed class BlueCatbirdLabyrinthCreateDeviceError(val name: String, val description: String?) {
         object RecordAlreadyExists: BlueCatbirdLabyrinthCreateDeviceError("RecordAlreadyExists", null)
+        object InvalidChatBinding: BlueCatbirdLabyrinthCreateDeviceError("InvalidChatBinding", null)
     }
 
 /**

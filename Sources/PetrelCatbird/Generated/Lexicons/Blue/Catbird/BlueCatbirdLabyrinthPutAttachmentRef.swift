@@ -9,18 +9,18 @@ public enum BlueCatbirdLabyrinthPutAttachmentRef {
     public struct Input: ATProtocolCodable {
         public let deviceKeyPubkey: Bytes
         public let blindedIndex: Bytes
-        public let blindedToken: Bytes
-        public let conversationId: String
+        public let blindedTokenSalt: Bytes
         public let blobId: String
+        public let threadId: String
         public let messageId: String
 
         /// Standard public initializer
-        public init(deviceKeyPubkey: Bytes, blindedIndex: Bytes, blindedToken: Bytes, conversationId: String, blobId: String, messageId: String) {
+        public init(deviceKeyPubkey: Bytes, blindedIndex: Bytes, blindedTokenSalt: Bytes, blobId: String, threadId: String, messageId: String) {
             self.deviceKeyPubkey = deviceKeyPubkey
             self.blindedIndex = blindedIndex
-            self.blindedToken = blindedToken
-            self.conversationId = conversationId
+            self.blindedTokenSalt = blindedTokenSalt
             self.blobId = blobId
+            self.threadId = threadId
             self.messageId = messageId
         }
 
@@ -28,9 +28,9 @@ public enum BlueCatbirdLabyrinthPutAttachmentRef {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
             blindedIndex = try container.decode(Bytes.self, forKey: .blindedIndex)
-            blindedToken = try container.decode(Bytes.self, forKey: .blindedToken)
-            conversationId = try container.decode(String.self, forKey: .conversationId)
+            blindedTokenSalt = try container.decode(Bytes.self, forKey: .blindedTokenSalt)
             blobId = try container.decode(String.self, forKey: .blobId)
+            threadId = try container.decode(String.self, forKey: .threadId)
             messageId = try container.decode(String.self, forKey: .messageId)
         }
 
@@ -38,9 +38,9 @@ public enum BlueCatbirdLabyrinthPutAttachmentRef {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(deviceKeyPubkey, forKey: .deviceKeyPubkey)
             try container.encode(blindedIndex, forKey: .blindedIndex)
-            try container.encode(blindedToken, forKey: .blindedToken)
-            try container.encode(conversationId, forKey: .conversationId)
+            try container.encode(blindedTokenSalt, forKey: .blindedTokenSalt)
             try container.encode(blobId, forKey: .blobId)
+            try container.encode(threadId, forKey: .threadId)
             try container.encode(messageId, forKey: .messageId)
         }
 
@@ -50,12 +50,12 @@ public enum BlueCatbirdLabyrinthPutAttachmentRef {
             map = map.adding(key: "deviceKeyPubkey", value: deviceKeyPubkeyValue)
             let blindedIndexValue = try blindedIndex.toCBORValue()
             map = map.adding(key: "blindedIndex", value: blindedIndexValue)
-            let blindedTokenValue = try blindedToken.toCBORValue()
-            map = map.adding(key: "blindedToken", value: blindedTokenValue)
-            let conversationIdValue = try conversationId.toCBORValue()
-            map = map.adding(key: "conversationId", value: conversationIdValue)
+            let blindedTokenSaltValue = try blindedTokenSalt.toCBORValue()
+            map = map.adding(key: "blindedTokenSalt", value: blindedTokenSaltValue)
             let blobIdValue = try blobId.toCBORValue()
             map = map.adding(key: "blobId", value: blobIdValue)
+            let threadIdValue = try threadId.toCBORValue()
+            map = map.adding(key: "threadId", value: threadIdValue)
             let messageIdValue = try messageId.toCBORValue()
             map = map.adding(key: "messageId", value: messageIdValue)
             return map
@@ -64,9 +64,9 @@ public enum BlueCatbirdLabyrinthPutAttachmentRef {
         private enum CodingKeys: String, CodingKey {
             case deviceKeyPubkey
             case blindedIndex
-            case blindedToken
-            case conversationId
+            case blindedTokenSalt
             case blobId
+            case threadId
             case messageId
         }
     }
@@ -112,7 +112,7 @@ public enum BlueCatbirdLabyrinthPutAttachmentRef {
 public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - putAttachmentRef
 
-    // Store an attachment reference under orf_server_map(caller device state, blindedIndex), with orf_server_map(state, blindedToken) as its access MAC, and pin the blob against object GC. Entitlement: blobId must be a bound attachment blob of conversationId whose application binding names messageId (the chat message id is the Labyrinth messageId), and the calling chat device must hold the application interval covering that entry. Unlinkability (decision J4): the server keeps the owner DID and the (conversationId, messageId) pair only as keyed digests; a blob may be referenced for one message only. Local conversations only. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    // Store an attachment reference: index = orf_server_map(caller device state, index domain, blindedIndex), salt = orf_server_map(state, token domain, blindedTokenSalt), tokenMac = HMAC-SHA256(salt, json([threadId, messageId])), and pin the blob against chat object GC. Entitlement: blobId must be a bound attachment blob of conversation threadId whose application binding names messageId (an attachment-bearing message's Labyrinth messageId is its chat message id), and the calling chat device must hold the application interval covering that entry. Unlinkability (decision J4): the server keeps the owner DID and (threadId, messageId) only as keyed digests, and a blob may be referenced for one message only. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     //
     // - Parameter input: The input parameters for the request
 

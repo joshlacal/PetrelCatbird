@@ -2,10 +2,10 @@
 import Foundation
 import Petrel
 
-// lexicon: 1, id: blue.catbird.labyrinth.deleteMailbox
+// lexicon: 1, id: blue.catbird.labyrinth.purgeMailbox
 
-public enum BlueCatbirdLabyrinthDeleteMailbox {
-    public static let typeIdentifier = "blue.catbird.labyrinth.deleteMailbox"
+public enum BlueCatbirdLabyrinthPurgeMailbox {
+    public static let typeIdentifier = "blue.catbird.labyrinth.purgeMailbox"
     public struct Input: ATProtocolCodable {
         /// Standard public initializer
         public init() {}
@@ -39,20 +39,20 @@ public enum BlueCatbirdLabyrinthDeleteMailbox {
 }
 
 public extension ATProtoClient.Blue.Catbird.Labyrinth {
-    // MARK: - deleteMailbox
+    // MARK: - purgeMailbox
 
-    // Delete the caller's whole Labyrinth mailbox: devices, epochs, epoch members, virtual devices (recovery bundles), owner batches, every ORF state and attachment reference of the caller, and the caller's chain in the head directory, so the account can enroll again from epoch 0. Peers that pinned an old head see a directory fork on their next read, which is the intended signal of a reset. Thread records the caller sent are kept (redactMessages and deleteAccountData handle those). Mailbox endpoint on the caller's home DS. Idempotent. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    // Delete the caller's whole Labyrinth mailbox: devices, epochs, epoch members, virtual devices (recovery bundles), owner batches, every ORF state and attachment reference of the caller, and the caller's chain in the head directory, so the account can enroll again from epoch 0. Peers that pinned an old head see a directory fork on their next read, which is the intended signal of a reset. Thread records the caller sent are kept (redactMessage and deleteAccountData handle those). Mailbox endpoint on the caller's home DS. Idempotent. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     //
     // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func deleteMailbox(
-        input: BlueCatbirdLabyrinthDeleteMailbox.Input
+    func purgeMailbox(
+        input: BlueCatbirdLabyrinthPurgeMailbox.Input
 
-    ) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthDeleteMailbox.Output?) {
-        let endpoint = "blue.catbird.labyrinth.deleteMailbox"
+    ) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthPurgeMailbox.Output?) {
+        let endpoint = "blue.catbird.labyrinth.purgeMailbox"
 
         var headers: [String: String] = [:]
 
@@ -73,7 +73,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         )
 
         // Determine service DID for this endpoint
-        let serviceDID = await networkService.getServiceDID(for: "blue.catbird.labyrinth.deleteMailbox")
+        let serviceDID = await networkService.getServiceDID(for: "blue.catbird.labyrinth.purgeMailbox")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
         let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
@@ -92,12 +92,12 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
 
             do {
                 let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdLabyrinthDeleteMailbox.Output.self, from: responseData)
+                let decodedData = try decoder.decode(BlueCatbirdLabyrinthPurgeMailbox.Output.self, from: responseData)
 
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.deleteMailbox: \(error)")
+                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.purgeMailbox: \(error)")
                 return (responseCode, nil)
             }
         } else {

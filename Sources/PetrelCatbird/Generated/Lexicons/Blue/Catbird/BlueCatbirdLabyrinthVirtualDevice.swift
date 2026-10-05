@@ -20,8 +20,9 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
     public let passkeyWrappedCode: Bytes?
     public let passkeyCredentialId: Bytes?
     public let createdAt: ATProtocolDate
+    public let lastUsedAt: ATProtocolDate?
 
-    public init(vdeviceId: Bytes, encryptedDeviceKeyPriv: Bytes, encryptedEpochStorageKeyPriv: Bytes, encryptedOrfClientState: Bytes, encryptedMailboxRootSalt: Bytes, encryptedEpochRootKey: Bytes, encryptedEpochNumber: Bytes, deviceKeyPubkey: Bytes, epochStorageKeyPubkey: Bytes, epochStorageKeySig: Bytes, mechanism: String, passkeyWrappedCode: Bytes? = nil, passkeyCredentialId: Bytes? = nil, createdAt: ATProtocolDate) {
+    public init(vdeviceId: Bytes, encryptedDeviceKeyPriv: Bytes, encryptedEpochStorageKeyPriv: Bytes, encryptedOrfClientState: Bytes, encryptedMailboxRootSalt: Bytes, encryptedEpochRootKey: Bytes, encryptedEpochNumber: Bytes, deviceKeyPubkey: Bytes, epochStorageKeyPubkey: Bytes, epochStorageKeySig: Bytes, mechanism: String, passkeyWrappedCode: Bytes? = nil, passkeyCredentialId: Bytes? = nil, createdAt: ATProtocolDate, lastUsedAt: ATProtocolDate? = nil) {
         self.vdeviceId = vdeviceId
         self.encryptedDeviceKeyPriv = encryptedDeviceKeyPriv
         self.encryptedEpochStorageKeyPriv = encryptedEpochStorageKeyPriv
@@ -36,6 +37,7 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
         self.passkeyWrappedCode = passkeyWrappedCode
         self.passkeyCredentialId = passkeyCredentialId
         self.createdAt = createdAt
+        self.lastUsedAt = lastUsedAt
     }
 
     public init(from decoder: Decoder) throws {
@@ -66,6 +68,13 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
             passkeyCredentialId = nil
         }
         createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        do {
+            lastUsedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastUsedAt)
+        } catch {
+            // Forward compatibility: a malformed optional field must not fail the whole record.
+            LogManager.logWarning("Decoding error for optional property 'lastUsedAt' — degrading to nil: \(error)")
+            lastUsedAt = nil
+        }
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -85,6 +94,7 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
         try container.encodeIfPresent(passkeyWrappedCode, forKey: .passkeyWrappedCode)
         try container.encodeIfPresent(passkeyCredentialId, forKey: .passkeyCredentialId)
         try container.encode(createdAt, forKey: .createdAt)
+        try container.encodeIfPresent(lastUsedAt, forKey: .lastUsedAt)
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -135,6 +145,9 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
         if createdAt != other.createdAt {
             return false
         }
+        if lastUsedAt != other.lastUsedAt {
+            return false
+        }
         return true
     }
 
@@ -161,6 +174,11 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
             hasher.combine(nil as Int?)
         }
         hasher.combine(createdAt)
+        if let value = lastUsedAt {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
     }
 
     public func toCBORValue() throws -> Any {
@@ -198,6 +216,10 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
         }
         let createdAtValue = try createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
+        if let value = lastUsedAt {
+            let lastUsedAtValue = try value.toCBORValue()
+            map = map.adding(key: "lastUsedAt", value: lastUsedAtValue)
+        }
         return map
     }
 
@@ -217,5 +239,6 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
         case passkeyWrappedCode
         case passkeyCredentialId
         case createdAt
+        case lastUsedAt
     }
 }

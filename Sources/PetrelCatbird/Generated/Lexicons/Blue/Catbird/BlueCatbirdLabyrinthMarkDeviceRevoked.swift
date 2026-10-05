@@ -67,6 +67,7 @@ public enum BlueCatbirdLabyrinthMarkDeviceRevoked {
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case deviceNotFound = "DeviceNotFound"
+        case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
         public var description: String {
             return rawValue
         }

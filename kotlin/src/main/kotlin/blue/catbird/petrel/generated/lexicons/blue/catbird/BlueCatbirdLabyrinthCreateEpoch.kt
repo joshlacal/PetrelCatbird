@@ -32,6 +32,8 @@ sealed class BlueCatbirdLabyrinthCreateEpochError(val name: String, val descript
         object RecordAlreadyExists: BlueCatbirdLabyrinthCreateEpochError("RecordAlreadyExists", null)
         object InvalidEpochChain: BlueCatbirdLabyrinthCreateEpochError("InvalidEpochChain", null)
         object AttestationNotCurrent: BlueCatbirdLabyrinthCreateEpochError("AttestationNotCurrent", null)
+        object LabyrinthDeviceNotBound: BlueCatbirdLabyrinthCreateEpochError("LabyrinthDeviceNotBound", null)
+        object MemberDeviceNotRegistered: BlueCatbirdLabyrinthCreateEpochError("MemberDeviceNotRegistered", null)
     }
 
 /**

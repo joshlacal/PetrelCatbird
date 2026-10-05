@@ -27,7 +27,8 @@ object BlueCatbirdLabyrinthDeviceDefs {
         val epochStorageKeySig: Bytes,/** Labyrinth HPKE auth key; absent for virtual devices. */        @SerialName("epochStorageAuthKeyPubkey")
         val epochStorageAuthKeyPubkey: Bytes? = null,/** pk_sign(deviceKey, 0x31, epochStorageAuthKeyPubkey). */        @SerialName("epochStorageAuthKeySig")
         val epochStorageAuthKeySig: Bytes? = null,/** True for a recovery (virtual) device, which has no epochStorageAuthKey. */        @SerialName("virtual")
-        val virtual: Boolean,/** Set once when the device is revoked; the revoking device opens a new epoch that excludes it ([CB-11]). */        @SerialName("revokedAt")
+        val virtual: Boolean,/** [CB-36] Ed25519(chat key, "catbird.labyrinth.device_binding:" || did || ":" || deviceKeyPubkey) by the chat device that enrolled this physical device. Absent for virtual devices; a physical device without a valid binding to a current chat device is dropped at the next rotation. */        @SerialName("chatBinding")
+        val chatBinding: BlueCatbirdLabyrinthDefsTransportAttestation? = null,/** Set once when the device is revoked; the revoking device opens a new epoch that excludes it ([CB-11]). */        @SerialName("revokedAt")
         val revokedAt: ATProtocolDate? = null,        @SerialName("createdAt")
         val createdAt: ATProtocolDate    ) {
         companion object {

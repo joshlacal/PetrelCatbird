@@ -2,88 +2,72 @@
 import Foundation
 import Petrel
 
-// lexicon: 1, id: blue.catbird.labyrinth.redactMessages
+// lexicon: 1, id: blue.catbird.labyrinth.deleteAttachmentRef
 
-public enum BlueCatbirdLabyrinthRedactMessages {
-    public static let typeIdentifier = "blue.catbird.labyrinth.redactMessages"
+public enum BlueCatbirdLabyrinthDeleteAttachmentRef {
+    public static let typeIdentifier = "blue.catbird.labyrinth.deleteAttachmentRef"
     public struct Input: ATProtocolCodable {
-        public let threadId: String
-        public let messageIds: [String]
+        public let deviceKeyPubkey: Bytes
+        public let blindedIndex: Bytes
 
         /// Standard public initializer
-        public init(threadId: String, messageIds: [String]) {
-            self.threadId = threadId
-            self.messageIds = messageIds
+        public init(deviceKeyPubkey: Bytes, blindedIndex: Bytes) {
+            self.deviceKeyPubkey = deviceKeyPubkey
+            self.blindedIndex = blindedIndex
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            threadId = try container.decode(String.self, forKey: .threadId)
-            messageIds = try container.decode([String].self, forKey: .messageIds)
+            deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
+            blindedIndex = try container.decode(Bytes.self, forKey: .blindedIndex)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(threadId, forKey: .threadId)
-            try container.encode(messageIds, forKey: .messageIds)
+            try container.encode(deviceKeyPubkey, forKey: .deviceKeyPubkey)
+            try container.encode(blindedIndex, forKey: .blindedIndex)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let threadIdValue = try threadId.toCBORValue()
-            map = map.adding(key: "threadId", value: threadIdValue)
-            let messageIdsValue = try messageIds.toCBORValue()
-            map = map.adding(key: "messageIds", value: messageIdsValue)
+            let deviceKeyPubkeyValue = try deviceKeyPubkey.toCBORValue()
+            map = map.adding(key: "deviceKeyPubkey", value: deviceKeyPubkeyValue)
+            let blindedIndexValue = try blindedIndex.toCBORValue()
+            map = map.adding(key: "blindedIndex", value: blindedIndexValue)
             return map
         }
 
         private enum CodingKeys: String, CodingKey {
-            case threadId
-            case messageIds
+            case deviceKeyPubkey
+            case blindedIndex
         }
     }
 
     public struct Output: ATProtocolCodable {
-        public let redacted: Int
+        // Empty output - no properties (response is {})
 
         /// Standard public initializer
-        public init(
-            redacted: Int
-
-        ) {
-            self.redacted = redacted
-        }
+        public init() {}
 
         public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            redacted = try container.decode(Int.self, forKey: .redacted)
+            // Empty output - just validate it's an object by trying to get any container
+            _ = try decoder.singleValueContainer()
         }
 
         public func encode(to encoder: Encoder) throws {
-            var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(redacted, forKey: .redacted)
+            // Empty output - encode empty object
+            _ = encoder.singleValueContainer()
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-
-            let redactedValue = try redacted.toCBORValue()
-            map = map.adding(key: "redacted", value: redactedValue)
-
-            return map
-        }
-
-        private enum CodingKeys: String, CodingKey {
-            case redacted
+            // Empty output - return empty CBOR map
+            return OrderedCBORMap()
         }
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case notParticipant = "NotParticipant"
-        case conversationMoved = "ConversationMoved"
-        case relayUnavailable = "RelayUnavailable"
+        case orfStateNotFound = "OrfStateNotFound"
+        case attachmentsUnavailable = "AttachmentsUnavailable"
         public var description: String {
             return rawValue
         }
@@ -95,20 +79,20 @@ public enum BlueCatbirdLabyrinthRedactMessages {
 }
 
 public extension ATProtoClient.Blue.Catbird.Labyrinth {
-    // MARK: - redactMessages
+    // MARK: - deleteAttachmentRef
 
-    // Unsend (decision J1): redact the caller's own sender copies of these messages in a conversation's thread records. Each matching item keeps its batch, server order, messageId, timestamp, mekId and senderTransportPubkey; its signedEncMessage is removed and redactedAt is set (defs#sealedMessage). Author-only: items written by other DIDs are never touched, even under a reused messageId ([CB-31]). Every attachment reference to a redacted message is invalidated. Current membership is not required. Thread endpoint on the conversation's sequencer DS; a device homed elsewhere is relayed (labyrinthRelay). Idempotent: unknown or already-redacted ids count zero. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    // Delete the caller's attachment reference at this blinded index; when no reference to the blob remains, its object becomes eligible for chat object GC again. Idempotent. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     //
     // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func redactMessages(
-        input: BlueCatbirdLabyrinthRedactMessages.Input
+    func deleteAttachmentRef(
+        input: BlueCatbirdLabyrinthDeleteAttachmentRef.Input
 
-    ) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthRedactMessages.Output?) {
-        let endpoint = "blue.catbird.labyrinth.redactMessages"
+    ) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthDeleteAttachmentRef.Output?) {
+        let endpoint = "blue.catbird.labyrinth.deleteAttachmentRef"
 
         var headers: [String: String] = [:]
 
@@ -129,7 +113,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         )
 
         // Determine service DID for this endpoint
-        let serviceDID = await networkService.getServiceDID(for: "blue.catbird.labyrinth.redactMessages")
+        let serviceDID = await networkService.getServiceDID(for: "blue.catbird.labyrinth.deleteAttachmentRef")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
@@ -148,12 +132,12 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
 
             do {
                 let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdLabyrinthRedactMessages.Output.self, from: responseData)
+                let decodedData = try decoder.decode(BlueCatbirdLabyrinthDeleteAttachmentRef.Output.self, from: responseData)
 
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.redactMessages: \(error)")
+                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.deleteAttachmentRef: \(error)")
                 return (responseCode, nil)
             }
         } else {
@@ -161,7 +145,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
             if let atprotoError = ATProtoErrorParser.parse(
                 data: responseData,
                 statusCode: responseCode,
-                errorType: BlueCatbirdLabyrinthRedactMessages.Error.self
+                errorType: BlueCatbirdLabyrinthDeleteAttachmentRef.Error.self
             ) {
                 throw atprotoError
             }

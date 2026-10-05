@@ -9,25 +9,22 @@ public enum BlueCatbirdLabyrinthGetAttachmentBlob {
     public struct Parameters: Parametrizable {
         public let deviceKeyPubkey: String
         public let blindedIndex: String
-        public let blindedToken: String
-        public let conversationId: String
         public let messageId: String
-        public let blobId: String
+        public let blindedTokenSalt: String
+        public let threadId: String
 
         public init(
             deviceKeyPubkey: String,
             blindedIndex: String,
-            blindedToken: String,
-            conversationId: String,
             messageId: String,
-            blobId: String
+            blindedTokenSalt: String,
+            threadId: String
         ) {
             self.deviceKeyPubkey = deviceKeyPubkey
             self.blindedIndex = blindedIndex
-            self.blindedToken = blindedToken
-            self.conversationId = conversationId
             self.messageId = messageId
-            self.blobId = blobId
+            self.blindedTokenSalt = blindedTokenSalt
+            self.threadId = threadId
         }
     }
 
@@ -86,7 +83,7 @@ public enum BlueCatbirdLabyrinthGetAttachmentBlob {
 public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - getAttachmentBlob
 
-    /// Read an attachment blob with the ORF access token, for a restored device that has no application interval at the attachment's entry. The caller presents the ids the token was minted over; the server checks them against the reference's keyed digests, checks that the blob is still bound to that message and not deleted or expired, and that the message still exists: an unredacted thread item readable by the caller, or an item in the caller's own owner batches (whitepaper p.42). ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    /// Read an attachment blob with the ORF access token, for a restored device that has no application interval at the attachment's entry. The server recomputes the token MAC from blindedTokenSalt and the presented threadId and messageId, checks that the blob is still bound to that message and not deleted or expired, and that the message still exists for the caller: an unredacted thread item readable by the caller, or an item of the caller's own owner archive (whitepaper p.42). Every refusal reads as NotFound. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
     ///
