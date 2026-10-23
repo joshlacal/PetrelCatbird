@@ -42,10 +42,14 @@ object PlaceStreamLiveSubscribeSegmentsMessageUnionSerializer : kotlinx.serializ
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): PlaceStreamLiveSubscribeSegmentsMessageUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("PlaceStreamLiveSubscribeSegmentsMessageUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return PlaceStreamLiveSubscribeSegmentsMessageUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return PlaceStreamLiveSubscribeSegmentsMessageUnion.Unexpected(element)
 
         return when (type) {
             else -> PlaceStreamLiveSubscribeSegmentsMessageUnion.Unexpected(element)

@@ -55,8 +55,9 @@
           "properties": {
             "rkey": {
               "type": "string",
-              "maxLength": 13,
-              "description": "TID."
+              "format": "record-key",
+              "maxLength": 64,
+              "description": "Immutable source Space record key; deterministic keys may use a 64-character digest."
             },
             "order": {
               "type": "ref",

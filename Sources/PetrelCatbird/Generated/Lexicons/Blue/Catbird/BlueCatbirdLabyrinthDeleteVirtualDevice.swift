@@ -60,6 +60,7 @@ public enum BlueCatbirdLabyrinthDeleteVirtualDevice {
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case virtualDeviceNotFound = "VirtualDeviceNotFound"
+        case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
         public var description: String {
             return rawValue
         }
@@ -73,7 +74,7 @@ public enum BlueCatbirdLabyrinthDeleteVirtualDevice {
 public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - deleteVirtualDevice
 
-    // Delete one recovery bundle (decision J2: removing a recovery method) and its ORF state, releasing the mailbox counters. The caller has already rotated the bundle's device out of the epoch and marked it revoked; its device record and past epoch memberships stay. Mailbox endpoint. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    // Delete one recovery bundle (decision J2: removing a recovery method) and its ORF state, releasing the mailbox counters. The caller has already rotated the bundle's device out of the epoch and marked it revoked; its device record and past epoch memberships stay. Mailbox endpoint. Requires a bound Labyrinth device (a current, non-virtual device registered by the calling chat device). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     //
     // - Parameter input: The input parameters for the request
 

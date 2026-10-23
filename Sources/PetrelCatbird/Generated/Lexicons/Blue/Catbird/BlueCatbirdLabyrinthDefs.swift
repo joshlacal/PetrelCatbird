@@ -748,13 +748,17 @@ public enum BlueCatbirdLabyrinthDefs {
         public let transportPubkey: Bytes?
         public let sig: Bytes?
         public let redactedAt: ATProtocolDate?
+        public let by: DID?
+        public let reason: String?
 
         public init(
-            transportPubkey: Bytes? = nil, sig: Bytes? = nil, redactedAt: ATProtocolDate? = nil
+            transportPubkey: Bytes? = nil, sig: Bytes? = nil, redactedAt: ATProtocolDate? = nil, by: DID? = nil, reason: String? = nil
         ) {
             self.transportPubkey = transportPubkey
             self.sig = sig
             self.redactedAt = redactedAt
+            self.by = by
+            self.reason = reason
         }
 
         public init(from decoder: Decoder) throws {
@@ -783,6 +787,22 @@ public enum BlueCatbirdLabyrinthDefs {
                 LogManager.logWarning("Decoding error for optional property 'redactedAt' — degrading to nil: \(error)")
                 redactedAt = nil
             }
+            do {
+                by = try container.decodeIfPresent(DID.self, forKey: .by)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'by' — degrading to nil: \(error)")
+                by = nil
+            }
+            do {
+                reason = try container.decodeIfPresent(String.self, forKey: .reason)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'reason' — degrading to nil: \(error)")
+                reason = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -791,6 +811,8 @@ public enum BlueCatbirdLabyrinthDefs {
             try container.encodeIfPresent(transportPubkey, forKey: .transportPubkey)
             try container.encodeIfPresent(sig, forKey: .sig)
             try container.encodeIfPresent(redactedAt, forKey: .redactedAt)
+            try container.encodeIfPresent(by, forKey: .by)
+            try container.encodeIfPresent(reason, forKey: .reason)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -809,6 +831,16 @@ public enum BlueCatbirdLabyrinthDefs {
             } else {
                 hasher.combine(nil as Int?)
             }
+            if let value = by {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = reason {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
@@ -820,6 +852,12 @@ public enum BlueCatbirdLabyrinthDefs {
                 return false
             }
             if redactedAt != other.redactedAt {
+                return false
+            }
+            if by != other.by {
+                return false
+            }
+            if reason != other.reason {
                 return false
             }
             return true
@@ -844,6 +882,14 @@ public enum BlueCatbirdLabyrinthDefs {
                 let redactedAtValue = try value.toCBORValue()
                 map = map.adding(key: "redactedAt", value: redactedAtValue)
             }
+            if let value = by {
+                let byValue = try value.toCBORValue()
+                map = map.adding(key: "by", value: byValue)
+            }
+            if let value = reason {
+                let reasonValue = try value.toCBORValue()
+                map = map.adding(key: "reason", value: reasonValue)
+            }
             return map
         }
 
@@ -852,6 +898,248 @@ public enum BlueCatbirdLabyrinthDefs {
             case transportPubkey
             case sig
             case redactedAt
+            case by
+            case reason
+        }
+    }
+
+    public struct SpaceBatchRedaction: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.labyrinth.defs#spaceBatchRedaction"
+        public let messageId: String
+        public let timestamp: Int
+        public let redaction: BlueCatbirdLabyrinthDefs.Redaction
+
+        public init(
+            messageId: String, timestamp: Int, redaction: BlueCatbirdLabyrinthDefs.Redaction
+        ) {
+            self.messageId = messageId
+            self.timestamp = timestamp
+            self.redaction = redaction
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                messageId = try container.decode(String.self, forKey: .messageId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'messageId': \(error)")
+                throw error
+            }
+            do {
+                timestamp = try container.decode(Int.self, forKey: .timestamp)
+            } catch {
+                LogManager.logError("Decoding error for required property 'timestamp': \(error)")
+                throw error
+            }
+            do {
+                redaction = try container.decode(BlueCatbirdLabyrinthDefs.Redaction.self, forKey: .redaction)
+            } catch {
+                LogManager.logError("Decoding error for required property 'redaction': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(messageId, forKey: .messageId)
+            try container.encode(timestamp, forKey: .timestamp)
+            try container.encode(redaction, forKey: .redaction)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(messageId)
+            hasher.combine(timestamp)
+            hasher.combine(redaction)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if messageId != other.messageId {
+                return false
+            }
+            if timestamp != other.timestamp {
+                return false
+            }
+            if redaction != other.redaction {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let messageIdValue = try messageId.toCBORValue()
+            map = map.adding(key: "messageId", value: messageIdValue)
+            let timestampValue = try timestamp.toCBORValue()
+            map = map.adding(key: "timestamp", value: timestampValue)
+            let redactionValue = try redaction.toCBORValue()
+            map = map.adding(key: "redaction", value: redactionValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case messageId
+            case timestamp
+            case redaction
+        }
+    }
+
+    public struct SpaceBatchView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.labyrinth.defs#spaceBatchView"
+        public let author: DID
+        public let rkey: RecordKey
+        public let space: SpaceRef
+        public let generation: String
+        public let cid: CID
+        public let order: BlueCatbirdLabyrinthDefs.ServerOrder
+        public let redactions: [BlueCatbirdLabyrinthDefs.SpaceBatchRedaction]
+
+        public init(
+            author: DID, rkey: RecordKey, space: SpaceRef, generation: String, cid: CID, order: BlueCatbirdLabyrinthDefs.ServerOrder, redactions: [BlueCatbirdLabyrinthDefs.SpaceBatchRedaction]
+        ) {
+            self.author = author
+            self.rkey = rkey
+            self.space = space
+            self.generation = generation
+            self.cid = cid
+            self.order = order
+            self.redactions = redactions
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                author = try container.decode(DID.self, forKey: .author)
+            } catch {
+                LogManager.logError("Decoding error for required property 'author': \(error)")
+                throw error
+            }
+            do {
+                rkey = try container.decode(RecordKey.self, forKey: .rkey)
+            } catch {
+                LogManager.logError("Decoding error for required property 'rkey': \(error)")
+                throw error
+            }
+            do {
+                space = try container.decode(SpaceRef.self, forKey: .space)
+            } catch {
+                LogManager.logError("Decoding error for required property 'space': \(error)")
+                throw error
+            }
+            do {
+                generation = try container.decode(String.self, forKey: .generation)
+            } catch {
+                LogManager.logError("Decoding error for required property 'generation': \(error)")
+                throw error
+            }
+            do {
+                cid = try container.decode(CID.self, forKey: .cid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'cid': \(error)")
+                throw error
+            }
+            do {
+                order = try container.decode(BlueCatbirdLabyrinthDefs.ServerOrder.self, forKey: .order)
+            } catch {
+                LogManager.logError("Decoding error for required property 'order': \(error)")
+                throw error
+            }
+            do {
+                redactions = try container.decode([BlueCatbirdLabyrinthDefs.SpaceBatchRedaction].self, forKey: .redactions)
+            } catch {
+                LogManager.logError("Decoding error for required property 'redactions': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(author, forKey: .author)
+            try container.encode(rkey, forKey: .rkey)
+            try container.encode(space, forKey: .space)
+            try container.encode(generation, forKey: .generation)
+            try container.encode(cid, forKey: .cid)
+            try container.encode(order, forKey: .order)
+            try container.encode(redactions, forKey: .redactions)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(author)
+            hasher.combine(rkey)
+            hasher.combine(space)
+            hasher.combine(generation)
+            hasher.combine(cid)
+            hasher.combine(order)
+            hasher.combine(redactions)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if author != other.author {
+                return false
+            }
+            if rkey != other.rkey {
+                return false
+            }
+            if space != other.space {
+                return false
+            }
+            if generation != other.generation {
+                return false
+            }
+            if cid != other.cid {
+                return false
+            }
+            if order != other.order {
+                return false
+            }
+            if redactions != other.redactions {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let authorValue = try author.toCBORValue()
+            map = map.adding(key: "author", value: authorValue)
+            let rkeyValue = try rkey.toCBORValue()
+            map = map.adding(key: "rkey", value: rkeyValue)
+            let spaceValue = try space.toCBORValue()
+            map = map.adding(key: "space", value: spaceValue)
+            let generationValue = try generation.toCBORValue()
+            map = map.adding(key: "generation", value: generationValue)
+            let cidValue = try cid.toCBORValue()
+            map = map.adding(key: "cid", value: cidValue)
+            let orderValue = try order.toCBORValue()
+            map = map.adding(key: "order", value: orderValue)
+            let redactionsValue = try redactions.toCBORValue()
+            map = map.adding(key: "redactions", value: redactionsValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case author
+            case rkey
+            case space
+            case generation
+            case cid
+            case order
+            case redactions
         }
     }
 }

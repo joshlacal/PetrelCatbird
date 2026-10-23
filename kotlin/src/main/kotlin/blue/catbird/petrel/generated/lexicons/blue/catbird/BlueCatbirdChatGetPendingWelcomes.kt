@@ -32,20 +32,39 @@ object BlueCatbirdChatGetPendingWelcomesOutputItemsUnionSerializer : kotlinx.ser
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatGetPendingWelcomesOutputItemsUnion")
 
+    private val TYPE_WelcomeView = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#welcomeView")
+    private val TYPE_DirectRequestWelcomeView = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestWelcomeView")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatGetPendingWelcomesOutputItemsUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is BlueCatbirdChatGetPendingWelcomesOutputItemsUnion.WelcomeView -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeView.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#welcomeView")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsWelcomeView.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_WelcomeView
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_WelcomeView)
+                }
+                obj
             }
             is BlueCatbirdChatGetPendingWelcomesOutputItemsUnion.DirectRequestWelcomeView -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestWelcomeView.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestWelcomeView")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestWelcomeView.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DirectRequestWelcomeView
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DirectRequestWelcomeView)
+                }
+                obj
             }
             is BlueCatbirdChatGetPendingWelcomesOutputItemsUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -60,10 +79,14 @@ object BlueCatbirdChatGetPendingWelcomesOutputItemsUnionSerializer : kotlinx.ser
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatGetPendingWelcomesOutputItemsUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatGetPendingWelcomesOutputItemsUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatGetPendingWelcomesOutputItemsUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatGetPendingWelcomesOutputItemsUnion.Unexpected(element)
 
         return when (type) {
             "blue.catbird.chat.defs#welcomeView" -> BlueCatbirdChatGetPendingWelcomesOutputItemsUnion.WelcomeView(

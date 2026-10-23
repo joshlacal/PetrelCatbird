@@ -38,7 +38,7 @@ public enum BlueCatbirdLabyrinthDeleteAccountData {
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case relayUnavailable = "RelayUnavailable"
+        case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
         public var description: String {
             return rawValue
         }
@@ -52,7 +52,7 @@ public enum BlueCatbirdLabyrinthDeleteAccountData {
 public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - deleteAccountData
 
-    // Account deletion (decision J1): purge the mailbox exactly as purgeMailbox does (including every ORF state), redact every thread item the DID authored in every conversation (remote ones through their sequencer DSes) the way redactMessage does but without a client signature (the redaction carries only redactedAt), and delete the DID's idempotency records. MEK records stay, because other members' batches may be sealed under them. Idempotent. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    // Account deletion (decision J1). Requires a bound Labyrinth device. Locally, in one transaction: purge the mailbox exactly as purgeMailbox does (including every ORF state), redact every thread item the DID authored in conversations this DS sequences with a server redaction (defs#redaction variant 2: by, reason accountDeleted, redactedAt, and a DS signature), and queue a durable purgeAuthor job for the sequencer of every other conversation the DID takes or took part in; those are delivered with retries, so an unreachable DS neither blocks nor loses the deletion. Idempotency records are kept (they expire after 7 days), so a replayed pre-deletion write answers from its record instead of running again. MEK records stay, because other members' batches can be sealed under them. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     //
     // - Parameter input: The input parameters for the request
 

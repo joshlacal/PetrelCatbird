@@ -99,6 +99,7 @@ public enum BlueCatbirdLabyrinthPutAttachmentRef {
         case attachmentNotEntitled = "AttachmentNotEntitled"
         case attachmentAlreadyReferenced = "AttachmentAlreadyReferenced"
         case attachmentsUnavailable = "AttachmentsUnavailable"
+        case messageRedacted = "MessageRedacted"
         public var description: String {
             return rawValue
         }
@@ -112,7 +113,7 @@ public enum BlueCatbirdLabyrinthPutAttachmentRef {
 public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - putAttachmentRef
 
-    // Store an attachment reference: index = orf_server_map(caller device state, index domain, blindedIndex), salt = orf_server_map(state, token domain, blindedTokenSalt), tokenMac = HMAC-SHA256(salt, json([threadId, messageId])), and pin the blob against chat object GC. Entitlement: blobId must be a bound attachment blob of conversation threadId whose application binding names messageId (an attachment-bearing message's Labyrinth messageId is its chat message id), and the calling chat device must hold the application interval covering that entry. Unlinkability (decision J4): the server keeps the owner DID and (threadId, messageId) only as keyed digests, and a blob may be referenced for one message only. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    // Store an attachment reference: index = orf_server_map(caller device state, index domain, blindedIndex), salt = orf_server_map(state, token domain, blindedTokenSalt), tokenMac = HMAC-SHA256(salt, json([threadId, messageId])), and pin the blob against chat object GC. Entitlement: blobId must be a bound attachment blob of conversation threadId whose application binding names messageId (an attachment-bearing message's Labyrinth messageId is its chat message id), and the calling chat device must hold the application interval covering that entry. Unlinkability (decision J4): the server keeps the owner DID and (threadId, messageId) only as keyed digests, and a blob may be referenced for one message only. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded. A message its author unsent (redacted here, or announced redacted by the conversation's sequencer) is refused with MessageRedacted.
     //
     // - Parameter input: The input parameters for the request
 

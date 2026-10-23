@@ -29,14 +29,24 @@ object PlaceStreamLiveGetRecommendationsOutputRecommendationsUnionSerializer : k
     override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
         kotlinx.serialization.descriptors.buildClassSerialDescriptor("PlaceStreamLiveGetRecommendationsOutputRecommendationsUnion")
 
+    private val TYPE_LivestreamRecommendation = kotlinx.serialization.json.JsonPrimitive("place.stream.live.getRecommendations#livestreamRecommendation")
+
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: PlaceStreamLiveGetRecommendationsOutputRecommendationsUnion) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
         val element = when (value) {
             is PlaceStreamLiveGetRecommendationsOutputRecommendationsUnion.LivestreamRecommendation -> {
-                val obj = jsonEncoder.json.encodeToJsonElement(blue.catbird.petrel.generated.PlaceStreamLiveGetRecommendationsLivestreamRecommendation.serializer(), value.value)
-                kotlinx.serialization.json.JsonObject(obj.jsonObject.toMutableMap().also {
-                    it["\$type"] = kotlinx.serialization.json.JsonPrimitive("place.stream.live.getRecommendations#livestreamRecommendation")
-                })
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.PlaceStreamLiveGetRecommendationsLivestreamRecommendation.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_LivestreamRecommendation
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_LivestreamRecommendation)
+                }
+                obj
             }
             is PlaceStreamLiveGetRecommendationsOutputRecommendationsUnion.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
@@ -51,10 +61,14 @@ object PlaceStreamLiveGetRecommendationsOutputRecommendationsUnionSerializer : k
     }
 
     override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): PlaceStreamLiveGetRecommendationsOutputRecommendationsUnion {
-        val jsonDecoder = decoder as kotlinx.serialization.json.JsonDecoder
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("PlaceStreamLiveGetRecommendationsOutputRecommendationsUnion can only be deserialized from JSON")
         val element = jsonDecoder.decodeJsonElement()
-        val jsonObject = element.jsonObject
-        val type = jsonObject["\$type"]?.jsonPrimitive?.contentOrNull
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return PlaceStreamLiveGetRecommendationsOutputRecommendationsUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return PlaceStreamLiveGetRecommendationsOutputRecommendationsUnion.Unexpected(element)
 
         return when (type) {
             "place.stream.live.getRecommendations#livestreamRecommendation" -> PlaceStreamLiveGetRecommendationsOutputRecommendationsUnion.LivestreamRecommendation(

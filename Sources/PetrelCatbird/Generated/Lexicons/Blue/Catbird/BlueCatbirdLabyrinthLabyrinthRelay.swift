@@ -9,14 +9,16 @@ public enum BlueCatbirdLabyrinthLabyrinthRelay {
     public struct Input: ATProtocolCodable {
         public let op: String
         public let actorDid: DID
-        public let actorDeviceId: String
+        public let actorDeviceId: String?
         public let query: String?
         public let payload: Bytes?
         public let writeBody: String?
         public let writeSignature: String?
+        public let readHeader: String?
+        public let readSignature: String?
 
         /// Standard public initializer
-        public init(op: String, actorDid: DID, actorDeviceId: String, query: String? = nil, payload: Bytes? = nil, writeBody: String? = nil, writeSignature: String? = nil) {
+        public init(op: String, actorDid: DID, actorDeviceId: String? = nil, query: String? = nil, payload: Bytes? = nil, writeBody: String? = nil, writeSignature: String? = nil, readHeader: String? = nil, readSignature: String? = nil) {
             self.op = op
             self.actorDid = actorDid
             self.actorDeviceId = actorDeviceId
@@ -24,28 +26,34 @@ public enum BlueCatbirdLabyrinthLabyrinthRelay {
             self.payload = payload
             self.writeBody = writeBody
             self.writeSignature = writeSignature
+            self.readHeader = readHeader
+            self.readSignature = readSignature
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             op = try container.decode(String.self, forKey: .op)
             actorDid = try container.decode(DID.self, forKey: .actorDid)
-            actorDeviceId = try container.decode(String.self, forKey: .actorDeviceId)
+            actorDeviceId = try container.decodeIfPresent(String.self, forKey: .actorDeviceId)
             query = try container.decodeIfPresent(String.self, forKey: .query)
             payload = try container.decodeIfPresent(Bytes.self, forKey: .payload)
             writeBody = try container.decodeIfPresent(String.self, forKey: .writeBody)
             writeSignature = try container.decodeIfPresent(String.self, forKey: .writeSignature)
+            readHeader = try container.decodeIfPresent(String.self, forKey: .readHeader)
+            readSignature = try container.decodeIfPresent(String.self, forKey: .readSignature)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(op, forKey: .op)
             try container.encode(actorDid, forKey: .actorDid)
-            try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encodeIfPresent(actorDeviceId, forKey: .actorDeviceId)
             try container.encodeIfPresent(query, forKey: .query)
             try container.encodeIfPresent(payload, forKey: .payload)
             try container.encodeIfPresent(writeBody, forKey: .writeBody)
             try container.encodeIfPresent(writeSignature, forKey: .writeSignature)
+            try container.encodeIfPresent(readHeader, forKey: .readHeader)
+            try container.encodeIfPresent(readSignature, forKey: .readSignature)
         }
 
         public func toCBORValue() throws -> Any {
@@ -54,8 +62,10 @@ public enum BlueCatbirdLabyrinthLabyrinthRelay {
             map = map.adding(key: "op", value: opValue)
             let actorDidValue = try actorDid.toCBORValue()
             map = map.adding(key: "actorDid", value: actorDidValue)
-            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
-            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            if let value = actorDeviceId {
+                let actorDeviceIdValue = try value.toCBORValue()
+                map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            }
             if let value = query {
                 let queryValue = try value.toCBORValue()
                 map = map.adding(key: "query", value: queryValue)
@@ -72,6 +82,14 @@ public enum BlueCatbirdLabyrinthLabyrinthRelay {
                 let writeSignatureValue = try value.toCBORValue()
                 map = map.adding(key: "writeSignature", value: writeSignatureValue)
             }
+            if let value = readHeader {
+                let readHeaderValue = try value.toCBORValue()
+                map = map.adding(key: "readHeader", value: readHeaderValue)
+            }
+            if let value = readSignature {
+                let readSignatureValue = try value.toCBORValue()
+                map = map.adding(key: "readSignature", value: readSignatureValue)
+            }
             return map
         }
 
@@ -83,6 +101,8 @@ public enum BlueCatbirdLabyrinthLabyrinthRelay {
             case payload
             case writeBody
             case writeSignature
+            case readHeader
+            case readSignature
         }
     }
 
@@ -111,6 +131,7 @@ public enum BlueCatbirdLabyrinthLabyrinthRelay {
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case notHomeDs = "NotHomeDs"
         case notSequencer = "NotSequencer"
+        case invalidSignature = "InvalidSignature"
         public var description: String {
             return rawValue
         }
@@ -124,7 +145,7 @@ public enum BlueCatbirdLabyrinthLabyrinthRelay {
 public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - labyrinthRelay
 
-    // Server-to-server only (design Y3). A device's home DS uses this to forward a Labyrinth thread operation for a conversation that the receiving DS sequences. Authentication is standard DS service auth: iss is the home DS, aud is the sequencer, lxm is this NSID, under the federation peer policy. The receiver requires three things: the requesting DS is the actor's home DS in the conversation's participant rows, the actor's chat device is current in its replicated device table, and, for writes, the device's labyrinthWriteBody signature over the forwarded payload re-verifies. The output and errors are exactly those of the relayed endpoint.
+    // Server-to-server only (design Y3). A device's home DS uses this to forward a Labyrinth thread operation for a conversation that the receiving DS sequences. Authentication is standard DS service auth: iss is the home DS, aud is the sequencer, lxm is this NSID, under the federation peer policy. The receiver requires three things: the requesting DS is the actor's home DS in the conversation's participant rows, the actor's chat device is current in its replicated device table, for writes, the device's labyrinthWriteBody signature over the forwarded payload re-verifies, and for reads the device's signed read claim (readHeader/readSignature) re-verifies. The output and errors are exactly those of the relayed endpoint.
     //
     // - Parameter input: The input parameters for the request
 

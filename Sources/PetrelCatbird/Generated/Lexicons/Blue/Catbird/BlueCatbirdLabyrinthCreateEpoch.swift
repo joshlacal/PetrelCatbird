@@ -100,6 +100,7 @@ public enum BlueCatbirdLabyrinthCreateEpoch {
         case attestationNotCurrent = "AttestationNotCurrent"
         case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
         case memberDeviceNotRegistered = "MemberDeviceNotRegistered"
+        case attestationNotCaller = "AttestationNotCaller"
         public var description: String {
             return rawValue
         }
@@ -113,7 +114,7 @@ public enum BlueCatbirdLabyrinthCreateEpoch {
 public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - createEpoch
 
-    // Atomically create an epoch and its initial members, and record its head in the epoch-head directory. The epoch number is the race guard between devices ([CB-9]). Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    // Atomically create an epoch and its initial members, and record its head in the epoch-head directory. The head must recompute, its selfSig (XEdDSA by signingPubkey) must verify, it must be attested by the calling chat device's own key, and a later epoch's prevSig must verify under the previous epoch's signingPubkey. The epoch number is the race guard between devices ([CB-9]). Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     //
     // - Parameter input: The input parameters for the request
 

@@ -62,6 +62,9 @@ public enum BlueCatbirdLabyrinthPublishEpochHead {
         case invalidEpochChain = "InvalidEpochChain"
         case epochHeadConflict = "EpochHeadConflict"
         case attestationNotCurrent = "AttestationNotCurrent"
+        case epochNotFound = "EpochNotFound"
+        case attestationNotCaller = "AttestationNotCaller"
+        case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
         public var description: String {
             return rawValue
         }
@@ -75,7 +78,7 @@ public enum BlueCatbirdLabyrinthPublishEpochHead {
 public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - publishEpochHead
 
-    // Record the caller DID's next epoch head. Accepted only if its number is 0 or the latest + 1, its previousEpochHead is the stored head, the head recomputes, and a current chat device of the DID attested it. Identical bytes succeed again. Directory endpoint: any authenticated chat device may call it. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    // Re-publish the head of an epoch the caller's mailbox already holds. Heads enter the directory only through createEpoch, atomically; this endpoint can neither introduce an epoch nor claim the next number. The caller must hold a bound Labyrinth device, the epoch must exist with exactly this epochPublic, and its attestation must be by the calling chat device's own key. Identical bytes succeed again. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     //
     // - Parameter input: The input parameters for the request
 

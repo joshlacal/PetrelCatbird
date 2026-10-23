@@ -36,12 +36,23 @@ public enum BlueCatbirdLabyrinthPurgeMailbox {
             return OrderedCBORMap()
         }
     }
+
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
+        public var description: String {
+            return rawValue
+        }
+
+        public var errorName: String {
+            return rawValue
+        }
+    }
 }
 
 public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - purgeMailbox
 
-    // Delete the caller's whole Labyrinth mailbox: devices, epochs, epoch members, virtual devices (recovery bundles), owner batches, every ORF state and attachment reference of the caller, and the caller's chain in the head directory, so the account can enroll again from epoch 0. Peers that pinned an old head see a directory fork on their next read, which is the intended signal of a reset. Thread records the caller sent are kept (redactMessage and deleteAccountData handle those). Mailbox endpoint on the caller's home DS. Idempotent. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    // Delete the caller's whole Labyrinth mailbox: devices, epochs, epoch members, virtual devices (recovery bundles), owner batches, every ORF state and attachment reference of the caller, and the caller's chain in the head directory, so the account can enroll again from epoch 0. Peers that pinned an old head see a directory fork on their next read, which is the intended signal of a reset. Thread records the caller sent are kept (redactMessage and deleteAccountData handle those). Mailbox endpoint on the caller's home DS. Idempotent. Requires a bound Labyrinth device (a current, non-virtual device registered by the calling chat device). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     //
     // - Parameter input: The input parameters for the request
 
@@ -75,7 +86,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Determine service DID for this endpoint
         let serviceDID = await networkService.getServiceDID(for: "blue.catbird.labyrinth.purgeMailbox")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
-        let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
+        let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
         // Only validate Content-Type and decode on success. Error responses
@@ -101,6 +112,15 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
                 return (responseCode, nil)
             }
         } else {
+            // Try to parse a declared structured error response
+            if let atprotoError = ATProtoErrorParser.parse(
+                data: responseData,
+                statusCode: responseCode,
+                errorType: BlueCatbirdLabyrinthPurgeMailbox.Error.self
+            ) {
+                throw atprotoError
+            }
+
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }

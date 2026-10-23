@@ -306,7 +306,8 @@
         "generation",
         "cid",
         "order",
-        "redactions"
+        "redactions",
+        "itemCount"
       ],
       "properties": {
         "author": {
@@ -344,6 +345,12 @@
             "type": "ref",
             "ref": "blue.catbird.labyrinth.defs#spaceBatchRedaction"
           }
+        },
+        "itemCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256,
+          "description": "Original batch item count. Only a complete distinct redaction overlay can replace a purged source record."
         }
       }
     }

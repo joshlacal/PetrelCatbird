@@ -109,15 +109,49 @@ object BlueCatbirdLabyrinthDefsDefs {
     }
 
     /**
-     * [CB-38] An author's unsend request: Ed25519 by one of the author's chat device keys over 'catbird.labyrinth.redaction:did=' || did || ';message_id=' || messageId || ';thread_id=' || hex(threadId). transportPubkey and sig are absent exactly when the server redacted the item for an account deletion (deleteAccountData); readers show such items as deleted (account removed), never as an author unsend.
+     * A redaction of a sender item. Two variants. (1) [CB-38] author unsend: transportPubkey and sig, Ed25519 by one of the author's chat device keys over 'catbird.labyrinth.redaction:did=' || did || ';message_id=' || messageId || ';thread_id=' || hex(threadId). (2) Server redaction for an account deletion (deleteAccountData / purgeAuthor): transportPubkey is absent; by is the redacting (sequencer) DS's DID, reason is 'accountDeleted', redactedAt is the server's, and sig, when present, is Ed25519 by that DS's redaction key over the UTF-8 string 'catbird.labyrinth.ds_redaction:by=' || by || ';did=' || author DID || ';message_id=' || messageId || ';reason=accountDeleted;redacted_at=' || redactedAt || ';thread_id=' || hex(utf8(threadId)). Readers show variant 2 as 'account deleted' only when sig verifies under the key of the conversation's sequencer DID, and otherwise as 'removed by server'; never as an author unsend.
      */
     @Serializable
     data class BlueCatbirdLabyrinthDefsRedaction(
 /** The author's chat device Ed25519 key. */        @SerialName("transportPubkey")
-        val transportPubkey: Bytes? = null,/** Ed25519 signature. */        @SerialName("sig")
+        val transportPubkey: Bytes? = null,/** Ed25519 signature: by the author's chat device key (unsend) or by the DS redaction key (server redactions; optional there). */        @SerialName("sig")
         val sig: Bytes? = null,/** Set by the server when it applied the redaction. */        @SerialName("redactedAt")
-        val redactedAt: ATProtocolDate? = null    ) {
+        val redactedAt: ATProtocolDate? = null,/** Server redactions: the DID of the DS that applied it (the conversation's sequencer). */        @SerialName("by")
+        val `by`: DID? = null,/** Server redactions: why the server redacted the item. */        @SerialName("reason")
+        val reason: String? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsRedaction"
+        }
+    }
+
+    /**
+     * Authoritative tombstone overlay for an item in an immutable sender batch. Apply after verifying the source record.
+     */
+    @Serializable
+    data class BlueCatbirdLabyrinthDefsSpaceBatchRedaction(
+        @SerialName("messageId")
+        val messageId: String,        @SerialName("timestamp")
+        val timestamp: Int,        @SerialName("redaction")
+        val redaction: BlueCatbirdLabyrinthDefsRedaction    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsSpaceBatchRedaction"
+        }
+    }
+
+    /**
+     * An immutable Space batch reference and its authenticated sequencer order. Server tombstones remain authoritative even if the source ciphertext is still readable.
+     */
+    @Serializable
+    data class BlueCatbirdLabyrinthDefsSpaceBatchView(
+        @SerialName("author")
+        val author: DID,        @SerialName("rkey")
+        val rkey: String,/** Conversation Space reference, bound to the storage generation. */        @SerialName("space")
+        val space: SpaceRef,/** Immutable UUID identifying this conversation storage lifecycle. A recreated Space requires a new generation. */        @SerialName("generation")
+        val generation: String,        @SerialName("cid")
+        val cid: CID,        @SerialName("order")
+        val order: BlueCatbirdLabyrinthDefsServerOrder,        @SerialName("redactions")
+        val redactions: List<BlueCatbirdLabyrinthDefsSpaceBatchRedaction>    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsSpaceBatchView"
         }
     }

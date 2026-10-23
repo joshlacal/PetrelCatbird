@@ -9,7 +9,8 @@
         "type": "params",
         "required": [
           "threadId",
-          "generation"
+          "generation",
+          "actorDeviceId"
         ],
         "properties": {
           "threadId": {
@@ -65,6 +66,12 @@
             "minLength": 36,
             "maxLength": 36,
             "description": "Immutable UUID identifying this conversation storage lifecycle. A recreated Space requires a new generation."
+          },
+          "actorDeviceId": {
+            "type": "string",
+            "minLength": 36,
+            "maxLength": 36,
+            "description": "Current chat device UUID."
           }
         }
       },

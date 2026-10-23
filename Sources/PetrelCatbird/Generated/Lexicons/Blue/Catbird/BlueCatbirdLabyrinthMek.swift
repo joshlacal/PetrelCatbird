@@ -347,15 +347,11 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
 
         public static func == (lhs: BlueCatbirdLabyrinthMekSenderUnion, rhs: BlueCatbirdLabyrinthMekSenderUnion) -> Bool {
             switch (lhs, rhs) {
-            case let (
-                .blueCatbirdLabyrinthMekLabyrinthSender(lhsValue),
-                .blueCatbirdLabyrinthMekLabyrinthSender(rhsValue)
-            ):
+            case let (.blueCatbirdLabyrinthMekLabyrinthSender(lhsValue),
+                      .blueCatbirdLabyrinthMekLabyrinthSender(rhsValue)):
                 return lhsValue == rhsValue
-            case let (
-                .blueCatbirdLabyrinthMekTransportSender(lhsValue),
-                .blueCatbirdLabyrinthMekTransportSender(rhsValue)
-            ):
+            case let (.blueCatbirdLabyrinthMekTransportSender(lhsValue),
+                      .blueCatbirdLabyrinthMekTransportSender(rhsValue)):
                 return lhsValue == rhsValue
             case let (.unexpected(lhsValue), .unexpected(rhsValue)):
                 return lhsValue.isEqual(to: rhsValue)

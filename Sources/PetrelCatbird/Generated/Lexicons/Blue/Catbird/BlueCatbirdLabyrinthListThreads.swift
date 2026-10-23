@@ -81,16 +81,22 @@ public enum BlueCatbirdLabyrinthListThreads {
 
         public let cursor: String?
 
+        public let incomplete: [DID]?
+
         /// Standard public initializer
         public init(
             items: [ThreadView],
 
-            cursor: String? = nil
+            cursor: String? = nil,
+
+            incomplete: [DID]? = nil
 
         ) {
             self.items = items
 
             self.cursor = cursor
+
+            self.incomplete = incomplete
         }
 
         public init(from decoder: Decoder) throws {
@@ -105,6 +111,14 @@ public enum BlueCatbirdLabyrinthListThreads {
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
                 cursor = nil
             }
+
+            do {
+                incomplete = try container.decodeIfPresent([DID].self, forKey: .incomplete)
+            } catch {
+                // Forward compatibility: a malformed optional field must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'incomplete' — degrading to nil: \(error)")
+                incomplete = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -114,6 +128,9 @@ public enum BlueCatbirdLabyrinthListThreads {
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(cursor, forKey: .cursor)
+
+            // Encode optional property even if it's an empty array
+            try container.encodeIfPresent(incomplete, forKey: .incomplete)
         }
 
         public func toCBORValue() throws -> Any {
@@ -128,12 +145,19 @@ public enum BlueCatbirdLabyrinthListThreads {
                 map = map.adding(key: "cursor", value: cursorValue)
             }
 
+            if let value = incomplete {
+                // Encode optional property even if it's an empty array for CBOR
+                let incompleteValue = try value.toCBORValue()
+                map = map.adding(key: "incomplete", value: incompleteValue)
+            }
+
             return map
         }
 
         private enum CodingKeys: String, CodingKey {
             case items
             case cursor
+            case incomplete
         }
     }
 
@@ -152,7 +176,7 @@ public enum BlueCatbirdLabyrinthListThreads {
 public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - listThreads
 
-    /// Lookup by thread: every conversation in which the caller wrote a MEK or is a MEK recipient, including conversations it has left ([CB-22]), ascending by conversation id. The caller's home DS merges its own conversations with those of every remote sequencer of a conversation the caller takes or took part in (labyrinthRelay listThreads); an unreachable sequencer fails the call with RelayUnavailable. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    /// Lookup by thread: every conversation in which the caller wrote a MEK or is a MEK recipient, including conversations it has left ([CB-22]), ascending by conversation id. The caller's home DS merges its own conversations with those of every remote sequencer of a conversation the caller takes or took part in (labyrinthRelay listThreads); the remote sequencers are asked in parallel with a per-sequencer deadline and response cap, and a sequencer that cannot answer is named in incomplete instead of failing the call (its conversations are then missing from this page). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
     ///
