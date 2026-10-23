@@ -17,6 +17,7 @@ public enum BlueCatbirdLabyrinthListSpaceBatches {
         public let cursor: String?
         public let limit: Int?
         public let generation: String
+        public let actorDeviceId: String
 
         public init(
             threadId: String,
@@ -28,7 +29,8 @@ public enum BlueCatbirdLabyrinthListSpaceBatches {
             reverse: Bool? = nil,
             cursor: String? = nil,
             limit: Int? = nil,
-            generation: String
+            generation: String,
+            actorDeviceId: String
         ) {
             self.threadId = threadId
             self.sender = sender
@@ -40,6 +42,7 @@ public enum BlueCatbirdLabyrinthListSpaceBatches {
             self.cursor = cursor
             self.limit = limit
             self.generation = generation
+            self.actorDeviceId = actorDeviceId
         }
     }
 

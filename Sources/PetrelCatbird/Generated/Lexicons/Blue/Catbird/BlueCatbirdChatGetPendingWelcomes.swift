@@ -269,11 +269,15 @@ public enum BlueCatbirdChatGetPendingWelcomes {
 
         public static func == (lhs: OutputItemsUnion, rhs: OutputItemsUnion) -> Bool {
             switch (lhs, rhs) {
-            case let (.blueCatbirdChatDefsWelcomeView(lhsValue),
-                      .blueCatbirdChatDefsWelcomeView(rhsValue)):
+            case let (
+                .blueCatbirdChatDefsWelcomeView(lhsValue),
+                .blueCatbirdChatDefsWelcomeView(rhsValue)
+            ):
                 return lhsValue == rhsValue
-            case let (.blueCatbirdChatDefsDirectRequestWelcomeView(lhsValue),
-                      .blueCatbirdChatDefsDirectRequestWelcomeView(rhsValue)):
+            case let (
+                .blueCatbirdChatDefsDirectRequestWelcomeView(lhsValue),
+                .blueCatbirdChatDefsDirectRequestWelcomeView(rhsValue)
+            ):
                 return lhsValue == rhsValue
             case let (.unexpected(lhsValue), .unexpected(rhsValue)):
                 return lhsValue.isEqual(to: rhsValue)

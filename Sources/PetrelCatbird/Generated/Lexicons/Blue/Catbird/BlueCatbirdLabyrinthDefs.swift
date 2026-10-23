@@ -1000,9 +1000,10 @@ public enum BlueCatbirdLabyrinthDefs {
         public let cid: CID
         public let order: BlueCatbirdLabyrinthDefs.ServerOrder
         public let redactions: [BlueCatbirdLabyrinthDefs.SpaceBatchRedaction]
+        public let itemCount: Int
 
         public init(
-            author: DID, rkey: RecordKey, space: SpaceRef, generation: String, cid: CID, order: BlueCatbirdLabyrinthDefs.ServerOrder, redactions: [BlueCatbirdLabyrinthDefs.SpaceBatchRedaction]
+            author: DID, rkey: RecordKey, space: SpaceRef, generation: String, cid: CID, order: BlueCatbirdLabyrinthDefs.ServerOrder, redactions: [BlueCatbirdLabyrinthDefs.SpaceBatchRedaction], itemCount: Int
         ) {
             self.author = author
             self.rkey = rkey
@@ -1011,6 +1012,7 @@ public enum BlueCatbirdLabyrinthDefs {
             self.cid = cid
             self.order = order
             self.redactions = redactions
+            self.itemCount = itemCount
         }
 
         public init(from decoder: Decoder) throws {
@@ -1057,6 +1059,12 @@ public enum BlueCatbirdLabyrinthDefs {
                 LogManager.logError("Decoding error for required property 'redactions': \(error)")
                 throw error
             }
+            do {
+                itemCount = try container.decode(Int.self, forKey: .itemCount)
+            } catch {
+                LogManager.logError("Decoding error for required property 'itemCount': \(error)")
+                throw error
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -1069,6 +1077,7 @@ public enum BlueCatbirdLabyrinthDefs {
             try container.encode(cid, forKey: .cid)
             try container.encode(order, forKey: .order)
             try container.encode(redactions, forKey: .redactions)
+            try container.encode(itemCount, forKey: .itemCount)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -1079,6 +1088,7 @@ public enum BlueCatbirdLabyrinthDefs {
             hasher.combine(cid)
             hasher.combine(order)
             hasher.combine(redactions)
+            hasher.combine(itemCount)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
@@ -1102,6 +1112,9 @@ public enum BlueCatbirdLabyrinthDefs {
                 return false
             }
             if redactions != other.redactions {
+                return false
+            }
+            if itemCount != other.itemCount {
                 return false
             }
             return true
@@ -1128,6 +1141,8 @@ public enum BlueCatbirdLabyrinthDefs {
             map = map.adding(key: "order", value: orderValue)
             let redactionsValue = try redactions.toCBORValue()
             map = map.adding(key: "redactions", value: redactionsValue)
+            let itemCountValue = try itemCount.toCBORValue()
+            map = map.adding(key: "itemCount", value: itemCountValue)
             return map
         }
 
@@ -1140,6 +1155,7 @@ public enum BlueCatbirdLabyrinthDefs {
             case cid
             case order
             case redactions
+            case itemCount
         }
     }
 }

@@ -150,7 +150,8 @@ object BlueCatbirdLabyrinthDefsDefs {
         val generation: String,        @SerialName("cid")
         val cid: CID,        @SerialName("order")
         val order: BlueCatbirdLabyrinthDefsServerOrder,        @SerialName("redactions")
-        val redactions: List<BlueCatbirdLabyrinthDefsSpaceBatchRedaction>    ) {
+        val redactions: List<BlueCatbirdLabyrinthDefsSpaceBatchRedaction>,/** Original batch item count. Only a complete distinct redaction overlay can replace a purged source record. */        @SerialName("itemCount")
+        val itemCount: Int    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsSpaceBatchView"
         }

@@ -28,7 +28,8 @@ object BlueCatbirdLabyrinthListSpaceBatchesDefs {
         val reverse: Boolean? = null,// Opaque cursor from the previous page.        @SerialName("cursor")
         val cursor: String? = null,// Page size (at most 100).        @SerialName("limit")
         val limit: Int? = null,// Immutable UUID identifying this conversation storage lifecycle. A recreated Space requires a new generation.        @SerialName("generation")
-        val generation: String    )
+        val generation: String,// Current chat device UUID.        @SerialName("actorDeviceId")
+        val actorDeviceId: String    )
 
     @Serializable
     data class BlueCatbirdLabyrinthListSpaceBatchesOutput(

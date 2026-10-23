@@ -65,13 +65,13 @@ public enum BlueCatbirdLabyrinthAppendSpaceBatch {
     }
 
     public struct Output: ATProtocolCodable {
-        public let rkey: String
+        public let rkey: RecordKey
 
         public let order: BlueCatbirdLabyrinthDefs.ServerOrder
 
         /// Standard public initializer
         public init(
-            rkey: String,
+            rkey: RecordKey,
 
             order: BlueCatbirdLabyrinthDefs.ServerOrder
 
@@ -84,7 +84,7 @@ public enum BlueCatbirdLabyrinthAppendSpaceBatch {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            rkey = try container.decode(String.self, forKey: .rkey)
+            rkey = try container.decode(RecordKey.self, forKey: .rkey)
 
             order = try container.decode(BlueCatbirdLabyrinthDefs.ServerOrder.self, forKey: .order)
         }

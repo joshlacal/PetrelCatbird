@@ -27,7 +27,7 @@ object BlueCatbirdLabyrinthAppendSpaceBatchDefs {
 
     @Serializable
     data class BlueCatbirdLabyrinthAppendSpaceBatchOutput(
-// TID.        @SerialName("rkey")
+// Immutable source Space record key; deterministic keys may use a 64-character digest.        @SerialName("rkey")
         val rkey: String,        @SerialName("order")
         val order: BlueCatbirdLabyrinthDefsServerOrder    )
 
