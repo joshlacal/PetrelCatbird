@@ -5,6 +5,7 @@ import Petrel
 // lexicon: 1, id: blue.catbird.circle.metadata
 
 public struct BlueCatbirdCircleMetadata: ATProtocolCodable, ATProtocolValue {
+
     public static let typeIdentifier = "blue.catbird.circle.metadata"
     public let circleId: TID
     public let name: String
@@ -22,22 +23,22 @@ public struct BlueCatbirdCircleMetadata: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        circleId = try container.decode(TID.self, forKey: .circleId)
-        name = try container.decode(String.self, forKey: .name)
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.circleId = try container.decode(TID.self, forKey: .circleId)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            migratedFrom = try container.decodeIfPresent(SpaceRef.self, forKey: .migratedFrom)
+            self.migratedFrom = try container.decodeIfPresent(SpaceRef.self, forKey: .migratedFrom)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'migratedFrom' — degrading to nil: \(error)")
-            migratedFrom = nil
+            self.migratedFrom = nil
         }
         do {
-            migratedTo = try container.decodeIfPresent(SpaceRef.self, forKey: .migratedTo)
+            self.migratedTo = try container.decodeIfPresent(SpaceRef.self, forKey: .migratedTo)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'migratedTo' — degrading to nil: \(error)")
-            migratedTo = nil
+            self.migratedTo = nil
         }
     }
 
@@ -119,4 +120,5 @@ public struct BlueCatbirdCircleMetadata: ATProtocolCodable, ATProtocolValue {
         case migratedFrom
         case migratedTo
     }
+
 }

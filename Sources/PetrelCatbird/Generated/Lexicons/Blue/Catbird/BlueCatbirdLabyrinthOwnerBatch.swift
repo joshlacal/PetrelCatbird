@@ -5,6 +5,7 @@ import Petrel
 // lexicon: 1, id: blue.catbird.labyrinth.ownerBatch
 
 public struct BlueCatbirdLabyrinthOwnerBatch: ATProtocolCodable, ATProtocolValue {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.ownerBatch"
     public let threadId: String
     public let items: [BlueCatbirdLabyrinthDefs.OwnerMessage]
@@ -18,9 +19,9 @@ public struct BlueCatbirdLabyrinthOwnerBatch: ATProtocolCodable, ATProtocolValue
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        threadId = try container.decode(String.self, forKey: .threadId)
-        items = try container.decode([BlueCatbirdLabyrinthDefs.OwnerMessage].self, forKey: .items)
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.threadId = try container.decode(String.self, forKey: .threadId)
+        self.items = try container.decode([BlueCatbirdLabyrinthDefs.OwnerMessage].self, forKey: .items)
+        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -73,4 +74,5 @@ public struct BlueCatbirdLabyrinthOwnerBatch: ATProtocolCodable, ATProtocolValue
         case items
         case createdAt
     }
+
 }

@@ -5,6 +5,7 @@ import Petrel
 // lexicon: 1, id: place.stream.broadcast.syndication
 
 public struct PlaceStreamBroadcastSyndication: ATProtocolCodable, ATProtocolValue {
+
     public static let typeIdentifier = "place.stream.broadcast.syndication"
     public let broadcaster: DID
     public let streamer: DID
@@ -18,9 +19,9 @@ public struct PlaceStreamBroadcastSyndication: ATProtocolCodable, ATProtocolValu
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        broadcaster = try container.decode(DID.self, forKey: .broadcaster)
-        streamer = try container.decode(DID.self, forKey: .streamer)
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.broadcaster = try container.decode(DID.self, forKey: .broadcaster)
+        self.streamer = try container.decode(DID.self, forKey: .streamer)
+        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -73,4 +74,5 @@ public struct PlaceStreamBroadcastSyndication: ATProtocolCodable, ATProtocolValu
         case streamer
         case createdAt
     }
+
 }

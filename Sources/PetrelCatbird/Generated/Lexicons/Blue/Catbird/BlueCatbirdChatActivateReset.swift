@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.activateReset
 
-public enum BlueCatbirdChatActivateReset {
+public struct BlueCatbirdChatActivateReset {
+
     public static let typeIdentifier = "blue.catbird.chat.activateReset"
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedResetActivation
@@ -16,7 +17,7 @@ public enum BlueCatbirdChatActivateReset {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedResetActivation.self, forKey: .signedRequest)
+            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedResetActivation.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -37,14 +38,16 @@ public enum BlueCatbirdChatActivateReset {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let retiredCoordinates: BlueCatbirdChatDefs.ConversationCoordinates
 
         public let successorCoordinates: BlueCatbirdChatDefs.ConversationCoordinates
 
         public let entry: BlueCatbirdChatDefs.ResetActivationEntry
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             retiredCoordinates: BlueCatbirdChatDefs.ConversationCoordinates,
 
             successorCoordinates: BlueCatbirdChatDefs.ConversationCoordinates,
@@ -52,24 +55,29 @@ public enum BlueCatbirdChatActivateReset {
             entry: BlueCatbirdChatDefs.ResetActivationEntry
 
         ) {
+
             self.retiredCoordinates = retiredCoordinates
 
             self.successorCoordinates = successorCoordinates
 
             self.entry = entry
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            retiredCoordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .retiredCoordinates)
+            self.retiredCoordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .retiredCoordinates)
 
-            successorCoordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .successorCoordinates)
+            self.successorCoordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .successorCoordinates)
 
-            entry = try container.decode(BlueCatbirdChatDefs.ResetActivationEntry.self, forKey: .entry)
+            self.entry = try container.decode(BlueCatbirdChatDefs.ResetActivationEntry.self, forKey: .entry)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(retiredCoordinates, forKey: .retiredCoordinates)
@@ -77,9 +85,11 @@ public enum BlueCatbirdChatActivateReset {
             try container.encode(successorCoordinates, forKey: .successorCoordinates)
 
             try container.encode(entry, forKey: .entry)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let retiredCoordinatesValue = try retiredCoordinates.toCBORValue()
@@ -92,6 +102,7 @@ public enum BlueCatbirdChatActivateReset {
             map = map.adding(key: "entry", value: entryValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -99,6 +110,7 @@ public enum BlueCatbirdChatActivateReset {
             case successorCoordinates
             case entry
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -127,26 +139,27 @@ public enum BlueCatbirdChatActivateReset {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - activateReset
-
-    // An active registered device of an active admin DID authorizes an exact unexpired pending request; it need not be an old-generation leaf. Activation preserves immutable conversationKind plus every participant status/role/provenance, atomically supersedes the old generation, closes every old application interval at the reset seq, and installs the activator-only epoch-zero successor leaf. Every other participant has zero successor leaves: active participants recover through their own signed requests and pending participants remain pending. There is no reset reservation, bootstrap Commit, or Welcome. Metadata is either the same signed content/version/origin reencrypted with a fresh nonce or an activator-signed empty prior-version-plus-one snapshot.
-    //
-    // - Parameter input: The input parameters for the request
+    /// An active registered device of an active admin DID authorizes an exact unexpired pending request; it need not be an old-generation leaf. Activation preserves immutable conversationKind plus every participant status/role/provenance, atomically supersedes the old generation, closes every old application interval at the reset seq, and installs the activator-only epoch-zero successor leaf. Every other participant has zero successor leaves: active participants recover through their own signed requests and pending participants remain pending. There is no reset reservation, bootstrap Commit, or Welcome. Metadata is either the same signed content/version/origin reencrypted with a fresh nonce or an activator-signed empty prior-version-plus-one snapshot.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func activateReset(
+    public func activateReset(
+
         input: BlueCatbirdChatActivateReset.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatActivateReset.Output?) {
@@ -179,7 +192,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -189,6 +203,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatActivateReset.Output.self, from: responseData)
 
@@ -211,5 +226,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

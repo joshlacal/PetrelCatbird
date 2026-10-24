@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.listEpochMembers
 
-public enum BlueCatbirdLabyrinthListEpochMembers {
+public struct BlueCatbirdLabyrinthListEpochMembers {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.listEpochMembers"
     public struct Parameters: Parametrizable {
         public let epochNumber: Int
@@ -19,50 +20,60 @@ public enum BlueCatbirdLabyrinthListEpochMembers {
             self.epochNumber = epochNumber
             self.cursor = cursor
             self.limit = limit
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let items: [ATProtocolValueContainer]
 
         public let cursor: String?
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             items: [ATProtocolValueContainer],
 
             cursor: String? = nil
 
         ) {
+
             self.items = items
 
             self.cursor = cursor
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            items = try container.decode([ATProtocolValueContainer].self, forKey: .items)
+            self.items = try container.decode([ATProtocolValueContainer].self, forKey: .items)
 
             do {
-                cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
+                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
-                cursor = nil
+                self.cursor = nil
             }
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(items, forKey: .items)
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(cursor, forKey: .cursor)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let itemsValue = try items.toCBORValue()
@@ -75,36 +86,38 @@ public enum BlueCatbirdLabyrinthListEpochMembers {
             }
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case items
             case cursor
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case epochNotFound = "EpochNotFound"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Labyrinth {
+extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - listEpochMembers
-
     /// The members of one epoch. Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func listEpochMembers(input: BlueCatbirdLabyrinthListEpochMembers.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthListEpochMembers.Output?) {
+    public func listEpochMembers(input: BlueCatbirdLabyrinthListEpochMembers.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthListEpochMembers.Output?) {
         let endpoint = "blue.catbird.labyrinth.listEpochMembers"
 
         let queryItems = input.asQueryItems()
@@ -126,7 +139,8 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

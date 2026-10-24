@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: place.stream.server.createWebhook
 
-public enum PlaceStreamServerCreateWebhook {
+public struct PlaceStreamServerCreateWebhook {
+
     public static let typeIdentifier = "place.stream.server.createWebhook"
     public struct Input: ATProtocolCodable {
         public let url: URI
@@ -32,15 +33,15 @@ public enum PlaceStreamServerCreateWebhook {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            url = try container.decode(URI.self, forKey: .url)
-            events = try container.decode([InputEvents].self, forKey: .events)
-            active = try container.decodeIfPresent(Bool.self, forKey: .active)
-            prefix = try container.decodeIfPresent(String.self, forKey: .prefix)
-            suffix = try container.decodeIfPresent(String.self, forKey: .suffix)
-            rewrite = try container.decodeIfPresent([PlaceStreamServerDefs.RewriteRule].self, forKey: .rewrite)
-            name = try container.decodeIfPresent(String.self, forKey: .name)
-            description = try container.decodeIfPresent(String.self, forKey: .description)
-            muteWords = try container.decodeIfPresent([String].self, forKey: .muteWords)
+            self.url = try container.decode(URI.self, forKey: .url)
+            self.events = try container.decode([InputEvents].self, forKey: .events)
+            self.active = try container.decodeIfPresent(Bool.self, forKey: .active)
+            self.prefix = try container.decodeIfPresent(String.self, forKey: .prefix)
+            self.suffix = try container.decodeIfPresent(String.self, forKey: .suffix)
+            self.rewrite = try container.decodeIfPresent([PlaceStreamServerDefs.RewriteRule].self, forKey: .rewrite)
+            self.name = try container.decodeIfPresent(String.self, forKey: .name)
+            self.description = try container.decodeIfPresent(String.self, forKey: .description)
+            self.muteWords = try container.decodeIfPresent([String].self, forKey: .muteWords)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -107,40 +108,51 @@ public enum PlaceStreamServerCreateWebhook {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let webhook: PlaceStreamServerDefs.Webhook
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             webhook: PlaceStreamServerDefs.Webhook
 
         ) {
+
             self.webhook = webhook
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            webhook = try container.decode(PlaceStreamServerDefs.Webhook.self, forKey: .webhook)
+            self.webhook = try container.decode(PlaceStreamServerDefs.Webhook.self, forKey: .webhook)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(webhook, forKey: .webhook)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let webhookValue = try webhook.toCBORValue()
             map = map.adding(key: "webhook", value: webhookValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case webhook
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -151,11 +163,11 @@ public enum PlaceStreamServerCreateWebhook {
         /// The user has reached their maximum number of webhooks.
         case tooManyWebhooks = "TooManyWebhooks"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
 
@@ -174,19 +186,20 @@ public enum PlaceStreamServerCreateWebhook {
             return rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Place.Stream.Server {
+extension ATProtoClient.Place.Stream.Server {
     // MARK: - createWebhook
-
-    // Create a new webhook for receiving Streamplace events.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Create a new webhook for receiving Streamplace events.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func createWebhook(
+    public func createWebhook(
+
         input: PlaceStreamServerCreateWebhook.Input
 
     ) async throws -> (responseCode: Int, data: PlaceStreamServerCreateWebhook.Output?) {
@@ -219,7 +232,8 @@ public extension ATProtoClient.Place.Stream.Server {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -229,6 +243,7 @@ public extension ATProtoClient.Place.Stream.Server {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(PlaceStreamServerCreateWebhook.Output.self, from: responseData)
 
@@ -251,5 +266,7 @@ public extension ATProtoClient.Place.Stream.Server {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

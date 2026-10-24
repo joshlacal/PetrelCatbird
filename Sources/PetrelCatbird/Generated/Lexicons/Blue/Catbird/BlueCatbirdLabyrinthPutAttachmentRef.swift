@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.putAttachmentRef
 
-public enum BlueCatbirdLabyrinthPutAttachmentRef {
+public struct BlueCatbirdLabyrinthPutAttachmentRef {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.putAttachmentRef"
     public struct Input: ATProtocolCodable {
         public let deviceKeyPubkey: Bytes
@@ -26,12 +27,12 @@ public enum BlueCatbirdLabyrinthPutAttachmentRef {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
-            blindedIndex = try container.decode(Bytes.self, forKey: .blindedIndex)
-            blindedTokenSalt = try container.decode(Bytes.self, forKey: .blindedTokenSalt)
-            blobId = try container.decode(String.self, forKey: .blobId)
-            threadId = try container.decode(String.self, forKey: .threadId)
-            messageId = try container.decode(String.self, forKey: .messageId)
+            self.deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
+            self.blindedIndex = try container.decode(Bytes.self, forKey: .blindedIndex)
+            self.blindedTokenSalt = try container.decode(Bytes.self, forKey: .blindedTokenSalt)
+            self.blobId = try container.decode(String.self, forKey: .blobId)
+            self.threadId = try container.decode(String.self, forKey: .threadId)
+            self.messageId = try container.decode(String.self, forKey: .messageId)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -72,25 +73,37 @@ public enum BlueCatbirdLabyrinthPutAttachmentRef {
     }
 
     public struct Output: ATProtocolCodable {
+
         // Empty output - no properties (response is {})
 
-        /// Standard public initializer
-        public init() {}
+        // Standard public initializer
+        public init(
+
+        ) {
+
+        }
 
         public init(from decoder: Decoder) throws {
+
             // Empty output - just validate it's an object by trying to get any container
             _ = try decoder.singleValueContainer()
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             // Empty output - encode empty object
             _ = encoder.singleValueContainer()
+
         }
 
         public func toCBORValue() throws -> Any {
+
             // Empty output - return empty CBOR map
             return OrderedCBORMap()
+
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -101,26 +114,27 @@ public enum BlueCatbirdLabyrinthPutAttachmentRef {
         case attachmentsUnavailable = "AttachmentsUnavailable"
         case messageRedacted = "MessageRedacted"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Labyrinth {
+extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - putAttachmentRef
-
-    // Store an attachment reference: index = orf_server_map(caller device state, index domain, blindedIndex), salt = orf_server_map(state, token domain, blindedTokenSalt), tokenMac = HMAC-SHA256(salt, json([threadId, messageId])), and pin the blob against chat object GC. Entitlement: blobId must be a bound attachment blob of conversation threadId whose application binding names messageId (an attachment-bearing message's Labyrinth messageId is its chat message id), and the calling chat device must hold the application interval covering that entry. Unlinkability (decision J4): the server keeps the owner DID and (threadId, messageId) only as keyed digests, and a blob may be referenced for one message only. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded. A message its author unsent (redacted here, or announced redacted by the conversation's sequencer) is refused with MessageRedacted.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Store an attachment reference: index = orf_server_map(caller device state, index domain, blindedIndex), salt = orf_server_map(state, token domain, blindedTokenSalt), tokenMac = HMAC-SHA256(salt, json([threadId, messageId])), and pin the blob against chat object GC. Entitlement: blobId must be a bound attachment blob of conversation threadId whose application binding names messageId (an attachment-bearing message's Labyrinth messageId is its chat message id), and the calling chat device must hold the application interval covering that entry. Unlinkability (decision J4): the server keeps the owner DID and (threadId, messageId) only as keyed digests, and a blob may be referenced for one message only. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded. A message its author unsent (redacted here, or announced redacted by the conversation's sequencer) is refused with MessageRedacted.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func putAttachmentRef(
+    public func putAttachmentRef(
+
         input: BlueCatbirdLabyrinthPutAttachmentRef.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthPutAttachmentRef.Output?) {
@@ -153,7 +167,8 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -163,6 +178,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdLabyrinthPutAttachmentRef.Output.self, from: responseData)
 
@@ -185,5 +201,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

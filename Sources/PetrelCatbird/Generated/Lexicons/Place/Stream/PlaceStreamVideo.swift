@@ -5,6 +5,7 @@ import Petrel
 // lexicon: 1, id: place.stream.video
 
 public struct PlaceStreamVideo: ATProtocolCodable, ATProtocolValue {
+
     public static let typeIdentifier = "place.stream.video"
     public let title: String
     public let duration: Int?
@@ -22,28 +23,28 @@ public struct PlaceStreamVideo: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        title = try container.decode(String.self, forKey: .title)
+        self.title = try container.decode(String.self, forKey: .title)
         do {
-            duration = try container.decodeIfPresent(Int.self, forKey: .duration)
+            self.duration = try container.decodeIfPresent(Int.self, forKey: .duration)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'duration' — degrading to nil: \(error)")
-            duration = nil
+            self.duration = nil
         }
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            thumb = try container.decodeIfPresent(Blob.self, forKey: .thumb)
+            self.thumb = try container.decodeIfPresent(Blob.self, forKey: .thumb)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'thumb' — degrading to nil: \(error)")
-            thumb = nil
+            self.thumb = nil
         }
         do {
-            description = try container.decodeIfPresent(String.self, forKey: .description)
+            self.description = try container.decodeIfPresent(String.self, forKey: .description)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'description' — degrading to nil: \(error)")
-            description = nil
+            self.description = nil
         }
     }
 
@@ -131,4 +132,5 @@ public struct PlaceStreamVideo: ATProtocolCodable, ATProtocolValue {
         case thumb
         case description
     }
+
 }

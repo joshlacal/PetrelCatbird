@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.closeConversation
 
-public enum BlueCatbirdChatCloseConversation {
+public struct BlueCatbirdChatCloseConversation {
+
     public static let typeIdentifier = "blue.catbird.chat.closeConversation"
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedConversationClose
@@ -16,7 +17,7 @@ public enum BlueCatbirdChatCloseConversation {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedConversationClose.self, forKey: .signedRequest)
+            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedConversationClose.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -37,40 +38,51 @@ public enum BlueCatbirdChatCloseConversation {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let result: BlueCatbirdChatDefs.ConversationCloseResult
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             result: BlueCatbirdChatDefs.ConversationCloseResult
 
         ) {
+
             self.result = result
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            result = try container.decode(BlueCatbirdChatDefs.ConversationCloseResult.self, forKey: .result)
+            self.result = try container.decode(BlueCatbirdChatDefs.ConversationCloseResult.self, forKey: .result)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(result, forKey: .result)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let resultValue = try result.toCBORValue()
             map = map.adding(key: "result", value: resultValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case result
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -93,26 +105,27 @@ public enum BlueCatbirdChatCloseConversation {
         /// The bounded encrypted request lifecycle reserve cannot accommodate this operation. No first-execution effects are committed; retry the same signed operation after capacity is available.
         case capacityUnavailable = "CapacityUnavailable"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - closeConversation
-
-    // Terminal signed close. Either exact direct participant, including a pending invitee, may close unilaterally; a group may close only when its sole remaining logical participant is an active admin. The atomic CAS has no successor, closes every application interval, releases invitation counts and request-bound reservations, supersedes pending work, and returns the immutable terminal tombstone and entry.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Terminal signed close. Either exact direct participant, including a pending invitee, may close unilaterally; a group may close only when its sole remaining logical participant is an active admin. The atomic CAS has no successor, closes every application interval, releases invitation counts and request-bound reservations, supersedes pending work, and returns the immutable terminal tombstone and entry.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func closeConversation(
+    public func closeConversation(
+
         input: BlueCatbirdChatCloseConversation.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatCloseConversation.Output?) {
@@ -145,7 +158,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -155,6 +169,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatCloseConversation.Output.self, from: responseData)
 
@@ -177,5 +192,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

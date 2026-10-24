@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.listThreads
 
-public enum BlueCatbirdLabyrinthListThreads {
+public struct BlueCatbirdLabyrinthListThreads {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.listThreads"
 
     public struct ThreadView: ATProtocolCodable, ATProtocolValue {
@@ -20,7 +21,7 @@ public enum BlueCatbirdLabyrinthListThreads {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                threadId = try container.decode(String.self, forKey: .threadId)
+                self.threadId = try container.decode(String.self, forKey: .threadId)
             } catch {
                 LogManager.logError("Decoding error for required property 'threadId': \(error)")
                 throw error
@@ -62,7 +63,6 @@ public enum BlueCatbirdLabyrinthListThreads {
             case threadId
         }
     }
-
     public struct Parameters: Parametrizable {
         public let cursor: String?
         public let limit: Int?
@@ -73,18 +73,21 @@ public enum BlueCatbirdLabyrinthListThreads {
         ) {
             self.cursor = cursor
             self.limit = limit
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let items: [ThreadView]
 
         public let cursor: String?
 
         public let incomplete: [DID]?
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             items: [ThreadView],
 
             cursor: String? = nil,
@@ -92,36 +95,41 @@ public enum BlueCatbirdLabyrinthListThreads {
             incomplete: [DID]? = nil
 
         ) {
+
             self.items = items
 
             self.cursor = cursor
 
             self.incomplete = incomplete
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            items = try container.decode([ThreadView].self, forKey: .items)
+            self.items = try container.decode([ThreadView].self, forKey: .items)
 
             do {
-                cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
+                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
-                cursor = nil
+                self.cursor = nil
             }
 
             do {
-                incomplete = try container.decodeIfPresent([DID].self, forKey: .incomplete)
+                self.incomplete = try container.decodeIfPresent([DID].self, forKey: .incomplete)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'incomplete' — degrading to nil: \(error)")
-                incomplete = nil
+                self.incomplete = nil
             }
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(items, forKey: .items)
@@ -131,9 +139,11 @@ public enum BlueCatbirdLabyrinthListThreads {
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(incomplete, forKey: .incomplete)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let itemsValue = try items.toCBORValue()
@@ -152,6 +162,7 @@ public enum BlueCatbirdLabyrinthListThreads {
             }
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -159,30 +170,31 @@ public enum BlueCatbirdLabyrinthListThreads {
             case cursor
             case incomplete
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case relayUnavailable = "RelayUnavailable"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Labyrinth {
+extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - listThreads
-
     /// Lookup by thread: every conversation in which the caller wrote a MEK or is a MEK recipient, including conversations it has left ([CB-22]), ascending by conversation id. The caller's home DS merges its own conversations with those of every remote sequencer of a conversation the caller takes or took part in (labyrinthRelay listThreads); the remote sequencers are asked in parallel with a per-sequencer deadline and response cap, and a sequencer that cannot answer is named in incomplete instead of failing the call (its conversations are then missing from this page). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func listThreads(input: BlueCatbirdLabyrinthListThreads.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthListThreads.Output?) {
+    public func listThreads(input: BlueCatbirdLabyrinthListThreads.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthListThreads.Output?) {
         let endpoint = "blue.catbird.labyrinth.listThreads"
 
         let queryItems = input.asQueryItems()
@@ -204,7 +216,8 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

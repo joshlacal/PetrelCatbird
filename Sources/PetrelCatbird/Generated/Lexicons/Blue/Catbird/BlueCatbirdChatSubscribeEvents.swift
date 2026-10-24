@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.subscribeEvents
 
-public enum BlueCatbirdChatSubscribeEvents {
+public struct BlueCatbirdChatSubscribeEvents {
+
     public static let typeIdentifier = "blue.catbird.chat.subscribeEvents"
     public struct Parameters: Parametrizable {
         public let ticket: String
@@ -16,9 +17,9 @@ public enum BlueCatbirdChatSubscribeEvents {
         ) {
             self.ticket = ticket
             self.cursor = cursor
+
         }
     }
-
     public typealias Message = BlueCatbirdChatDefs.SubscriptionMessage
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -33,33 +34,36 @@ public enum BlueCatbirdChatSubscribeEvents {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-// The direct WebSocket upgrade authenticates only with the one-use short-lived getSubscriptionTicket token. cursor must byte-equal the cursor bound into the DID/device/authGeneration/path-bound ticket, which is consumed atomically before upgrade; mismatch, reuse, or expiry rejects. Streams durable entitlement-filtered envelopes plus uncursored best-effort typing variants. For durable envelopes previousCursor is the immediately preceding visible audience cursor and the first continues the ticket cursor. Typing events never alter this chain.
+/// The direct WebSocket upgrade authenticates only with the one-use short-lived getSubscriptionTicket token. cursor must byte-equal the cursor bound into the DID/device/authGeneration/path-bound ticket, which is consumed atomically before upgrade; mismatch, reuse, or expiry rejects. Streams durable entitlement-filtered envelopes plus uncursored best-effort typing variants. For durable envelopes previousCursor is the immediately preceding visible audience cursor and the first continues the ticket cursor. Typing events never alter this chain.
 
-public extension ATProtoClient.Blue.Catbird.Chat {
-    func subscribeEvents(
+extension ATProtoClient.Blue.Catbird.Chat {
+
+    public func subscribeEvents(
         ticket: String, cursor: String
     ) async throws -> AsyncThrowingStream<BlueCatbirdChatSubscribeEvents.Message, Error> {
         let params = BlueCatbirdChatSubscribeEvents.Parameters(ticket: ticket, cursor: cursor)
-        return try await networkService.subscribe(
+        return try await self.networkService.subscribe(
             endpoint: "blue.catbird.chat.subscribeEvents",
             parameters: params
         )
     }
 
     /// Alternative signature accepting input struct
-    func subscribeEvents(input: BlueCatbirdChatSubscribeEvents.Parameters) async throws -> AsyncThrowingStream<BlueCatbirdChatSubscribeEvents.Message, Error> {
-        return try await networkService.subscribe(
+    public func subscribeEvents(input: BlueCatbirdChatSubscribeEvents.Parameters) async throws -> AsyncThrowingStream<BlueCatbirdChatSubscribeEvents.Message, Error> {
+        return try await self.networkService.subscribe(
             endpoint: "blue.catbird.chat.subscribeEvents",
             parameters: input
         )
     }
+
 }

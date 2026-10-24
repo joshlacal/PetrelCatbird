@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.getSubscriptionTicket
 
-public enum BlueCatbirdChatGetSubscriptionTicket {
+public struct BlueCatbirdChatGetSubscriptionTicket {
+
     public static let typeIdentifier = "blue.catbird.chat.getSubscriptionTicket"
     public struct Input: ATProtocolCodable {
         public let actorDeviceId: String
@@ -22,10 +23,10 @@ public enum BlueCatbirdChatGetSubscriptionTicket {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            actorDeviceId = try container.decode(String.self, forKey: .actorDeviceId)
-            inventorySessionId = try container.decode(String.self, forKey: .inventorySessionId)
-            eventCursor = try container.decode(String.self, forKey: .eventCursor)
-            supportedProtocolVersions = try container.decodeIfPresent([InputSupportedProtocolVersions].self, forKey: .supportedProtocolVersions)
+            self.actorDeviceId = try container.decode(String.self, forKey: .actorDeviceId)
+            self.inventorySessionId = try container.decode(String.self, forKey: .inventorySessionId)
+            self.eventCursor = try container.decode(String.self, forKey: .eventCursor)
+            self.supportedProtocolVersions = try container.decodeIfPresent([InputSupportedProtocolVersions].self, forKey: .supportedProtocolVersions)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -60,6 +61,7 @@ public enum BlueCatbirdChatGetSubscriptionTicket {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let ticket: String
 
         public let endpoint: URI
@@ -68,8 +70,9 @@ public enum BlueCatbirdChatGetSubscriptionTicket {
 
         public let inventoryScope: BlueCatbirdChatDefs.DirectRequestInventoryScope?
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             ticket: String,
 
             endpoint: URI,
@@ -79,6 +82,7 @@ public enum BlueCatbirdChatGetSubscriptionTicket {
             inventoryScope: BlueCatbirdChatDefs.DirectRequestInventoryScope? = nil
 
         ) {
+
             self.ticket = ticket
 
             self.endpoint = endpoint
@@ -86,27 +90,31 @@ public enum BlueCatbirdChatGetSubscriptionTicket {
             self.expiresAt = expiresAt
 
             self.inventoryScope = inventoryScope
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            ticket = try container.decode(String.self, forKey: .ticket)
+            self.ticket = try container.decode(String.self, forKey: .ticket)
 
-            endpoint = try container.decode(URI.self, forKey: .endpoint)
+            self.endpoint = try container.decode(URI.self, forKey: .endpoint)
 
-            expiresAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .expiresAt)
+            self.expiresAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .expiresAt)
 
             do {
-                inventoryScope = try container.decodeIfPresent(BlueCatbirdChatDefs.DirectRequestInventoryScope.self, forKey: .inventoryScope)
+                self.inventoryScope = try container.decodeIfPresent(BlueCatbirdChatDefs.DirectRequestInventoryScope.self, forKey: .inventoryScope)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'inventoryScope' — degrading to nil: \(error)")
-                inventoryScope = nil
+                self.inventoryScope = nil
             }
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(ticket, forKey: .ticket)
@@ -117,9 +125,11 @@ public enum BlueCatbirdChatGetSubscriptionTicket {
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(inventoryScope, forKey: .inventoryScope)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let ticketValue = try ticket.toCBORValue()
@@ -138,6 +148,7 @@ public enum BlueCatbirdChatGetSubscriptionTicket {
             }
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -146,6 +157,7 @@ public enum BlueCatbirdChatGetSubscriptionTicket {
             case expiresAt
             case inventoryScope
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -163,11 +175,11 @@ public enum BlueCatbirdChatGetSubscriptionTicket {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
 
@@ -184,19 +196,20 @@ public enum BlueCatbirdChatGetSubscriptionTicket {
             return rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - getSubscriptionTicket
-
-    // After conversations, pending Welcomes, and recovery inbox have all reached hasMore=false for one inventorySession, a service-authenticated call atomically marks that barrier complete and mints a one-use short-lived ticket. The ticket binds the authenticated DID, actorDeviceId, authGeneration, inventorySessionId, exact event cursor, and subscription path. The first durable envelope's previousCursor equals that cursor. Protocol-two scopes bind audience, inventory/page/event cursors and ticket. Unscoped legacy sessions must fail ProtocolUpgradeRequired before any successful partial inventory if unsupported state exists. Omission is never removal evidence.
-    //
-    // - Parameter input: The input parameters for the request
+    /// After conversations, pending Welcomes, and recovery inbox have all reached hasMore=false for one inventorySession, a service-authenticated call atomically marks that barrier complete and mints a one-use short-lived ticket. The ticket binds the authenticated DID, actorDeviceId, authGeneration, inventorySessionId, exact event cursor, and subscription path. The first durable envelope's previousCursor equals that cursor. Protocol-two scopes bind audience, inventory/page/event cursors and ticket. Unscoped legacy sessions must fail ProtocolUpgradeRequired before any successful partial inventory if unsupported state exists. Omission is never removal evidence.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getSubscriptionTicket(
+    public func getSubscriptionTicket(
+
         input: BlueCatbirdChatGetSubscriptionTicket.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatGetSubscriptionTicket.Output?) {
@@ -229,7 +242,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -239,6 +253,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatGetSubscriptionTicket.Output.self, from: responseData)
 
@@ -261,5 +276,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

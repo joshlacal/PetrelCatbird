@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.createConversation
 
-public enum BlueCatbirdChatCreateConversation {
+public struct BlueCatbirdChatCreateConversation {
+
     public static let typeIdentifier = "blue.catbird.chat.createConversation"
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedCreation
@@ -16,7 +17,7 @@ public enum BlueCatbirdChatCreateConversation {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedCreation.self, forKey: .signedRequest)
+            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedCreation.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -37,40 +38,51 @@ public enum BlueCatbirdChatCreateConversation {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let result: BlueCatbirdChatDefs.ConversationCreationResult
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             result: BlueCatbirdChatDefs.ConversationCreationResult
 
         ) {
+
             self.result = result
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            result = try container.decode(BlueCatbirdChatDefs.ConversationCreationResult.self, forKey: .result)
+            self.result = try container.decode(BlueCatbirdChatDefs.ConversationCreationResult.self, forKey: .result)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(result, forKey: .result)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let resultValue = try result.toCBORValue()
             map = map.adding(key: "result", value: resultValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case result
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -98,26 +110,27 @@ public enum BlueCatbirdChatCreateConversation {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - createConversation
-
-    // True-absence-CAS creates immutable direct or group state from a client-staged creator-only epoch-zero group. Every noncreator is a pending zero-leaf consent request with no server-readable invitation body. Direct is exactly creator plus one pending admin-role invitee, is unique per unordered DID pair while nonterminal, and a concurrent loser receives the existing identity as a typed success outcome. Group invitees are pending members. Consent, invitation limits, and every-pair block policy are checked under lock. There is no preparation, general reservation, bootstrap Commit, or Welcome.
-    //
-    // - Parameter input: The input parameters for the request
+    /// True-absence-CAS creates immutable direct or group state from a client-staged creator-only epoch-zero group. Every noncreator is a pending zero-leaf consent request with no server-readable invitation body. Direct is exactly creator plus one pending admin-role invitee, is unique per unordered DID pair while nonterminal, and a concurrent loser receives the existing identity as a typed success outcome. Group invitees are pending members. Consent, invitation limits, and every-pair block policy are checked under lock. There is no preparation, general reservation, bootstrap Commit, or Welcome.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func createConversation(
+    public func createConversation(
+
         input: BlueCatbirdChatCreateConversation.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatCreateConversation.Output?) {
@@ -150,7 +163,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -160,6 +174,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatCreateConversation.Output.self, from: responseData)
 
@@ -182,5 +197,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

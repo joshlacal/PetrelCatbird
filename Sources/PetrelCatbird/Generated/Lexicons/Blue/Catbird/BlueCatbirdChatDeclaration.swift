@@ -5,6 +5,7 @@ import Petrel
 // lexicon: 1, id: blue.catbird.chat.declaration
 
 public struct BlueCatbirdChatDeclaration: ATProtocolCodable, ATProtocolValue {
+
     public static let typeIdentifier = "blue.catbird.chat.declaration"
     public let allowIncoming: String
     public let deliveryService: DID
@@ -20,10 +21,10 @@ public struct BlueCatbirdChatDeclaration: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        allowIncoming = try container.decode(String.self, forKey: .allowIncoming)
-        deliveryService = try container.decode(DID.self, forKey: .deliveryService)
-        protocolVersion = try container.decode(String.self, forKey: .protocolVersion)
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.allowIncoming = try container.decode(String.self, forKey: .allowIncoming)
+        self.deliveryService = try container.decode(DID.self, forKey: .deliveryService)
+        self.protocolVersion = try container.decode(String.self, forKey: .protocolVersion)
+        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -84,4 +85,5 @@ public struct BlueCatbirdChatDeclaration: ATProtocolCodable, ATProtocolValue {
         case protocolVersion
         case createdAt
     }
+
 }

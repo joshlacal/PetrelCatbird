@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: place.stream.server.deleteWebhook
 
-public enum PlaceStreamServerDeleteWebhook {
+public struct PlaceStreamServerDeleteWebhook {
+
     public static let typeIdentifier = "place.stream.server.deleteWebhook"
     public struct Input: ATProtocolCodable {
         public let id: String
@@ -16,7 +17,7 @@ public enum PlaceStreamServerDeleteWebhook {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            id = try container.decode(String.self, forKey: .id)
+            self.id = try container.decode(String.self, forKey: .id)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -37,40 +38,51 @@ public enum PlaceStreamServerDeleteWebhook {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let success: Bool
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             success: Bool
 
         ) {
+
             self.success = success
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            success = try container.decode(Bool.self, forKey: .success)
+            self.success = try container.decode(Bool.self, forKey: .success)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(success, forKey: .success)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let successValue = try success.toCBORValue()
             map = map.adding(key: "success", value: successValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case success
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -79,26 +91,27 @@ public enum PlaceStreamServerDeleteWebhook {
         /// The authenticated user does not have access to this webhook.
         case unauthorized = "Unauthorized"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Place.Stream.Server {
+extension ATProtoClient.Place.Stream.Server {
     // MARK: - deleteWebhook
-
-    // Delete an existing webhook.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Delete an existing webhook.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func deleteWebhook(
+    public func deleteWebhook(
+
         input: PlaceStreamServerDeleteWebhook.Input
 
     ) async throws -> (responseCode: Int, data: PlaceStreamServerDeleteWebhook.Output?) {
@@ -131,7 +144,8 @@ public extension ATProtoClient.Place.Stream.Server {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -141,6 +155,7 @@ public extension ATProtoClient.Place.Stream.Server {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(PlaceStreamServerDeleteWebhook.Output.self, from: responseData)
 
@@ -163,5 +178,7 @@ public extension ATProtoClient.Place.Stream.Server {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

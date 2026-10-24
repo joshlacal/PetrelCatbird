@@ -5,6 +5,7 @@ import Petrel
 // lexicon: 1, id: blue.catbird.labyrinth.virtualDevice
 
 public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolValue {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.virtualDevice"
     public let vdeviceId: Bytes
     public let encryptedDeviceKeyPriv: Bytes
@@ -42,38 +43,38 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        vdeviceId = try container.decode(Bytes.self, forKey: .vdeviceId)
-        encryptedDeviceKeyPriv = try container.decode(Bytes.self, forKey: .encryptedDeviceKeyPriv)
-        encryptedEpochStorageKeyPriv = try container.decode(Bytes.self, forKey: .encryptedEpochStorageKeyPriv)
-        encryptedOrfClientState = try container.decode(Bytes.self, forKey: .encryptedOrfClientState)
-        encryptedMailboxRootSalt = try container.decode(Bytes.self, forKey: .encryptedMailboxRootSalt)
-        encryptedEpochRootKey = try container.decode(Bytes.self, forKey: .encryptedEpochRootKey)
-        encryptedEpochNumber = try container.decode(Bytes.self, forKey: .encryptedEpochNumber)
-        deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
-        epochStorageKeyPubkey = try container.decode(Bytes.self, forKey: .epochStorageKeyPubkey)
-        epochStorageKeySig = try container.decode(Bytes.self, forKey: .epochStorageKeySig)
-        mechanism = try container.decode(String.self, forKey: .mechanism)
+        self.vdeviceId = try container.decode(Bytes.self, forKey: .vdeviceId)
+        self.encryptedDeviceKeyPriv = try container.decode(Bytes.self, forKey: .encryptedDeviceKeyPriv)
+        self.encryptedEpochStorageKeyPriv = try container.decode(Bytes.self, forKey: .encryptedEpochStorageKeyPriv)
+        self.encryptedOrfClientState = try container.decode(Bytes.self, forKey: .encryptedOrfClientState)
+        self.encryptedMailboxRootSalt = try container.decode(Bytes.self, forKey: .encryptedMailboxRootSalt)
+        self.encryptedEpochRootKey = try container.decode(Bytes.self, forKey: .encryptedEpochRootKey)
+        self.encryptedEpochNumber = try container.decode(Bytes.self, forKey: .encryptedEpochNumber)
+        self.deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
+        self.epochStorageKeyPubkey = try container.decode(Bytes.self, forKey: .epochStorageKeyPubkey)
+        self.epochStorageKeySig = try container.decode(Bytes.self, forKey: .epochStorageKeySig)
+        self.mechanism = try container.decode(String.self, forKey: .mechanism)
         do {
-            passkeyWrappedCode = try container.decodeIfPresent(Bytes.self, forKey: .passkeyWrappedCode)
+            self.passkeyWrappedCode = try container.decodeIfPresent(Bytes.self, forKey: .passkeyWrappedCode)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'passkeyWrappedCode' — degrading to nil: \(error)")
-            passkeyWrappedCode = nil
+            self.passkeyWrappedCode = nil
         }
         do {
-            passkeyCredentialId = try container.decodeIfPresent(Bytes.self, forKey: .passkeyCredentialId)
+            self.passkeyCredentialId = try container.decodeIfPresent(Bytes.self, forKey: .passkeyCredentialId)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'passkeyCredentialId' — degrading to nil: \(error)")
-            passkeyCredentialId = nil
+            self.passkeyCredentialId = nil
         }
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            lastUsedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastUsedAt)
+            self.lastUsedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastUsedAt)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'lastUsedAt' — degrading to nil: \(error)")
-            lastUsedAt = nil
+            self.lastUsedAt = nil
         }
     }
 
@@ -241,4 +242,5 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
         case createdAt
         case lastUsedAt
     }
+
 }

@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.mlsDS.getConvoEvents
 
-public enum BlueCatbirdMlsDSGetConvoEvents {
+public struct BlueCatbirdMlsDSGetConvoEvents {
+
     public static let typeIdentifier = "blue.catbird.mlsDS.getConvoEvents"
 
     public struct ConvoEventEntry: ATProtocolCodable, ATProtocolValue {
@@ -42,86 +43,86 @@ public enum BlueCatbirdMlsDSGetConvoEvents {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                seq = try container.decode(Int.self, forKey: .seq)
+                self.seq = try container.decode(Int.self, forKey: .seq)
             } catch {
                 LogManager.logError("Decoding error for required property 'seq': \(error)")
                 throw error
             }
             do {
-                epoch = try container.decode(Int.self, forKey: .epoch)
+                self.epoch = try container.decode(Int.self, forKey: .epoch)
             } catch {
                 LogManager.logError("Decoding error for required property 'epoch': \(error)")
                 throw error
             }
             do {
-                msgId = try container.decode(String.self, forKey: .msgId)
+                self.msgId = try container.decode(String.self, forKey: .msgId)
             } catch {
                 LogManager.logError("Decoding error for required property 'msgId': \(error)")
                 throw error
             }
             do {
-                messageType = try container.decode(String.self, forKey: .messageType)
+                self.messageType = try container.decode(String.self, forKey: .messageType)
             } catch {
                 LogManager.logError("Decoding error for required property 'messageType': \(error)")
                 throw error
             }
             do {
-                ciphertext = try container.decode(Bytes.self, forKey: .ciphertext)
+                self.ciphertext = try container.decode(Bytes.self, forKey: .ciphertext)
             } catch {
                 LogManager.logError("Decoding error for required property 'ciphertext': \(error)")
                 throw error
             }
             do {
-                paddedSize = try container.decode(Int.self, forKey: .paddedSize)
+                self.paddedSize = try container.decode(Int.self, forKey: .paddedSize)
             } catch {
                 LogManager.logError("Decoding error for required property 'paddedSize': \(error)")
                 throw error
             }
             do {
-                createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+                self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'createdAt': \(error)")
                 throw error
             }
             do {
-                entryId = try container.decodeIfPresent(String.self, forKey: .entryId)
+                self.entryId = try container.decodeIfPresent(String.self, forKey: .entryId)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'entryId' — degrading to nil: \(error)")
-                entryId = nil
+                self.entryId = nil
             }
             do {
-                entryKind = try container.decodeIfPresent(String.self, forKey: .entryKind)
+                self.entryKind = try container.decodeIfPresent(String.self, forKey: .entryKind)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'entryKind' — degrading to nil: \(error)")
-                entryKind = nil
+                self.entryKind = nil
             }
             do {
-                acceptedPayloadSha256 = try container.decodeIfPresent(Bytes.self, forKey: .acceptedPayloadSha256)
+                self.acceptedPayloadSha256 = try container.decodeIfPresent(Bytes.self, forKey: .acceptedPayloadSha256)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'acceptedPayloadSha256' — degrading to nil: \(error)")
-                acceptedPayloadSha256 = nil
+                self.acceptedPayloadSha256 = nil
             }
             do {
-                signedRequest = try container.decodeIfPresent(Bytes.self, forKey: .signedRequest)
+                self.signedRequest = try container.decodeIfPresent(Bytes.self, forKey: .signedRequest)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'signedRequest' — degrading to nil: \(error)")
-                signedRequest = nil
+                self.signedRequest = nil
             }
             do {
-                outerFingerprint = try container.decodeIfPresent(Bytes.self, forKey: .outerFingerprint)
+                self.outerFingerprint = try container.decodeIfPresent(Bytes.self, forKey: .outerFingerprint)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'outerFingerprint' — degrading to nil: \(error)")
-                outerFingerprint = nil
+                self.outerFingerprint = nil
             }
         }
 
@@ -278,7 +279,6 @@ public enum BlueCatbirdMlsDSGetConvoEvents {
             case outerFingerprint
         }
     }
-
     public struct Parameters: Parametrizable {
         public let convoId: String
         public let afterSeq: Int?
@@ -292,10 +292,12 @@ public enum BlueCatbirdMlsDSGetConvoEvents {
             self.convoId = convoId
             self.afterSeq = afterSeq
             self.limit = limit
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let convoId: String
 
         public let fromSeqExclusive: Int
@@ -304,8 +306,9 @@ public enum BlueCatbirdMlsDSGetConvoEvents {
 
         public let events: [ConvoEventEntry]
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             convoId: String,
 
             fromSeqExclusive: Int,
@@ -315,6 +318,7 @@ public enum BlueCatbirdMlsDSGetConvoEvents {
             events: [ConvoEventEntry]
 
         ) {
+
             self.convoId = convoId
 
             self.fromSeqExclusive = fromSeqExclusive
@@ -322,21 +326,25 @@ public enum BlueCatbirdMlsDSGetConvoEvents {
             self.toSeqInclusive = toSeqInclusive
 
             self.events = events
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            convoId = try container.decode(String.self, forKey: .convoId)
+            self.convoId = try container.decode(String.self, forKey: .convoId)
 
-            fromSeqExclusive = try container.decode(Int.self, forKey: .fromSeqExclusive)
+            self.fromSeqExclusive = try container.decode(Int.self, forKey: .fromSeqExclusive)
 
-            toSeqInclusive = try container.decode(Int.self, forKey: .toSeqInclusive)
+            self.toSeqInclusive = try container.decode(Int.self, forKey: .toSeqInclusive)
 
-            events = try container.decode([ConvoEventEntry].self, forKey: .events)
+            self.events = try container.decode([ConvoEventEntry].self, forKey: .events)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(convoId, forKey: .convoId)
@@ -346,9 +354,11 @@ public enum BlueCatbirdMlsDSGetConvoEvents {
             try container.encode(toSeqInclusive, forKey: .toSeqInclusive)
 
             try container.encode(events, forKey: .events)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let convoIdValue = try convoId.toCBORValue()
@@ -364,6 +374,7 @@ public enum BlueCatbirdMlsDSGetConvoEvents {
             map = map.adding(key: "events", value: eventsValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -372,31 +383,32 @@ public enum BlueCatbirdMlsDSGetConvoEvents {
             case toSeqInclusive
             case events
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case conversationNotFound = "ConversationNotFound"
         case notAuthorized = "NotAuthorized"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.MlsDS {
+extension ATProtoClient.Blue.Catbird.MlsDS {
     // MARK: - getConvoEvents
-
     /// Paginated retrieval of conversation events for federation reconciliation. Fetch a page of conversation events (messages) after a given sequence number.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getConvoEvents(input: BlueCatbirdMlsDSGetConvoEvents.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsDSGetConvoEvents.Output?) {
+    public func getConvoEvents(input: BlueCatbirdMlsDSGetConvoEvents.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsDSGetConvoEvents.Output?) {
         let endpoint = "blue.catbird.mlsDS.getConvoEvents"
 
         let queryItems = input.asQueryItems()
@@ -418,7 +430,8 @@ public extension ATProtoClient.Blue.Catbird.MlsDS {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

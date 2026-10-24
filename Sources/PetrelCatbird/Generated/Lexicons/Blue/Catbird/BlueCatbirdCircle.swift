@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.circle
 
-public enum BlueCatbirdCircle {
+public struct BlueCatbirdCircle {
+
     public static let typeIdentifier = "blue.catbird.circle"
 
     public struct SpaceDeclarationDescriptor: Sendable, Equatable {
@@ -18,4 +19,5 @@ public enum BlueCatbirdCircle {
         nsid: "blue.catbird.circle", keyType: "tid",
         name: "Catbird Circle", collections: ["blue.catbird.circle.metadata", "app.bsky.feed.post", "app.bsky.feed.like"]
     )
+
 }

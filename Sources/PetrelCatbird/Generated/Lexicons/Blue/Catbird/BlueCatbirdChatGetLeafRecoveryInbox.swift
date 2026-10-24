@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.getLeafRecoveryInbox
 
-public enum BlueCatbirdChatGetLeafRecoveryInbox {
+public struct BlueCatbirdChatGetLeafRecoveryInbox {
+
     public static let typeIdentifier = "blue.catbird.chat.getLeafRecoveryInbox"
     public struct Parameters: Parametrizable {
         public let actorDeviceId: String
@@ -25,10 +26,12 @@ public enum BlueCatbirdChatGetLeafRecoveryInbox {
             self.pageCursor = pageCursor
             self.limit = limit
             self.supportedProtocolVersions = supportedProtocolVersions
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let items: [BlueCatbirdChatDefs.LeafRecoveryInboxItem]
 
         public let inventorySessionId: String
@@ -43,8 +46,9 @@ public enum BlueCatbirdChatGetLeafRecoveryInbox {
 
         public let inventoryScope: BlueCatbirdChatDefs.DirectRequestInventoryScope?
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             items: [BlueCatbirdChatDefs.LeafRecoveryInboxItem],
 
             inventorySessionId: String,
@@ -60,6 +64,7 @@ public enum BlueCatbirdChatGetLeafRecoveryInbox {
             inventoryScope: BlueCatbirdChatDefs.DirectRequestInventoryScope? = nil
 
         ) {
+
             self.items = items
 
             self.inventorySessionId = inventorySessionId
@@ -73,39 +78,43 @@ public enum BlueCatbirdChatGetLeafRecoveryInbox {
             self.snapshotExpiresAt = snapshotExpiresAt
 
             self.inventoryScope = inventoryScope
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            items = try container.decode([BlueCatbirdChatDefs.LeafRecoveryInboxItem].self, forKey: .items)
+            self.items = try container.decode([BlueCatbirdChatDefs.LeafRecoveryInboxItem].self, forKey: .items)
 
-            inventorySessionId = try container.decode(String.self, forKey: .inventorySessionId)
+            self.inventorySessionId = try container.decode(String.self, forKey: .inventorySessionId)
 
-            snapshotEventCursor = try container.decode(String.self, forKey: .snapshotEventCursor)
+            self.snapshotEventCursor = try container.decode(String.self, forKey: .snapshotEventCursor)
 
             do {
-                nextPageCursor = try container.decodeIfPresent(String.self, forKey: .nextPageCursor)
+                self.nextPageCursor = try container.decodeIfPresent(String.self, forKey: .nextPageCursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'nextPageCursor' — degrading to nil: \(error)")
-                nextPageCursor = nil
+                self.nextPageCursor = nil
             }
 
-            hasMore = try container.decode(Bool.self, forKey: .hasMore)
+            self.hasMore = try container.decode(Bool.self, forKey: .hasMore)
 
-            snapshotExpiresAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .snapshotExpiresAt)
+            self.snapshotExpiresAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .snapshotExpiresAt)
 
             do {
-                inventoryScope = try container.decodeIfPresent(BlueCatbirdChatDefs.DirectRequestInventoryScope.self, forKey: .inventoryScope)
+                self.inventoryScope = try container.decodeIfPresent(BlueCatbirdChatDefs.DirectRequestInventoryScope.self, forKey: .inventoryScope)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'inventoryScope' — degrading to nil: \(error)")
-                inventoryScope = nil
+                self.inventoryScope = nil
             }
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(items, forKey: .items)
@@ -123,9 +132,11 @@ public enum BlueCatbirdChatGetLeafRecoveryInbox {
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(inventoryScope, forKey: .inventoryScope)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let itemsValue = try items.toCBORValue()
@@ -156,6 +167,7 @@ public enum BlueCatbirdChatGetLeafRecoveryInbox {
             }
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -167,6 +179,7 @@ public enum BlueCatbirdChatGetLeafRecoveryInbox {
             case snapshotExpiresAt
             case inventoryScope
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -183,11 +196,11 @@ public enum BlueCatbirdChatGetLeafRecoveryInbox {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
 
@@ -218,18 +231,18 @@ public enum BlueCatbirdChatGetLeafRecoveryInbox {
             return rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - getLeafRecoveryInbox
-
     /// Returns the flat closed exact-device recovery inbox from the retained inventorySession created by getConversations: the unchanged target-device-signed leafRecoveryView and the four concrete non-authorizing recoveryWorkView-family variants sourced only from retained expired or rejected Welcomes. Every union ref is a concrete object. inventorySessionId is always required; pageCursor is an opaque recovery-domain cursor bound to the same device, session, audience, fence, and expiry. Every response echoes the exact session event cursor and expiry; nextPageCursor is absent after the final page. Protocol-two scopes bind audience, inventory/page/event cursors and ticket. Unscoped legacy sessions must fail ProtocolUpgradeRequired before any successful partial inventory if unsupported state exists. Omission is never removal evidence.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getLeafRecoveryInbox(input: BlueCatbirdChatGetLeafRecoveryInbox.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetLeafRecoveryInbox.Output?) {
+    public func getLeafRecoveryInbox(input: BlueCatbirdChatGetLeafRecoveryInbox.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetLeafRecoveryInbox.Output?) {
         let endpoint = "blue.catbird.chat.getLeafRecoveryInbox"
 
         let queryItems = input.asQueryItems()
@@ -251,7 +264,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

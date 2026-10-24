@@ -5,6 +5,7 @@ import Petrel
 // lexicon: 1, id: place.stream.chat.gate
 
 public struct PlaceStreamChatGate: ATProtocolCodable, ATProtocolValue {
+
     public static let typeIdentifier = "place.stream.chat.gate"
     public let hiddenMessage: ATProtocolURI
 
@@ -14,7 +15,7 @@ public struct PlaceStreamChatGate: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        hiddenMessage = try container.decode(ATProtocolURI.self, forKey: .hiddenMessage)
+        self.hiddenMessage = try container.decode(ATProtocolURI.self, forKey: .hiddenMessage)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -51,4 +52,5 @@ public struct PlaceStreamChatGate: ATProtocolCodable, ATProtocolValue {
         case typeIdentifier = "$type"
         case hiddenMessage
     }
+
 }

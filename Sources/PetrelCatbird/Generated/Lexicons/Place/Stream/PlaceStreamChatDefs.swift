@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: place.stream.chat.defs
 
-public enum PlaceStreamChatDefs {
+public struct PlaceStreamChatDefs {
+
     public static let typeIdentifier = "place.stream.chat.defs"
 
     public struct MessageView: ATProtocolCodable, ATProtocolValue {
@@ -36,66 +37,66 @@ public enum PlaceStreamChatDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
             } catch {
                 LogManager.logError("Decoding error for required property 'uri': \(error)")
                 throw error
             }
             do {
-                cid = try container.decode(CID.self, forKey: .cid)
+                self.cid = try container.decode(CID.self, forKey: .cid)
             } catch {
                 LogManager.logError("Decoding error for required property 'cid': \(error)")
                 throw error
             }
             do {
-                author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .author)
+                self.author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .author)
             } catch {
                 LogManager.logError("Decoding error for required property 'author': \(error)")
                 throw error
             }
             do {
-                record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+                self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
             } catch {
                 LogManager.logError("Decoding error for required property 'record': \(error)")
                 throw error
             }
             do {
-                indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
+                self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'indexedAt': \(error)")
                 throw error
             }
             do {
-                chatProfile = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: .chatProfile)
+                self.chatProfile = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: .chatProfile)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'chatProfile' — degrading to nil: \(error)")
-                chatProfile = nil
+                self.chatProfile = nil
             }
             do {
-                replyTo = try container.decodeIfPresent(MessageViewReplyToUnion.self, forKey: .replyTo)
+                self.replyTo = try container.decodeIfPresent(MessageViewReplyToUnion.self, forKey: .replyTo)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'replyTo' — degrading to nil: \(error)")
-                replyTo = nil
+                self.replyTo = nil
             }
             do {
-                deleted = try container.decodeIfPresent(Bool.self, forKey: .deleted)
+                self.deleted = try container.decodeIfPresent(Bool.self, forKey: .deleted)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'deleted' — degrading to nil: \(error)")
-                deleted = nil
+                self.deleted = nil
             }
             do {
-                badges = try container.decodeIfPresent([PlaceStreamBadgeDefs.BadgeView].self, forKey: .badges)
+                self.badges = try container.decodeIfPresent([PlaceStreamBadgeDefs.BadgeView].self, forKey: .badges)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'badges' — degrading to nil: \(error)")
-                badges = nil
+                self.badges = nil
             }
         }
 
@@ -246,44 +247,44 @@ public enum PlaceStreamChatDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
             } catch {
                 LogManager.logError("Decoding error for required property 'uri': \(error)")
                 throw error
             }
             do {
-                cid = try container.decode(CID.self, forKey: .cid)
+                self.cid = try container.decode(CID.self, forKey: .cid)
             } catch {
                 LogManager.logError("Decoding error for required property 'cid': \(error)")
                 throw error
             }
             do {
-                record = try container.decode(PlaceStreamChatPinnedRecord.self, forKey: .record)
+                self.record = try container.decode(PlaceStreamChatPinnedRecord.self, forKey: .record)
             } catch {
                 LogManager.logError("Decoding error for required property 'record': \(error)")
                 throw error
             }
             do {
-                indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
+                self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'indexedAt': \(error)")
                 throw error
             }
             do {
-                pinnedBy = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: .pinnedBy)
+                self.pinnedBy = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: .pinnedBy)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'pinnedBy' — degrading to nil: \(error)")
-                pinnedBy = nil
+                self.pinnedBy = nil
             }
             do {
-                message = try container.decodeIfPresent(MessageView.self, forKey: .message)
+                self.message = try container.decodeIfPresent(MessageView.self, forKey: .message)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'message' — degrading to nil: \(error)")
-                message = nil
+                self.message = nil
             }
         }
 
@@ -400,20 +401,20 @@ public enum PlaceStreamChatDefs {
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             switch self {
-            case let .placeStreamChatDefsMessageView(value):
+            case .placeStreamChatDefsMessageView(let value):
                 try container.encode("place.stream.chat.defs#messageView", forKey: .type)
                 try value.encode(to: encoder)
-            case let .unexpected(container):
+            case .unexpected(let container):
                 try container.encode(to: encoder)
             }
         }
 
         public func hash(into hasher: inout Hasher) {
             switch self {
-            case let .placeStreamChatDefsMessageView(value):
+            case .placeStreamChatDefsMessageView(let value):
                 hasher.combine("place.stream.chat.defs#messageView")
                 hasher.combine(value)
-            case let .unexpected(container):
+            case .unexpected(let container):
                 hasher.combine("unexpected")
                 hasher.combine(container)
             }
@@ -425,12 +426,10 @@ public enum PlaceStreamChatDefs {
 
         public static func == (lhs: MessageViewReplyToUnion, rhs: MessageViewReplyToUnion) -> Bool {
             switch (lhs, rhs) {
-            case let (
-                .placeStreamChatDefsMessageView(lhsValue),
-                .placeStreamChatDefsMessageView(rhsValue)
-            ):
+            case (.placeStreamChatDefsMessageView(let lhsValue),
+                  .placeStreamChatDefsMessageView(let rhsValue)):
                 return lhsValue == rhsValue
-            case let (.unexpected(lhsValue), .unexpected(rhsValue)):
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
                 return lhsValue.isEqual(to: rhsValue)
             default:
                 return false
@@ -442,13 +441,13 @@ public enum PlaceStreamChatDefs {
             return self == other
         }
 
-        /// DAGCBOR encoding with field ordering
+        // DAGCBOR encoding with field ordering
         public func toCBORValue() throws -> Any {
             // Create an ordered map to maintain field order
             var map = OrderedCBORMap()
 
             switch self {
-            case let .placeStreamChatDefsMessageView(value):
+            case .placeStreamChatDefsMessageView(let value):
                 map = map.adding(key: "$type", value: "place.stream.chat.defs#messageView")
 
                 let valueDict = try value.toCBORValue()
@@ -465,9 +464,10 @@ public enum PlaceStreamChatDefs {
                     }
                 }
                 return map
-            case let .unexpected(container):
+            case .unexpected(let container):
                 return try container.toCBORValue()
             }
         }
     }
+
 }

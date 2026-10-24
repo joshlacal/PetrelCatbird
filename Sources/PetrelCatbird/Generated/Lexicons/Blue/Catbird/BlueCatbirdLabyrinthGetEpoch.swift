@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.getEpoch
 
-public enum BlueCatbirdLabyrinthGetEpoch {
+public struct BlueCatbirdLabyrinthGetEpoch {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.getEpoch"
     public struct Parameters: Parametrizable {
         public let epochNumber: Int
@@ -13,43 +14,53 @@ public enum BlueCatbirdLabyrinthGetEpoch {
             epochNumber: Int
         ) {
             self.epochNumber = epochNumber
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let epochId: String
 
         public let record: ATProtocolValueContainer
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             epochId: String,
 
             record: ATProtocolValueContainer
 
         ) {
+
             self.epochId = epochId
 
             self.record = record
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            epochId = try container.decode(String.self, forKey: .epochId)
+            self.epochId = try container.decode(String.self, forKey: .epochId)
 
-            record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+            self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(epochId, forKey: .epochId)
 
             try container.encode(record, forKey: .record)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let epochIdValue = try epochId.toCBORValue()
@@ -59,36 +70,38 @@ public enum BlueCatbirdLabyrinthGetEpoch {
             map = map.adding(key: "record", value: recordValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case epochId
             case record
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case epochNotFound = "EpochNotFound"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Labyrinth {
+extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - getEpoch
-
     /// One epoch by number. Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getEpoch(input: BlueCatbirdLabyrinthGetEpoch.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetEpoch.Output?) {
+    public func getEpoch(input: BlueCatbirdLabyrinthGetEpoch.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetEpoch.Output?) {
         let endpoint = "blue.catbird.labyrinth.getEpoch"
 
         let queryItems = input.asQueryItems()
@@ -110,7 +123,8 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

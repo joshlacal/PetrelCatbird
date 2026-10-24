@@ -10,7 +10,8 @@ import Petrel
 
 // lexicon: 1, id: place.stream.playback.whep
 
-public enum PlaceStreamPlaybackWhep {
+public struct PlaceStreamPlaybackWhep {
+
     public static let typeIdentifier = "place.stream.playback.whep"
     public struct Parameters: Parametrizable {
         public let streamer: String
@@ -22,9 +23,9 @@ public enum PlaceStreamPlaybackWhep {
         ) {
             self.streamer = streamer
             self.rendition = rendition
+
         }
     }
-
     public struct Input: ATProtocolCodable {
         public let data: Data
 
@@ -35,7 +36,7 @@ public enum PlaceStreamPlaybackWhep {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            data = try container.decode(Data.self, forKey: .data)
+            self.data = try container.decode(Data.self, forKey: .data)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -56,58 +57,69 @@ public enum PlaceStreamPlaybackWhep {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let data: Data
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             data: Data
 
         ) {
+
             self.data = data
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            data = try container.decode(Data.self, forKey: .data)
+            self.data = try container.decode(Data.self, forKey: .data)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(data, forKey: .data)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let dataValue = try data.toCBORValue()
             map = map.adding(key: "data", value: dataValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case data
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         /// This user may not play this stream.
         case unauthorized = "Unauthorized"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
 extension ATProtoClient.Place.Stream.Playback {
     // MARK: - whep
-
     /// Play a stream over WebRTC using WHEP.
     ///
     /// - Parameters:
@@ -119,6 +131,7 @@ extension ATProtoClient.Place.Stream.Playback {
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
     public func whep(
+
         data: Data,
         mimeType: String,
         stripMetadata: Bool = true,
@@ -139,7 +152,7 @@ extension ATProtoClient.Place.Stream.Playback {
         }
         var headers: [String: String] = [
             "Content-Type": mimeType,
-            "Content-Length": "\(dataToUpload.count)",
+            "Content-Length": "\(dataToUpload.count)"
         ]
 
         headers["Accept"] = "*/*"
@@ -163,10 +176,12 @@ extension ATProtoClient.Place.Stream.Playback {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             // Wildcard encoding ("*/*") — accept any Content-Type, including a missing one.
 
             do {
+
                 let decodedData = PlaceStreamPlaybackWhep.Output(data: responseData)
 
                 return (responseCode, decodedData)
@@ -188,6 +203,7 @@ extension ATProtoClient.Place.Stream.Playback {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
 
     /// Compresses an image while maintaining reasonable quality
@@ -195,12 +211,12 @@ extension ATProtoClient.Place.Stream.Playback {
     ///   - imageData: The original image data
     ///   - maxSizeInBytes: The maximum target size in bytes (default: 1MB)
     /// - Returns: Compressed image data, or nil if compression failed
-    private func compressImage(_ imageData: Data, maxSizeInBytes: Int = 1_000_000) -> Data? {
+    private func compressImage(_ imageData: Data, maxSizeInBytes: Int = 1000000) -> Data? {
         #if canImport(UIKit)
             guard let image = UIImage(data: imageData) else { return nil }
             var compression: CGFloat = 1.0
             var compressedData = image.jpegData(compressionQuality: compression)
-            while (compressedData?.count ?? 0) > maxSizeInBytes, compression > 0.1 {
+            while (compressedData?.count ?? 0) > maxSizeInBytes && compression > 0.1 {
                 compression -= 0.1
                 compressedData = image.jpegData(compressionQuality: compression)
             }
@@ -211,8 +227,7 @@ extension ATProtoClient.Place.Stream.Playback {
             var compressedData: Data?
             repeat {
                 if let tiffRepresentation = image.tiffRepresentation,
-                   let bitmapImage = NSBitmapImageRep(data: tiffRepresentation)
-                {
+                   let bitmapImage = NSBitmapImageRep(data: tiffRepresentation) {
                     compressedData = bitmapImage.representation(using: .jpeg, properties: [.compressionFactor: compression])
                 }
                 compression -= 0.1
@@ -223,4 +238,5 @@ extension ATProtoClient.Place.Stream.Playback {
             return nil
         #endif
     }
+
 }

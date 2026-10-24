@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.getSpaceMembership
 
-public enum BlueCatbirdLabyrinthGetSpaceMembership {
+public struct BlueCatbirdLabyrinthGetSpaceMembership {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.getSpaceMembership"
     public struct Parameters: Parametrizable {
         public let space: SpaceRef
@@ -16,10 +17,12 @@ public enum BlueCatbirdLabyrinthGetSpaceMembership {
         ) {
             self.space = space
             self.user = user
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let space: SpaceRef
 
         public let generation: String
@@ -30,8 +33,9 @@ public enum BlueCatbirdLabyrinthGetSpaceMembership {
 
         public let chatSeq: Int
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             space: SpaceRef,
 
             generation: String,
@@ -43,6 +47,7 @@ public enum BlueCatbirdLabyrinthGetSpaceMembership {
             chatSeq: Int
 
         ) {
+
             self.space = space
 
             self.generation = generation
@@ -52,23 +57,27 @@ public enum BlueCatbirdLabyrinthGetSpaceMembership {
             self.chatGeneration = chatGeneration
 
             self.chatSeq = chatSeq
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            space = try container.decode(SpaceRef.self, forKey: .space)
+            self.space = try container.decode(SpaceRef.self, forKey: .space)
 
-            generation = try container.decode(String.self, forKey: .generation)
+            self.generation = try container.decode(String.self, forKey: .generation)
 
-            user = try container.decode(DID.self, forKey: .user)
+            self.user = try container.decode(DID.self, forKey: .user)
 
-            chatGeneration = try container.decode(Int.self, forKey: .chatGeneration)
+            self.chatGeneration = try container.decode(Int.self, forKey: .chatGeneration)
 
-            chatSeq = try container.decode(Int.self, forKey: .chatSeq)
+            self.chatSeq = try container.decode(Int.self, forKey: .chatSeq)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(space, forKey: .space)
@@ -80,9 +89,11 @@ public enum BlueCatbirdLabyrinthGetSpaceMembership {
             try container.encode(chatGeneration, forKey: .chatGeneration)
 
             try container.encode(chatSeq, forKey: .chatSeq)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let spaceValue = try space.toCBORValue()
@@ -101,6 +112,7 @@ public enum BlueCatbirdLabyrinthGetSpaceMembership {
             map = map.adding(key: "chatSeq", value: chatSeqValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -110,6 +122,7 @@ public enum BlueCatbirdLabyrinthGetSpaceMembership {
             case chatGeneration
             case chatSeq
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -118,25 +131,25 @@ public enum BlueCatbirdLabyrinthGetSpaceMembership {
         case spaceDeleted = "SpaceDeleted"
         case storageNotConfigured = "StorageNotConfigured"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Labyrinth {
+extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - getSpaceMembership
-
     /// Internal Space authority policy lookup. Requires authority service JWT, DS audience, exact lxm, jti and a lifetime of at most 60 seconds. User is the DID from the authority's verified canonical delegation. No user device proof is accepted here. Positive policy must not be cached.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getSpaceMembership(input: BlueCatbirdLabyrinthGetSpaceMembership.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetSpaceMembership.Output?) {
+    public func getSpaceMembership(input: BlueCatbirdLabyrinthGetSpaceMembership.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetSpaceMembership.Output?) {
         let endpoint = "blue.catbird.labyrinth.getSpaceMembership"
 
         let queryItems = input.asQueryItems()
@@ -158,7 +171,8 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

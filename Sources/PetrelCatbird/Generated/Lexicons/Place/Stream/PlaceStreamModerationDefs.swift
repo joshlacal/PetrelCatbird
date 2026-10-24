@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: place.stream.moderation.defs
 
-public enum PlaceStreamModerationDefs {
+public struct PlaceStreamModerationDefs {
+
     public static let typeIdentifier = "place.stream.moderation.defs"
 
     public struct PermissionView: ATProtocolCodable, ATProtocolValue {
@@ -26,25 +27,25 @@ public enum PlaceStreamModerationDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
             } catch {
                 LogManager.logError("Decoding error for required property 'uri': \(error)")
                 throw error
             }
             do {
-                cid = try container.decode(CID.self, forKey: .cid)
+                self.cid = try container.decode(CID.self, forKey: .cid)
             } catch {
                 LogManager.logError("Decoding error for required property 'cid': \(error)")
                 throw error
             }
             do {
-                author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .author)
+                self.author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .author)
             } catch {
                 LogManager.logError("Decoding error for required property 'author': \(error)")
                 throw error
             }
             do {
-                record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+                self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
             } catch {
                 LogManager.logError("Decoding error for required property 'record': \(error)")
                 throw error
@@ -110,4 +111,5 @@ public enum PlaceStreamModerationDefs {
             case record
         }
     }
+
 }

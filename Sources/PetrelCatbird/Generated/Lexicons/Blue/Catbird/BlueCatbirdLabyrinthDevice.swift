@@ -5,6 +5,7 @@ import Petrel
 // lexicon: 1, id: blue.catbird.labyrinth.device
 
 public struct BlueCatbirdLabyrinthDevice: ATProtocolCodable, ATProtocolValue {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.device"
     public let deviceKeyPubkey: Bytes
     public let epochStorageKeyPubkey: Bytes
@@ -30,39 +31,39 @@ public struct BlueCatbirdLabyrinthDevice: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
-        epochStorageKeyPubkey = try container.decode(Bytes.self, forKey: .epochStorageKeyPubkey)
-        epochStorageKeySig = try container.decode(Bytes.self, forKey: .epochStorageKeySig)
+        self.deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
+        self.epochStorageKeyPubkey = try container.decode(Bytes.self, forKey: .epochStorageKeyPubkey)
+        self.epochStorageKeySig = try container.decode(Bytes.self, forKey: .epochStorageKeySig)
         do {
-            epochStorageAuthKeyPubkey = try container.decodeIfPresent(Bytes.self, forKey: .epochStorageAuthKeyPubkey)
+            self.epochStorageAuthKeyPubkey = try container.decodeIfPresent(Bytes.self, forKey: .epochStorageAuthKeyPubkey)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'epochStorageAuthKeyPubkey' — degrading to nil: \(error)")
-            epochStorageAuthKeyPubkey = nil
+            self.epochStorageAuthKeyPubkey = nil
         }
         do {
-            epochStorageAuthKeySig = try container.decodeIfPresent(Bytes.self, forKey: .epochStorageAuthKeySig)
+            self.epochStorageAuthKeySig = try container.decodeIfPresent(Bytes.self, forKey: .epochStorageAuthKeySig)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'epochStorageAuthKeySig' — degrading to nil: \(error)")
-            epochStorageAuthKeySig = nil
+            self.epochStorageAuthKeySig = nil
         }
-        virtual = try container.decode(Bool.self, forKey: .virtual)
+        self.virtual = try container.decode(Bool.self, forKey: .virtual)
         do {
-            chatBinding = try container.decodeIfPresent(BlueCatbirdLabyrinthDefs.TransportAttestation.self, forKey: .chatBinding)
+            self.chatBinding = try container.decodeIfPresent(BlueCatbirdLabyrinthDefs.TransportAttestation.self, forKey: .chatBinding)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'chatBinding' — degrading to nil: \(error)")
-            chatBinding = nil
+            self.chatBinding = nil
         }
         do {
-            revokedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .revokedAt)
+            self.revokedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .revokedAt)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'revokedAt' — degrading to nil: \(error)")
-            revokedAt = nil
+            self.revokedAt = nil
         }
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -187,4 +188,5 @@ public struct BlueCatbirdLabyrinthDevice: ATProtocolCodable, ATProtocolValue {
         case revokedAt
         case createdAt
     }
+
 }

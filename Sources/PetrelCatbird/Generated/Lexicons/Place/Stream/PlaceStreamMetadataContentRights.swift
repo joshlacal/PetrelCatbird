@@ -5,6 +5,7 @@ import Petrel
 // lexicon: 1, id: place.stream.metadata.contentRights
 
 public struct PlaceStreamMetadataContentRights: ATProtocolCodable, ATProtocolValue {
+
     public static let typeIdentifier = "place.stream.metadata.contentRights"
     public let creator: String?
     public let copyrightNotice: String?
@@ -22,11 +23,11 @@ public struct PlaceStreamMetadataContentRights: ATProtocolCodable, ATProtocolVal
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        creator = try container.decodeIfPresent(String.self, forKey: .creator)
-        copyrightNotice = try container.decodeIfPresent(String.self, forKey: .copyrightNotice)
-        copyrightYear = try container.decodeIfPresent(Int.self, forKey: .copyrightYear)
-        license = try container.decodeIfPresent(String.self, forKey: .license)
-        creditLine = try container.decodeIfPresent(String.self, forKey: .creditLine)
+        self.creator = try container.decodeIfPresent(String.self, forKey: .creator)
+        self.copyrightNotice = try container.decodeIfPresent(String.self, forKey: .copyrightNotice)
+        self.copyrightYear = try container.decodeIfPresent(Int.self, forKey: .copyrightYear)
+        self.license = try container.decodeIfPresent(String.self, forKey: .license)
+        self.creditLine = try container.decodeIfPresent(String.self, forKey: .creditLine)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -122,4 +123,5 @@ public struct PlaceStreamMetadataContentRights: ATProtocolCodable, ATProtocolVal
         case license
         case creditLine
     }
+
 }

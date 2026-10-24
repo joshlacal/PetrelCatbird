@@ -5,6 +5,7 @@ import Petrel
 // lexicon: 1, id: place.stream.metadata.configuration
 
 public struct PlaceStreamMetadataConfiguration: ATProtocolCodable, ATProtocolValue {
+
     public static let typeIdentifier = "place.stream.metadata.configuration"
     public let contentWarnings: PlaceStreamMetadataContentWarnings?
     public let contentRights: PlaceStreamMetadataContentRights?
@@ -19,25 +20,25 @@ public struct PlaceStreamMetadataConfiguration: ATProtocolCodable, ATProtocolVal
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         do {
-            contentWarnings = try container.decodeIfPresent(PlaceStreamMetadataContentWarnings.self, forKey: .contentWarnings)
+            self.contentWarnings = try container.decodeIfPresent(PlaceStreamMetadataContentWarnings.self, forKey: .contentWarnings)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'contentWarnings' — degrading to nil: \(error)")
-            contentWarnings = nil
+            self.contentWarnings = nil
         }
         do {
-            contentRights = try container.decodeIfPresent(PlaceStreamMetadataContentRights.self, forKey: .contentRights)
+            self.contentRights = try container.decodeIfPresent(PlaceStreamMetadataContentRights.self, forKey: .contentRights)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'contentRights' — degrading to nil: \(error)")
-            contentRights = nil
+            self.contentRights = nil
         }
         do {
-            distributionPolicy = try container.decodeIfPresent(PlaceStreamMetadataDistributionPolicy.self, forKey: .distributionPolicy)
+            self.distributionPolicy = try container.decodeIfPresent(PlaceStreamMetadataDistributionPolicy.self, forKey: .distributionPolicy)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'distributionPolicy' — degrading to nil: \(error)")
-            distributionPolicy = nil
+            self.distributionPolicy = nil
         }
     }
 
@@ -109,4 +110,5 @@ public struct PlaceStreamMetadataConfiguration: ATProtocolCodable, ATProtocolVal
         case contentRights
         case distributionPolicy
     }
+
 }

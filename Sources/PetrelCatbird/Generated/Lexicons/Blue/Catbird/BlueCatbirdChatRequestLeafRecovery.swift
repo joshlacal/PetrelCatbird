@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.requestLeafRecovery
 
-public enum BlueCatbirdChatRequestLeafRecovery {
+public struct BlueCatbirdChatRequestLeafRecovery {
+
     public static let typeIdentifier = "blue.catbird.chat.requestLeafRecovery"
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedLeafRecoveryRequest
@@ -16,7 +17,7 @@ public enum BlueCatbirdChatRequestLeafRecovery {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedLeafRecoveryRequest.self, forKey: .signedRequest)
+            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedLeafRecoveryRequest.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -37,40 +38,51 @@ public enum BlueCatbirdChatRequestLeafRecovery {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let recovery: BlueCatbirdChatDefs.LeafRecoveryView
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             recovery: BlueCatbirdChatDefs.LeafRecoveryView
 
         ) {
+
             self.recovery = recovery
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            recovery = try container.decode(BlueCatbirdChatDefs.LeafRecoveryView.self, forKey: .recovery)
+            self.recovery = try container.decode(BlueCatbirdChatDefs.LeafRecoveryView.self, forKey: .recovery)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(recovery, forKey: .recovery)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let recoveryValue = try recovery.toCBORValue()
             map = map.adding(key: "recovery", value: recoveryValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case recovery
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -93,26 +105,27 @@ public enum BlueCatbirdChatRequestLeafRecovery {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - requestLeafRecovery
-
-    // An active participant's target device signs an idempotent, expiring add-or-replace recovery request and atomically reserves its own compatible KeyPackage. Under the mutation lock the server rechecks block policy for every unordered roster pair. This does not alter MLS state; a different current leaf must fulfill exactly this one request with one ordinary public Add Commit and Welcome.
-    //
-    // - Parameter input: The input parameters for the request
+    /// An active participant's target device signs an idempotent, expiring add-or-replace recovery request and atomically reserves its own compatible KeyPackage. Under the mutation lock the server rechecks block policy for every unordered roster pair. This does not alter MLS state; a different current leaf must fulfill exactly this one request with one ordinary public Add Commit and Welcome.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func requestLeafRecovery(
+    public func requestLeafRecovery(
+
         input: BlueCatbirdChatRequestLeafRecovery.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatRequestLeafRecovery.Output?) {
@@ -145,7 +158,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -155,6 +169,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatRequestLeafRecovery.Output.self, from: responseData)
 
@@ -177,5 +192,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

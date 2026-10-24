@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.getAttachmentBlob
 
-public enum BlueCatbirdLabyrinthGetAttachmentBlob {
+public struct BlueCatbirdLabyrinthGetAttachmentBlob {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.getAttachmentBlob"
     public struct Parameters: Parametrizable {
         public let deviceKeyPubkey: String
@@ -25,44 +26,56 @@ public enum BlueCatbirdLabyrinthGetAttachmentBlob {
             self.messageId = messageId
             self.blindedTokenSalt = blindedTokenSalt
             self.threadId = threadId
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let data: Data
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             data: Data
 
         ) {
+
             self.data = data
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            data = try container.decode(Data.self, forKey: .data)
+            self.data = try container.decode(Data.self, forKey: .data)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(data, forKey: .data)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let dataValue = try data.toCBORValue()
             map = map.adding(key: "data", value: dataValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case data
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -71,25 +84,25 @@ public enum BlueCatbirdLabyrinthGetAttachmentBlob {
         case attachmentsUnavailable = "AttachmentsUnavailable"
         case relayUnavailable = "RelayUnavailable"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Labyrinth {
+extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - getAttachmentBlob
-
     /// Read an attachment blob with the ORF access token, for a restored device that has no application interval at the attachment's entry. The server recomputes the token MAC from blindedTokenSalt and the presented threadId and messageId, checks that the blob is still bound to that message and not deleted or expired, and that the message still exists for the caller: an unredacted thread item readable by the caller, or an item of the caller's own owner archive (whitepaper p.42). Every refusal reads as NotFound. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getAttachmentBlob(input: BlueCatbirdLabyrinthGetAttachmentBlob.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetAttachmentBlob.Output?) {
+    public func getAttachmentBlob(input: BlueCatbirdLabyrinthGetAttachmentBlob.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetAttachmentBlob.Output?) {
         let endpoint = "blue.catbird.labyrinth.getAttachmentBlob"
 
         let queryItems = input.asQueryItems()
@@ -111,7 +124,8 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             // Wildcard encoding ("*/*") — accept any Content-Type, including a missing one.
 
             let decodedData = BlueCatbirdLabyrinthGetAttachmentBlob.Output(data: responseData)

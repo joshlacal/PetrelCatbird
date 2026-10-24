@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: place.stream.badge.defs
 
-public enum PlaceStreamBadgeDefs {
+public struct PlaceStreamBadgeDefs {
+
     public static let typeIdentifier = "place.stream.badge.defs"
 
     public struct BadgeView: ATProtocolCodable, ATProtocolValue {
@@ -26,30 +27,30 @@ public enum PlaceStreamBadgeDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                badgeType = try container.decode(String.self, forKey: .badgeType)
+                self.badgeType = try container.decode(String.self, forKey: .badgeType)
             } catch {
                 LogManager.logError("Decoding error for required property 'badgeType': \(error)")
                 throw error
             }
             do {
-                issuer = try container.decode(DID.self, forKey: .issuer)
+                self.issuer = try container.decode(DID.self, forKey: .issuer)
             } catch {
                 LogManager.logError("Decoding error for required property 'issuer': \(error)")
                 throw error
             }
             do {
-                recipient = try container.decode(DID.self, forKey: .recipient)
+                self.recipient = try container.decode(DID.self, forKey: .recipient)
             } catch {
                 LogManager.logError("Decoding error for required property 'recipient': \(error)")
                 throw error
             }
             do {
-                signature = try container.decodeIfPresent(String.self, forKey: .signature)
+                self.signature = try container.decodeIfPresent(String.self, forKey: .signature)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'signature' — degrading to nil: \(error)")
-                signature = nil
+                self.signature = nil
             }
         }
 
@@ -118,4 +119,5 @@ public enum PlaceStreamBadgeDefs {
             case signature
         }
     }
+
 }

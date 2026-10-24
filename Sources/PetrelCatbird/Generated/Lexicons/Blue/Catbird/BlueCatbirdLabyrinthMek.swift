@@ -5,6 +5,7 @@ import Petrel
 // lexicon: 1, id: blue.catbird.labyrinth.mek
 
 public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.mek"
     public let threadId: String
     public let mekId: Bytes
@@ -24,12 +25,12 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        threadId = try container.decode(String.self, forKey: .threadId)
-        mekId = try container.decode(Bytes.self, forKey: .mekId)
-        rosterHash = try container.decode(Bytes.self, forKey: .rosterHash)
-        sender = try container.decode(BlueCatbirdLabyrinthMekSenderUnion.self, forKey: .sender)
-        recipients = try container.decode([BlueCatbirdLabyrinthDefs.MekRecipient].self, forKey: .recipients)
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.threadId = try container.decode(String.self, forKey: .threadId)
+        self.mekId = try container.decode(Bytes.self, forKey: .mekId)
+        self.rosterHash = try container.decode(Bytes.self, forKey: .rosterHash)
+        self.sender = try container.decode(BlueCatbirdLabyrinthMekSenderUnion.self, forKey: .sender)
+        self.recipients = try container.decode([BlueCatbirdLabyrinthDefs.MekRecipient].self, forKey: .recipients)
+        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -124,19 +125,19 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                did = try container.decode(DID.self, forKey: .did)
+                self.did = try container.decode(DID.self, forKey: .did)
             } catch {
                 LogManager.logError("Decoding error for required property 'did': \(error)")
                 throw error
             }
             do {
-                senderEpochHead = try container.decode(Bytes.self, forKey: .senderEpochHead)
+                self.senderEpochHead = try container.decode(Bytes.self, forKey: .senderEpochHead)
             } catch {
                 LogManager.logError("Decoding error for required property 'senderEpochHead': \(error)")
                 throw error
             }
             do {
-                senderEpoch = try container.decode(BlueCatbirdLabyrinthDefs.EpochPublic.self, forKey: .senderEpoch)
+                self.senderEpoch = try container.decode(BlueCatbirdLabyrinthDefs.EpochPublic.self, forKey: .senderEpoch)
             } catch {
                 LogManager.logError("Decoding error for required property 'senderEpoch': \(error)")
                 throw error
@@ -212,19 +213,19 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                transportPubkey = try container.decode(Bytes.self, forKey: .transportPubkey)
+                self.transportPubkey = try container.decode(Bytes.self, forKey: .transportPubkey)
             } catch {
                 LogManager.logError("Decoding error for required property 'transportPubkey': \(error)")
                 throw error
             }
             do {
-                ephemeralAuthPubkey = try container.decode(Bytes.self, forKey: .ephemeralAuthPubkey)
+                self.ephemeralAuthPubkey = try container.decode(Bytes.self, forKey: .ephemeralAuthPubkey)
             } catch {
                 LogManager.logError("Decoding error for required property 'ephemeralAuthPubkey': \(error)")
                 throw error
             }
             do {
-                sig = try container.decode(Bytes.self, forKey: .sig)
+                self.sig = try container.decode(Bytes.self, forKey: .sig)
             } catch {
                 LogManager.logError("Decoding error for required property 'sig': \(error)")
                 throw error
@@ -290,7 +291,6 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
         public init(_ value: BlueCatbirdLabyrinthMek.LabyrinthSender) {
             self = .blueCatbirdLabyrinthMekLabyrinthSender(value)
         }
-
         public init(_ value: BlueCatbirdLabyrinthMek.TransportSender) {
             self = .blueCatbirdLabyrinthMekTransportSender(value)
         }
@@ -316,26 +316,26 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             switch self {
-            case let .blueCatbirdLabyrinthMekLabyrinthSender(value):
+            case .blueCatbirdLabyrinthMekLabyrinthSender(let value):
                 try container.encode("blue.catbird.labyrinth.mek#labyrinthSender", forKey: .type)
                 try value.encode(to: encoder)
-            case let .blueCatbirdLabyrinthMekTransportSender(value):
+            case .blueCatbirdLabyrinthMekTransportSender(let value):
                 try container.encode("blue.catbird.labyrinth.mek#transportSender", forKey: .type)
                 try value.encode(to: encoder)
-            case let .unexpected(container):
+            case .unexpected(let container):
                 try container.encode(to: encoder)
             }
         }
 
         public func hash(into hasher: inout Hasher) {
             switch self {
-            case let .blueCatbirdLabyrinthMekLabyrinthSender(value):
+            case .blueCatbirdLabyrinthMekLabyrinthSender(let value):
                 hasher.combine("blue.catbird.labyrinth.mek#labyrinthSender")
                 hasher.combine(value)
-            case let .blueCatbirdLabyrinthMekTransportSender(value):
+            case .blueCatbirdLabyrinthMekTransportSender(let value):
                 hasher.combine("blue.catbird.labyrinth.mek#transportSender")
                 hasher.combine(value)
-            case let .unexpected(container):
+            case .unexpected(let container):
                 hasher.combine("unexpected")
                 hasher.combine(container)
             }
@@ -347,17 +347,13 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
 
         public static func == (lhs: BlueCatbirdLabyrinthMekSenderUnion, rhs: BlueCatbirdLabyrinthMekSenderUnion) -> Bool {
             switch (lhs, rhs) {
-            case let (
-                .blueCatbirdLabyrinthMekLabyrinthSender(lhsValue),
-                .blueCatbirdLabyrinthMekLabyrinthSender(rhsValue)
-            ):
+            case (.blueCatbirdLabyrinthMekLabyrinthSender(let lhsValue),
+                  .blueCatbirdLabyrinthMekLabyrinthSender(let rhsValue)):
                 return lhsValue == rhsValue
-            case let (
-                .blueCatbirdLabyrinthMekTransportSender(lhsValue),
-                .blueCatbirdLabyrinthMekTransportSender(rhsValue)
-            ):
+            case (.blueCatbirdLabyrinthMekTransportSender(let lhsValue),
+                  .blueCatbirdLabyrinthMekTransportSender(let rhsValue)):
                 return lhsValue == rhsValue
-            case let (.unexpected(lhsValue), .unexpected(rhsValue)):
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
                 return lhsValue.isEqual(to: rhsValue)
             default:
                 return false
@@ -369,13 +365,13 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
             return self == other
         }
 
-        /// DAGCBOR encoding with field ordering
+        // DAGCBOR encoding with field ordering
         public func toCBORValue() throws -> Any {
             // Create an ordered map to maintain field order
             var map = OrderedCBORMap()
 
             switch self {
-            case let .blueCatbirdLabyrinthMekLabyrinthSender(value):
+            case .blueCatbirdLabyrinthMekLabyrinthSender(let value):
                 map = map.adding(key: "$type", value: "blue.catbird.labyrinth.mek#labyrinthSender")
 
                 let valueDict = try value.toCBORValue()
@@ -392,7 +388,7 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case let .blueCatbirdLabyrinthMekTransportSender(value):
+            case .blueCatbirdLabyrinthMekTransportSender(let value):
                 map = map.adding(key: "$type", value: "blue.catbird.labyrinth.mek#transportSender")
 
                 let valueDict = try value.toCBORValue()
@@ -409,9 +405,10 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case let .unexpected(container):
+            case .unexpected(let container):
                 return try container.toCBORValue()
             }
         }
     }
+
 }

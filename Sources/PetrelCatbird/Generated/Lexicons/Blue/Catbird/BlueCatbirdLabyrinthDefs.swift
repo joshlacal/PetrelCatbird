@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.defs
 
-public enum BlueCatbirdLabyrinthDefs {
+public struct BlueCatbirdLabyrinthDefs {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.defs"
 
     public struct EpochPublic: ATProtocolCodable, ATProtocolValue {
@@ -36,59 +37,59 @@ public enum BlueCatbirdLabyrinthDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                epochNumber = try container.decode(Int.self, forKey: .epochNumber)
+                self.epochNumber = try container.decode(Int.self, forKey: .epochNumber)
             } catch {
                 LogManager.logError("Decoding error for required property 'epochNumber': \(error)")
                 throw error
             }
             do {
-                authPubkey = try container.decode(Bytes.self, forKey: .authPubkey)
+                self.authPubkey = try container.decode(Bytes.self, forKey: .authPubkey)
             } catch {
                 LogManager.logError("Decoding error for required property 'authPubkey': \(error)")
                 throw error
             }
             do {
-                encryptionPubkey = try container.decode(Bytes.self, forKey: .encryptionPubkey)
+                self.encryptionPubkey = try container.decode(Bytes.self, forKey: .encryptionPubkey)
             } catch {
                 LogManager.logError("Decoding error for required property 'encryptionPubkey': \(error)")
                 throw error
             }
             do {
-                signingPubkey = try container.decode(Bytes.self, forKey: .signingPubkey)
+                self.signingPubkey = try container.decode(Bytes.self, forKey: .signingPubkey)
             } catch {
                 LogManager.logError("Decoding error for required property 'signingPubkey': \(error)")
                 throw error
             }
             do {
-                previousEpochHead = try container.decodeIfPresent(Bytes.self, forKey: .previousEpochHead)
+                self.previousEpochHead = try container.decodeIfPresent(Bytes.self, forKey: .previousEpochHead)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'previousEpochHead' — degrading to nil: \(error)")
-                previousEpochHead = nil
+                self.previousEpochHead = nil
             }
             do {
-                epochHead = try container.decode(Bytes.self, forKey: .epochHead)
+                self.epochHead = try container.decode(Bytes.self, forKey: .epochHead)
             } catch {
                 LogManager.logError("Decoding error for required property 'epochHead': \(error)")
                 throw error
             }
             do {
-                selfSig = try container.decode(Bytes.self, forKey: .selfSig)
+                self.selfSig = try container.decode(Bytes.self, forKey: .selfSig)
             } catch {
                 LogManager.logError("Decoding error for required property 'selfSig': \(error)")
                 throw error
             }
             do {
-                prevSig = try container.decodeIfPresent(Bytes.self, forKey: .prevSig)
+                self.prevSig = try container.decodeIfPresent(Bytes.self, forKey: .prevSig)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'prevSig' — degrading to nil: \(error)")
-                prevSig = nil
+                self.prevSig = nil
             }
             do {
-                attestation = try container.decode(TransportAttestation.self, forKey: .attestation)
+                self.attestation = try container.decode(TransportAttestation.self, forKey: .attestation)
             } catch {
                 LogManager.logError("Decoding error for required property 'attestation': \(error)")
                 throw error
@@ -222,13 +223,13 @@ public enum BlueCatbirdLabyrinthDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                transportPubkey = try container.decode(Bytes.self, forKey: .transportPubkey)
+                self.transportPubkey = try container.decode(Bytes.self, forKey: .transportPubkey)
             } catch {
                 LogManager.logError("Decoding error for required property 'transportPubkey': \(error)")
                 throw error
             }
             do {
-                sig = try container.decode(Bytes.self, forKey: .sig)
+                self.sig = try container.decode(Bytes.self, forKey: .sig)
             } catch {
                 LogManager.logError("Decoding error for required property 'sig': \(error)")
                 throw error
@@ -302,42 +303,42 @@ public enum BlueCatbirdLabyrinthDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                messageId = try container.decode(String.self, forKey: .messageId)
+                self.messageId = try container.decode(String.self, forKey: .messageId)
             } catch {
                 LogManager.logError("Decoding error for required property 'messageId': \(error)")
                 throw error
             }
             do {
-                timestamp = try container.decode(Int.self, forKey: .timestamp)
+                self.timestamp = try container.decode(Int.self, forKey: .timestamp)
             } catch {
                 LogManager.logError("Decoding error for required property 'timestamp': \(error)")
                 throw error
             }
             do {
-                mekId = try container.decode(Bytes.self, forKey: .mekId)
+                self.mekId = try container.decode(Bytes.self, forKey: .mekId)
             } catch {
                 LogManager.logError("Decoding error for required property 'mekId': \(error)")
                 throw error
             }
             do {
-                senderTransportPubkey = try container.decode(Bytes.self, forKey: .senderTransportPubkey)
+                self.senderTransportPubkey = try container.decode(Bytes.self, forKey: .senderTransportPubkey)
             } catch {
                 LogManager.logError("Decoding error for required property 'senderTransportPubkey': \(error)")
                 throw error
             }
             do {
-                signedEncMessage = try container.decode(Bytes.self, forKey: .signedEncMessage)
+                self.signedEncMessage = try container.decode(Bytes.self, forKey: .signedEncMessage)
             } catch {
                 LogManager.logError("Decoding error for required property 'signedEncMessage': \(error)")
                 throw error
             }
             do {
-                redaction = try container.decodeIfPresent(Redaction.self, forKey: .redaction)
+                self.redaction = try container.decodeIfPresent(Redaction.self, forKey: .redaction)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'redaction' — degrading to nil: \(error)")
-                redaction = nil
+                self.redaction = nil
             }
         }
 
@@ -446,37 +447,37 @@ public enum BlueCatbirdLabyrinthDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                threadId = try container.decode(String.self, forKey: .threadId)
+                self.threadId = try container.decode(String.self, forKey: .threadId)
             } catch {
                 LogManager.logError("Decoding error for required property 'threadId': \(error)")
                 throw error
             }
             do {
-                messageId = try container.decode(String.self, forKey: .messageId)
+                self.messageId = try container.decode(String.self, forKey: .messageId)
             } catch {
                 LogManager.logError("Decoding error for required property 'messageId': \(error)")
                 throw error
             }
             do {
-                timestamp = try container.decode(Int.self, forKey: .timestamp)
+                self.timestamp = try container.decode(Int.self, forKey: .timestamp)
             } catch {
                 LogManager.logError("Decoding error for required property 'timestamp': \(error)")
                 throw error
             }
             do {
-                epochNumber = try container.decode(Int.self, forKey: .epochNumber)
+                self.epochNumber = try container.decode(Int.self, forKey: .epochNumber)
             } catch {
                 LogManager.logError("Decoding error for required property 'epochNumber': \(error)")
                 throw error
             }
             do {
-                version = try container.decode(Int.self, forKey: .version)
+                self.version = try container.decode(Int.self, forKey: .version)
             } catch {
                 LogManager.logError("Decoding error for required property 'version': \(error)")
                 throw error
             }
             do {
-                encrypted = try container.decode(Bytes.self, forKey: .encrypted)
+                self.encrypted = try container.decode(Bytes.self, forKey: .encrypted)
             } catch {
                 LogManager.logError("Decoding error for required property 'encrypted': \(error)")
                 throw error
@@ -576,19 +577,19 @@ public enum BlueCatbirdLabyrinthDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                did = try container.decode(DID.self, forKey: .did)
+                self.did = try container.decode(DID.self, forKey: .did)
             } catch {
                 LogManager.logError("Decoding error for required property 'did': \(error)")
                 throw error
             }
             do {
-                recipientEpochHead = try container.decode(Bytes.self, forKey: .recipientEpochHead)
+                self.recipientEpochHead = try container.decode(Bytes.self, forKey: .recipientEpochHead)
             } catch {
                 LogManager.logError("Decoding error for required property 'recipientEpochHead': \(error)")
                 throw error
             }
             do {
-                ciphertext = try container.decode(Bytes.self, forKey: .ciphertext)
+                self.ciphertext = try container.decode(Bytes.self, forKey: .ciphertext)
             } catch {
                 LogManager.logError("Decoding error for required property 'ciphertext': \(error)")
                 throw error
@@ -664,21 +665,21 @@ public enum BlueCatbirdLabyrinthDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                seq = try container.decode(Int.self, forKey: .seq)
+                self.seq = try container.decode(Int.self, forKey: .seq)
             } catch {
                 LogManager.logError("Decoding error for required property 'seq': \(error)")
                 throw error
             }
             do {
-                chatSeq = try container.decodeIfPresent(Int.self, forKey: .chatSeq)
+                self.chatSeq = try container.decodeIfPresent(Int.self, forKey: .chatSeq)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'chatSeq' — degrading to nil: \(error)")
-                chatSeq = nil
+                self.chatSeq = nil
             }
             do {
-                receivedAt = try container.decode(ATProtocolDate.self, forKey: .receivedAt)
+                self.receivedAt = try container.decode(ATProtocolDate.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
                 throw error
@@ -764,44 +765,44 @@ public enum BlueCatbirdLabyrinthDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                transportPubkey = try container.decodeIfPresent(Bytes.self, forKey: .transportPubkey)
+                self.transportPubkey = try container.decodeIfPresent(Bytes.self, forKey: .transportPubkey)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'transportPubkey' — degrading to nil: \(error)")
-                transportPubkey = nil
+                self.transportPubkey = nil
             }
             do {
-                sig = try container.decodeIfPresent(Bytes.self, forKey: .sig)
+                self.sig = try container.decodeIfPresent(Bytes.self, forKey: .sig)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'sig' — degrading to nil: \(error)")
-                sig = nil
+                self.sig = nil
             }
             do {
-                redactedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .redactedAt)
+                self.redactedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .redactedAt)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'redactedAt' — degrading to nil: \(error)")
-                redactedAt = nil
+                self.redactedAt = nil
             }
             do {
-                by = try container.decodeIfPresent(DID.self, forKey: .by)
+                self.by = try container.decodeIfPresent(DID.self, forKey: .by)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'by' — degrading to nil: \(error)")
-                by = nil
+                self.by = nil
             }
             do {
-                reason = try container.decodeIfPresent(String.self, forKey: .reason)
+                self.reason = try container.decodeIfPresent(String.self, forKey: .reason)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'reason' — degrading to nil: \(error)")
-                reason = nil
+                self.reason = nil
             }
         }
 
@@ -920,19 +921,19 @@ public enum BlueCatbirdLabyrinthDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                messageId = try container.decode(String.self, forKey: .messageId)
+                self.messageId = try container.decode(String.self, forKey: .messageId)
             } catch {
                 LogManager.logError("Decoding error for required property 'messageId': \(error)")
                 throw error
             }
             do {
-                timestamp = try container.decode(Int.self, forKey: .timestamp)
+                self.timestamp = try container.decode(Int.self, forKey: .timestamp)
             } catch {
                 LogManager.logError("Decoding error for required property 'timestamp': \(error)")
                 throw error
             }
             do {
-                redaction = try container.decode(BlueCatbirdLabyrinthDefs.Redaction.self, forKey: .redaction)
+                self.redaction = try container.decode(BlueCatbirdLabyrinthDefs.Redaction.self, forKey: .redaction)
             } catch {
                 LogManager.logError("Decoding error for required property 'redaction': \(error)")
                 throw error
@@ -1018,49 +1019,49 @@ public enum BlueCatbirdLabyrinthDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                author = try container.decode(DID.self, forKey: .author)
+                self.author = try container.decode(DID.self, forKey: .author)
             } catch {
                 LogManager.logError("Decoding error for required property 'author': \(error)")
                 throw error
             }
             do {
-                rkey = try container.decode(RecordKey.self, forKey: .rkey)
+                self.rkey = try container.decode(RecordKey.self, forKey: .rkey)
             } catch {
                 LogManager.logError("Decoding error for required property 'rkey': \(error)")
                 throw error
             }
             do {
-                space = try container.decode(SpaceRef.self, forKey: .space)
+                self.space = try container.decode(SpaceRef.self, forKey: .space)
             } catch {
                 LogManager.logError("Decoding error for required property 'space': \(error)")
                 throw error
             }
             do {
-                generation = try container.decode(String.self, forKey: .generation)
+                self.generation = try container.decode(String.self, forKey: .generation)
             } catch {
                 LogManager.logError("Decoding error for required property 'generation': \(error)")
                 throw error
             }
             do {
-                cid = try container.decode(CID.self, forKey: .cid)
+                self.cid = try container.decode(CID.self, forKey: .cid)
             } catch {
                 LogManager.logError("Decoding error for required property 'cid': \(error)")
                 throw error
             }
             do {
-                order = try container.decode(BlueCatbirdLabyrinthDefs.ServerOrder.self, forKey: .order)
+                self.order = try container.decode(BlueCatbirdLabyrinthDefs.ServerOrder.self, forKey: .order)
             } catch {
                 LogManager.logError("Decoding error for required property 'order': \(error)")
                 throw error
             }
             do {
-                redactions = try container.decode([BlueCatbirdLabyrinthDefs.SpaceBatchRedaction].self, forKey: .redactions)
+                self.redactions = try container.decode([BlueCatbirdLabyrinthDefs.SpaceBatchRedaction].self, forKey: .redactions)
             } catch {
                 LogManager.logError("Decoding error for required property 'redactions': \(error)")
                 throw error
             }
             do {
-                itemCount = try container.decode(Int.self, forKey: .itemCount)
+                self.itemCount = try container.decode(Int.self, forKey: .itemCount)
             } catch {
                 LogManager.logError("Decoding error for required property 'itemCount': \(error)")
                 throw error
@@ -1158,4 +1159,5 @@ public enum BlueCatbirdLabyrinthDefs {
             case itemCount
         }
     }
+
 }

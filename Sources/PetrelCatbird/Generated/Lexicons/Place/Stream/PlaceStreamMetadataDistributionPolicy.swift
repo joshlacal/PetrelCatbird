@@ -5,6 +5,7 @@ import Petrel
 // lexicon: 1, id: place.stream.metadata.distributionPolicy
 
 public struct PlaceStreamMetadataDistributionPolicy: ATProtocolCodable, ATProtocolValue {
+
     public static let typeIdentifier = "place.stream.metadata.distributionPolicy"
     public let deleteAfter: Int?
     public let allowedBroadcasters: [String]?
@@ -16,8 +17,8 @@ public struct PlaceStreamMetadataDistributionPolicy: ATProtocolCodable, ATProtoc
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        deleteAfter = try container.decodeIfPresent(Int.self, forKey: .deleteAfter)
-        allowedBroadcasters = try container.decodeIfPresent([String].self, forKey: .allowedBroadcasters)
+        self.deleteAfter = try container.decodeIfPresent(Int.self, forKey: .deleteAfter)
+        self.allowedBroadcasters = try container.decodeIfPresent([String].self, forKey: .allowedBroadcasters)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -71,4 +72,5 @@ public struct PlaceStreamMetadataDistributionPolicy: ATProtocolCodable, ATProtoc
         case deleteAfter
         case allowedBroadcasters
     }
+
 }

@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.registerOrfState
 
-public enum BlueCatbirdLabyrinthRegisterOrfState {
+public struct BlueCatbirdLabyrinthRegisterOrfState {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.registerOrfState"
 
     public struct Parent: ATProtocolCodable, ATProtocolValue {
@@ -22,13 +23,13 @@ public enum BlueCatbirdLabyrinthRegisterOrfState {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
+                self.deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
             } catch {
                 LogManager.logError("Decoding error for required property 'deviceKeyPubkey': \(error)")
                 throw error
             }
             do {
-                evolveToken = try container.decode(Bytes.self, forKey: .evolveToken)
+                self.evolveToken = try container.decode(Bytes.self, forKey: .evolveToken)
             } catch {
                 LogManager.logError("Decoding error for required property 'evolveToken': \(error)")
                 throw error
@@ -78,7 +79,6 @@ public enum BlueCatbirdLabyrinthRegisterOrfState {
             case evolveToken
         }
     }
-
     public struct Input: ATProtocolCodable {
         public let deviceKeyPubkey: Bytes
         public let parent: Parent?
@@ -91,8 +91,8 @@ public enum BlueCatbirdLabyrinthRegisterOrfState {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
-            parent = try container.decodeIfPresent(Parent.self, forKey: .parent)
+            self.deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
+            self.parent = try container.decodeIfPresent(Parent.self, forKey: .parent)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -119,51 +119,64 @@ public enum BlueCatbirdLabyrinthRegisterOrfState {
     }
 
     public struct Output: ATProtocolCodable {
+
         // Empty output - no properties (response is {})
 
-        /// Standard public initializer
-        public init() {}
+        // Standard public initializer
+        public init(
+
+        ) {
+
+        }
 
         public init(from decoder: Decoder) throws {
+
             // Empty output - just validate it's an object by trying to get any container
             _ = try decoder.singleValueContainer()
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             // Empty output - encode empty object
             _ = encoder.singleValueContainer()
+
         }
 
         public func toCBORValue() throws -> Any {
+
             // Empty output - return empty CBOR map
             return OrderedCBORMap()
+
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case recordAlreadyExists = "RecordAlreadyExists"
         case orfStateNotFound = "OrfStateNotFound"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Labyrinth {
+extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - registerOrfState
-
-    // Create a device's ORF server state: orf_server_init without a parent, else orf_server_evolve(parent state, evolveToken). ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Create a device's ORF server state: orf_server_init without a parent, else orf_server_evolve(parent state, evolveToken). ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func registerOrfState(
+    public func registerOrfState(
+
         input: BlueCatbirdLabyrinthRegisterOrfState.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthRegisterOrfState.Output?) {
@@ -196,7 +209,8 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -206,6 +220,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdLabyrinthRegisterOrfState.Output.self, from: responseData)
 
@@ -228,5 +243,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

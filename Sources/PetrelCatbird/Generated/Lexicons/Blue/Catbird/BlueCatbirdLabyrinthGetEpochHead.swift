@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.getEpochHead
 
-public enum BlueCatbirdLabyrinthGetEpochHead {
+public struct BlueCatbirdLabyrinthGetEpochHead {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.getEpochHead"
     public struct Parameters: Parametrizable {
         public let did: DID
@@ -16,43 +17,53 @@ public enum BlueCatbirdLabyrinthGetEpochHead {
         ) {
             self.did = did
             self.epochNumber = epochNumber
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let epoch: BlueCatbirdLabyrinthDefs.EpochPublic
 
         public let receivedAt: ATProtocolDate
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             epoch: BlueCatbirdLabyrinthDefs.EpochPublic,
 
             receivedAt: ATProtocolDate
 
         ) {
+
             self.epoch = epoch
 
             self.receivedAt = receivedAt
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            epoch = try container.decode(BlueCatbirdLabyrinthDefs.EpochPublic.self, forKey: .epoch)
+            self.epoch = try container.decode(BlueCatbirdLabyrinthDefs.EpochPublic.self, forKey: .epoch)
 
-            receivedAt = try container.decode(ATProtocolDate.self, forKey: .receivedAt)
+            self.receivedAt = try container.decode(ATProtocolDate.self, forKey: .receivedAt)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(epoch, forKey: .epoch)
 
             try container.encode(receivedAt, forKey: .receivedAt)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let epochValue = try epoch.toCBORValue()
@@ -62,36 +73,38 @@ public enum BlueCatbirdLabyrinthGetEpochHead {
             map = map.adding(key: "receivedAt", value: receivedAtValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case epoch
             case receivedAt
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case epochNotFound = "EpochNotFound"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Labyrinth {
+extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - getEpochHead
-
     /// A DID's recorded epoch head; the latest when epochNumber is absent. Directory endpoint: any authenticated chat device may call it. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getEpochHead(input: BlueCatbirdLabyrinthGetEpochHead.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetEpochHead.Output?) {
+    public func getEpochHead(input: BlueCatbirdLabyrinthGetEpochHead.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetEpochHead.Output?) {
         let endpoint = "blue.catbird.labyrinth.getEpochHead"
 
         let queryItems = input.asQueryItems()
@@ -113,7 +126,8 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

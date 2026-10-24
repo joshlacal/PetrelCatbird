@@ -5,6 +5,7 @@ import Petrel
 // lexicon: 1, id: blue.catbird.labyrinth.epochMember
 
 public struct BlueCatbirdLabyrinthEpochMember: ATProtocolCodable, ATProtocolValue {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.epochMember"
     public let epochNumber: Int
     public let deviceKeyPubkey: Bytes
@@ -22,17 +23,17 @@ public struct BlueCatbirdLabyrinthEpochMember: ATProtocolCodable, ATProtocolValu
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        epochNumber = try container.decode(Int.self, forKey: .epochNumber)
-        deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
-        deviceMac = try container.decode(Bytes.self, forKey: .deviceMac)
+        self.epochNumber = try container.decode(Int.self, forKey: .epochNumber)
+        self.deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
+        self.deviceMac = try container.decode(Bytes.self, forKey: .deviceMac)
         do {
-            encryptedEntropy = try container.decodeIfPresent(Bytes.self, forKey: .encryptedEntropy)
+            self.encryptedEntropy = try container.decodeIfPresent(Bytes.self, forKey: .encryptedEntropy)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'encryptedEntropy' — degrading to nil: \(error)")
-            encryptedEntropy = nil
+            self.encryptedEntropy = nil
         }
-        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -107,4 +108,5 @@ public struct BlueCatbirdLabyrinthEpochMember: ATProtocolCodable, ATProtocolValu
         case encryptedEntropy
         case createdAt
     }
+
 }

@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: place.stream.live.getRecommendations
 
-public enum PlaceStreamLiveGetRecommendations {
+public struct PlaceStreamLiveGetRecommendations {
+
     public static let typeIdentifier = "place.stream.live.getRecommendations"
 
     public struct LivestreamRecommendation: ATProtocolCodable, ATProtocolValue {
@@ -22,13 +23,13 @@ public enum PlaceStreamLiveGetRecommendations {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                did = try container.decode(DID.self, forKey: .did)
+                self.did = try container.decode(DID.self, forKey: .did)
             } catch {
                 LogManager.logError("Decoding error for required property 'did': \(error)")
                 throw error
             }
             do {
-                source = try container.decode(LivestreamRecommendationSource.self, forKey: .source)
+                self.source = try container.decode(LivestreamRecommendationSource.self, forKey: .source)
             } catch {
                 LogManager.logError("Decoding error for required property 'source': \(error)")
                 throw error
@@ -78,7 +79,6 @@ public enum PlaceStreamLiveGetRecommendations {
             case source
         }
     }
-
     public struct Parameters: Parametrizable {
         public let userDID: DID
 
@@ -86,50 +86,60 @@ public enum PlaceStreamLiveGetRecommendations {
             userDID: DID
         ) {
             self.userDID = userDID
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let recommendations: [OutputRecommendationsUnion]
 
         public let userDID: DID?
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             recommendations: [OutputRecommendationsUnion],
 
             userDID: DID? = nil
 
         ) {
+
             self.recommendations = recommendations
 
             self.userDID = userDID
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            recommendations = try container.decode([OutputRecommendationsUnion].self, forKey: .recommendations)
+            self.recommendations = try container.decode([OutputRecommendationsUnion].self, forKey: .recommendations)
 
             do {
-                userDID = try container.decodeIfPresent(DID.self, forKey: .userDID)
+                self.userDID = try container.decodeIfPresent(DID.self, forKey: .userDID)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'userDID' — degrading to nil: \(error)")
-                userDID = nil
+                self.userDID = nil
             }
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(recommendations, forKey: .recommendations)
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(userDID, forKey: .userDID)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let recommendationsValue = try recommendations.toCBORValue()
@@ -142,12 +152,14 @@ public enum PlaceStreamLiveGetRecommendations {
             }
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case recommendations
             case userDID
         }
+
     }
 
     public enum OutputRecommendationsUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
@@ -175,20 +187,20 @@ public enum PlaceStreamLiveGetRecommendations {
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             switch self {
-            case let .placeStreamLiveGetRecommendationsLivestreamRecommendation(value):
+            case .placeStreamLiveGetRecommendationsLivestreamRecommendation(let value):
                 try container.encode("place.stream.live.getRecommendations#livestreamRecommendation", forKey: .type)
                 try value.encode(to: encoder)
-            case let .unexpected(container):
+            case .unexpected(let container):
                 try container.encode(to: encoder)
             }
         }
 
         public func hash(into hasher: inout Hasher) {
             switch self {
-            case let .placeStreamLiveGetRecommendationsLivestreamRecommendation(value):
+            case .placeStreamLiveGetRecommendationsLivestreamRecommendation(let value):
                 hasher.combine("place.stream.live.getRecommendations#livestreamRecommendation")
                 hasher.combine(value)
-            case let .unexpected(container):
+            case .unexpected(let container):
                 hasher.combine("unexpected")
                 hasher.combine(container)
             }
@@ -200,12 +212,10 @@ public enum PlaceStreamLiveGetRecommendations {
 
         public static func == (lhs: OutputRecommendationsUnion, rhs: OutputRecommendationsUnion) -> Bool {
             switch (lhs, rhs) {
-            case let (
-                .placeStreamLiveGetRecommendationsLivestreamRecommendation(lhsValue),
-                .placeStreamLiveGetRecommendationsLivestreamRecommendation(rhsValue)
-            ):
+            case (.placeStreamLiveGetRecommendationsLivestreamRecommendation(let lhsValue),
+                  .placeStreamLiveGetRecommendationsLivestreamRecommendation(let rhsValue)):
                 return lhsValue == rhsValue
-            case let (.unexpected(lhsValue), .unexpected(rhsValue)):
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
                 return lhsValue.isEqual(to: rhsValue)
             default:
                 return false
@@ -217,13 +227,13 @@ public enum PlaceStreamLiveGetRecommendations {
             return self == other
         }
 
-        /// DAGCBOR encoding with field ordering
+        // DAGCBOR encoding with field ordering
         public func toCBORValue() throws -> Any {
             // Create an ordered map to maintain field order
             var map = OrderedCBORMap()
 
             switch self {
-            case let .placeStreamLiveGetRecommendationsLivestreamRecommendation(value):
+            case .placeStreamLiveGetRecommendationsLivestreamRecommendation(let value):
                 map = map.adding(key: "$type", value: "place.stream.live.getRecommendations#livestreamRecommendation")
 
                 let valueDict = try value.toCBORValue()
@@ -240,7 +250,7 @@ public enum PlaceStreamLiveGetRecommendations {
                     }
                 }
                 return map
-            case let .unexpected(container):
+            case .unexpected(let container):
                 return try container.toCBORValue()
             }
         }
@@ -260,18 +270,18 @@ public enum PlaceStreamLiveGetRecommendations {
             return rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Place.Stream.Live {
+extension ATProtoClient.Place.Stream.Live {
     // MARK: - getRecommendations
-
     /// Get the list of streamers recommended by a user
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getRecommendations(input: PlaceStreamLiveGetRecommendations.Parameters) async throws -> (responseCode: Int, data: PlaceStreamLiveGetRecommendations.Output?) {
+    public func getRecommendations(input: PlaceStreamLiveGetRecommendations.Parameters) async throws -> (responseCode: Int, data: PlaceStreamLiveGetRecommendations.Output?) {
         let endpoint = "place.stream.live.getRecommendations"
 
         let queryItems = input.asQueryItems()
@@ -293,7 +303,8 @@ public extension ATProtoClient.Place.Stream.Live {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -313,6 +324,7 @@ public extension ATProtoClient.Place.Stream.Live {
                 return (responseCode, nil)
             }
         } else {
+
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)

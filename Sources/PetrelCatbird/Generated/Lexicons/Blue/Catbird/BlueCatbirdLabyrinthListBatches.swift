@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.listBatches
 
-public enum BlueCatbirdLabyrinthListBatches {
+public struct BlueCatbirdLabyrinthListBatches {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.listBatches"
 
     public struct AuthoredView: ATProtocolCodable, ATProtocolValue {
@@ -26,25 +27,25 @@ public enum BlueCatbirdLabyrinthListBatches {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                author = try container.decode(DID.self, forKey: .author)
+                self.author = try container.decode(DID.self, forKey: .author)
             } catch {
                 LogManager.logError("Decoding error for required property 'author': \(error)")
                 throw error
             }
             do {
-                rkey = try container.decode(String.self, forKey: .rkey)
+                self.rkey = try container.decode(String.self, forKey: .rkey)
             } catch {
                 LogManager.logError("Decoding error for required property 'rkey': \(error)")
                 throw error
             }
             do {
-                record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+                self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
             } catch {
                 LogManager.logError("Decoding error for required property 'record': \(error)")
                 throw error
             }
             do {
-                order = try container.decode(BlueCatbirdLabyrinthDefs.ServerOrder.self, forKey: .order)
+                self.order = try container.decode(BlueCatbirdLabyrinthDefs.ServerOrder.self, forKey: .order)
             } catch {
                 LogManager.logError("Decoding error for required property 'order': \(error)")
                 throw error
@@ -110,7 +111,6 @@ public enum BlueCatbirdLabyrinthListBatches {
             case order
         }
     }
-
     public struct Parameters: Parametrizable {
         public let threadId: String
         public let sender: DID?
@@ -142,50 +142,60 @@ public enum BlueCatbirdLabyrinthListBatches {
             self.reverse = reverse
             self.cursor = cursor
             self.limit = limit
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let items: [AuthoredView]
 
         public let cursor: String?
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             items: [AuthoredView],
 
             cursor: String? = nil
 
         ) {
+
             self.items = items
 
             self.cursor = cursor
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            items = try container.decode([AuthoredView].self, forKey: .items)
+            self.items = try container.decode([AuthoredView].self, forKey: .items)
 
             do {
-                cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
+                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
-                cursor = nil
+                self.cursor = nil
             }
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(items, forKey: .items)
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(cursor, forKey: .cursor)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let itemsValue = try items.toCBORValue()
@@ -198,36 +208,38 @@ public enum BlueCatbirdLabyrinthListBatches {
             }
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case items
             case cursor
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case notRecipient = "NotRecipient"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Labyrinth {
+extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - listBatches
-
     /// Batches holding a message in [fromMs, untilMs) by sender timestamp and received in [since, until) by the server clock, in server seq order (descending when reverse), filtered to those sealed under a MEK the caller wrote or received. Thread endpoint on the conversation's sequencer DS; threadId is the chat conversation id ([CB-2]). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func listBatches(input: BlueCatbirdLabyrinthListBatches.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthListBatches.Output?) {
+    public func listBatches(input: BlueCatbirdLabyrinthListBatches.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthListBatches.Output?) {
         let endpoint = "blue.catbird.labyrinth.listBatches"
 
         let queryItems = input.asQueryItems()
@@ -249,7 +261,8 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

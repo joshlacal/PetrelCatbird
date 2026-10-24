@@ -5,6 +5,7 @@ import Petrel
 // lexicon: 1, id: blue.catbird.labyrinth.mailboxKeys
 
 public struct BlueCatbirdLabyrinthMailboxKeys: ATProtocolCodable, ATProtocolValue {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.mailboxKeys"
     public let current: BlueCatbirdLabyrinthDefs.EpochPublic
     public let backend: String?
@@ -18,15 +19,15 @@ public struct BlueCatbirdLabyrinthMailboxKeys: ATProtocolCodable, ATProtocolValu
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        current = try container.decode(BlueCatbirdLabyrinthDefs.EpochPublic.self, forKey: .current)
+        self.current = try container.decode(BlueCatbirdLabyrinthDefs.EpochPublic.self, forKey: .current)
         do {
-            backend = try container.decodeIfPresent(String.self, forKey: .backend)
+            self.backend = try container.decodeIfPresent(String.self, forKey: .backend)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'backend' — degrading to nil: \(error)")
-            backend = nil
+            self.backend = nil
         }
-        updatedAt = try container.decode(ATProtocolDate.self, forKey: .updatedAt)
+        self.updatedAt = try container.decode(ATProtocolDate.self, forKey: .updatedAt)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -85,4 +86,5 @@ public struct BlueCatbirdLabyrinthMailboxKeys: ATProtocolCodable, ATProtocolValu
         case backend
         case updatedAt
     }
+
 }

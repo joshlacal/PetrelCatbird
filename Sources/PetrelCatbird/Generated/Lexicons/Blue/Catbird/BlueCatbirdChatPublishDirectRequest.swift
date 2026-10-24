@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.publishDirectRequest
 
-public enum BlueCatbirdChatPublishDirectRequest {
+public struct BlueCatbirdChatPublishDirectRequest {
+
     public static let typeIdentifier = "blue.catbird.chat.publishDirectRequest"
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedDirectRequestPublication
@@ -16,7 +17,7 @@ public enum BlueCatbirdChatPublishDirectRequest {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedDirectRequestPublication.self, forKey: .signedRequest)
+            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedDirectRequestPublication.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -37,40 +38,51 @@ public enum BlueCatbirdChatPublishDirectRequest {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let outcome: BlueCatbirdChatDefs.DirectRequestOutcome
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             outcome: BlueCatbirdChatDefs.DirectRequestOutcome
 
         ) {
+
             self.outcome = outcome
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            outcome = try container.decode(BlueCatbirdChatDefs.DirectRequestOutcome.self, forKey: .outcome)
+            self.outcome = try container.decode(BlueCatbirdChatDefs.DirectRequestOutcome.self, forKey: .outcome)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(outcome, forKey: .outcome)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let outcomeValue = try outcome.toCBORValue()
             map = map.adding(key: "outcome", value: outcomeValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case outcome
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -102,26 +114,27 @@ public enum BlueCatbirdChatPublishDirectRequest {
         case cutoverRequired = "CutoverRequired"
         case signedOperationExpired = "SignedOperationExpired"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - publishDirectRequest
-
-    // Wire protocol 2 encrypted direct requests. Standard service authentication plus canonical device signature. Unknown outcome is never proof of non-publication.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Wire protocol 2 encrypted direct requests. Standard service authentication plus canonical device signature. Unknown outcome is never proof of non-publication.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func publishDirectRequest(
+    public func publishDirectRequest(
+
         input: BlueCatbirdChatPublishDirectRequest.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatPublishDirectRequest.Output?) {
@@ -154,7 +167,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -164,6 +178,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatPublishDirectRequest.Output.self, from: responseData)
 
@@ -186,5 +201,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

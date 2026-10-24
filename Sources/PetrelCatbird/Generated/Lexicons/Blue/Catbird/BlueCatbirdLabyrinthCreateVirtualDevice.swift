@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.createVirtualDevice
 
-public enum BlueCatbirdLabyrinthCreateVirtualDevice {
+public struct BlueCatbirdLabyrinthCreateVirtualDevice {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.createVirtualDevice"
 
     public struct OrfParent: ATProtocolCodable, ATProtocolValue {
@@ -22,13 +23,13 @@ public enum BlueCatbirdLabyrinthCreateVirtualDevice {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
+                self.deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
             } catch {
                 LogManager.logError("Decoding error for required property 'deviceKeyPubkey': \(error)")
                 throw error
             }
             do {
-                evolveToken = try container.decode(Bytes.self, forKey: .evolveToken)
+                self.evolveToken = try container.decode(Bytes.self, forKey: .evolveToken)
             } catch {
                 LogManager.logError("Decoding error for required property 'evolveToken': \(error)")
                 throw error
@@ -78,7 +79,6 @@ public enum BlueCatbirdLabyrinthCreateVirtualDevice {
             case evolveToken
         }
     }
-
     public struct Input: ATProtocolCodable {
         public let record: ATProtocolValueContainer
         public let member: ATProtocolValueContainer?
@@ -93,9 +93,9 @@ public enum BlueCatbirdLabyrinthCreateVirtualDevice {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
-            member = try container.decodeIfPresent(ATProtocolValueContainer.self, forKey: .member)
-            orf = try container.decodeIfPresent(OrfParent.self, forKey: .orf)
+            self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+            self.member = try container.decodeIfPresent(ATProtocolValueContainer.self, forKey: .member)
+            self.orf = try container.decodeIfPresent(OrfParent.self, forKey: .orf)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -128,25 +128,37 @@ public enum BlueCatbirdLabyrinthCreateVirtualDevice {
     }
 
     public struct Output: ATProtocolCodable {
+
         // Empty output - no properties (response is {})
 
-        /// Standard public initializer
-        public init() {}
+        // Standard public initializer
+        public init(
+
+        ) {
+
+        }
 
         public init(from decoder: Decoder) throws {
+
             // Empty output - just validate it's an object by trying to get any container
             _ = try decoder.singleValueContainer()
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             // Empty output - encode empty object
             _ = encoder.singleValueContainer()
+
         }
 
         public func toCBORValue() throws -> Any {
+
             // Empty output - return empty CBOR map
             return OrderedCBORMap()
+
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -154,26 +166,27 @@ public enum BlueCatbirdLabyrinthCreateVirtualDevice {
         case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
         case memberDeviceNotRegistered = "MemberDeviceNotRegistered"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Labyrinth {
+extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - createVirtualDevice
-
-    // Store a recovery bundle. member and orf are optional: when present they are written in the same transaction (the epoch membership, and the bundle's ORF state evolved from the parent). Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Store a recovery bundle. member and orf are optional: when present they are written in the same transaction (the epoch membership, and the bundle's ORF state evolved from the parent). Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func createVirtualDevice(
+    public func createVirtualDevice(
+
         input: BlueCatbirdLabyrinthCreateVirtualDevice.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthCreateVirtualDevice.Output?) {
@@ -206,7 +219,8 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -216,6 +230,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdLabyrinthCreateVirtualDevice.Output.self, from: responseData)
 
@@ -238,5 +253,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

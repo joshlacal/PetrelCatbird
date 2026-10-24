@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: place.stream.branding.deleteBlob
 
-public enum PlaceStreamBrandingDeleteBlob {
+public struct PlaceStreamBrandingDeleteBlob {
+
     public static let typeIdentifier = "place.stream.branding.deleteBlob"
     public struct Input: ATProtocolCodable {
         public let key: String
@@ -18,8 +19,8 @@ public enum PlaceStreamBrandingDeleteBlob {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            key = try container.decode(String.self, forKey: .key)
-            broadcaster = try container.decodeIfPresent(DID.self, forKey: .broadcaster)
+            self.key = try container.decode(String.self, forKey: .key)
+            self.broadcaster = try container.decodeIfPresent(DID.self, forKey: .broadcaster)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -46,40 +47,51 @@ public enum PlaceStreamBrandingDeleteBlob {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let success: Bool
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             success: Bool
 
         ) {
+
             self.success = success
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            success = try container.decode(Bool.self, forKey: .success)
+            self.success = try container.decode(Bool.self, forKey: .success)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(success, forKey: .success)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let successValue = try success.toCBORValue()
             map = map.adding(key: "success", value: successValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case success
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -88,26 +100,27 @@ public enum PlaceStreamBrandingDeleteBlob {
         /// The requested branding asset does not exist
         case brandingNotFound = "BrandingNotFound"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Place.Stream.Branding {
+extension ATProtoClient.Place.Stream.Branding {
     // MARK: - deleteBlob
-
-    // Delete a branding asset blob. Requires admin authorization.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Delete a branding asset blob. Requires admin authorization.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func deleteBlob(
+    public func deleteBlob(
+
         input: PlaceStreamBrandingDeleteBlob.Input
 
     ) async throws -> (responseCode: Int, data: PlaceStreamBrandingDeleteBlob.Output?) {
@@ -140,7 +153,8 @@ public extension ATProtoClient.Place.Stream.Branding {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -150,6 +164,7 @@ public extension ATProtoClient.Place.Stream.Branding {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(PlaceStreamBrandingDeleteBlob.Output.self, from: responseData)
 
@@ -172,5 +187,7 @@ public extension ATProtoClient.Place.Stream.Branding {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.getConversationState
 
-public enum BlueCatbirdChatGetConversationState {
+public struct BlueCatbirdChatGetConversationState {
+
     public static let typeIdentifier = "blue.catbird.chat.getConversationState"
     public struct Parameters: Parametrizable {
         public let actorDeviceId: String
@@ -16,10 +17,12 @@ public enum BlueCatbirdChatGetConversationState {
         ) {
             self.actorDeviceId = actorDeviceId
             self.conversationId = conversationId
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let state: BlueCatbirdChatDefs.ConversationState
 
         public let pendingResetRequests: [BlueCatbirdChatDefs.ResetRequestView]
@@ -28,8 +31,9 @@ public enum BlueCatbirdChatGetConversationState {
 
         public let pendingLeafRecoveryRequests: [BlueCatbirdChatDefs.LeafRecoveryView]?
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             state: BlueCatbirdChatDefs.ConversationState,
 
             pendingResetRequests: [BlueCatbirdChatDefs.ResetRequestView],
@@ -39,6 +43,7 @@ public enum BlueCatbirdChatGetConversationState {
             pendingLeafRecoveryRequests: [BlueCatbirdChatDefs.LeafRecoveryView]? = nil
 
         ) {
+
             self.state = state
 
             self.pendingResetRequests = pendingResetRequests
@@ -46,27 +51,31 @@ public enum BlueCatbirdChatGetConversationState {
             self.pendingLeaveRequests = pendingLeaveRequests
 
             self.pendingLeafRecoveryRequests = pendingLeafRecoveryRequests
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            state = try container.decode(BlueCatbirdChatDefs.ConversationState.self, forKey: .state)
+            self.state = try container.decode(BlueCatbirdChatDefs.ConversationState.self, forKey: .state)
 
-            pendingResetRequests = try container.decode([BlueCatbirdChatDefs.ResetRequestView].self, forKey: .pendingResetRequests)
+            self.pendingResetRequests = try container.decode([BlueCatbirdChatDefs.ResetRequestView].self, forKey: .pendingResetRequests)
 
-            pendingLeaveRequests = try container.decode([BlueCatbirdChatDefs.LeaveRequestView].self, forKey: .pendingLeaveRequests)
+            self.pendingLeaveRequests = try container.decode([BlueCatbirdChatDefs.LeaveRequestView].self, forKey: .pendingLeaveRequests)
 
             do {
-                pendingLeafRecoveryRequests = try container.decodeIfPresent([BlueCatbirdChatDefs.LeafRecoveryView].self, forKey: .pendingLeafRecoveryRequests)
+                self.pendingLeafRecoveryRequests = try container.decodeIfPresent([BlueCatbirdChatDefs.LeafRecoveryView].self, forKey: .pendingLeafRecoveryRequests)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'pendingLeafRecoveryRequests' — degrading to nil: \(error)")
-                pendingLeafRecoveryRequests = nil
+                self.pendingLeafRecoveryRequests = nil
             }
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(state, forKey: .state)
@@ -77,9 +86,11 @@ public enum BlueCatbirdChatGetConversationState {
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(pendingLeafRecoveryRequests, forKey: .pendingLeafRecoveryRequests)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let stateValue = try state.toCBORValue()
@@ -98,6 +109,7 @@ public enum BlueCatbirdChatGetConversationState {
             }
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -106,6 +118,7 @@ public enum BlueCatbirdChatGetConversationState {
             case pendingLeaveRequests
             case pendingLeafRecoveryRequests
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -122,25 +135,25 @@ public enum BlueCatbirdChatGetConversationState {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - getConversationState
-
     /// Returns public state and visible pending reset/leave/recovery work under separate control-plane entitlement. state.snapshotSeq is the greatest committed conversation seq included in this transactionally observed state; it is not a getEntries afterSeq or an application-visibility grant. A logical participant with zero leaves may receive bounded inventory/reset/recovery/leave visibility needed to join or leave, but roster status and sibling-device membership grant no application ciphertext. A former concrete device leaf is bounded by its own inclusive terminalSeq and cannot inherit another device's interval.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getConversationState(input: BlueCatbirdChatGetConversationState.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetConversationState.Output?) {
+    public func getConversationState(input: BlueCatbirdChatGetConversationState.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetConversationState.Output?) {
         let endpoint = "blue.catbird.chat.getConversationState"
 
         let queryItems = input.asQueryItems()
@@ -162,7 +175,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

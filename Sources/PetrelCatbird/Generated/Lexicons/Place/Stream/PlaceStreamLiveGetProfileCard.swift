@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: place.stream.live.getProfileCard
 
-public enum PlaceStreamLiveGetProfileCard {
+public struct PlaceStreamLiveGetProfileCard {
+
     public static let typeIdentifier = "place.stream.live.getProfileCard"
     public struct Parameters: Parametrizable {
         public let id: String
@@ -13,68 +14,80 @@ public enum PlaceStreamLiveGetProfileCard {
             id: String
         ) {
             self.id = id
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let data: Data
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             data: Data
 
         ) {
+
             self.data = data
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            data = try container.decode(Data.self, forKey: .data)
+            self.data = try container.decode(Data.self, forKey: .data)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(data, forKey: .data)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let dataValue = try data.toCBORValue()
             map = map.adding(key: "data", value: dataValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case data
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case repoNotFound = "RepoNotFound"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Place.Stream.Live {
+extension ATProtoClient.Place.Stream.Live {
     // MARK: - getProfileCard
-
     /// Get an OG image associated with a given account.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getProfileCard(input: PlaceStreamLiveGetProfileCard.Parameters) async throws -> (responseCode: Int, data: PlaceStreamLiveGetProfileCard.Output?) {
+    public func getProfileCard(input: PlaceStreamLiveGetProfileCard.Parameters) async throws -> (responseCode: Int, data: PlaceStreamLiveGetProfileCard.Output?) {
         let endpoint = "place.stream.live.getProfileCard"
 
         let queryItems = input.asQueryItems()
@@ -96,7 +109,8 @@ public extension ATProtoClient.Place.Stream.Live {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             // Wildcard encoding ("*/*") — accept any Content-Type, including a missing one.
 
             let decodedData = PlaceStreamLiveGetProfileCard.Output(data: responseData)

@@ -5,6 +5,7 @@ import Petrel
 // lexicon: 1, id: place.stream.metadata.contentWarnings
 
 public struct PlaceStreamMetadataContentWarnings: ATProtocolCodable, ATProtocolValue {
+
     public static let typeIdentifier = "place.stream.metadata.contentWarnings"
     public let warnings: [String]?
 
@@ -14,7 +15,7 @@ public struct PlaceStreamMetadataContentWarnings: ATProtocolCodable, ATProtocolV
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        warnings = try container.decodeIfPresent([String].self, forKey: .warnings)
+        self.warnings = try container.decodeIfPresent([String].self, forKey: .warnings)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -54,4 +55,5 @@ public struct PlaceStreamMetadataContentWarnings: ATProtocolCodable, ATProtocolV
     private enum CodingKeys: String, CodingKey {
         case warnings
     }
+
 }

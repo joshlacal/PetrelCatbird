@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.acceptConversation
 
-public enum BlueCatbirdChatAcceptConversation {
+public struct BlueCatbirdChatAcceptConversation {
+
     public static let typeIdentifier = "blue.catbird.chat.acceptConversation"
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedParticipantAcceptance?
@@ -18,8 +19,8 @@ public enum BlueCatbirdChatAcceptConversation {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            signedRequest = try container.decodeIfPresent(BlueCatbirdChatDefs.SignedParticipantAcceptance.self, forKey: .signedRequest)
-            directRequest = try container.decodeIfPresent(BlueCatbirdChatDefs.SignedDirectRequestAcceptance.self, forKey: .directRequest)
+            self.signedRequest = try container.decodeIfPresent(BlueCatbirdChatDefs.SignedParticipantAcceptance.self, forKey: .signedRequest)
+            self.directRequest = try container.decodeIfPresent(BlueCatbirdChatDefs.SignedDirectRequestAcceptance.self, forKey: .directRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -48,6 +49,7 @@ public enum BlueCatbirdChatAcceptConversation {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let coordinates: BlueCatbirdChatDefs.ConversationCoordinates
 
         public let entry: BlueCatbirdChatDefs.ParticipantAcceptanceEntry?
@@ -56,8 +58,9 @@ public enum BlueCatbirdChatAcceptConversation {
 
         public let acceptanceProof: BlueCatbirdChatDefs.DirectRequestAcceptanceProof?
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             coordinates: BlueCatbirdChatDefs.ConversationCoordinates,
 
             entry: BlueCatbirdChatDefs.ParticipantAcceptanceEntry? = nil,
@@ -67,6 +70,7 @@ public enum BlueCatbirdChatAcceptConversation {
             acceptanceProof: BlueCatbirdChatDefs.DirectRequestAcceptanceProof? = nil
 
         ) {
+
             self.coordinates = coordinates
 
             self.entry = entry
@@ -74,39 +78,43 @@ public enum BlueCatbirdChatAcceptConversation {
             self.recovery = recovery
 
             self.acceptanceProof = acceptanceProof
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            coordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .coordinates)
+            self.coordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .coordinates)
 
             do {
-                entry = try container.decodeIfPresent(BlueCatbirdChatDefs.ParticipantAcceptanceEntry.self, forKey: .entry)
+                self.entry = try container.decodeIfPresent(BlueCatbirdChatDefs.ParticipantAcceptanceEntry.self, forKey: .entry)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'entry' — degrading to nil: \(error)")
-                entry = nil
+                self.entry = nil
             }
 
             do {
-                recovery = try container.decodeIfPresent(BlueCatbirdChatDefs.LeafRecoveryView.self, forKey: .recovery)
+                self.recovery = try container.decodeIfPresent(BlueCatbirdChatDefs.LeafRecoveryView.self, forKey: .recovery)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'recovery' — degrading to nil: \(error)")
-                recovery = nil
+                self.recovery = nil
             }
 
             do {
-                acceptanceProof = try container.decodeIfPresent(BlueCatbirdChatDefs.DirectRequestAcceptanceProof.self, forKey: .acceptanceProof)
+                self.acceptanceProof = try container.decodeIfPresent(BlueCatbirdChatDefs.DirectRequestAcceptanceProof.self, forKey: .acceptanceProof)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'acceptanceProof' — degrading to nil: \(error)")
-                acceptanceProof = nil
+                self.acceptanceProof = nil
             }
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(coordinates, forKey: .coordinates)
@@ -119,9 +127,11 @@ public enum BlueCatbirdChatAcceptConversation {
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(acceptanceProof, forKey: .acceptanceProof)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let coordinatesValue = try coordinates.toCBORValue()
@@ -146,6 +156,7 @@ public enum BlueCatbirdChatAcceptConversation {
             }
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -154,6 +165,7 @@ public enum BlueCatbirdChatAcceptConversation {
             case recovery
             case acceptanceProof
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -184,26 +196,27 @@ public enum BlueCatbirdChatAcceptConversation {
         /// The bounded encrypted request lifecycle reserve cannot accommodate this operation. No first-execution effects are committed; retry the same signed operation after capacity is available.
         case capacityUnavailable = "CapacityUnavailable"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - acceptConversation
-
-    // Accepts one exact pending invitation from the target participant's active registered device. Under the conversation mutation lock it verifies immutable invitation provenance, consent and every-pair block policy, changes only pending to active at prior stateVersion plus one, and atomically creates one add-kind target-device-signed recovery request with a request-bound KeyPackage reservation. A different current leaf later fulfills the one-device Add Commit and Welcome. Wire protocol 2 directRequestAcceptance is policy-only and never reserves or adds a leaf; accepted devices recover separately. Version 1 keeps its mandatory recovery semantics.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Accepts one exact pending invitation from the target participant's active registered device. Under the conversation mutation lock it verifies immutable invitation provenance, consent and every-pair block policy, changes only pending to active at prior stateVersion plus one, and atomically creates one add-kind target-device-signed recovery request with a request-bound KeyPackage reservation. A different current leaf later fulfills the one-device Add Commit and Welcome. Wire protocol 2 directRequestAcceptance is policy-only and never reserves or adds a leaf; accepted devices recover separately. Version 1 keeps its mandatory recovery semantics.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func acceptConversation(
+    public func acceptConversation(
+
         input: BlueCatbirdChatAcceptConversation.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatAcceptConversation.Output?) {
@@ -236,7 +249,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -246,6 +260,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatAcceptConversation.Output.self, from: responseData)
 
@@ -268,5 +283,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

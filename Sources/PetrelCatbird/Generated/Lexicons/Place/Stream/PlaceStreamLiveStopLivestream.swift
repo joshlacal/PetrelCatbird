@@ -4,11 +4,14 @@ import Petrel
 
 // lexicon: 1, id: place.stream.live.stopLivestream
 
-public enum PlaceStreamLiveStopLivestream {
+public struct PlaceStreamLiveStopLivestream {
+
     public static let typeIdentifier = "place.stream.live.stopLivestream"
     public struct Input: ATProtocolCodable {
+
         /// Standard public initializer
-        public init() {}
+        public init() {
+        }
 
         public func toCBORValue() throws -> Any {
             return OrderedCBORMap()
@@ -16,39 +19,48 @@ public enum PlaceStreamLiveStopLivestream {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let uri: URI
 
         public let cid: CID
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             uri: URI,
 
             cid: CID
 
         ) {
+
             self.uri = uri
 
             self.cid = cid
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            uri = try container.decode(URI.self, forKey: .uri)
+            self.uri = try container.decode(URI.self, forKey: .uri)
 
-            cid = try container.decode(CID.self, forKey: .cid)
+            self.cid = try container.decode(CID.self, forKey: .cid)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(uri, forKey: .uri)
 
             try container.encode(cid, forKey: .cid)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let uriValue = try uri.toCBORValue()
@@ -58,26 +70,29 @@ public enum PlaceStreamLiveStopLivestream {
             map = map.adding(key: "cid", value: cidValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case uri
             case cid
         }
+
     }
+
 }
 
-public extension ATProtoClient.Place.Stream.Live {
+extension ATProtoClient.Place.Stream.Live {
     // MARK: - stopLivestream
-
-    // Stop your current livestream, updating your current place.stream.livestream record and ceasing the flow of video.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Stop your current livestream, updating your current place.stream.livestream record and ceasing the flow of video.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func stopLivestream(
+    public func stopLivestream(
+
         input: PlaceStreamLiveStopLivestream.Input
 
     ) async throws -> (responseCode: Int, data: PlaceStreamLiveStopLivestream.Output?) {
@@ -110,7 +125,8 @@ public extension ATProtoClient.Place.Stream.Live {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -120,6 +136,7 @@ public extension ATProtoClient.Place.Stream.Live {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(PlaceStreamLiveStopLivestream.Output.self, from: responseData)
 
@@ -130,8 +147,11 @@ public extension ATProtoClient.Place.Stream.Live {
                 return (responseCode, nil)
             }
         } else {
+
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

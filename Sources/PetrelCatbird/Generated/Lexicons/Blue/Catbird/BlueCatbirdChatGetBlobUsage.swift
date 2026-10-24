@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.getBlobUsage
 
-public enum BlueCatbirdChatGetBlobUsage {
+public struct BlueCatbirdChatGetBlobUsage {
+
     public static let typeIdentifier = "blue.catbird.chat.getBlobUsage"
     public struct Parameters: Parametrizable {
         public let actorDeviceId: String
@@ -13,44 +14,56 @@ public enum BlueCatbirdChatGetBlobUsage {
             actorDeviceId: String
         ) {
             self.actorDeviceId = actorDeviceId
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let usage: BlueCatbirdChatDefs.BlobUsageView
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             usage: BlueCatbirdChatDefs.BlobUsageView
 
         ) {
+
             self.usage = usage
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            usage = try container.decode(BlueCatbirdChatDefs.BlobUsageView.self, forKey: .usage)
+            self.usage = try container.decode(BlueCatbirdChatDefs.BlobUsageView.self, forKey: .usage)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(usage, forKey: .usage)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let usageValue = try usage.toCBORValue()
             map = map.adding(key: "usage", value: usageValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case usage
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -64,25 +77,25 @@ public enum BlueCatbirdChatGetBlobUsage {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - getBlobUsage
-
     /// Return auth-derived aggregate opaque-blob usage and reserved quota for the verified bare DID; no caller-selected principal is accepted.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getBlobUsage(input: BlueCatbirdChatGetBlobUsage.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetBlobUsage.Output?) {
+    public func getBlobUsage(input: BlueCatbirdChatGetBlobUsage.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetBlobUsage.Output?) {
         let endpoint = "blue.catbird.chat.getBlobUsage"
 
         let queryItems = input.asQueryItems()
@@ -104,7 +117,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

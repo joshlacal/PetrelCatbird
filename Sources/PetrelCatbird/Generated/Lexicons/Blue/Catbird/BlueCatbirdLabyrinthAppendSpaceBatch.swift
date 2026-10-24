@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.appendSpaceBatch
 
-public enum BlueCatbirdLabyrinthAppendSpaceBatch {
+public struct BlueCatbirdLabyrinthAppendSpaceBatch {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.appendSpaceBatch"
     public struct Input: ATProtocolCodable {
         public let record: BlueCatbirdLabyrinthBatch
@@ -24,11 +25,11 @@ public enum BlueCatbirdLabyrinthAppendSpaceBatch {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            record = try container.decode(BlueCatbirdLabyrinthBatch.self, forKey: .record)
-            generation = try container.decode(String.self, forKey: .generation)
-            space = try container.decode(SpaceRef.self, forKey: .space)
-            rkey = try container.decode(RecordKey.self, forKey: .rkey)
-            cid = try container.decode(CID.self, forKey: .cid)
+            self.record = try container.decode(BlueCatbirdLabyrinthBatch.self, forKey: .record)
+            self.generation = try container.decode(String.self, forKey: .generation)
+            self.space = try container.decode(SpaceRef.self, forKey: .space)
+            self.rkey = try container.decode(RecordKey.self, forKey: .rkey)
+            self.cid = try container.decode(CID.self, forKey: .cid)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -65,39 +66,48 @@ public enum BlueCatbirdLabyrinthAppendSpaceBatch {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let rkey: RecordKey
 
         public let order: BlueCatbirdLabyrinthDefs.ServerOrder
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             rkey: RecordKey,
 
             order: BlueCatbirdLabyrinthDefs.ServerOrder
 
         ) {
+
             self.rkey = rkey
 
             self.order = order
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            rkey = try container.decode(RecordKey.self, forKey: .rkey)
+            self.rkey = try container.decode(RecordKey.self, forKey: .rkey)
 
-            order = try container.decode(BlueCatbirdLabyrinthDefs.ServerOrder.self, forKey: .order)
+            self.order = try container.decode(BlueCatbirdLabyrinthDefs.ServerOrder.self, forKey: .order)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(rkey, forKey: .rkey)
 
             try container.encode(order, forKey: .order)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let rkeyValue = try rkey.toCBORValue()
@@ -107,12 +117,14 @@ public enum BlueCatbirdLabyrinthAppendSpaceBatch {
             map = map.adding(key: "order", value: orderValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case rkey
             case order
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -125,26 +137,27 @@ public enum BlueCatbirdLabyrinthAppendSpaceBatch {
         case storageNotConfigured = "StorageNotConfigured"
         case spaceDeleted = "SpaceDeleted"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Labyrinth {
+extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - appendSpaceBatch
-
-    // Validate a sender batch under the current device and membership locks, then store only its immutable Space record reference and server ordering. The source record CID, conversation and storage generation must match before stamping. The DS does not retain the sender ciphertext.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Validate a sender batch under the current device and membership locks, then store only its immutable Space record reference and server ordering. The source record CID, conversation and storage generation must match before stamping. The DS does not retain the sender ciphertext.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func appendSpaceBatch(
+    public func appendSpaceBatch(
+
         input: BlueCatbirdLabyrinthAppendSpaceBatch.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthAppendSpaceBatch.Output?) {
@@ -177,7 +190,8 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -187,6 +201,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdLabyrinthAppendSpaceBatch.Output.self, from: responseData)
 
@@ -209,5 +224,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

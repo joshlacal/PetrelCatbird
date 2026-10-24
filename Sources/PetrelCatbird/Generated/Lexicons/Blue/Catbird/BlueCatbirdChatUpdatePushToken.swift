@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.updatePushToken
 
-public enum BlueCatbirdChatUpdatePushToken {
+public struct BlueCatbirdChatUpdatePushToken {
+
     public static let typeIdentifier = "blue.catbird.chat.updatePushToken"
     public struct Input: ATProtocolCodable {
         public let token: String?
@@ -18,8 +19,8 @@ public enum BlueCatbirdChatUpdatePushToken {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            token = try container.decodeIfPresent(String.self, forKey: .token)
-            registration = try container.decodeIfPresent(BlueCatbirdChatDefs.SignedPushRegistration.self, forKey: .registration)
+            self.token = try container.decodeIfPresent(String.self, forKey: .token)
+            self.registration = try container.decodeIfPresent(BlueCatbirdChatDefs.SignedPushRegistration.self, forKey: .registration)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -48,46 +49,55 @@ public enum BlueCatbirdChatUpdatePushToken {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let device: BlueCatbirdChatDefs.DeviceView
 
         public let pushBinding: BlueCatbirdChatDefs.PushRegistrationBinding?
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             device: BlueCatbirdChatDefs.DeviceView,
 
             pushBinding: BlueCatbirdChatDefs.PushRegistrationBinding? = nil
 
         ) {
+
             self.device = device
 
             self.pushBinding = pushBinding
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            device = try container.decode(BlueCatbirdChatDefs.DeviceView.self, forKey: .device)
+            self.device = try container.decode(BlueCatbirdChatDefs.DeviceView.self, forKey: .device)
 
             do {
-                pushBinding = try container.decodeIfPresent(BlueCatbirdChatDefs.PushRegistrationBinding.self, forKey: .pushBinding)
+                self.pushBinding = try container.decodeIfPresent(BlueCatbirdChatDefs.PushRegistrationBinding.self, forKey: .pushBinding)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'pushBinding' — degrading to nil: \(error)")
-                pushBinding = nil
+                self.pushBinding = nil
             }
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(device, forKey: .device)
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(pushBinding, forKey: .pushBinding)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let deviceValue = try device.toCBORValue()
@@ -100,12 +110,14 @@ public enum BlueCatbirdChatUpdatePushToken {
             }
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case device
             case pushBinding
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -122,26 +134,27 @@ public enum BlueCatbirdChatUpdatePushToken {
         case registrationConflict = "RegistrationConflict"
         case capacityUnavailable = "CapacityUnavailable"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - updatePushToken
-
-    // Register, rotate or disable a canonical device-signed APNs/FCM push binding. Unsigned token-only input retains legacy registration behavior and never enables encrypted-request notification delivery.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Register, rotate or disable a canonical device-signed APNs/FCM push binding. Unsigned token-only input retains legacy registration behavior and never enables encrypted-request notification delivery.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func updatePushToken(
+    public func updatePushToken(
+
         input: BlueCatbirdChatUpdatePushToken.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatUpdatePushToken.Output?) {
@@ -174,7 +187,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -184,6 +198,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatUpdatePushToken.Output.self, from: responseData)
 
@@ -206,5 +221,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.deleteOrfState
 
-public enum BlueCatbirdLabyrinthDeleteOrfState {
+public struct BlueCatbirdLabyrinthDeleteOrfState {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.deleteOrfState"
     public struct Input: ATProtocolCodable {
         public let deviceKeyPubkey: Bytes
@@ -16,7 +17,7 @@ public enum BlueCatbirdLabyrinthDeleteOrfState {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
+            self.deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -37,50 +38,63 @@ public enum BlueCatbirdLabyrinthDeleteOrfState {
     }
 
     public struct Output: ATProtocolCodable {
+
         // Empty output - no properties (response is {})
 
-        /// Standard public initializer
-        public init() {}
+        // Standard public initializer
+        public init(
+
+        ) {
+
+        }
 
         public init(from decoder: Decoder) throws {
+
             // Empty output - just validate it's an object by trying to get any container
             _ = try decoder.singleValueContainer()
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             // Empty output - encode empty object
             _ = encoder.singleValueContainer()
+
         }
 
         public func toCBORValue() throws -> Any {
+
             // Empty output - return empty CBOR map
             return OrderedCBORMap()
+
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Labyrinth {
+extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - deleteOrfState
-
-    // Delete a device's ORF server state (revocation, SPEC 5.6). Idempotent. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Requires a bound Labyrinth device (a current, non-virtual device registered by the calling chat device). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Delete a device's ORF server state (revocation, SPEC 5.6). Idempotent. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Requires a bound Labyrinth device (a current, non-virtual device registered by the calling chat device). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func deleteOrfState(
+    public func deleteOrfState(
+
         input: BlueCatbirdLabyrinthDeleteOrfState.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthDeleteOrfState.Output?) {
@@ -113,7 +127,8 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -123,6 +138,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdLabyrinthDeleteOrfState.Output.self, from: responseData)
 
@@ -145,5 +161,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

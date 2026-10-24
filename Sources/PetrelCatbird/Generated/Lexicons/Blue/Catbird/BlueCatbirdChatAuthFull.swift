@@ -4,6 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.authFull
 
-public enum BlueCatbirdChatAuthFull {
+public struct BlueCatbirdChatAuthFull {
+
     public static let typeIdentifier = "blue.catbird.chat.authFull"
+
 }

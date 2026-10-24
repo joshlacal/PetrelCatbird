@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.prepareBlobUpload
 
-public enum BlueCatbirdChatPrepareBlobUpload {
+public struct BlueCatbirdChatPrepareBlobUpload {
+
     public static let typeIdentifier = "blue.catbird.chat.prepareBlobUpload"
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedBlobUploadPreparation
@@ -16,7 +17,7 @@ public enum BlueCatbirdChatPrepareBlobUpload {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedBlobUploadPreparation.self, forKey: .signedRequest)
+            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedBlobUploadPreparation.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -37,40 +38,51 @@ public enum BlueCatbirdChatPrepareBlobUpload {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let upload: BlueCatbirdChatDefs.BlobUploadView
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             upload: BlueCatbirdChatDefs.BlobUploadView
 
         ) {
+
             self.upload = upload
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            upload = try container.decode(BlueCatbirdChatDefs.BlobUploadView.self, forKey: .upload)
+            self.upload = try container.decode(BlueCatbirdChatDefs.BlobUploadView.self, forKey: .upload)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(upload, forKey: .upload)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let uploadValue = try upload.toCBORValue()
             map = map.adding(key: "upload", value: uploadValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case upload
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -92,26 +104,27 @@ public enum BlueCatbirdChatPrepareBlobUpload {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Chat {
+extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - prepareBlobUpload
-
-    // Reserve opaque blob quota for the signing DID/device and return one bounded one-time upload ticket. The signed projection binds blob UUID, exact active coordinate, ciphertext SHA-256/size/purpose, owner, and idempotency. After upload the blob is completed and unbound; it may be bound only by that same owner device under exact descriptor/hash/size/purpose equality. Unbound uploads expire and release quota.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Reserve opaque blob quota for the signing DID/device and return one bounded one-time upload ticket. The signed projection binds blob UUID, exact active coordinate, ciphertext SHA-256/size/purpose, owner, and idempotency. After upload the blob is completed and unbound; it may be bound only by that same owner device under exact descriptor/hash/size/purpose equality. Unbound uploads expire and release quota.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func prepareBlobUpload(
+    public func prepareBlobUpload(
+
         input: BlueCatbirdChatPrepareBlobUpload.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatPrepareBlobUpload.Output?) {
@@ -144,7 +157,8 @@ public extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -154,6 +168,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatPrepareBlobUpload.Output.self, from: responseData)
 
@@ -176,5 +191,7 @@ public extension ATProtoClient.Blue.Catbird.Chat {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

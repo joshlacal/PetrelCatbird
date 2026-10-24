@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.circle.defs
 
-public enum BlueCatbirdCircleDefs {
+public struct BlueCatbirdCircleDefs {
+
     public static let typeIdentifier = "blue.catbird.circle.defs"
 
     public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
@@ -30,44 +31,44 @@ public enum BlueCatbirdCircleDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                uri = try container.decode(SpaceRef.self, forKey: .uri)
+                self.uri = try container.decode(SpaceRef.self, forKey: .uri)
             } catch {
                 LogManager.logError("Decoding error for required property 'uri': \(error)")
                 throw error
             }
             do {
-                circleId = try container.decode(TID.self, forKey: .circleId)
+                self.circleId = try container.decode(TID.self, forKey: .circleId)
             } catch {
                 LogManager.logError("Decoding error for required property 'circleId': \(error)")
                 throw error
             }
             do {
-                name = try container.decode(String.self, forKey: .name)
+                self.name = try container.decode(String.self, forKey: .name)
             } catch {
                 LogManager.logError("Decoding error for required property 'name': \(error)")
                 throw error
             }
             do {
-                owner = try container.decode(DID.self, forKey: .owner)
+                self.owner = try container.decode(DID.self, forKey: .owner)
             } catch {
                 LogManager.logError("Decoding error for required property 'owner': \(error)")
                 throw error
             }
             do {
-                memberCount = try container.decodeIfPresent(Int.self, forKey: .memberCount)
+                self.memberCount = try container.decodeIfPresent(Int.self, forKey: .memberCount)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'memberCount' — degrading to nil: \(error)")
-                memberCount = nil
+                self.memberCount = nil
             }
             do {
-                muted = try container.decodeIfPresent(Bool.self, forKey: .muted)
+                self.muted = try container.decodeIfPresent(Bool.self, forKey: .muted)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'muted' — degrading to nil: \(error)")
-                muted = nil
+                self.muted = nil
             }
         }
 
@@ -174,13 +175,13 @@ public enum BlueCatbirdCircleDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                post = try container.decode(AppBskyFeedDefs.FeedViewPost.self, forKey: .post)
+                self.post = try container.decode(AppBskyFeedDefs.FeedViewPost.self, forKey: .post)
             } catch {
                 LogManager.logError("Decoding error for required property 'post': \(error)")
                 throw error
             }
             do {
-                circle = try container.decode(CircleSummary.self, forKey: .circle)
+                self.circle = try container.decode(CircleSummary.self, forKey: .circle)
             } catch {
                 LogManager.logError("Decoding error for required property 'circle': \(error)")
                 throw error
@@ -254,39 +255,39 @@ public enum BlueCatbirdCircleDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                id = try container.decode(String.self, forKey: .id)
+                self.id = try container.decode(String.self, forKey: .id)
             } catch {
                 LogManager.logError("Decoding error for required property 'id': \(error)")
                 throw error
             }
             do {
-                reason = try container.decode(NotificationReason.self, forKey: .reason)
+                self.reason = try container.decode(NotificationReason.self, forKey: .reason)
             } catch {
                 LogManager.logError("Decoding error for required property 'reason': \(error)")
                 throw error
             }
             do {
-                actor = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .actor)
+                self.actor = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .actor)
             } catch {
                 LogManager.logError("Decoding error for required property 'actor': \(error)")
                 throw error
             }
             do {
-                subject = try container.decodeIfPresent(ATProtocolURI.self, forKey: .subject)
+                self.subject = try container.decodeIfPresent(ATProtocolURI.self, forKey: .subject)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'subject' — degrading to nil: \(error)")
-                subject = nil
+                self.subject = nil
             }
             do {
-                indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
+                self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'indexedAt': \(error)")
                 throw error
             }
             do {
-                circle = try container.decode(CircleSummary.self, forKey: .circle)
+                self.circle = try container.decode(CircleSummary.self, forKey: .circle)
             } catch {
                 LogManager.logError("Decoding error for required property 'circle': \(error)")
                 throw error
@@ -389,4 +390,5 @@ public enum BlueCatbirdCircleDefs {
             return rawValue
         }
     }
+
 }

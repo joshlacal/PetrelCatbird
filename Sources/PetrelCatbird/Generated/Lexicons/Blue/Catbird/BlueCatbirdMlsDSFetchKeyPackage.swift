@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.mlsDS.fetchKeyPackage
 
-public enum BlueCatbirdMlsDSFetchKeyPackage {
+public struct BlueCatbirdMlsDSFetchKeyPackage {
+
     public static let typeIdentifier = "blue.catbird.mlsDS.fetchKeyPackage"
     public struct Parameters: Parametrizable {
         public let recipientDid: String
@@ -16,43 +17,53 @@ public enum BlueCatbirdMlsDSFetchKeyPackage {
         ) {
             self.recipientDid = recipientDid
             self.convoId = convoId
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let keyPackage: Bytes
 
         public let keyPackageHash: String
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             keyPackage: Bytes,
 
             keyPackageHash: String
 
         ) {
+
             self.keyPackage = keyPackage
 
             self.keyPackageHash = keyPackageHash
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            keyPackage = try container.decode(Bytes.self, forKey: .keyPackage)
+            self.keyPackage = try container.decode(Bytes.self, forKey: .keyPackage)
 
-            keyPackageHash = try container.decode(String.self, forKey: .keyPackageHash)
+            self.keyPackageHash = try container.decode(String.self, forKey: .keyPackageHash)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(keyPackage, forKey: .keyPackage)
 
             try container.encode(keyPackageHash, forKey: .keyPackageHash)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let keyPackageValue = try keyPackage.toCBORValue()
@@ -62,12 +73,14 @@ public enum BlueCatbirdMlsDSFetchKeyPackage {
             map = map.adding(key: "keyPackageHash", value: keyPackageHashValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case keyPackage
             case keyPackageHash
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -75,25 +88,25 @@ public enum BlueCatbirdMlsDSFetchKeyPackage {
         case recipientNotFound = "RecipientNotFound"
         case noKeyPackagesAvailable = "NoKeyPackagesAvailable"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.MlsDS {
+extension ATProtoClient.Blue.Catbird.MlsDS {
     // MARK: - fetchKeyPackage
-
     /// Return and consume a key package for a local user, requested by a remote DS. Fetch and atomically consume one key package for a user in the context of a conversation.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func fetchKeyPackage(input: BlueCatbirdMlsDSFetchKeyPackage.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsDSFetchKeyPackage.Output?) {
+    public func fetchKeyPackage(input: BlueCatbirdMlsDSFetchKeyPackage.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsDSFetchKeyPackage.Output?) {
         let endpoint = "blue.catbird.mlsDS.fetchKeyPackage"
 
         let queryItems = input.asQueryItems()
@@ -115,7 +128,8 @@ public extension ATProtoClient.Blue.Catbird.MlsDS {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: place.stream.live.getLiveUsers
 
-public enum PlaceStreamLiveGetLiveUsers {
+public struct PlaceStreamLiveGetLiveUsers {
+
     public static let typeIdentifier = "place.stream.live.getLiveUsers"
     public struct Parameters: Parametrizable {
         public let limit: Int?
@@ -16,40 +17,50 @@ public enum PlaceStreamLiveGetLiveUsers {
         ) {
             self.limit = limit
             self.before = before
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let streams: [PlaceStreamLivestream.LivestreamView]?
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             streams: [PlaceStreamLivestream.LivestreamView]? = nil
 
         ) {
+
             self.streams = streams
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
             do {
-                streams = try container.decodeIfPresent([PlaceStreamLivestream.LivestreamView].self, forKey: .streams)
+                self.streams = try container.decodeIfPresent([PlaceStreamLivestream.LivestreamView].self, forKey: .streams)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'streams' — degrading to nil: \(error)")
-                streams = nil
+                self.streams = nil
             }
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(streams, forKey: .streams)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             if let value = streams {
@@ -59,24 +70,26 @@ public enum PlaceStreamLiveGetLiveUsers {
             }
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case streams
         }
+
     }
+
 }
 
-public extension ATProtoClient.Place.Stream.Live {
+extension ATProtoClient.Place.Stream.Live {
     // MARK: - getLiveUsers
-
     /// Get a list of livestream segments for a user
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getLiveUsers(input: PlaceStreamLiveGetLiveUsers.Parameters) async throws -> (responseCode: Int, data: PlaceStreamLiveGetLiveUsers.Output?) {
+    public func getLiveUsers(input: PlaceStreamLiveGetLiveUsers.Parameters) async throws -> (responseCode: Int, data: PlaceStreamLiveGetLiveUsers.Output?) {
         let endpoint = "place.stream.live.getLiveUsers"
 
         let queryItems = input.asQueryItems()
@@ -98,7 +111,8 @@ public extension ATProtoClient.Place.Stream.Live {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -118,6 +132,7 @@ public extension ATProtoClient.Place.Stream.Live {
                 return (responseCode, nil)
             }
         } else {
+
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)

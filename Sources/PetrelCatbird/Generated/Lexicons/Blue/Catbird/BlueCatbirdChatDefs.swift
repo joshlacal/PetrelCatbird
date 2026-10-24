@@ -2,25 +2,22 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.chat.defs
 
-
-public struct BlueCatbirdChatDefs { 
+public struct BlueCatbirdChatDefs {
 
     public static let typeIdentifier = "blue.catbird.chat.defs"
-        
-public struct ConversationCoordinates: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#conversationCoordinates"
-            public let conversationId: OperationId
-            public let generation: Int
-            public let stateVersion: Int
-            public let groupId: Bytes
-            public let epoch: Int
-            public let groupContextHash: Bytes
-            public let confirmationTag: Bytes
-            public let lifecycle: DefsLifecycle
+
+    public struct ConversationCoordinates: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#conversationCoordinates"
+        public let conversationId: OperationId
+        public let generation: Int
+        public let stateVersion: Int
+        public let groupId: Bytes
+        public let epoch: Int
+        public let groupContextHash: Bytes
+        public let confirmationTag: Bytes
+        public let lifecycle: DefsLifecycle
 
         public init(
             conversationId: OperationId, generation: Int, stateVersion: Int, groupId: Bytes, epoch: Int, groupContextHash: Bytes, confirmationTag: Bytes, lifecycle: DefsLifecycle
@@ -178,17 +175,17 @@ public struct ConversationCoordinates: ATProtocolCodable, ATProtocolValue {
             case lifecycle
         }
     }
-        
-public struct ApplicationFrameContext: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#applicationFrameContext"
-            public let conversationId: Bytes
-            public let generation: Int
-            public let stateVersion: Int
-            public let groupId: Bytes
-            public let epoch: Int
-            public let groupContextHash: Bytes
-            public let confirmationTag: Bytes
-            public let lifecycle: String
+
+    public struct ApplicationFrameContext: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#applicationFrameContext"
+        public let conversationId: Bytes
+        public let generation: Int
+        public let stateVersion: Int
+        public let groupId: Bytes
+        public let epoch: Int
+        public let groupContextHash: Bytes
+        public let confirmationTag: Bytes
+        public let lifecycle: String
 
         public init(
             conversationId: Bytes, generation: Int, stateVersion: Int, groupId: Bytes, epoch: Int, groupContextHash: Bytes, confirmationTag: Bytes, lifecycle: String
@@ -346,15 +343,15 @@ public struct ApplicationFrameContext: ATProtocolCodable, ATProtocolValue {
             case lifecycle
         }
     }
-        
-public struct MetadataCryptoContext: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#metadataCryptoContext"
-            public let conversationId: Bytes
-            public let generation: Int
-            public let groupId: Bytes
-            public let epoch: Int
-            public let groupContextHash: Bytes
-            public let confirmationTag: Bytes
+
+    public struct MetadataCryptoContext: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#metadataCryptoContext"
+        public let conversationId: Bytes
+        public let generation: Int
+        public let groupId: Bytes
+        public let epoch: Int
+        public let groupContextHash: Bytes
+        public let confirmationTag: Bytes
 
         public init(
             conversationId: Bytes, generation: Int, groupId: Bytes, epoch: Int, groupContextHash: Bytes, confirmationTag: Bytes
@@ -482,17 +479,17 @@ public struct MetadataCryptoContext: ATProtocolCodable, ATProtocolValue {
             case confirmationTag
         }
     }
-        
-public struct MlsAadPriorContext: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#mlsAadPriorContext"
-            public let conversationId: Bytes
-            public let generation: Int
-            public let stateVersion: Int
-            public let groupId: Bytes
-            public let epoch: Int
-            public let groupContextHash: Bytes
-            public let confirmationTag: Bytes
-            public let lifecycle: String
+
+    public struct MlsAadPriorContext: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#mlsAadPriorContext"
+        public let conversationId: Bytes
+        public let generation: Int
+        public let stateVersion: Int
+        public let groupId: Bytes
+        public let epoch: Int
+        public let groupContextHash: Bytes
+        public let confirmationTag: Bytes
+        public let lifecycle: String
 
         public init(
             conversationId: Bytes, generation: Int, stateVersion: Int, groupId: Bytes, epoch: Int, groupContextHash: Bytes, confirmationTag: Bytes, lifecycle: String
@@ -650,14 +647,14 @@ public struct MlsAadPriorContext: ATProtocolCodable, ATProtocolValue {
             case lifecycle
         }
     }
-        
-public struct KeyPackageArtifact: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#keyPackageArtifact"
-            public let framing: String
-            public let contentType: String
-            public let bytes: Bytes
-            public let sha256: Bytes
-            public let keyPackageRef: Bytes
+
+    public struct KeyPackageArtifact: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#keyPackageArtifact"
+        public let framing: String
+        public let contentType: String
+        public let bytes: Bytes
+        public let sha256: Bytes
+        public let keyPackageRef: Bytes
 
         public init(
             framing: String, contentType: String, bytes: Bytes, sha256: Bytes, keyPackageRef: Bytes
@@ -770,13 +767,13 @@ public struct KeyPackageArtifact: ATProtocolCodable, ATProtocolValue {
             case keyPackageRef
         }
     }
-        
-public struct PublicCommit: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#publicCommit"
-            public let framing: String
-            public let contentType: String
-            public let bytes: Bytes
-            public let sha256: Bytes
+
+    public struct PublicCommit: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#publicCommit"
+        public let framing: String
+        public let contentType: String
+        public let bytes: Bytes
+        public let sha256: Bytes
 
         public init(
             framing: String, contentType: String, bytes: Bytes, sha256: Bytes
@@ -874,13 +871,13 @@ public struct PublicCommit: ATProtocolCodable, ATProtocolValue {
             case sha256
         }
     }
-        
-public struct GroupInfoArtifact: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#groupInfoArtifact"
-            public let framing: String
-            public let contentType: String
-            public let bytes: Bytes
-            public let sha256: Bytes
+
+    public struct GroupInfoArtifact: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#groupInfoArtifact"
+        public let framing: String
+        public let contentType: String
+        public let bytes: Bytes
+        public let sha256: Bytes
 
         public init(
             framing: String, contentType: String, bytes: Bytes, sha256: Bytes
@@ -978,13 +975,13 @@ public struct GroupInfoArtifact: ATProtocolCodable, ATProtocolValue {
             case sha256
         }
     }
-        
-public struct PrivateApplicationMessage: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#privateApplicationMessage"
-            public let framing: String
-            public let contentType: String
-            public let bytes: Bytes
-            public let sha256: Bytes
+
+    public struct PrivateApplicationMessage: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#privateApplicationMessage"
+        public let framing: String
+        public let contentType: String
+        public let bytes: Bytes
+        public let sha256: Bytes
 
         public init(
             framing: String, contentType: String, bytes: Bytes, sha256: Bytes
@@ -1082,24 +1079,24 @@ public struct PrivateApplicationMessage: ATProtocolCodable, ATProtocolValue {
             case sha256
         }
     }
-        
-public struct DeviceCapability: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#deviceCapability"
-            public let protocolVersion: DefsProtocolVersion
-            public let mlsVersion: String
-            public let cipherSuite: DefsCipherSuite
-            public let credentialType: String
-            public let addByValue: String
-            public let updatePath: String
-            public let removeByValue: String
-            public let ratchetTreeGroupInfo: String
-            public let externalPubGroupInfo: String
-            public let applicationFrameProfile: String
-            public let controlProfile: String
-            public let attachmentProfile: String
-            public let metadataProfile: String
-            public let typingProfile: String
-            public let directRequestProfile: DirectRequestProfile?
+
+    public struct DeviceCapability: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#deviceCapability"
+        public let protocolVersion: DefsProtocolVersion
+        public let mlsVersion: String
+        public let cipherSuite: DefsCipherSuite
+        public let credentialType: String
+        public let addByValue: String
+        public let updatePath: String
+        public let removeByValue: String
+        public let ratchetTreeGroupInfo: String
+        public let externalPubGroupInfo: String
+        public let applicationFrameProfile: String
+        public let controlProfile: String
+        public let attachmentProfile: String
+        public let metadataProfile: String
+        public let typingProfile: String
+        public let directRequestProfile: DirectRequestProfile?
 
         public init(
             protocolVersion: DefsProtocolVersion, mlsVersion: String, cipherSuite: DefsCipherSuite, credentialType: String, addByValue: String, updatePath: String, removeByValue: String, ratchetTreeGroupInfo: String, externalPubGroupInfo: String, applicationFrameProfile: String, controlProfile: String, attachmentProfile: String, metadataProfile: String, typingProfile: String, directRequestProfile: DirectRequestProfile? = nil
@@ -1370,18 +1367,18 @@ public struct DeviceCapability: ATProtocolCodable, ATProtocolValue {
             case directRequestProfile
         }
     }
-        
-public struct DeviceView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#deviceView"
-            public let deviceId: DeviceId
-            public let keyId: KeyId
-            public let signaturePublicKey: Bytes
-            public let authGeneration: Int
-            public let status: DefsDeviceStatus
-            public let createdAt: CanonicalDatetime
-            public let updatedAt: CanonicalDatetime
-            public let availablePackageCount: Int
-            public let reservedPackageCount: Int
+
+    public struct DeviceView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#deviceView"
+        public let deviceId: DeviceId
+        public let keyId: KeyId
+        public let signaturePublicKey: Bytes
+        public let authGeneration: Int
+        public let status: DefsDeviceStatus
+        public let createdAt: CanonicalDatetime
+        public let updatedAt: CanonicalDatetime
+        public let availablePackageCount: Int
+        public let reservedPackageCount: Int
 
         public init(
             deviceId: DeviceId, keyId: KeyId, signaturePublicKey: Bytes, authGeneration: Int, status: DefsDeviceStatus, createdAt: CanonicalDatetime, updatedAt: CanonicalDatetime, availablePackageCount: Int, reservedPackageCount: Int
@@ -1554,11 +1551,11 @@ public struct DeviceView: ATProtocolCodable, ATProtocolValue {
             case reservedPackageCount
         }
     }
-        
-public struct OwnDeviceView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#ownDeviceView"
-            public let device: DeviceView
-            public let directRequestKeyPool: DirectRequestKeyPoolStats?
+
+    public struct OwnDeviceView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#ownDeviceView"
+        public let device: DeviceView
+        public let directRequestKeyPool: DirectRequestKeyPoolStats?
 
         public init(
             device: DeviceView, directRequestKeyPool: DirectRequestKeyPoolStats? = nil
@@ -1634,14 +1631,14 @@ public struct OwnDeviceView: ATProtocolCodable, ATProtocolValue {
             case directRequestKeyPool
         }
     }
-        
-public struct AddressableDevice: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#addressableDevice"
-            public let userDid: BareDid
-            public let deviceId: DeviceId
-            public let keyId: KeyId
-            public let capability: DeviceCapability
-            public let availablePackageCount: Int
+
+    public struct AddressableDevice: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#addressableDevice"
+        public let userDid: BareDid
+        public let deviceId: DeviceId
+        public let keyId: KeyId
+        public let capability: DeviceCapability
+        public let availablePackageCount: Int
 
         public init(
             userDid: BareDid, deviceId: DeviceId, keyId: KeyId, capability: DeviceCapability, availablePackageCount: Int
@@ -1754,12 +1751,12 @@ public struct AddressableDevice: ATProtocolCodable, ATProtocolValue {
             case availablePackageCount
         }
     }
-        
-public struct InvitationProvenance: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#invitationProvenance"
-            public let invitationTransitionId: OperationId
-            public let invitedByDid: BareDid
-            public let invitedByDeviceId: DeviceId
+
+    public struct InvitationProvenance: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#invitationProvenance"
+        public let invitationTransitionId: OperationId
+        public let invitedByDid: BareDid
+        public let invitedByDeviceId: DeviceId
 
         public init(
             invitationTransitionId: OperationId, invitedByDid: BareDid, invitedByDeviceId: DeviceId
@@ -1842,13 +1839,13 @@ public struct InvitationProvenance: ATProtocolCodable, ATProtocolValue {
             case invitedByDeviceId
         }
     }
-        
-public struct Participant: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#participant"
-            public let userDid: BareDid
-            public let role: DefsMemberRole
-            public let status: DefsParticipantStatus
-            public let invitationProvenance: InvitationProvenance?
+
+    public struct Participant: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#participant"
+        public let userDid: BareDid
+        public let role: DefsMemberRole
+        public let status: DefsParticipantStatus
+        public let invitationProvenance: InvitationProvenance?
 
         public init(
             userDid: BareDid, role: DefsMemberRole, status: DefsParticipantStatus, invitationProvenance: InvitationProvenance? = nil
@@ -1954,15 +1951,15 @@ public struct Participant: ATProtocolCodable, ATProtocolValue {
             case invitationProvenance
         }
     }
-        
-public struct ParticipantView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#participantView"
-            public let userDid: BareDid
-            public let role: DefsMemberRole
-            public let status: DefsParticipantStatus
-            public let invitationProvenance: InvitationProvenance?
-            public let leafCount: Int
-            public let labyrinthHead: LabyrinthHead?
+
+    public struct ParticipantView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#participantView"
+        public let userDid: BareDid
+        public let role: DefsMemberRole
+        public let status: DefsParticipantStatus
+        public let invitationProvenance: InvitationProvenance?
+        public let leafCount: Int
+        public let labyrinthHead: LabyrinthHead?
 
         public init(
             userDid: BareDid, role: DefsMemberRole, status: DefsParticipantStatus, invitationProvenance: InvitationProvenance? = nil, leafCount: Int, labyrinthHead: LabyrinthHead? = nil
@@ -2106,12 +2103,12 @@ public struct ParticipantView: ATProtocolCodable, ATProtocolValue {
             case labyrinthHead
         }
     }
-        
-public struct LabyrinthHead: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#labyrinthHead"
-            public let epochNumber: Int
-            public let epochHead: Bytes
-            public let attestationKeyId: String
+
+    public struct LabyrinthHead: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#labyrinthHead"
+        public let epochNumber: Int
+        public let epochHead: Bytes
+        public let attestationKeyId: String
 
         public init(
             epochNumber: Int, epochHead: Bytes, attestationKeyId: String
@@ -2194,13 +2191,13 @@ public struct LabyrinthHead: ATProtocolCodable, ATProtocolValue {
             case attestationKeyId
         }
     }
-        
-public struct DeviceLeaf: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#deviceLeaf"
-            public let userDid: BareDid
-            public let deviceId: DeviceId
-            public let leafOrigin: DefsLeafOrigin
-            public let joinKeyPackageRef: Bytes?
+
+    public struct DeviceLeaf: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#deviceLeaf"
+        public let userDid: BareDid
+        public let deviceId: DeviceId
+        public let leafOrigin: DefsLeafOrigin
+        public let joinKeyPackageRef: Bytes?
 
         public init(
             userDid: BareDid, deviceId: DeviceId, leafOrigin: DefsLeafOrigin, joinKeyPackageRef: Bytes? = nil
@@ -2306,15 +2303,15 @@ public struct DeviceLeaf: ATProtocolCodable, ATProtocolValue {
             case joinKeyPackageRef
         }
     }
-        
-public struct DeviceLeafView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#deviceLeafView"
-            public let userDid: BareDid
-            public let deviceId: DeviceId
-            public let leafOrigin: DefsLeafOrigin
-            public let joinKeyPackageRef: Bytes?
-            public let keyId: KeyId
-            public let deviceStatus: DefsDeviceStatus
+
+    public struct DeviceLeafView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#deviceLeafView"
+        public let userDid: BareDid
+        public let deviceId: DeviceId
+        public let leafOrigin: DefsLeafOrigin
+        public let joinKeyPackageRef: Bytes?
+        public let keyId: KeyId
+        public let deviceStatus: DefsDeviceStatus
 
         public init(
             userDid: BareDid, deviceId: DeviceId, leafOrigin: DefsLeafOrigin, joinKeyPackageRef: Bytes? = nil, keyId: KeyId, deviceStatus: DefsDeviceStatus
@@ -2450,13 +2447,13 @@ public struct DeviceLeafView: ATProtocolCodable, ATProtocolValue {
             case deviceStatus
         }
     }
-        
-public struct AddParticipant: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#addParticipant"
-            public let userDid: BareDid
-            public let role: String
-            public let status: String
-            public let invitationProvenance: InvitationProvenance
+
+    public struct AddParticipant: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#addParticipant"
+        public let userDid: BareDid
+        public let role: String
+        public let status: String
+        public let invitationProvenance: InvitationProvenance
 
         public init(
             userDid: BareDid, role: String, status: String, invitationProvenance: InvitationProvenance
@@ -2554,10 +2551,10 @@ public struct AddParticipant: ATProtocolCodable, ATProtocolValue {
             case invitationProvenance
         }
     }
-        
-public struct RemoveParticipant: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#removeParticipant"
-            public let userDid: BareDid
+
+    public struct RemoveParticipant: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#removeParticipant"
+        public let userDid: BareDid
 
         public init(
             userDid: BareDid
@@ -2610,11 +2607,11 @@ public struct RemoveParticipant: ATProtocolCodable, ATProtocolValue {
             case userDid
         }
     }
-        
-public struct ChangeParticipantRole: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#changeParticipantRole"
-            public let userDid: BareDid
-            public let role: DefsMemberRole
+
+    public struct ChangeParticipantRole: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#changeParticipantRole"
+        public let userDid: BareDid
+        public let role: DefsMemberRole
 
         public init(
             userDid: BareDid, role: DefsMemberRole
@@ -2682,13 +2679,13 @@ public struct ChangeParticipantRole: ATProtocolCodable, ATProtocolValue {
             case role
         }
     }
-        
-public struct AddLeafByRecovery: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#addLeafByRecovery"
-            public let userDid: BareDid
-            public let deviceId: DeviceId
-            public let recoveryRequestId: OperationId
-            public let keyPackageRef: Bytes
+
+    public struct AddLeafByRecovery: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#addLeafByRecovery"
+        public let userDid: BareDid
+        public let deviceId: DeviceId
+        public let recoveryRequestId: OperationId
+        public let keyPackageRef: Bytes
 
         public init(
             userDid: BareDid, deviceId: DeviceId, recoveryRequestId: OperationId, keyPackageRef: Bytes
@@ -2786,11 +2783,11 @@ public struct AddLeafByRecovery: ATProtocolCodable, ATProtocolValue {
             case keyPackageRef
         }
     }
-        
-public struct RemoveLeaf: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#removeLeaf"
-            public let userDid: BareDid
-            public let deviceId: DeviceId
+
+    public struct RemoveLeaf: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#removeLeaf"
+        public let userDid: BareDid
+        public let deviceId: DeviceId
 
         public init(
             userDid: BareDid, deviceId: DeviceId
@@ -2858,11 +2855,11 @@ public struct RemoveLeaf: ATProtocolCodable, ATProtocolValue {
             case deviceId
         }
     }
-        
-public struct RecoveryWelcomeProvenance: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#recoveryWelcomeProvenance"
-            public let recoveryRequestId: OperationId
-            public let keyPackageRef: Bytes
+
+    public struct RecoveryWelcomeProvenance: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#recoveryWelcomeProvenance"
+        public let recoveryRequestId: OperationId
+        public let keyPackageRef: Bytes
 
         public init(
             recoveryRequestId: OperationId, keyPackageRef: Bytes
@@ -2930,12 +2927,12 @@ public struct RecoveryWelcomeProvenance: ATProtocolCodable, ATProtocolValue {
             case keyPackageRef
         }
     }
-        
-public struct WelcomeDelivery: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#welcomeDelivery"
-            public let recipientDid: BareDid
-            public let recipientDeviceId: DeviceId
-            public let provenance: RecoveryWelcomeProvenance
+
+    public struct WelcomeDelivery: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#welcomeDelivery"
+        public let recipientDid: BareDid
+        public let recipientDeviceId: DeviceId
+        public let provenance: RecoveryWelcomeProvenance
 
         public init(
             recipientDid: BareDid, recipientDeviceId: DeviceId, provenance: RecoveryWelcomeProvenance
@@ -3018,15 +3015,15 @@ public struct WelcomeDelivery: ATProtocolCodable, ATProtocolValue {
             case provenance
         }
     }
-        
-public struct WelcomeBundle: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#welcomeBundle"
-            public let welcomeId: OperationId
-            public let framing: String
-            public let contentType: String
-            public let opaqueWelcome: Bytes
-            public let sha256: Bytes
-            public let deliveries: [WelcomeDelivery]
+
+    public struct WelcomeBundle: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#welcomeBundle"
+        public let welcomeId: OperationId
+        public let framing: String
+        public let contentType: String
+        public let opaqueWelcome: Bytes
+        public let sha256: Bytes
+        public let deliveries: [WelcomeDelivery]
 
         public init(
             welcomeId: OperationId, framing: String, contentType: String, opaqueWelcome: Bytes, sha256: Bytes, deliveries: [WelcomeDelivery]
@@ -3154,20 +3151,20 @@ public struct WelcomeBundle: ATProtocolCodable, ATProtocolValue {
             case deliveries
         }
     }
-        
-public struct WelcomeView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#welcomeView"
-            public let welcomeId: OperationId
-            public let conversationId: OperationId
-            public let transitionSeq: Int
-            public let coordinates: ConversationCoordinates
-            public let status: DefsWelcomeStatus
-            public let opaqueWelcome: Bytes
-            public let sha256: Bytes
-            public let recipientDid: BareDid
-            public let recipientDeviceId: DeviceId
-            public let provenance: RecoveryWelcomeProvenance
-            public let expiresAt: CanonicalDatetime
+
+    public struct WelcomeView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#welcomeView"
+        public let welcomeId: OperationId
+        public let conversationId: OperationId
+        public let transitionSeq: Int
+        public let coordinates: ConversationCoordinates
+        public let status: DefsWelcomeStatus
+        public let opaqueWelcome: Bytes
+        public let sha256: Bytes
+        public let recipientDid: BareDid
+        public let recipientDeviceId: DeviceId
+        public let provenance: RecoveryWelcomeProvenance
+        public let expiresAt: CanonicalDatetime
 
         public init(
             welcomeId: OperationId, conversationId: OperationId, transitionSeq: Int, coordinates: ConversationCoordinates, status: DefsWelcomeStatus, opaqueWelcome: Bytes, sha256: Bytes, recipientDid: BareDid, recipientDeviceId: DeviceId, provenance: RecoveryWelcomeProvenance, expiresAt: CanonicalDatetime
@@ -3370,14 +3367,14 @@ public struct WelcomeView: ATProtocolCodable, ATProtocolValue {
             case expiresAt
         }
     }
-        
-public struct CommitAad: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#commitAad"
-            public let protocolVersion: DefsProtocolVersion
-            public let conversationId: Bytes
-            public let generation: Int
-            public let transitionId: Bytes
-            public let prior: MlsAadPriorContext
+
+    public struct CommitAad: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#commitAad"
+        public let protocolVersion: DefsProtocolVersion
+        public let conversationId: Bytes
+        public let generation: Int
+        public let transitionId: Bytes
+        public let prior: MlsAadPriorContext
 
         public init(
             protocolVersion: DefsProtocolVersion, conversationId: Bytes, generation: Int, transitionId: Bytes, prior: MlsAadPriorContext
@@ -3490,14 +3487,14 @@ public struct CommitAad: ATProtocolCodable, ATProtocolValue {
             case prior
         }
     }
-        
-public struct ApplicationAad: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#applicationAad"
-            public let protocolVersion: DefsProtocolVersion
-            public let conversationId: Bytes
-            public let generation: Int
-            public let messageId: Bytes
-            public let prior: MlsAadPriorContext
+
+    public struct ApplicationAad: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#applicationAad"
+        public let protocolVersion: DefsProtocolVersion
+        public let conversationId: Bytes
+        public let generation: Int
+        public let messageId: Bytes
+        public let prior: MlsAadPriorContext
 
         public init(
             protocolVersion: DefsProtocolVersion, conversationId: Bytes, generation: Int, messageId: Bytes, prior: MlsAadPriorContext
@@ -3610,13 +3607,13 @@ public struct ApplicationAad: ATProtocolCodable, ATProtocolValue {
             case prior
         }
     }
-        
-public struct TransitionManifest: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#transitionManifest"
-            public let participantChanges: [ParticipantChange]
-            public let leafChanges: [LeafChange]
-            public let welcomeBundle: WelcomeBundle?
-            public let leafRecoveryRequestId: OperationId?
+
+    public struct TransitionManifest: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#transitionManifest"
+        public let participantChanges: [ParticipantChange]
+        public let leafChanges: [LeafChange]
+        public let welcomeBundle: WelcomeBundle?
+        public let leafRecoveryRequestId: OperationId?
 
         public init(
             participantChanges: [ParticipantChange], leafChanges: [LeafChange], welcomeBundle: WelcomeBundle? = nil, leafRecoveryRequestId: OperationId? = nil
@@ -3730,11 +3727,11 @@ public struct TransitionManifest: ATProtocolCodable, ATProtocolValue {
             case leafRecoveryRequestId
         }
     }
-        
-public struct CreationManifest: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#creationManifest"
-            public let participants: [Participant]
-            public let actorLeaf: DeviceLeaf
+
+    public struct CreationManifest: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#creationManifest"
+        public let participants: [Participant]
+        public let actorLeaf: DeviceLeaf
 
         public init(
             participants: [Participant], actorLeaf: DeviceLeaf
@@ -3802,11 +3799,11 @@ public struct CreationManifest: ATProtocolCodable, ATProtocolValue {
             case actorLeaf
         }
     }
-        
-public struct ResetActivationManifest: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#resetActivationManifest"
-            public let participants: [Participant]
-            public let actorLeaf: DeviceLeaf
+
+    public struct ResetActivationManifest: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#resetActivationManifest"
+        public let participants: [Participant]
+        public let actorLeaf: DeviceLeaf
 
         public init(
             participants: [Participant], actorLeaf: DeviceLeaf
@@ -3874,22 +3871,22 @@ public struct ResetActivationManifest: ATProtocolCodable, ATProtocolValue {
             case actorLeaf
         }
     }
-        
-public struct LeafRecoveryReservation: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#leafRecoveryReservation"
-            public let recoveryRequestId: OperationId
-            public let conversationId: OperationId
-            public let boundCoordinate: ConversationCoordinates
-            public let requesterDid: BareDid
-            public let requesterDeviceId: DeviceId
-            public let requesterKeyId: KeyId
-            public let requesterAuthGeneration: Int
-            public let keyPackageRef: Bytes
-            public let cipherSuite: DefsCipherSuite
-            public let purpose: String
-            public let status: DefsReservationStatus
-            public let expiresAt: CanonicalDatetime
-            public let keyPackage: KeyPackageArtifact
+
+    public struct LeafRecoveryReservation: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#leafRecoveryReservation"
+        public let recoveryRequestId: OperationId
+        public let conversationId: OperationId
+        public let boundCoordinate: ConversationCoordinates
+        public let requesterDid: BareDid
+        public let requesterDeviceId: DeviceId
+        public let requesterKeyId: KeyId
+        public let requesterAuthGeneration: Int
+        public let keyPackageRef: Bytes
+        public let cipherSuite: DefsCipherSuite
+        public let purpose: String
+        public let status: DefsReservationStatus
+        public let expiresAt: CanonicalDatetime
+        public let keyPackage: KeyPackageArtifact
 
         public init(
             recoveryRequestId: OperationId, conversationId: OperationId, boundCoordinate: ConversationCoordinates, requesterDid: BareDid, requesterDeviceId: DeviceId, requesterKeyId: KeyId, requesterAuthGeneration: Int, keyPackageRef: Bytes, cipherSuite: DefsCipherSuite, purpose: String, status: DefsReservationStatus, expiresAt: CanonicalDatetime, keyPackage: KeyPackageArtifact
@@ -4122,13 +4119,13 @@ public struct LeafRecoveryReservation: ATProtocolCodable, ATProtocolValue {
             case keyPackage
         }
     }
-        
-public struct UploadedBlobBinding: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#uploadedBlobBinding"
-            public let blobId: OperationId
-            public let ciphertextSha256: Bytes
-            public let ciphertextSize: Int
-            public let purpose: DefsBlobPurpose
+
+    public struct UploadedBlobBinding: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#uploadedBlobBinding"
+        public let blobId: OperationId
+        public let ciphertextSha256: Bytes
+        public let ciphertextSize: Int
+        public let purpose: DefsBlobPurpose
 
         public init(
             blobId: OperationId, ciphertextSha256: Bytes, ciphertextSize: Int, purpose: DefsBlobPurpose
@@ -4226,13 +4223,13 @@ public struct UploadedBlobBinding: ATProtocolCodable, ATProtocolValue {
             case purpose
         }
     }
-        
-public struct ApplicationAttachmentBinding: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#applicationAttachmentBinding"
-            public let blobId: OperationId
-            public let ciphertextSha256: Bytes
-            public let ciphertextSize: Int
-            public let purpose: String
+
+    public struct ApplicationAttachmentBinding: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#applicationAttachmentBinding"
+        public let blobId: OperationId
+        public let ciphertextSha256: Bytes
+        public let ciphertextSize: Int
+        public let purpose: String
 
         public init(
             blobId: OperationId, ciphertextSha256: Bytes, ciphertextSize: Int, purpose: String
@@ -4330,13 +4327,13 @@ public struct ApplicationAttachmentBinding: ATProtocolCodable, ATProtocolValue {
             case purpose
         }
     }
-        
-public struct MetadataAvatarBinding: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#metadataAvatarBinding"
-            public let blobId: OperationId
-            public let ciphertextSha256: Bytes
-            public let ciphertextSize: Int
-            public let purpose: String
+
+    public struct MetadataAvatarBinding: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#metadataAvatarBinding"
+        public let blobId: OperationId
+        public let ciphertextSha256: Bytes
+        public let ciphertextSize: Int
+        public let purpose: String
 
         public init(
             blobId: OperationId, ciphertextSha256: Bytes, ciphertextSize: Int, purpose: String
@@ -4434,15 +4431,15 @@ public struct MetadataAvatarBinding: ATProtocolCodable, ATProtocolValue {
             case purpose
         }
     }
-        
-public struct BlobUploadView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#blobUploadView"
-            public let blobId: OperationId
-            public let uploadTicket: String
-            public let ciphertextSha256: Bytes
-            public let ciphertextSize: Int
-            public let purpose: DefsBlobPurpose
-            public let expiresAt: CanonicalDatetime
+
+    public struct BlobUploadView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#blobUploadView"
+        public let blobId: OperationId
+        public let uploadTicket: String
+        public let ciphertextSha256: Bytes
+        public let ciphertextSize: Int
+        public let purpose: DefsBlobPurpose
+        public let expiresAt: CanonicalDatetime
 
         public init(
             blobId: OperationId, uploadTicket: String, ciphertextSha256: Bytes, ciphertextSize: Int, purpose: DefsBlobPurpose, expiresAt: CanonicalDatetime
@@ -4570,14 +4567,14 @@ public struct BlobUploadView: ATProtocolCodable, ATProtocolValue {
             case expiresAt
         }
     }
-        
-public struct BlobUsageView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#blobUsageView"
-            public let usedBytes: Int
-            public let reservedBytes: Int
-            public let quotaBytes: Int
-            public let blobCount: Int
-            public let liveUnboundCount: Int
+
+    public struct BlobUsageView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#blobUsageView"
+        public let usedBytes: Int
+        public let reservedBytes: Int
+        public let quotaBytes: Int
+        public let blobCount: Int
+        public let liveUnboundCount: Int
 
         public init(
             usedBytes: Int, reservedBytes: Int, quotaBytes: Int, blobCount: Int, liveUnboundCount: Int
@@ -4690,20 +4687,20 @@ public struct BlobUsageView: ATProtocolCodable, ATProtocolValue {
             case liveUnboundCount
         }
     }
-        
-public struct DeviceEnrollmentBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#deviceEnrollmentBody"
-            public let signatureDomain: String
-            public let actorDid: BareDid
-            public let deviceId: DeviceId
-            public let deviceName: String
-            public let keyId: KeyId
-            public let signaturePublicKey: Bytes
-            public let expectedAuthGeneration: Int
-            public let capability: DeviceCapability
-            public let keyPackages: [KeyPackageArtifact]
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct DeviceEnrollmentBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#deviceEnrollmentBody"
+        public let signatureDomain: String
+        public let actorDid: BareDid
+        public let deviceId: DeviceId
+        public let deviceName: String
+        public let keyId: KeyId
+        public let signaturePublicKey: Bytes
+        public let expectedAuthGeneration: Int
+        public let capability: DeviceCapability
+        public let keyPackages: [KeyPackageArtifact]
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, actorDid: BareDid, deviceId: DeviceId, deviceName: String, keyId: KeyId, signaturePublicKey: Bytes, expectedAuthGeneration: Int, capability: DeviceCapability, keyPackages: [KeyPackageArtifact], idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -4906,18 +4903,18 @@ public struct DeviceEnrollmentBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct KeyPackageReplenishmentBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#keyPackageReplenishmentBody"
-            public let signatureDomain: String
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let signaturePublicKey: Bytes
-            public let keyPackages: [KeyPackageArtifact]
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct KeyPackageReplenishmentBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#keyPackageReplenishmentBody"
+        public let signatureDomain: String
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let signaturePublicKey: Bytes
+        public let keyPackages: [KeyPackageArtifact]
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, signaturePublicKey: Bytes, keyPackages: [KeyPackageArtifact], idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -5090,18 +5087,18 @@ public struct KeyPackageReplenishmentBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct DeviceRevocationBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#deviceRevocationBody"
-            public let signatureDomain: String
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let targetDeviceId: DeviceId
-            public let targetAuthGeneration: Int
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct DeviceRevocationBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#deviceRevocationBody"
+        public let signatureDomain: String
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let targetDeviceId: DeviceId
+        public let targetAuthGeneration: Int
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, targetDeviceId: DeviceId, targetAuthGeneration: Int, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -5274,24 +5271,24 @@ public struct DeviceRevocationBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct CreationBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#creationBody"
-            public let signatureDomain: String
-            public let conversationId: OperationId
-            public let conversationKind: DefsConversationKind
-            public let transitionId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let absence: Bool
-            public let next: ConversationCoordinates
-            public let manifest: CreationManifest
-            public let genesisGroupInfo: GroupInfoArtifact
-            public let metadataSnapshot: MetadataSnapshot
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct CreationBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#creationBody"
+        public let signatureDomain: String
+        public let conversationId: OperationId
+        public let conversationKind: DefsConversationKind
+        public let transitionId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let absence: Bool
+        public let next: ConversationCoordinates
+        public let manifest: CreationManifest
+        public let genesisGroupInfo: GroupInfoArtifact
+        public let metadataSnapshot: MetadataSnapshot
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, conversationId: OperationId, conversationKind: DefsConversationKind, transitionId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, absence: Bool, next: ConversationCoordinates, manifest: CreationManifest, genesisGroupInfo: GroupInfoArtifact, metadataSnapshot: MetadataSnapshot, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -5554,23 +5551,23 @@ public struct CreationBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct CommitTransitionBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#commitTransitionBody"
-            public let signatureDomain: String
-            public let transitionId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let prior: ConversationCoordinates
-            public let next: ConversationCoordinates
-            public let aad: CommitAad
-            public let manifest: TransitionManifest
-            public let commit: PublicCommit
-            public let metadataSnapshot: MetadataSnapshot
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct CommitTransitionBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#commitTransitionBody"
+        public let signatureDomain: String
+        public let transitionId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let prior: ConversationCoordinates
+        public let next: ConversationCoordinates
+        public let aad: CommitAad
+        public let manifest: TransitionManifest
+        public let commit: PublicCommit
+        public let metadataSnapshot: MetadataSnapshot
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, transitionId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, next: ConversationCoordinates, aad: CommitAad, manifest: TransitionManifest, commit: PublicCommit, metadataSnapshot: MetadataSnapshot, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -5818,20 +5815,20 @@ public struct CommitTransitionBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct PolicyTransitionBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#policyTransitionBody"
-            public let signatureDomain: String
-            public let transitionId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let prior: ConversationCoordinates
-            public let next: ConversationCoordinates
-            public let participantChanges: [ParticipantChange]
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct PolicyTransitionBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#policyTransitionBody"
+        public let signatureDomain: String
+        public let transitionId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let prior: ConversationCoordinates
+        public let next: ConversationCoordinates
+        public let participantChanges: [ParticipantChange]
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, transitionId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, next: ConversationCoordinates, participantChanges: [ParticipantChange], idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -6034,21 +6031,21 @@ public struct PolicyTransitionBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct ParticipantAcceptanceBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#participantAcceptanceBody"
-            public let signatureDomain: String
-            public let transitionId: OperationId
-            public let recoveryRequestId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let prior: ConversationCoordinates
-            public let next: ConversationCoordinates
-            public let invitationProvenance: InvitationProvenance
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct ParticipantAcceptanceBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#participantAcceptanceBody"
+        public let signatureDomain: String
+        public let transitionId: OperationId
+        public let recoveryRequestId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let prior: ConversationCoordinates
+        public let next: ConversationCoordinates
+        public let invitationProvenance: InvitationProvenance
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, transitionId: OperationId, recoveryRequestId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, next: ConversationCoordinates, invitationProvenance: InvitationProvenance, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -6266,20 +6263,20 @@ public struct ParticipantAcceptanceBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct ApplicationSendBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#applicationSendBody"
-            public let signatureDomain: String
-            public let messageId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let prior: ConversationCoordinates
-            public let aad: ApplicationAad
-            public let applicationMessage: PrivateApplicationMessage
-            public let blobBindings: [ApplicationAttachmentBinding]
-            public let signedAt: CanonicalDatetime
+
+    public struct ApplicationSendBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#applicationSendBody"
+        public let signatureDomain: String
+        public let messageId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let prior: ConversationCoordinates
+        public let aad: ApplicationAad
+        public let applicationMessage: PrivateApplicationMessage
+        public let blobBindings: [ApplicationAttachmentBinding]
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, messageId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, aad: ApplicationAad, applicationMessage: PrivateApplicationMessage, blobBindings: [ApplicationAttachmentBinding], signedAt: CanonicalDatetime
@@ -6482,11 +6479,11 @@ public struct ApplicationSendBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct MessageTarget: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#messageTarget"
-            public let targetSeq: Int
-            public let targetMessageId: Bytes
+
+    public struct MessageTarget: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#messageTarget"
+        public let targetSeq: Int
+        public let targetMessageId: Bytes
 
         public init(
             targetSeq: Int, targetMessageId: Bytes
@@ -6554,22 +6551,22 @@ public struct MessageTarget: ATProtocolCodable, ATProtocolValue {
             case targetMessageId
         }
     }
-        
-public struct EncryptedImageEmbed: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#encryptedImageEmbed"
-            public let blobId: Bytes
-            public let purpose: String
-            public let algorithm: String
-            public let key: Bytes
-            public let nonce: Bytes
-            public let ciphertextSha256: Bytes
-            public let ciphertextSize: Int
-            public let plaintextSize: Int
-            public let mimeType: EncryptedImageEmbedMimeType
-            public let width: Int
-            public let height: Int
-            public let altText: String?
-            public let blurhash: String?
+
+    public struct EncryptedImageEmbed: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#encryptedImageEmbed"
+        public let blobId: Bytes
+        public let purpose: String
+        public let algorithm: String
+        public let key: Bytes
+        public let nonce: Bytes
+        public let ciphertextSha256: Bytes
+        public let ciphertextSize: Int
+        public let plaintextSize: Int
+        public let mimeType: EncryptedImageEmbedMimeType
+        public let width: Int
+        public let height: Int
+        public let altText: String?
+        public let blurhash: String?
 
         public init(
             blobId: Bytes, purpose: String, algorithm: String, key: Bytes, nonce: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, plaintextSize: Int, mimeType: EncryptedImageEmbedMimeType, width: Int, height: Int, altText: String? = nil, blurhash: String? = nil
@@ -6818,21 +6815,21 @@ public struct EncryptedImageEmbed: ATProtocolCodable, ATProtocolValue {
             case blurhash
         }
     }
-        
-public struct EncryptedAudioEmbed: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#encryptedAudioEmbed"
-            public let blobId: Bytes
-            public let purpose: String
-            public let algorithm: String
-            public let key: Bytes
-            public let nonce: Bytes
-            public let ciphertextSha256: Bytes
-            public let ciphertextSize: Int
-            public let plaintextSize: Int
-            public let mimeType: EncryptedAudioEmbedMimeType
-            public let durationMillis: Int
-            public let waveform: Bytes
-            public let transcript: String?
+
+    public struct EncryptedAudioEmbed: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#encryptedAudioEmbed"
+        public let blobId: Bytes
+        public let purpose: String
+        public let algorithm: String
+        public let key: Bytes
+        public let nonce: Bytes
+        public let ciphertextSha256: Bytes
+        public let ciphertextSize: Int
+        public let plaintextSize: Int
+        public let mimeType: EncryptedAudioEmbedMimeType
+        public let durationMillis: Int
+        public let waveform: Bytes
+        public let transcript: String?
 
         public init(
             blobId: Bytes, purpose: String, algorithm: String, key: Bytes, nonce: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, plaintextSize: Int, mimeType: EncryptedAudioEmbedMimeType, durationMillis: Int, waveform: Bytes, transcript: String? = nil
@@ -7058,11 +7055,11 @@ public struct EncryptedAudioEmbed: ATProtocolCodable, ATProtocolValue {
             case transcript
         }
     }
-        
-public struct AtprotoRecordEmbed: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#atprotoRecordEmbed"
-            public let uri: ATProtocolURI
-            public let cid: CID
+
+    public struct AtprotoRecordEmbed: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#atprotoRecordEmbed"
+        public let uri: ATProtocolURI
+        public let cid: CID
 
         public init(
             uri: ATProtocolURI, cid: CID
@@ -7130,12 +7127,12 @@ public struct AtprotoRecordEmbed: ATProtocolCodable, ATProtocolValue {
             case cid
         }
     }
-        
-public struct ExternalLinkEmbed: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#externalLinkEmbed"
-            public let uri: URI
-            public let title: String?
-            public let description: String?
+
+    public struct ExternalLinkEmbed: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#externalLinkEmbed"
+        public let uri: URI
+        public let title: String?
+        public let description: String?
 
         public init(
             uri: URI, title: String? = nil, description: String? = nil
@@ -7234,10 +7231,10 @@ public struct ExternalLinkEmbed: ATProtocolCodable, ATProtocolValue {
             case description
         }
     }
-        
-public struct EncryptedImageEmbedVariant: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#encryptedImageEmbedVariant"
-            public let encryptedImage: EncryptedImageEmbed
+
+    public struct EncryptedImageEmbedVariant: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#encryptedImageEmbedVariant"
+        public let encryptedImage: EncryptedImageEmbed
 
         public init(
             encryptedImage: EncryptedImageEmbed
@@ -7290,10 +7287,10 @@ public struct EncryptedImageEmbedVariant: ATProtocolCodable, ATProtocolValue {
             case encryptedImage
         }
     }
-        
-public struct EncryptedAudioEmbedVariant: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#encryptedAudioEmbedVariant"
-            public let encryptedAudio: EncryptedAudioEmbed
+
+    public struct EncryptedAudioEmbedVariant: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#encryptedAudioEmbedVariant"
+        public let encryptedAudio: EncryptedAudioEmbed
 
         public init(
             encryptedAudio: EncryptedAudioEmbed
@@ -7346,10 +7343,10 @@ public struct EncryptedAudioEmbedVariant: ATProtocolCodable, ATProtocolValue {
             case encryptedAudio
         }
     }
-        
-public struct AtprotoRecordEmbedVariant: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#atprotoRecordEmbedVariant"
-            public let atprotoRecord: AtprotoRecordEmbed
+
+    public struct AtprotoRecordEmbedVariant: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#atprotoRecordEmbedVariant"
+        public let atprotoRecord: AtprotoRecordEmbed
 
         public init(
             atprotoRecord: AtprotoRecordEmbed
@@ -7402,10 +7399,10 @@ public struct AtprotoRecordEmbedVariant: ATProtocolCodable, ATProtocolValue {
             case atprotoRecord
         }
     }
-        
-public struct ExternalLinkEmbedVariant: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#externalLinkEmbedVariant"
-            public let externalLink: ExternalLinkEmbed
+
+    public struct ExternalLinkEmbedVariant: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#externalLinkEmbedVariant"
+        public let externalLink: ExternalLinkEmbed
 
         public init(
             externalLink: ExternalLinkEmbed
@@ -7458,12 +7455,12 @@ public struct ExternalLinkEmbedVariant: ATProtocolCodable, ATProtocolValue {
             case externalLink
         }
     }
-        
-public struct MessageFrameBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#messageFrameBody"
-            public let text: String?
-            public let replyTo: MessageTarget?
-            public let embed: ApplicationEmbed?
+
+    public struct MessageFrameBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#messageFrameBody"
+        public let text: String?
+        public let replyTo: MessageTarget?
+        public let embed: ApplicationEmbed?
 
         public init(
             text: String? = nil, replyTo: MessageTarget? = nil, embed: ApplicationEmbed? = nil
@@ -7570,12 +7567,12 @@ public struct MessageFrameBody: ATProtocolCodable, ATProtocolValue {
             case embed
         }
     }
-        
-public struct ReactionFrameBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#reactionFrameBody"
-            public let target: MessageTarget
-            public let emoji: String
-            public let operation: ReactionFrameBodyOperation
+
+    public struct ReactionFrameBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#reactionFrameBody"
+        public let target: MessageTarget
+        public let emoji: String
+        public let operation: ReactionFrameBodyOperation
 
         public init(
             target: MessageTarget, emoji: String, operation: ReactionFrameBodyOperation
@@ -7658,11 +7655,11 @@ public struct ReactionFrameBody: ATProtocolCodable, ATProtocolValue {
             case operation
         }
     }
-        
-public struct EditFrameBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#editFrameBody"
-            public let target: MessageTarget
-            public let replacementText: String
+
+    public struct EditFrameBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#editFrameBody"
+        public let target: MessageTarget
+        public let replacementText: String
 
         public init(
             target: MessageTarget, replacementText: String
@@ -7730,10 +7727,10 @@ public struct EditFrameBody: ATProtocolCodable, ATProtocolValue {
             case replacementText
         }
     }
-        
-public struct TombstoneFrameBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#tombstoneFrameBody"
-            public let target: MessageTarget
+
+    public struct TombstoneFrameBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#tombstoneFrameBody"
+        public let target: MessageTarget
 
         public init(
             target: MessageTarget
@@ -7786,11 +7783,11 @@ public struct TombstoneFrameBody: ATProtocolCodable, ATProtocolValue {
             case target
         }
     }
-        
-public struct ReadStateFrameBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#readStateFrameBody"
-            public let throughSeq: Int
-            public let throughMessageId: Bytes
+
+    public struct ReadStateFrameBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#readStateFrameBody"
+        public let throughSeq: Int
+        public let throughMessageId: Bytes
 
         public init(
             throughSeq: Int, throughMessageId: Bytes
@@ -7858,10 +7855,10 @@ public struct ReadStateFrameBody: ATProtocolCodable, ATProtocolValue {
             case throughMessageId
         }
     }
-        
-public struct MessageFrameVariant: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#messageFrameVariant"
-            public let message: MessageFrameBody
+
+    public struct MessageFrameVariant: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#messageFrameVariant"
+        public let message: MessageFrameBody
 
         public init(
             message: MessageFrameBody
@@ -7914,10 +7911,10 @@ public struct MessageFrameVariant: ATProtocolCodable, ATProtocolValue {
             case message
         }
     }
-        
-public struct ReactionFrameVariant: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#reactionFrameVariant"
-            public let reaction: ReactionFrameBody
+
+    public struct ReactionFrameVariant: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#reactionFrameVariant"
+        public let reaction: ReactionFrameBody
 
         public init(
             reaction: ReactionFrameBody
@@ -7970,10 +7967,10 @@ public struct ReactionFrameVariant: ATProtocolCodable, ATProtocolValue {
             case reaction
         }
     }
-        
-public struct EditFrameVariant: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#editFrameVariant"
-            public let edit: EditFrameBody
+
+    public struct EditFrameVariant: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#editFrameVariant"
+        public let edit: EditFrameBody
 
         public init(
             edit: EditFrameBody
@@ -8026,10 +8023,10 @@ public struct EditFrameVariant: ATProtocolCodable, ATProtocolValue {
             case edit
         }
     }
-        
-public struct TombstoneFrameVariant: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#tombstoneFrameVariant"
-            public let tombstone: TombstoneFrameBody
+
+    public struct TombstoneFrameVariant: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#tombstoneFrameVariant"
+        public let tombstone: TombstoneFrameBody
 
         public init(
             tombstone: TombstoneFrameBody
@@ -8082,10 +8079,10 @@ public struct TombstoneFrameVariant: ATProtocolCodable, ATProtocolValue {
             case tombstone
         }
     }
-        
-public struct ReadStateFrameVariant: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#readStateFrameVariant"
-            public let readState: ReadStateFrameBody
+
+    public struct ReadStateFrameVariant: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#readStateFrameVariant"
+        public let readState: ReadStateFrameBody
 
         public init(
             readState: ReadStateFrameBody
@@ -8138,14 +8135,14 @@ public struct ReadStateFrameVariant: ATProtocolCodable, ATProtocolValue {
             case readState
         }
     }
-        
-public struct ApplicationFrame: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#applicationFrame"
-            public let `protocol`: String
-            public let version: Int
-            public let messageId: Bytes
-            public let context: ApplicationFrameContext
-            public let body: ApplicationFrameBody
+
+    public struct ApplicationFrame: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#applicationFrame"
+        public let `protocol`: String
+        public let version: Int
+        public let messageId: Bytes
+        public let context: ApplicationFrameContext
+        public let body: ApplicationFrameBody
 
         public init(
             `protocol`: String, version: Int, messageId: Bytes, context: ApplicationFrameContext, body: ApplicationFrameBody
@@ -8258,17 +8255,17 @@ public struct ApplicationFrame: ATProtocolCodable, ATProtocolValue {
             case body
         }
     }
-        
-public struct BlobAad: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#blobAad"
-            public let `protocol`: String
-            public let context: ApplicationFrameContext
-            public let messageId: Bytes
-            public let attachmentIndex: Int
-            public let blobId: Bytes
-            public let purpose: String
-            public let mediaType: String
-            public let plaintextSize: Int
+
+    public struct BlobAad: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#blobAad"
+        public let `protocol`: String
+        public let context: ApplicationFrameContext
+        public let messageId: Bytes
+        public let attachmentIndex: Int
+        public let blobId: Bytes
+        public let purpose: String
+        public let mediaType: String
+        public let plaintextSize: Int
 
         public init(
             `protocol`: String, context: ApplicationFrameContext, messageId: Bytes, attachmentIndex: Int, blobId: Bytes, purpose: String, mediaType: String, plaintextSize: Int
@@ -8426,24 +8423,24 @@ public struct BlobAad: ATProtocolCodable, ATProtocolValue {
             case plaintextSize
         }
     }
-        
-public struct MetadataAvatarEmbed: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#metadataAvatarEmbed"
-            public let blobId: Bytes
-            public let purpose: String
-            public let algorithm: String
-            public let key: Bytes
-            public let nonce: Bytes
-            public let ciphertextSha256: Bytes
-            public let ciphertextSize: Int
-            public let plaintextSize: Int
-            public let mimeType: MetadataAvatarEmbedMimeType
-            public let width: Int
-            public let height: Int
-            public let altText: String?
-            public let blurhash: String?
-            public let originTransitionId: Bytes
-            public let originalMetadataVersion: Int
+
+    public struct MetadataAvatarEmbed: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#metadataAvatarEmbed"
+        public let blobId: Bytes
+        public let purpose: String
+        public let algorithm: String
+        public let key: Bytes
+        public let nonce: Bytes
+        public let ciphertextSha256: Bytes
+        public let ciphertextSize: Int
+        public let plaintextSize: Int
+        public let mimeType: MetadataAvatarEmbedMimeType
+        public let width: Int
+        public let height: Int
+        public let altText: String?
+        public let blurhash: String?
+        public let originTransitionId: Bytes
+        public let originalMetadataVersion: Int
 
         public init(
             blobId: Bytes, purpose: String, algorithm: String, key: Bytes, nonce: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, plaintextSize: Int, mimeType: MetadataAvatarEmbedMimeType, width: Int, height: Int, altText: String? = nil, blurhash: String? = nil, originTransitionId: Bytes, originalMetadataVersion: Int
@@ -8722,17 +8719,17 @@ public struct MetadataAvatarEmbed: ATProtocolCodable, ATProtocolValue {
             case originalMetadataVersion
         }
     }
-        
-public struct MetadataAvatarBlobAad: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#metadataAvatarBlobAad"
-            public let `protocol`: String
-            public let conversationId: Bytes
-            public let originTransitionId: Bytes
-            public let originalMetadataVersion: Int
-            public let blobId: Bytes
-            public let purpose: String
-            public let mediaType: String
-            public let plaintextSize: Int
+
+    public struct MetadataAvatarBlobAad: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#metadataAvatarBlobAad"
+        public let `protocol`: String
+        public let conversationId: Bytes
+        public let originTransitionId: Bytes
+        public let originalMetadataVersion: Int
+        public let blobId: Bytes
+        public let purpose: String
+        public let mediaType: String
+        public let plaintextSize: Int
 
         public init(
             `protocol`: String, conversationId: Bytes, originTransitionId: Bytes, originalMetadataVersion: Int, blobId: Bytes, purpose: String, mediaType: String, plaintextSize: Int
@@ -8890,16 +8887,16 @@ public struct MetadataAvatarBlobAad: ATProtocolCodable, ATProtocolValue {
             case plaintextSize
         }
     }
-        
-public struct MetadataExporterContext: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#metadataExporterContext"
-            public let `protocol`: String
-            public let version: Int
-            public let conversationId: Bytes
-            public let generation: Int
-            public let epoch: Int
-            public let groupContextHash: Bytes
-            public let metadataVersion: Int
+
+    public struct MetadataExporterContext: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#metadataExporterContext"
+        public let `protocol`: String
+        public let version: Int
+        public let conversationId: Bytes
+        public let generation: Int
+        public let epoch: Int
+        public let groupContextHash: Bytes
+        public let metadataVersion: Int
 
         public init(
             `protocol`: String, version: Int, conversationId: Bytes, generation: Int, epoch: Int, groupContextHash: Bytes, metadataVersion: Int
@@ -9042,13 +9039,13 @@ public struct MetadataExporterContext: ATProtocolCodable, ATProtocolValue {
             case metadataVersion
         }
     }
-        
-public struct MetadataAadAvatarBinding: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#metadataAadAvatarBinding"
-            public let blobId: Bytes
-            public let ciphertextSha256: Bytes
-            public let ciphertextSize: Int
-            public let purpose: String
+
+    public struct MetadataAadAvatarBinding: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#metadataAadAvatarBinding"
+        public let blobId: Bytes
+        public let ciphertextSha256: Bytes
+        public let ciphertextSize: Int
+        public let purpose: String
 
         public init(
             blobId: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, purpose: String
@@ -9146,16 +9143,16 @@ public struct MetadataAadAvatarBinding: ATProtocolCodable, ATProtocolValue {
             case purpose
         }
     }
-        
-public struct MetadataAad: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#metadataAad"
-            public let `protocol`: String
-            public let version: Int
-            public let coordinate: MetadataCryptoContext
-            public let metadataVersion: Int
-            public let originTransitionId: Bytes
-            public let ciphertextSize: Int
-            public let avatarBinding: MetadataAadAvatarBinding?
+
+    public struct MetadataAad: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#metadataAad"
+        public let `protocol`: String
+        public let version: Int
+        public let coordinate: MetadataCryptoContext
+        public let metadataVersion: Int
+        public let originTransitionId: Bytes
+        public let ciphertextSize: Int
+        public let avatarBinding: MetadataAadAvatarBinding?
 
         public init(
             `protocol`: String, version: Int, coordinate: MetadataCryptoContext, metadataVersion: Int, originTransitionId: Bytes, ciphertextSize: Int, avatarBinding: MetadataAadAvatarBinding? = nil
@@ -9306,18 +9303,18 @@ public struct MetadataAad: ATProtocolCodable, ATProtocolValue {
             case avatarBinding
         }
     }
-        
-public struct MetadataAuthorProof: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#metadataAuthorProof"
-            public let authorDid: BareDid
-            public let authorDeviceId: DeviceId
-            public let authorKeyId: KeyId
-            public let signaturePublicKey: Bytes
-            public let authGenerationAtOrigin: Int
-            public let originTransitionId: OperationId
-            public let originSeq: Int
-            public let roleAtOrigin: String
-            public let deviceStatusAtOrigin: String
+
+    public struct MetadataAuthorProof: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#metadataAuthorProof"
+        public let authorDid: BareDid
+        public let authorDeviceId: DeviceId
+        public let authorKeyId: KeyId
+        public let signaturePublicKey: Bytes
+        public let authGenerationAtOrigin: Int
+        public let originTransitionId: OperationId
+        public let originSeq: Int
+        public let roleAtOrigin: String
+        public let deviceStatusAtOrigin: String
 
         public init(
             authorDid: BareDid, authorDeviceId: DeviceId, authorKeyId: KeyId, signaturePublicKey: Bytes, authGenerationAtOrigin: Int, originTransitionId: OperationId, originSeq: Int, roleAtOrigin: String, deviceStatusAtOrigin: String
@@ -9490,19 +9487,19 @@ public struct MetadataAuthorProof: ATProtocolCodable, ATProtocolValue {
             case deviceStatusAtOrigin
         }
     }
-        
-public struct MetadataContentProjection: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#metadataContentProjection"
-            public let `protocol`: String
-            public let version: Int
-            public let originTransitionId: Bytes
-            public let metadataVersion: Int
-            public let authorDid: BareDid
-            public let authorDeviceId: Bytes
-            public let authorKeyId: KeyId
-            public let title: String
-            public let description: String?
-            public let avatar: MetadataAvatarEmbed?
+
+    public struct MetadataContentProjection: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#metadataContentProjection"
+        public let `protocol`: String
+        public let version: Int
+        public let originTransitionId: Bytes
+        public let metadataVersion: Int
+        public let authorDid: BareDid
+        public let authorDeviceId: Bytes
+        public let authorKeyId: KeyId
+        public let title: String
+        public let description: String?
+        public let avatar: MetadataAvatarEmbed?
 
         public init(
             `protocol`: String, version: Int, originTransitionId: Bytes, metadataVersion: Int, authorDid: BareDid, authorDeviceId: Bytes, authorKeyId: KeyId, title: String, description: String? = nil, avatar: MetadataAvatarEmbed? = nil
@@ -9706,11 +9703,11 @@ public struct MetadataContentProjection: ATProtocolCodable, ATProtocolValue {
             case avatar
         }
     }
-        
-public struct MetadataPlaintext: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#metadataPlaintext"
-            public let content: MetadataContentProjection
-            public let contentSignature: Bytes
+
+    public struct MetadataPlaintext: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#metadataPlaintext"
+        public let content: MetadataContentProjection
+        public let contentSignature: Bytes
 
         public init(
             content: MetadataContentProjection, contentSignature: Bytes
@@ -9778,18 +9775,18 @@ public struct MetadataPlaintext: ATProtocolCodable, ATProtocolValue {
             case contentSignature
         }
     }
-        
-public struct MetadataSnapshot: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#metadataSnapshot"
-            public let coordinate: MetadataCryptoContext
-            public let originTransitionId: OperationId
-            public let metadataVersion: Int
-            public let nonce: Bytes
-            public let ciphertext: Bytes
-            public let ciphertextSha256: Bytes
-            public let ciphertextSize: Int
-            public let avatarBinding: MetadataAvatarBinding?
-            public let authorProof: MetadataAuthorProof
+
+    public struct MetadataSnapshot: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#metadataSnapshot"
+        public let coordinate: MetadataCryptoContext
+        public let originTransitionId: OperationId
+        public let metadataVersion: Int
+        public let nonce: Bytes
+        public let ciphertext: Bytes
+        public let ciphertextSha256: Bytes
+        public let ciphertextSize: Int
+        public let avatarBinding: MetadataAvatarBinding?
+        public let authorProof: MetadataAuthorProof
 
         public init(
             coordinate: MetadataCryptoContext, originTransitionId: OperationId, metadataVersion: Int, nonce: Bytes, ciphertext: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, avatarBinding: MetadataAvatarBinding? = nil, authorProof: MetadataAuthorProof
@@ -9970,20 +9967,20 @@ public struct MetadataSnapshot: ATProtocolCodable, ATProtocolValue {
             case authorProof
         }
     }
-        
-public struct MetadataTransitionBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#metadataTransitionBody"
-            public let signatureDomain: String
-            public let transitionId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let prior: ConversationCoordinates
-            public let next: ConversationCoordinates
-            public let metadataSnapshot: MetadataSnapshot
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct MetadataTransitionBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#metadataTransitionBody"
+        public let signatureDomain: String
+        public let transitionId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let prior: ConversationCoordinates
+        public let next: ConversationCoordinates
+        public let metadataSnapshot: MetadataSnapshot
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, transitionId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, next: ConversationCoordinates, metadataSnapshot: MetadataSnapshot, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -10186,18 +10183,18 @@ public struct MetadataTransitionBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct TypingBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#typingBody"
-            public let signatureDomain: String
-            public let typingId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let coordinates: ConversationCoordinates
-            public let isTyping: Bool
-            public let signedAt: CanonicalDatetime
+
+    public struct TypingBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#typingBody"
+        public let signatureDomain: String
+        public let typingId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let coordinates: ConversationCoordinates
+        public let isTyping: Bool
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, typingId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, coordinates: ConversationCoordinates, isTyping: Bool, signedAt: CanonicalDatetime
@@ -10370,15 +10367,15 @@ public struct TypingBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct TypingEvent: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#typingEvent"
-            public let typingId: OperationId
-            public let conversationId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let isTyping: Bool
-            public let expiresAt: CanonicalDatetime
+
+    public struct TypingEvent: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#typingEvent"
+        public let typingId: OperationId
+        public let conversationId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let isTyping: Bool
+        public let expiresAt: CanonicalDatetime
 
         public init(
             typingId: OperationId, conversationId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, isTyping: Bool, expiresAt: CanonicalDatetime
@@ -10506,24 +10503,24 @@ public struct TypingEvent: ATProtocolCodable, ATProtocolValue {
             case expiresAt
         }
     }
-        
-public struct BlobUploadPreparationBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#blobUploadPreparationBody"
-            public let signatureDomain: String
-            public let blobId: OperationId
-            public let conversationId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let prior: ConversationCoordinates
-            public let ciphertextSha256: Bytes
-            public let ciphertextSize: Int
-            public let mediaType: String
-            public let plaintextSize: Int
-            public let purpose: DefsBlobPurpose
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct BlobUploadPreparationBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#blobUploadPreparationBody"
+        public let signatureDomain: String
+        public let blobId: OperationId
+        public let conversationId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let prior: ConversationCoordinates
+        public let ciphertextSha256: Bytes
+        public let ciphertextSize: Int
+        public let mediaType: String
+        public let plaintextSize: Int
+        public let purpose: DefsBlobPurpose
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, blobId: OperationId, conversationId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, ciphertextSha256: Bytes, ciphertextSize: Int, mediaType: String, plaintextSize: Int, purpose: DefsBlobPurpose, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -10786,17 +10783,17 @@ public struct BlobUploadPreparationBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct BlobDeletionBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#blobDeletionBody"
-            public let signatureDomain: String
-            public let blobId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct BlobDeletionBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#blobDeletionBody"
+        public let signatureDomain: String
+        public let blobId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, blobId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -10954,19 +10951,19 @@ public struct BlobDeletionBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct ResetRequestBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#resetRequestBody"
-            public let signatureDomain: String
-            public let resetRequestId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let prior: ConversationCoordinates
-            public let reason: DefsResetReason
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct ResetRequestBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#resetRequestBody"
+        public let signatureDomain: String
+        public let resetRequestId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let prior: ConversationCoordinates
+        public let reason: DefsResetReason
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, resetRequestId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, reason: DefsResetReason, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -11154,25 +11151,25 @@ public struct ResetRequestBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct ResetActivationBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#resetActivationBody"
-            public let signatureDomain: String
-            public let resetRequestId: OperationId
-            public let transitionId: OperationId
-            public let conversationKind: DefsConversationKind
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let prior: ConversationCoordinates
-            public let retired: ConversationCoordinates
-            public let successor: ConversationCoordinates
-            public let manifest: ResetActivationManifest
-            public let genesisGroupInfo: GroupInfoArtifact
-            public let metadataSnapshot: MetadataSnapshot
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct ResetActivationBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#resetActivationBody"
+        public let signatureDomain: String
+        public let resetRequestId: OperationId
+        public let transitionId: OperationId
+        public let conversationKind: DefsConversationKind
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let prior: ConversationCoordinates
+        public let retired: ConversationCoordinates
+        public let successor: ConversationCoordinates
+        public let manifest: ResetActivationManifest
+        public let genesisGroupInfo: GroupInfoArtifact
+        public let metadataSnapshot: MetadataSnapshot
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, resetRequestId: OperationId, transitionId: OperationId, conversationKind: DefsConversationKind, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, retired: ConversationCoordinates, successor: ConversationCoordinates, manifest: ResetActivationManifest, genesisGroupInfo: GroupInfoArtifact, metadataSnapshot: MetadataSnapshot, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -11450,18 +11447,18 @@ public struct ResetActivationBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct ResetRequestView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#resetRequestView"
-            public let resetRequestId: OperationId
-            public let conversationId: OperationId
-            public let requesterDid: BareDid
-            public let requesterDeviceId: DeviceId
-            public let prior: ConversationCoordinates
-            public let reason: DefsResetReason
-            public let status: ResetRequestViewStatus
-            public let requestedAt: CanonicalDatetime
-            public let expiresAt: CanonicalDatetime
+
+    public struct ResetRequestView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#resetRequestView"
+        public let resetRequestId: OperationId
+        public let conversationId: OperationId
+        public let requesterDid: BareDid
+        public let requesterDeviceId: DeviceId
+        public let prior: ConversationCoordinates
+        public let reason: DefsResetReason
+        public let status: ResetRequestViewStatus
+        public let requestedAt: CanonicalDatetime
+        public let expiresAt: CanonicalDatetime
 
         public init(
             resetRequestId: OperationId, conversationId: OperationId, requesterDid: BareDid, requesterDeviceId: DeviceId, prior: ConversationCoordinates, reason: DefsResetReason, status: ResetRequestViewStatus, requestedAt: CanonicalDatetime, expiresAt: CanonicalDatetime
@@ -11634,19 +11631,19 @@ public struct ResetRequestView: ATProtocolCodable, ATProtocolValue {
             case expiresAt
         }
     }
-        
-public struct LeafRecoveryRequestBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#leafRecoveryRequestBody"
-            public let signatureDomain: String
-            public let recoveryRequestId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let prior: ConversationCoordinates
-            public let recoveryKind: DefsLeafRecoveryKind
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct LeafRecoveryRequestBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#leafRecoveryRequestBody"
+        public let signatureDomain: String
+        public let recoveryRequestId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let prior: ConversationCoordinates
+        public let recoveryKind: DefsLeafRecoveryKind
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, recoveryRequestId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, recoveryKind: DefsLeafRecoveryKind, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -11834,17 +11831,17 @@ public struct LeafRecoveryRequestBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct LeafRecoveryCancellationBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#leafRecoveryCancellationBody"
-            public let signatureDomain: String
-            public let recoveryRequestId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct LeafRecoveryCancellationBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#leafRecoveryCancellationBody"
+        public let signatureDomain: String
+        public let recoveryRequestId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, recoveryRequestId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -12002,24 +11999,24 @@ public struct LeafRecoveryCancellationBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct LeafRecoveryFulfillmentBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#leafRecoveryFulfillmentBody"
-            public let signatureDomain: String
-            public let recoveryRequestId: OperationId
-            public let transitionId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let prior: ConversationCoordinates
-            public let next: ConversationCoordinates
-            public let aad: CommitAad
-            public let manifest: TransitionManifest
-            public let commit: PublicCommit
-            public let metadataSnapshot: MetadataSnapshot
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct LeafRecoveryFulfillmentBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#leafRecoveryFulfillmentBody"
+        public let signatureDomain: String
+        public let recoveryRequestId: OperationId
+        public let transitionId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let prior: ConversationCoordinates
+        public let next: ConversationCoordinates
+        public let aad: CommitAad
+        public let manifest: TransitionManifest
+        public let commit: PublicCommit
+        public let metadataSnapshot: MetadataSnapshot
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, recoveryRequestId: OperationId, transitionId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, next: ConversationCoordinates, aad: CommitAad, manifest: TransitionManifest, commit: PublicCommit, metadataSnapshot: MetadataSnapshot, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -12282,19 +12279,19 @@ public struct LeafRecoveryFulfillmentBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct LeafRecoveryView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#leafRecoveryView"
-            public let recoveryRequestId: OperationId
-            public let conversationId: OperationId
-            public let requesterDid: BareDid
-            public let requesterDeviceId: DeviceId
-            public let recoveryKind: DefsLeafRecoveryKind
-            public let boundCoordinate: ConversationCoordinates
-            public let reservation: LeafRecoveryReservation
-            public let status: DefsLeafRecoveryStatus
-            public let requestedAt: CanonicalDatetime
-            public let expiresAt: CanonicalDatetime
+
+    public struct LeafRecoveryView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#leafRecoveryView"
+        public let recoveryRequestId: OperationId
+        public let conversationId: OperationId
+        public let requesterDid: BareDid
+        public let requesterDeviceId: DeviceId
+        public let recoveryKind: DefsLeafRecoveryKind
+        public let boundCoordinate: ConversationCoordinates
+        public let reservation: LeafRecoveryReservation
+        public let status: DefsLeafRecoveryStatus
+        public let requestedAt: CanonicalDatetime
+        public let expiresAt: CanonicalDatetime
 
         public init(
             recoveryRequestId: OperationId, conversationId: OperationId, requesterDid: BareDid, requesterDeviceId: DeviceId, recoveryKind: DefsLeafRecoveryKind, boundCoordinate: ConversationCoordinates, reservation: LeafRecoveryReservation, status: DefsLeafRecoveryStatus, requestedAt: CanonicalDatetime, expiresAt: CanonicalDatetime
@@ -12482,18 +12479,18 @@ public struct LeafRecoveryView: ATProtocolCodable, ATProtocolValue {
             case expiresAt
         }
     }
-        
-public struct RecoveryWorkPendingView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#recoveryWorkPendingView"
-            public let recoveryWorkId: OperationId
-            public let conversationId: OperationId
-            public let recipientDid: BareDid
-            public let recipientDeviceId: DeviceId
-            public let sourceKind: DefsRecoveryWorkSourceKind
-            public let sourceId: OperationId
-            public let sourceCoordinate: ConversationCoordinates
-            public let status: String
-            public let createdAt: CanonicalDatetime
+
+    public struct RecoveryWorkPendingView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#recoveryWorkPendingView"
+        public let recoveryWorkId: OperationId
+        public let conversationId: OperationId
+        public let recipientDid: BareDid
+        public let recipientDeviceId: DeviceId
+        public let sourceKind: DefsRecoveryWorkSourceKind
+        public let sourceId: OperationId
+        public let sourceCoordinate: ConversationCoordinates
+        public let status: String
+        public let createdAt: CanonicalDatetime
 
         public init(
             recoveryWorkId: OperationId, conversationId: OperationId, recipientDid: BareDid, recipientDeviceId: DeviceId, sourceKind: DefsRecoveryWorkSourceKind, sourceId: OperationId, sourceCoordinate: ConversationCoordinates, status: String, createdAt: CanonicalDatetime
@@ -12666,20 +12663,20 @@ public struct RecoveryWorkPendingView: ATProtocolCodable, ATProtocolValue {
             case createdAt
         }
     }
-        
-public struct RecoveryWorkCompletedByTransitionView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView"
-            public let recoveryWorkId: OperationId
-            public let conversationId: OperationId
-            public let recipientDid: BareDid
-            public let recipientDeviceId: DeviceId
-            public let sourceKind: DefsRecoveryWorkSourceKind
-            public let sourceId: OperationId
-            public let sourceCoordinate: ConversationCoordinates
-            public let status: String
-            public let createdAt: CanonicalDatetime
-            public let terminalTransitionId: OperationId
-            public let terminalAt: CanonicalDatetime
+
+    public struct RecoveryWorkCompletedByTransitionView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView"
+        public let recoveryWorkId: OperationId
+        public let conversationId: OperationId
+        public let recipientDid: BareDid
+        public let recipientDeviceId: DeviceId
+        public let sourceKind: DefsRecoveryWorkSourceKind
+        public let sourceId: OperationId
+        public let sourceCoordinate: ConversationCoordinates
+        public let status: String
+        public let createdAt: CanonicalDatetime
+        public let terminalTransitionId: OperationId
+        public let terminalAt: CanonicalDatetime
 
         public init(
             recoveryWorkId: OperationId, conversationId: OperationId, recipientDid: BareDid, recipientDeviceId: DeviceId, sourceKind: DefsRecoveryWorkSourceKind, sourceId: OperationId, sourceCoordinate: ConversationCoordinates, status: String, createdAt: CanonicalDatetime, terminalTransitionId: OperationId, terminalAt: CanonicalDatetime
@@ -12882,20 +12879,20 @@ public struct RecoveryWorkCompletedByTransitionView: ATProtocolCodable, ATProtoc
             case terminalAt
         }
     }
-        
-public struct RecoveryWorkSupersededByTransitionView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView"
-            public let recoveryWorkId: OperationId
-            public let conversationId: OperationId
-            public let recipientDid: BareDid
-            public let recipientDeviceId: DeviceId
-            public let sourceKind: DefsRecoveryWorkSourceKind
-            public let sourceId: OperationId
-            public let sourceCoordinate: ConversationCoordinates
-            public let status: String
-            public let createdAt: CanonicalDatetime
-            public let terminalTransitionId: OperationId
-            public let terminalAt: CanonicalDatetime
+
+    public struct RecoveryWorkSupersededByTransitionView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView"
+        public let recoveryWorkId: OperationId
+        public let conversationId: OperationId
+        public let recipientDid: BareDid
+        public let recipientDeviceId: DeviceId
+        public let sourceKind: DefsRecoveryWorkSourceKind
+        public let sourceId: OperationId
+        public let sourceCoordinate: ConversationCoordinates
+        public let status: String
+        public let createdAt: CanonicalDatetime
+        public let terminalTransitionId: OperationId
+        public let terminalAt: CanonicalDatetime
 
         public init(
             recoveryWorkId: OperationId, conversationId: OperationId, recipientDid: BareDid, recipientDeviceId: DeviceId, sourceKind: DefsRecoveryWorkSourceKind, sourceId: OperationId, sourceCoordinate: ConversationCoordinates, status: String, createdAt: CanonicalDatetime, terminalTransitionId: OperationId, terminalAt: CanonicalDatetime
@@ -13098,20 +13095,20 @@ public struct RecoveryWorkSupersededByTransitionView: ATProtocolCodable, ATProto
             case terminalAt
         }
     }
-        
-public struct RecoveryWorkSupersededByRevocationView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView"
-            public let recoveryWorkId: OperationId
-            public let conversationId: OperationId
-            public let recipientDid: BareDid
-            public let recipientDeviceId: DeviceId
-            public let sourceKind: DefsRecoveryWorkSourceKind
-            public let sourceId: OperationId
-            public let sourceCoordinate: ConversationCoordinates
-            public let status: String
-            public let createdAt: CanonicalDatetime
-            public let terminalRevocationId: OperationId
-            public let terminalAt: CanonicalDatetime
+
+    public struct RecoveryWorkSupersededByRevocationView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView"
+        public let recoveryWorkId: OperationId
+        public let conversationId: OperationId
+        public let recipientDid: BareDid
+        public let recipientDeviceId: DeviceId
+        public let sourceKind: DefsRecoveryWorkSourceKind
+        public let sourceId: OperationId
+        public let sourceCoordinate: ConversationCoordinates
+        public let status: String
+        public let createdAt: CanonicalDatetime
+        public let terminalRevocationId: OperationId
+        public let terminalAt: CanonicalDatetime
 
         public init(
             recoveryWorkId: OperationId, conversationId: OperationId, recipientDid: BareDid, recipientDeviceId: DeviceId, sourceKind: DefsRecoveryWorkSourceKind, sourceId: OperationId, sourceCoordinate: ConversationCoordinates, status: String, createdAt: CanonicalDatetime, terminalRevocationId: OperationId, terminalAt: CanonicalDatetime
@@ -13314,20 +13311,20 @@ public struct RecoveryWorkSupersededByRevocationView: ATProtocolCodable, ATProto
             case terminalAt
         }
     }
-        
-public struct ConversationCloseBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#conversationCloseBody"
-            public let signatureDomain: String
-            public let transitionId: OperationId
-            public let conversationKind: DefsConversationKind
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let prior: ConversationCoordinates
-            public let retired: ConversationCoordinates
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct ConversationCloseBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#conversationCloseBody"
+        public let signatureDomain: String
+        public let transitionId: OperationId
+        public let conversationKind: DefsConversationKind
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let prior: ConversationCoordinates
+        public let retired: ConversationCoordinates
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, transitionId: OperationId, conversationKind: DefsConversationKind, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, retired: ConversationCoordinates, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -13530,18 +13527,18 @@ public struct ConversationCloseBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct LeaveRequestBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#leaveRequestBody"
-            public let signatureDomain: String
-            public let leaveRequestId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let prior: ConversationCoordinates
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct LeaveRequestBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#leaveRequestBody"
+        public let signatureDomain: String
+        public let leaveRequestId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let prior: ConversationCoordinates
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, leaveRequestId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -13714,19 +13711,19 @@ public struct LeaveRequestBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct ZeroLeafLeaveBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#zeroLeafLeaveBody"
-            public let signatureDomain: String
-            public let transitionId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let prior: ConversationCoordinates
-            public let next: ConversationCoordinates
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct ZeroLeafLeaveBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#zeroLeafLeaveBody"
+        public let signatureDomain: String
+        public let transitionId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let prior: ConversationCoordinates
+        public let next: ConversationCoordinates
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, transitionId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, next: ConversationCoordinates, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -13914,18 +13911,18 @@ public struct ZeroLeafLeaveBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct LeaveCancellationBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#leaveCancellationBody"
-            public let signatureDomain: String
-            public let conversationId: OperationId
-            public let leaveRequestId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct LeaveCancellationBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#leaveCancellationBody"
+        public let signatureDomain: String
+        public let conversationId: OperationId
+        public let leaveRequestId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, conversationId: OperationId, leaveRequestId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -14098,24 +14095,24 @@ public struct LeaveCancellationBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct LeaveCommitFulfillmentBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#leaveCommitFulfillmentBody"
-            public let signatureDomain: String
-            public let leaveRequestId: OperationId
-            public let transitionId: OperationId
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let prior: ConversationCoordinates
-            public let next: ConversationCoordinates
-            public let aad: CommitAad
-            public let manifest: TransitionManifest
-            public let commit: PublicCommit
-            public let metadataSnapshot: MetadataSnapshot
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct LeaveCommitFulfillmentBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#leaveCommitFulfillmentBody"
+        public let signatureDomain: String
+        public let leaveRequestId: OperationId
+        public let transitionId: OperationId
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let prior: ConversationCoordinates
+        public let next: ConversationCoordinates
+        public let aad: CommitAad
+        public let manifest: TransitionManifest
+        public let commit: PublicCommit
+        public let metadataSnapshot: MetadataSnapshot
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, leaveRequestId: OperationId, transitionId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, next: ConversationCoordinates, aad: CommitAad, manifest: TransitionManifest, commit: PublicCommit, metadataSnapshot: MetadataSnapshot, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -14378,17 +14375,17 @@ public struct LeaveCommitFulfillmentBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct LeaveRequestView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#leaveRequestView"
-            public let leaveRequestId: OperationId
-            public let conversationId: OperationId
-            public let requesterDid: BareDid
-            public let requesterDeviceId: DeviceId
-            public let prior: ConversationCoordinates
-            public let status: DefsLeaveRequestStatus
-            public let requestedAt: CanonicalDatetime
-            public let expiresAt: CanonicalDatetime
+
+    public struct LeaveRequestView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#leaveRequestView"
+        public let leaveRequestId: OperationId
+        public let conversationId: OperationId
+        public let requesterDid: BareDid
+        public let requesterDeviceId: DeviceId
+        public let prior: ConversationCoordinates
+        public let status: DefsLeaveRequestStatus
+        public let requestedAt: CanonicalDatetime
+        public let expiresAt: CanonicalDatetime
 
         public init(
             leaveRequestId: OperationId, conversationId: OperationId, requesterDid: BareDid, requesterDeviceId: DeviceId, prior: ConversationCoordinates, status: DefsLeaveRequestStatus, requestedAt: CanonicalDatetime, expiresAt: CanonicalDatetime
@@ -14546,11 +14543,11 @@ public struct LeaveRequestView: ATProtocolCodable, ATProtocolValue {
             case expiresAt
         }
     }
-        
-public struct DurableLeaveRequestResult: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#durableLeaveRequestResult"
-            public let leaveRequest: LeaveRequestView
-            public let entry: LeaveRequestEntry
+
+    public struct DurableLeaveRequestResult: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#durableLeaveRequestResult"
+        public let leaveRequest: LeaveRequestView
+        public let entry: LeaveRequestEntry
 
         public init(
             leaveRequest: LeaveRequestView, entry: LeaveRequestEntry
@@ -14618,11 +14615,11 @@ public struct DurableLeaveRequestResult: ATProtocolCodable, ATProtocolValue {
             case entry
         }
     }
-        
-public struct ZeroLeafLeaveResult: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#zeroLeafLeaveResult"
-            public let coordinates: ConversationCoordinates
-            public let entry: ZeroLeafLeaveEntry
+
+    public struct ZeroLeafLeaveResult: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#zeroLeafLeaveResult"
+        public let coordinates: ConversationCoordinates
+        public let entry: ZeroLeafLeaveEntry
 
         public init(
             coordinates: ConversationCoordinates, entry: ZeroLeafLeaveEntry
@@ -14690,11 +14687,11 @@ public struct ZeroLeafLeaveResult: ATProtocolCodable, ATProtocolValue {
             case entry
         }
     }
-        
-public struct ConversationCreatedResult: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#conversationCreatedResult"
-            public let coordinates: ConversationCoordinates
-            public let entry: CreationEntry
+
+    public struct ConversationCreatedResult: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#conversationCreatedResult"
+        public let coordinates: ConversationCoordinates
+        public let entry: CreationEntry
 
         public init(
             coordinates: ConversationCoordinates, entry: CreationEntry
@@ -14762,12 +14759,12 @@ public struct ConversationCreatedResult: ATProtocolCodable, ATProtocolValue {
             case entry
         }
     }
-        
-public struct ExistingDirectConversationResult: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#existingDirectConversationResult"
-            public let conversationKind: String
-            public let conversationId: OperationId
-            public let coordinates: ConversationCoordinates
+
+    public struct ExistingDirectConversationResult: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#existingDirectConversationResult"
+        public let conversationKind: String
+        public let conversationId: OperationId
+        public let coordinates: ConversationCoordinates
 
         public init(
             conversationKind: String, conversationId: OperationId, coordinates: ConversationCoordinates
@@ -14850,19 +14847,19 @@ public struct ExistingDirectConversationResult: ATProtocolCodable, ATProtocolVal
             case coordinates
         }
     }
-        
-public struct WelcomeAcknowledgementBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#welcomeAcknowledgementBody"
-            public let signatureDomain: String
-            public let welcomeId: OperationId
-            public let transitionSeq: Int
-            public let coordinates: ConversationCoordinates
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct WelcomeAcknowledgementBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#welcomeAcknowledgementBody"
+        public let signatureDomain: String
+        public let welcomeId: OperationId
+        public let transitionSeq: Int
+        public let coordinates: ConversationCoordinates
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, welcomeId: OperationId, transitionSeq: Int, coordinates: ConversationCoordinates, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -15050,20 +15047,20 @@ public struct WelcomeAcknowledgementBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct WelcomeRejectionBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#welcomeRejectionBody"
-            public let signatureDomain: String
-            public let welcomeId: OperationId
-            public let transitionSeq: Int
-            public let coordinates: ConversationCoordinates
-            public let reason: DefsWelcomeRejectionReason
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct WelcomeRejectionBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#welcomeRejectionBody"
+        public let signatureDomain: String
+        public let welcomeId: OperationId
+        public let transitionSeq: Int
+        public let coordinates: ConversationCoordinates
+        public let reason: DefsWelcomeRejectionReason
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, welcomeId: OperationId, transitionSeq: Int, coordinates: ConversationCoordinates, reason: DefsWelcomeRejectionReason, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -15266,11 +15263,11 @@ public struct WelcomeRejectionBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct SignedDeviceEnrollment: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedDeviceEnrollment"
-            public let body: SignedDeviceEnrollmentBodyUnion
-            public let signature: Bytes
+
+    public struct SignedDeviceEnrollment: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedDeviceEnrollment"
+        public let body: SignedDeviceEnrollmentBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedDeviceEnrollmentBodyUnion, signature: Bytes
@@ -15338,11 +15335,11 @@ public struct SignedDeviceEnrollment: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedKeyPackageReplenishment: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedKeyPackageReplenishment"
-            public let body: SignedKeyPackageReplenishmentBodyUnion
-            public let signature: Bytes
+
+    public struct SignedKeyPackageReplenishment: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedKeyPackageReplenishment"
+        public let body: SignedKeyPackageReplenishmentBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedKeyPackageReplenishmentBodyUnion, signature: Bytes
@@ -15410,11 +15407,11 @@ public struct SignedKeyPackageReplenishment: ATProtocolCodable, ATProtocolValue 
             case signature
         }
     }
-        
-public struct SignedDeviceRevocation: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedDeviceRevocation"
-            public let body: SignedDeviceRevocationBodyUnion
-            public let signature: Bytes
+
+    public struct SignedDeviceRevocation: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedDeviceRevocation"
+        public let body: SignedDeviceRevocationBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedDeviceRevocationBodyUnion, signature: Bytes
@@ -15482,11 +15479,11 @@ public struct SignedDeviceRevocation: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedBlobUploadPreparation: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedBlobUploadPreparation"
-            public let body: SignedBlobUploadPreparationBodyUnion
-            public let signature: Bytes
+
+    public struct SignedBlobUploadPreparation: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedBlobUploadPreparation"
+        public let body: SignedBlobUploadPreparationBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedBlobUploadPreparationBodyUnion, signature: Bytes
@@ -15554,11 +15551,11 @@ public struct SignedBlobUploadPreparation: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedBlobDeletion: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedBlobDeletion"
-            public let body: SignedBlobDeletionBodyUnion
-            public let signature: Bytes
+
+    public struct SignedBlobDeletion: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedBlobDeletion"
+        public let body: SignedBlobDeletionBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedBlobDeletionBodyUnion, signature: Bytes
@@ -15626,11 +15623,11 @@ public struct SignedBlobDeletion: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedCreation: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedCreation"
-            public let body: SignedCreationBodyUnion
-            public let signature: Bytes
+
+    public struct SignedCreation: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedCreation"
+        public let body: SignedCreationBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedCreationBodyUnion, signature: Bytes
@@ -15698,11 +15695,11 @@ public struct SignedCreation: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedCommitTransition: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedCommitTransition"
-            public let body: SignedCommitTransitionBodyUnion
-            public let signature: Bytes
+
+    public struct SignedCommitTransition: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedCommitTransition"
+        public let body: SignedCommitTransitionBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedCommitTransitionBodyUnion, signature: Bytes
@@ -15770,11 +15767,11 @@ public struct SignedCommitTransition: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedPolicyTransition: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedPolicyTransition"
-            public let body: SignedPolicyTransitionBodyUnion
-            public let signature: Bytes
+
+    public struct SignedPolicyTransition: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedPolicyTransition"
+        public let body: SignedPolicyTransitionBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedPolicyTransitionBodyUnion, signature: Bytes
@@ -15842,11 +15839,11 @@ public struct SignedPolicyTransition: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedParticipantAcceptance: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedParticipantAcceptance"
-            public let body: SignedParticipantAcceptanceBodyUnion
-            public let signature: Bytes
+
+    public struct SignedParticipantAcceptance: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedParticipantAcceptance"
+        public let body: SignedParticipantAcceptanceBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedParticipantAcceptanceBodyUnion, signature: Bytes
@@ -15914,11 +15911,11 @@ public struct SignedParticipantAcceptance: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedApplicationSend: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedApplicationSend"
-            public let body: SignedApplicationSendBodyUnion
-            public let signature: Bytes
+
+    public struct SignedApplicationSend: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedApplicationSend"
+        public let body: SignedApplicationSendBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedApplicationSendBodyUnion, signature: Bytes
@@ -15986,11 +15983,11 @@ public struct SignedApplicationSend: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedTyping: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedTyping"
-            public let body: SignedTypingBodyUnion
-            public let signature: Bytes
+
+    public struct SignedTyping: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedTyping"
+        public let body: SignedTypingBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedTypingBodyUnion, signature: Bytes
@@ -16058,11 +16055,11 @@ public struct SignedTyping: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedMetadataTransition: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedMetadataTransition"
-            public let body: SignedMetadataTransitionBodyUnion
-            public let signature: Bytes
+
+    public struct SignedMetadataTransition: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedMetadataTransition"
+        public let body: SignedMetadataTransitionBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedMetadataTransitionBodyUnion, signature: Bytes
@@ -16130,11 +16127,11 @@ public struct SignedMetadataTransition: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedResetRequest: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedResetRequest"
-            public let body: SignedResetRequestBodyUnion
-            public let signature: Bytes
+
+    public struct SignedResetRequest: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedResetRequest"
+        public let body: SignedResetRequestBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedResetRequestBodyUnion, signature: Bytes
@@ -16202,11 +16199,11 @@ public struct SignedResetRequest: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedResetActivation: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedResetActivation"
-            public let body: SignedResetActivationBodyUnion
-            public let signature: Bytes
+
+    public struct SignedResetActivation: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedResetActivation"
+        public let body: SignedResetActivationBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedResetActivationBodyUnion, signature: Bytes
@@ -16274,11 +16271,11 @@ public struct SignedResetActivation: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedLeafRecoveryRequest: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedLeafRecoveryRequest"
-            public let body: SignedLeafRecoveryRequestBodyUnion
-            public let signature: Bytes
+
+    public struct SignedLeafRecoveryRequest: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedLeafRecoveryRequest"
+        public let body: SignedLeafRecoveryRequestBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedLeafRecoveryRequestBodyUnion, signature: Bytes
@@ -16346,11 +16343,11 @@ public struct SignedLeafRecoveryRequest: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedLeafRecoveryCancellation: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedLeafRecoveryCancellation"
-            public let body: SignedLeafRecoveryCancellationBodyUnion
-            public let signature: Bytes
+
+    public struct SignedLeafRecoveryCancellation: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedLeafRecoveryCancellation"
+        public let body: SignedLeafRecoveryCancellationBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedLeafRecoveryCancellationBodyUnion, signature: Bytes
@@ -16418,11 +16415,11 @@ public struct SignedLeafRecoveryCancellation: ATProtocolCodable, ATProtocolValue
             case signature
         }
     }
-        
-public struct SignedLeafRecoveryFulfillment: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedLeafRecoveryFulfillment"
-            public let body: SignedLeafRecoveryFulfillmentBodyUnion
-            public let signature: Bytes
+
+    public struct SignedLeafRecoveryFulfillment: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedLeafRecoveryFulfillment"
+        public let body: SignedLeafRecoveryFulfillmentBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedLeafRecoveryFulfillmentBodyUnion, signature: Bytes
@@ -16490,11 +16487,11 @@ public struct SignedLeafRecoveryFulfillment: ATProtocolCodable, ATProtocolValue 
             case signature
         }
     }
-        
-public struct SignedConversationClose: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedConversationClose"
-            public let body: SignedConversationCloseBodyUnion
-            public let signature: Bytes
+
+    public struct SignedConversationClose: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedConversationClose"
+        public let body: SignedConversationCloseBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedConversationCloseBodyUnion, signature: Bytes
@@ -16562,11 +16559,11 @@ public struct SignedConversationClose: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedLeaveRequest: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedLeaveRequest"
-            public let body: SignedLeaveRequestBodyUnion
-            public let signature: Bytes
+
+    public struct SignedLeaveRequest: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedLeaveRequest"
+        public let body: SignedLeaveRequestBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedLeaveRequestBodyUnion, signature: Bytes
@@ -16634,11 +16631,11 @@ public struct SignedLeaveRequest: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedZeroLeafLeave: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedZeroLeafLeave"
-            public let body: SignedZeroLeafLeaveBodyUnion
-            public let signature: Bytes
+
+    public struct SignedZeroLeafLeave: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedZeroLeafLeave"
+        public let body: SignedZeroLeafLeaveBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedZeroLeafLeaveBodyUnion, signature: Bytes
@@ -16706,11 +16703,11 @@ public struct SignedZeroLeafLeave: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedLeaveCancellation: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedLeaveCancellation"
-            public let body: SignedLeaveCancellationBodyUnion
-            public let signature: Bytes
+
+    public struct SignedLeaveCancellation: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedLeaveCancellation"
+        public let body: SignedLeaveCancellationBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedLeaveCancellationBodyUnion, signature: Bytes
@@ -16778,11 +16775,11 @@ public struct SignedLeaveCancellation: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedLeaveCommitFulfillment: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedLeaveCommitFulfillment"
-            public let body: SignedLeaveCommitFulfillmentBodyUnion
-            public let signature: Bytes
+
+    public struct SignedLeaveCommitFulfillment: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedLeaveCommitFulfillment"
+        public let body: SignedLeaveCommitFulfillmentBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedLeaveCommitFulfillmentBodyUnion, signature: Bytes
@@ -16850,11 +16847,11 @@ public struct SignedLeaveCommitFulfillment: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedWelcomeAcknowledgement: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedWelcomeAcknowledgement"
-            public let body: SignedWelcomeAcknowledgementBodyUnion
-            public let signature: Bytes
+
+    public struct SignedWelcomeAcknowledgement: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedWelcomeAcknowledgement"
+        public let body: SignedWelcomeAcknowledgementBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedWelcomeAcknowledgementBodyUnion, signature: Bytes
@@ -16922,11 +16919,11 @@ public struct SignedWelcomeAcknowledgement: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct SignedWelcomeRejection: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedWelcomeRejection"
-            public let body: SignedWelcomeRejectionBodyUnion
-            public let signature: Bytes
+
+    public struct SignedWelcomeRejection: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedWelcomeRejection"
+        public let body: SignedWelcomeRejectionBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedWelcomeRejectionBodyUnion, signature: Bytes
@@ -16994,19 +16991,19 @@ public struct SignedWelcomeRejection: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct ConversationState: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#conversationState"
-            public let conversationKind: DefsConversationKind
-            public let coordinates: ConversationCoordinates
-            public let cipherSuite: DefsCipherSuite
-            public let participants: [ParticipantView]
-            public let leaves: [DeviceLeafView]
-            public let metadataSnapshot: MetadataSnapshot
-            public let snapshotSeq: Int
-            public let sequencerDid: BareDid?
-            public let sequencerTerm: Int?
-            public let directRequest: DirectRequestState?
+
+    public struct ConversationState: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#conversationState"
+        public let conversationKind: DefsConversationKind
+        public let coordinates: ConversationCoordinates
+        public let cipherSuite: DefsCipherSuite
+        public let participants: [ParticipantView]
+        public let leaves: [DeviceLeafView]
+        public let metadataSnapshot: MetadataSnapshot
+        public let snapshotSeq: Int
+        public let sequencerDid: BareDid?
+        public let sequencerTerm: Int?
+        public let directRequest: DirectRequestState?
 
         public init(
             conversationKind: DefsConversationKind, coordinates: ConversationCoordinates, cipherSuite: DefsCipherSuite, participants: [ParticipantView], leaves: [DeviceLeafView], metadataSnapshot: MetadataSnapshot, snapshotSeq: Int, sequencerDid: BareDid? = nil, sequencerTerm: Int? = nil, directRequest: DirectRequestState? = nil
@@ -17218,11 +17215,11 @@ public struct ConversationState: ATProtocolCodable, ATProtocolValue {
             case directRequest
         }
     }
-        
-public struct ConversationInventoryState: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#conversationInventoryState"
-            public let state: ConversationState
-            public let directRequest: DirectRequestState?
+
+    public struct ConversationInventoryState: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#conversationInventoryState"
+        public let state: ConversationState
+        public let directRequest: DirectRequestState?
 
         public init(
             state: ConversationState, directRequest: DirectRequestState? = nil
@@ -17298,15 +17295,15 @@ public struct ConversationInventoryState: ATProtocolCodable, ATProtocolValue {
             case directRequest
         }
     }
-        
-public struct ConversationRemovalTombstone: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#conversationRemovalTombstone"
-            public let conversationId: OperationId
-            public let membershipIntervalId: OperationId
-            public let userDid: BareDid
-            public let deviceId: DeviceId
-            public let terminalSeq: Int
-            public let removedAt: CanonicalDatetime
+
+    public struct ConversationRemovalTombstone: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#conversationRemovalTombstone"
+        public let conversationId: OperationId
+        public let membershipIntervalId: OperationId
+        public let userDid: BareDid
+        public let deviceId: DeviceId
+        public let terminalSeq: Int
+        public let removedAt: CanonicalDatetime
 
         public init(
             conversationId: OperationId, membershipIntervalId: OperationId, userDid: BareDid, deviceId: DeviceId, terminalSeq: Int, removedAt: CanonicalDatetime
@@ -17434,16 +17431,16 @@ public struct ConversationRemovalTombstone: ATProtocolCodable, ATProtocolValue {
             case removedAt
         }
     }
-        
-public struct ConversationCloseTombstone: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#conversationCloseTombstone"
-            public let conversationId: OperationId
-            public let conversationKind: DefsConversationKind
-            public let retired: ConversationCoordinates
-            public let closedByDid: BareDid
-            public let closedByDeviceId: DeviceId
-            public let terminalSeq: Int
-            public let closedAt: CanonicalDatetime
+
+    public struct ConversationCloseTombstone: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#conversationCloseTombstone"
+        public let conversationId: OperationId
+        public let conversationKind: DefsConversationKind
+        public let retired: ConversationCoordinates
+        public let closedByDid: BareDid
+        public let closedByDeviceId: DeviceId
+        public let terminalSeq: Int
+        public let closedAt: CanonicalDatetime
 
         public init(
             conversationId: OperationId, conversationKind: DefsConversationKind, retired: ConversationCoordinates, closedByDid: BareDid, closedByDeviceId: DeviceId, terminalSeq: Int, closedAt: CanonicalDatetime
@@ -17586,11 +17583,11 @@ public struct ConversationCloseTombstone: ATProtocolCodable, ATProtocolValue {
             case closedAt
         }
     }
-        
-public struct ConversationCloseResult: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#conversationCloseResult"
-            public let tombstone: ConversationCloseTombstone
-            public let entry: ConversationCloseEntry
+
+    public struct ConversationCloseResult: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#conversationCloseResult"
+        public let tombstone: ConversationCloseTombstone
+        public let entry: ConversationCloseEntry
 
         public init(
             tombstone: ConversationCloseTombstone, entry: ConversationCloseEntry
@@ -17658,14 +17655,14 @@ public struct ConversationCloseResult: ATProtocolCodable, ATProtocolValue {
             case entry
         }
     }
-        
-public struct ApplicationEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#applicationEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedApplicationSend
-            public let receivedAt: CanonicalDatetime
+
+    public struct ApplicationEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#applicationEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedApplicationSend
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedApplicationSend, receivedAt: CanonicalDatetime
@@ -17778,14 +17775,14 @@ public struct ApplicationEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct CommitEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#commitEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedCommitTransition
-            public let receivedAt: CanonicalDatetime
+
+    public struct CommitEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#commitEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedCommitTransition
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedCommitTransition, receivedAt: CanonicalDatetime
@@ -17898,14 +17895,14 @@ public struct CommitEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct PolicyEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#policyEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedPolicyTransition
-            public let receivedAt: CanonicalDatetime
+
+    public struct PolicyEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#policyEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedPolicyTransition
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedPolicyTransition, receivedAt: CanonicalDatetime
@@ -18018,14 +18015,14 @@ public struct PolicyEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct MetadataEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#metadataEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedMetadataTransition
-            public let receivedAt: CanonicalDatetime
+
+    public struct MetadataEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#metadataEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedMetadataTransition
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedMetadataTransition, receivedAt: CanonicalDatetime
@@ -18138,14 +18135,14 @@ public struct MetadataEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct CreationEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#creationEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedCreation
-            public let receivedAt: CanonicalDatetime
+
+    public struct CreationEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#creationEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedCreation
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedCreation, receivedAt: CanonicalDatetime
@@ -18258,15 +18255,15 @@ public struct CreationEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct ParticipantAcceptanceEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#participantAcceptanceEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedParticipantAcceptance
-            public let recovery: LeafRecoveryView
-            public let receivedAt: CanonicalDatetime
+
+    public struct ParticipantAcceptanceEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#participantAcceptanceEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedParticipantAcceptance
+        public let recovery: LeafRecoveryView
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedParticipantAcceptance, recovery: LeafRecoveryView, receivedAt: CanonicalDatetime
@@ -18394,15 +18391,15 @@ public struct ParticipantAcceptanceEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct ConversationCloseEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#conversationCloseEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedConversationClose
-            public let tombstone: ConversationCloseTombstone
-            public let receivedAt: CanonicalDatetime
+
+    public struct ConversationCloseEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#conversationCloseEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedConversationClose
+        public let tombstone: ConversationCloseTombstone
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedConversationClose, tombstone: ConversationCloseTombstone, receivedAt: CanonicalDatetime
@@ -18530,14 +18527,14 @@ public struct ConversationCloseEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct ResetRequestEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#resetRequestEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedResetRequest
-            public let receivedAt: CanonicalDatetime
+
+    public struct ResetRequestEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#resetRequestEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedResetRequest
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedResetRequest, receivedAt: CanonicalDatetime
@@ -18650,14 +18647,14 @@ public struct ResetRequestEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct ResetActivationEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#resetActivationEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedResetActivation
-            public let receivedAt: CanonicalDatetime
+
+    public struct ResetActivationEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#resetActivationEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedResetActivation
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedResetActivation, receivedAt: CanonicalDatetime
@@ -18770,14 +18767,14 @@ public struct ResetActivationEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct LeafRecoveryFulfillmentEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#leafRecoveryFulfillmentEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedLeafRecoveryFulfillment
-            public let receivedAt: CanonicalDatetime
+
+    public struct LeafRecoveryFulfillmentEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#leafRecoveryFulfillmentEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedLeafRecoveryFulfillment
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedLeafRecoveryFulfillment, receivedAt: CanonicalDatetime
@@ -18890,14 +18887,14 @@ public struct LeafRecoveryFulfillmentEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct LeaveRequestEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#leaveRequestEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedLeaveRequest
-            public let receivedAt: CanonicalDatetime
+
+    public struct LeaveRequestEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#leaveRequestEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedLeaveRequest
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedLeaveRequest, receivedAt: CanonicalDatetime
@@ -19010,14 +19007,14 @@ public struct LeaveRequestEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct ZeroLeafLeaveEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#zeroLeafLeaveEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedZeroLeafLeave
-            public let receivedAt: CanonicalDatetime
+
+    public struct ZeroLeafLeaveEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#zeroLeafLeaveEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedZeroLeafLeave
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedZeroLeafLeave, receivedAt: CanonicalDatetime
@@ -19130,14 +19127,14 @@ public struct ZeroLeafLeaveEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct LeaveCancellationEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#leaveCancellationEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedLeaveCancellation
-            public let receivedAt: CanonicalDatetime
+
+    public struct LeaveCancellationEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#leaveCancellationEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedLeaveCancellation
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedLeaveCancellation, receivedAt: CanonicalDatetime
@@ -19250,14 +19247,14 @@ public struct LeaveCancellationEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct LeaveCommitFulfillmentEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#leaveCommitFulfillmentEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedLeaveCommitFulfillment
-            public let receivedAt: CanonicalDatetime
+
+    public struct LeaveCommitFulfillmentEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#leaveCommitFulfillmentEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedLeaveCommitFulfillment
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedLeaveCommitFulfillment, receivedAt: CanonicalDatetime
@@ -19370,10 +19367,10 @@ public struct LeaveCommitFulfillmentEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct ConversationChangedEvent: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#conversationChangedEvent"
-            public let conversationId: OperationId
+
+    public struct ConversationChangedEvent: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#conversationChangedEvent"
+        public let conversationId: OperationId
 
         public init(
             conversationId: OperationId
@@ -19426,12 +19423,12 @@ public struct ConversationChangedEvent: ATProtocolCodable, ATProtocolValue {
             case conversationId
         }
     }
-        
-public struct ConversationClosedEvent: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#conversationClosedEvent"
-            public let conversationId: OperationId
-            public let conversationKind: DefsConversationKind
-            public let terminalSeq: Int
+
+    public struct ConversationClosedEvent: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#conversationClosedEvent"
+        public let conversationId: OperationId
+        public let conversationKind: DefsConversationKind
+        public let terminalSeq: Int
 
         public init(
             conversationId: OperationId, conversationKind: DefsConversationKind, terminalSeq: Int
@@ -19514,11 +19511,11 @@ public struct ConversationClosedEvent: ATProtocolCodable, ATProtocolValue {
             case terminalSeq
         }
     }
-        
-public struct MessageAvailableEvent: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#messageAvailableEvent"
-            public let conversationId: OperationId
-            public let seq: Int
+
+    public struct MessageAvailableEvent: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#messageAvailableEvent"
+        public let conversationId: OperationId
+        public let seq: Int
 
         public init(
             conversationId: OperationId, seq: Int
@@ -19586,11 +19583,11 @@ public struct MessageAvailableEvent: ATProtocolCodable, ATProtocolValue {
             case seq
         }
     }
-        
-public struct WelcomeAvailableEvent: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#welcomeAvailableEvent"
-            public let welcomeId: OperationId
-            public let conversationId: OperationId
+
+    public struct WelcomeAvailableEvent: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#welcomeAvailableEvent"
+        public let welcomeId: OperationId
+        public let conversationId: OperationId
 
         public init(
             welcomeId: OperationId, conversationId: OperationId
@@ -19658,11 +19655,11 @@ public struct WelcomeAvailableEvent: ATProtocolCodable, ATProtocolValue {
             case conversationId
         }
     }
-        
-public struct WelcomeDispositionEvent: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#welcomeDispositionEvent"
-            public let welcomeId: OperationId
-            public let status: DefsWelcomeStatus
+
+    public struct WelcomeDispositionEvent: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#welcomeDispositionEvent"
+        public let welcomeId: OperationId
+        public let status: DefsWelcomeStatus
 
         public init(
             welcomeId: OperationId, status: DefsWelcomeStatus
@@ -19730,11 +19727,11 @@ public struct WelcomeDispositionEvent: ATProtocolCodable, ATProtocolValue {
             case status
         }
     }
-        
-public struct ResetRequestedEvent: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#resetRequestedEvent"
-            public let resetRequestId: OperationId
-            public let conversationId: OperationId
+
+    public struct ResetRequestedEvent: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#resetRequestedEvent"
+        public let resetRequestId: OperationId
+        public let conversationId: OperationId
 
         public init(
             resetRequestId: OperationId, conversationId: OperationId
@@ -19802,12 +19799,12 @@ public struct ResetRequestedEvent: ATProtocolCodable, ATProtocolValue {
             case conversationId
         }
     }
-        
-public struct LeafRecoveryEvent: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#leafRecoveryEvent"
-            public let recoveryRequestId: OperationId
-            public let conversationId: OperationId
-            public let status: DefsLeafRecoveryStatus
+
+    public struct LeafRecoveryEvent: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#leafRecoveryEvent"
+        public let recoveryRequestId: OperationId
+        public let conversationId: OperationId
+        public let status: DefsLeafRecoveryStatus
 
         public init(
             recoveryRequestId: OperationId, conversationId: OperationId, status: DefsLeafRecoveryStatus
@@ -19890,12 +19887,12 @@ public struct LeafRecoveryEvent: ATProtocolCodable, ATProtocolValue {
             case status
         }
     }
-        
-public struct LeaveRequestEvent: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#leaveRequestEvent"
-            public let leaveRequestId: OperationId
-            public let conversationId: OperationId
-            public let status: DefsLeaveRequestStatus
+
+    public struct LeaveRequestEvent: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#leaveRequestEvent"
+        public let leaveRequestId: OperationId
+        public let conversationId: OperationId
+        public let status: DefsLeaveRequestStatus
 
         public init(
             leaveRequestId: OperationId, conversationId: OperationId, status: DefsLeaveRequestStatus
@@ -19978,14 +19975,14 @@ public struct LeaveRequestEvent: ATProtocolCodable, ATProtocolValue {
             case status
         }
     }
-        
-public struct AccessEndedEvent: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#accessEndedEvent"
-            public let conversationId: OperationId
-            public let membershipIntervalId: OperationId
-            public let userDid: BareDid
-            public let deviceId: DeviceId
-            public let terminalSeq: Int
+
+    public struct AccessEndedEvent: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#accessEndedEvent"
+        public let conversationId: OperationId
+        public let membershipIntervalId: OperationId
+        public let userDid: BareDid
+        public let deviceId: DeviceId
+        public let terminalSeq: Int
 
         public init(
             conversationId: OperationId, membershipIntervalId: OperationId, userDid: BareDid, deviceId: DeviceId, terminalSeq: Int
@@ -20098,10 +20095,10 @@ public struct AccessEndedEvent: ATProtocolCodable, ATProtocolValue {
             case terminalSeq
         }
     }
-        
-public struct WatermarkEvent: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#watermarkEvent"
-            public let issuedAt: CanonicalDatetime
+
+    public struct WatermarkEvent: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#watermarkEvent"
+        public let issuedAt: CanonicalDatetime
 
         public init(
             issuedAt: CanonicalDatetime
@@ -20154,13 +20151,13 @@ public struct WatermarkEvent: ATProtocolCodable, ATProtocolValue {
             case issuedAt
         }
     }
-        
-public struct EventEnvelope: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#eventEnvelope"
-            public let previousCursor: String
-            public let cursor: String
-            public let payload: ProtocolEventPayload
-            public let createdAt: CanonicalDatetime
+
+    public struct EventEnvelope: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#eventEnvelope"
+        public let previousCursor: String
+        public let cursor: String
+        public let payload: ProtocolEventPayload
+        public let createdAt: CanonicalDatetime
 
         public init(
             previousCursor: String, cursor: String, payload: ProtocolEventPayload, createdAt: CanonicalDatetime
@@ -20258,17 +20255,17 @@ public struct EventEnvelope: ATProtocolCodable, ATProtocolValue {
             case createdAt
         }
     }
-        
-public struct FreshDirectOrigin: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#freshDirectOrigin"
+
+    public struct FreshDirectOrigin: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#freshDirectOrigin"
 
         public init(
-            
+
         ) {
         }
 
         public init(from decoder: Decoder) throws {
-            
+
             let _ = decoder
         }
 
@@ -20281,7 +20278,7 @@ public struct FreshDirectOrigin: ATProtocolCodable, ATProtocolValue {
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
-            
+
             return other is Self
         }
 
@@ -20299,11 +20296,11 @@ public struct FreshDirectOrigin: ATProtocolCodable, ATProtocolValue {
             case typeIdentifier = "$type"
         }
     }
-        
-public struct LegacyPendingDirectOrigin: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#legacyPendingDirectOrigin"
-            public let exactPrior: ConversationCoordinates
-            public let originalInvitationProvenance: InvitationProvenance
+
+    public struct LegacyPendingDirectOrigin: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#legacyPendingDirectOrigin"
+        public let exactPrior: ConversationCoordinates
+        public let originalInvitationProvenance: InvitationProvenance
 
         public init(
             exactPrior: ConversationCoordinates, originalInvitationProvenance: InvitationProvenance
@@ -20371,15 +20368,15 @@ public struct LegacyPendingDirectOrigin: ATProtocolCodable, ATProtocolValue {
             case originalInvitationProvenance
         }
     }
-        
-public struct GroupInvitationReference: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#groupInvitationReference"
-            public let authorityDid: BareDid
-            public let conversationId: OperationId
-            public let invitationTransitionId: OperationId
-            public let invitedByDid: BareDid
-            public let invitedByDeviceId: DeviceId
-            public let recipientDid: BareDid
+
+    public struct GroupInvitationReference: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#groupInvitationReference"
+        public let authorityDid: BareDid
+        public let conversationId: OperationId
+        public let invitationTransitionId: OperationId
+        public let invitedByDid: BareDid
+        public let invitedByDeviceId: DeviceId
+        public let recipientDid: BareDid
 
         public init(
             authorityDid: BareDid, conversationId: OperationId, invitationTransitionId: OperationId, invitedByDid: BareDid, invitedByDeviceId: DeviceId, recipientDid: BareDid
@@ -20507,24 +20504,24 @@ public struct GroupInvitationReference: ATProtocolCodable, ATProtocolValue {
             case recipientDid
         }
     }
-        
-public struct DirectRequestGrantBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestGrantBody"
-            public let signatureDomain: String
-            public let protocolVersion: String
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let grantId: OperationId
-            public let grantRevision: Int
-            public let purpose: String
-            public let profile: DirectRequestProfile
-            public let keyPackageRef: Bytes
-            public let keyPackageSha256: Bytes
-            public let expiresAt: CanonicalDatetime
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct DirectRequestGrantBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestGrantBody"
+        public let signatureDomain: String
+        public let protocolVersion: String
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let grantId: OperationId
+        public let grantRevision: Int
+        public let purpose: String
+        public let profile: DirectRequestProfile
+        public let keyPackageRef: Bytes
+        public let keyPackageSha256: Bytes
+        public let expiresAt: CanonicalDatetime
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, grantId: OperationId, grantRevision: Int, purpose: String, profile: DirectRequestProfile, keyPackageRef: Bytes, keyPackageSha256: Bytes, expiresAt: CanonicalDatetime, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -20787,11 +20784,11 @@ public struct DirectRequestGrantBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct SignedDirectRequestGrant: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestGrant"
-            public let body: SignedDirectRequestGrantBodyUnion
-            public let signature: Bytes
+
+    public struct SignedDirectRequestGrant: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestGrant"
+        public let body: SignedDirectRequestGrantBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedDirectRequestGrantBodyUnion, signature: Bytes
@@ -20859,11 +20856,11 @@ public struct SignedDirectRequestGrant: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct DirectRequestKey: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestKey"
-            public let keyPackage: KeyPackageArtifact
-            public let grant: SignedDirectRequestGrant
+
+    public struct DirectRequestKey: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestKey"
+        public let keyPackage: KeyPackageArtifact
+        public let grant: SignedDirectRequestGrant
 
         public init(
             keyPackage: KeyPackageArtifact, grant: SignedDirectRequestGrant
@@ -20931,20 +20928,20 @@ public struct DirectRequestKey: ATProtocolCodable, ATProtocolValue {
             case grant
         }
     }
-        
-public struct DirectRequestKeysPublicationBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestKeysPublicationBody"
-            public let signatureDomain: String
-            public let protocolVersion: String
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let revision: Int
-            public let enabled: Bool
-            public let keys: [DirectRequestKey]
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct DirectRequestKeysPublicationBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestKeysPublicationBody"
+        public let signatureDomain: String
+        public let protocolVersion: String
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let revision: Int
+        public let enabled: Bool
+        public let keys: [DirectRequestKey]
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, revision: Int, enabled: Bool, keys: [DirectRequestKey], idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -21147,11 +21144,11 @@ public struct DirectRequestKeysPublicationBody: ATProtocolCodable, ATProtocolVal
             case signedAt
         }
     }
-        
-public struct SignedDirectRequestKeysPublication: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestKeysPublication"
-            public let body: SignedDirectRequestKeysPublicationBodyUnion
-            public let signature: Bytes
+
+    public struct SignedDirectRequestKeysPublication: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestKeysPublication"
+        public let body: SignedDirectRequestKeysPublicationBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedDirectRequestKeysPublicationBodyUnion, signature: Bytes
@@ -21219,23 +21216,23 @@ public struct SignedDirectRequestKeysPublication: ATProtocolCodable, ATProtocolV
             case signature
         }
     }
-        
-public struct DirectRequestPreparationBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPreparationBody"
-            public let signatureDomain: String
-            public let protocolVersion: String
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let requestId: OperationId
-            public let firstMessageId: OperationId
-            public let conversationId: OperationId
-            public let recipientDid: BareDid
-            public let origin: DirectRequestOrigin
-            public let profile: DirectRequestProfile
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct DirectRequestPreparationBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPreparationBody"
+        public let signatureDomain: String
+        public let protocolVersion: String
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let requestId: OperationId
+        public let firstMessageId: OperationId
+        public let conversationId: OperationId
+        public let recipientDid: BareDid
+        public let origin: DirectRequestOrigin
+        public let profile: DirectRequestProfile
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, requestId: OperationId, firstMessageId: OperationId, conversationId: OperationId, recipientDid: BareDid, origin: DirectRequestOrigin, profile: DirectRequestProfile, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -21483,11 +21480,11 @@ public struct DirectRequestPreparationBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct SignedDirectRequestPreparation: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestPreparation"
-            public let body: SignedDirectRequestPreparationBodyUnion
-            public let signature: Bytes
+
+    public struct SignedDirectRequestPreparation: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestPreparation"
+        public let body: SignedDirectRequestPreparationBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedDirectRequestPreparationBodyUnion, signature: Bytes
@@ -21555,15 +21552,15 @@ public struct SignedDirectRequestPreparation: ATProtocolCodable, ATProtocolValue
             case signature
         }
     }
-        
-public struct DirectRequestSelectedDevice: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestSelectedDevice"
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let keyPackage: KeyPackageArtifact
-            public let grant: SignedDirectRequestGrant
+
+    public struct DirectRequestSelectedDevice: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestSelectedDevice"
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let keyPackage: KeyPackageArtifact
+        public let grant: SignedDirectRequestGrant
 
         public init(
             actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, keyPackage: KeyPackageArtifact, grant: SignedDirectRequestGrant
@@ -21691,13 +21688,13 @@ public struct DirectRequestSelectedDevice: ATProtocolCodable, ATProtocolValue {
             case grant
         }
     }
-        
-public struct DirectRequestCreator: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestCreator"
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
+
+    public struct DirectRequestCreator: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestCreator"
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
 
         public init(
             actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int
@@ -21795,26 +21792,26 @@ public struct DirectRequestCreator: ATProtocolCodable, ATProtocolValue {
             case authGeneration
         }
     }
-        
-public struct DirectRequestPreparationView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPreparationView"
-            public let protocolVersion: String
-            public let requestId: OperationId
-            public let firstMessageId: OperationId
-            public let conversationId: OperationId
-            public let recipientDid: BareDid
-            public let origin: DirectRequestOrigin
-            public let profile: DirectRequestProfile
-            public let preparationDigest: Bytes
-            public let preparationSignature: Bytes
-            public let creator: DirectRequestCreator
-            public let selectedDevices: [DirectRequestSelectedDevice]
-            public let preparedAt: CanonicalDatetime
-            public let leaseExpiresAt: CanonicalDatetime
-            public let minimumImportUntil: CanonicalDatetime
-            public let preparationRequestDigest: Bytes
-            public let authorityDid: BareDid
-            public let receiptKeyId: DirectRequestReceiptKeyId
+
+    public struct DirectRequestPreparationView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPreparationView"
+        public let protocolVersion: String
+        public let requestId: OperationId
+        public let firstMessageId: OperationId
+        public let conversationId: OperationId
+        public let recipientDid: BareDid
+        public let origin: DirectRequestOrigin
+        public let profile: DirectRequestProfile
+        public let preparationDigest: Bytes
+        public let preparationSignature: Bytes
+        public let creator: DirectRequestCreator
+        public let selectedDevices: [DirectRequestSelectedDevice]
+        public let preparedAt: CanonicalDatetime
+        public let leaseExpiresAt: CanonicalDatetime
+        public let minimumImportUntil: CanonicalDatetime
+        public let preparationRequestDigest: Bytes
+        public let authorityDid: BareDid
+        public let receiptKeyId: DirectRequestReceiptKeyId
 
         public init(
             protocolVersion: String, requestId: OperationId, firstMessageId: OperationId, conversationId: OperationId, recipientDid: BareDid, origin: DirectRequestOrigin, profile: DirectRequestProfile, preparationDigest: Bytes, preparationSignature: Bytes, creator: DirectRequestCreator, selectedDevices: [DirectRequestSelectedDevice], preparedAt: CanonicalDatetime, leaseExpiresAt: CanonicalDatetime, minimumImportUntil: CanonicalDatetime, preparationRequestDigest: Bytes, authorityDid: BareDid, receiptKeyId: DirectRequestReceiptKeyId
@@ -22107,19 +22104,19 @@ public struct DirectRequestPreparationView: ATProtocolCodable, ATProtocolValue {
             case receiptKeyId
         }
     }
-        
-public struct DirectRequestContext: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestContext"
-            public let protocolVersion: String
-            public let requestId: OperationId
-            public let firstMessageId: OperationId
-            public let conversationId: OperationId
-            public let origin: DirectRequestOrigin
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let actorKeyId: KeyId
-            public let recipientDid: BareDid
-            public let preparationDigest: Bytes
+
+    public struct DirectRequestContext: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestContext"
+        public let protocolVersion: String
+        public let requestId: OperationId
+        public let firstMessageId: OperationId
+        public let conversationId: OperationId
+        public let origin: DirectRequestOrigin
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let actorKeyId: KeyId
+        public let recipientDid: BareDid
+        public let preparationDigest: Bytes
 
         public init(
             protocolVersion: String, requestId: OperationId, firstMessageId: OperationId, conversationId: OperationId, origin: DirectRequestOrigin, actorDid: BareDid, actorDeviceId: DeviceId, actorKeyId: KeyId, recipientDid: BareDid, preparationDigest: Bytes
@@ -22307,11 +22304,11 @@ public struct DirectRequestContext: ATProtocolCodable, ATProtocolValue {
             case preparationDigest
         }
     }
-        
-public struct DirectRequestCommitAad: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestCommitAad"
-            public let protocolVersion: String
-            public let contextHash: Bytes
+
+    public struct DirectRequestCommitAad: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestCommitAad"
+        public let protocolVersion: String
+        public let contextHash: Bytes
 
         public init(
             protocolVersion: String, contextHash: Bytes
@@ -22379,13 +22376,13 @@ public struct DirectRequestCommitAad: ATProtocolCodable, ATProtocolValue {
             case contextHash
         }
     }
-        
-public struct DirectRequestApplicationAad: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestApplicationAad"
-            public let protocolVersion: String
-            public let contextHash: Bytes
-            public let coordinates: ConversationCoordinates
-            public let messageId: OperationId
+
+    public struct DirectRequestApplicationAad: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestApplicationAad"
+        public let protocolVersion: String
+        public let contextHash: Bytes
+        public let coordinates: ConversationCoordinates
+        public let messageId: OperationId
 
         public init(
             protocolVersion: String, contextHash: Bytes, coordinates: ConversationCoordinates, messageId: OperationId
@@ -22483,11 +22480,11 @@ public struct DirectRequestApplicationAad: ATProtocolCodable, ATProtocolValue {
             case messageId
         }
     }
-        
-public struct DirectRequestIntroduction: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestIntroduction"
-            public let text: String
-            public let invitation: GroupInvitationReference?
+
+    public struct DirectRequestIntroduction: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestIntroduction"
+        public let text: String
+        public let invitation: GroupInvitationReference?
 
         public init(
             text: String, invitation: GroupInvitationReference? = nil
@@ -22563,16 +22560,16 @@ public struct DirectRequestIntroduction: ATProtocolCodable, ATProtocolValue {
             case invitation
         }
     }
-        
-public struct DirectRequestWelcomeProvenance: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestWelcomeProvenance"
-            public let requestId: OperationId
-            public let preparationDigest: Bytes
-            public let contextHash: Bytes
-            public let grantId: OperationId
-            public let grantRevision: Int
-            public let keyPackageRef: Bytes
-            public let importUntil: CanonicalDatetime
+
+    public struct DirectRequestWelcomeProvenance: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestWelcomeProvenance"
+        public let requestId: OperationId
+        public let preparationDigest: Bytes
+        public let contextHash: Bytes
+        public let grantId: OperationId
+        public let grantRevision: Int
+        public let keyPackageRef: Bytes
+        public let importUntil: CanonicalDatetime
 
         public init(
             requestId: OperationId, preparationDigest: Bytes, contextHash: Bytes, grantId: OperationId, grantRevision: Int, keyPackageRef: Bytes, importUntil: CanonicalDatetime
@@ -22715,12 +22712,12 @@ public struct DirectRequestWelcomeProvenance: ATProtocolCodable, ATProtocolValue
             case importUntil
         }
     }
-        
-public struct DirectRequestWelcomeDelivery: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestWelcomeDelivery"
-            public let recipientDid: BareDid
-            public let recipientDeviceId: DeviceId
-            public let provenance: DirectRequestWelcomeProvenance
+
+    public struct DirectRequestWelcomeDelivery: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestWelcomeDelivery"
+        public let recipientDid: BareDid
+        public let recipientDeviceId: DeviceId
+        public let provenance: DirectRequestWelcomeProvenance
 
         public init(
             recipientDid: BareDid, recipientDeviceId: DeviceId, provenance: DirectRequestWelcomeProvenance
@@ -22803,12 +22800,12 @@ public struct DirectRequestWelcomeDelivery: ATProtocolCodable, ATProtocolValue {
             case provenance
         }
     }
-        
-public struct DirectRequestWelcomeBundle: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestWelcomeBundle"
-            public let opaqueWelcome: Bytes
-            public let sha256: Bytes
-            public let deliveries: [DirectRequestWelcomeDelivery]
+
+    public struct DirectRequestWelcomeBundle: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestWelcomeBundle"
+        public let opaqueWelcome: Bytes
+        public let sha256: Bytes
+        public let deliveries: [DirectRequestWelcomeDelivery]
 
         public init(
             opaqueWelcome: Bytes, sha256: Bytes, deliveries: [DirectRequestWelcomeDelivery]
@@ -22891,15 +22888,15 @@ public struct DirectRequestWelcomeBundle: ATProtocolCodable, ATProtocolValue {
             case deliveries
         }
     }
-        
-public struct DirectRequestBootstrapArtifacts: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestBootstrapArtifacts"
-            public let genesisGroupInfo: GroupInfoArtifact
-            public let addCommit: PublicCommit
-            public let finalGroupInfo: GroupInfoArtifact
-            public let welcome: DirectRequestWelcomeBundle
-            public let metadataSnapshot: MetadataSnapshot
-            public let initialCiphertext: Bytes
+
+    public struct DirectRequestBootstrapArtifacts: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestBootstrapArtifacts"
+        public let genesisGroupInfo: GroupInfoArtifact
+        public let addCommit: PublicCommit
+        public let finalGroupInfo: GroupInfoArtifact
+        public let welcome: DirectRequestWelcomeBundle
+        public let metadataSnapshot: MetadataSnapshot
+        public let initialCiphertext: Bytes
 
         public init(
             genesisGroupInfo: GroupInfoArtifact, addCommit: PublicCommit, finalGroupInfo: GroupInfoArtifact, welcome: DirectRequestWelcomeBundle, metadataSnapshot: MetadataSnapshot, initialCiphertext: Bytes
@@ -23027,29 +23024,29 @@ public struct DirectRequestBootstrapArtifacts: ATProtocolCodable, ATProtocolValu
             case initialCiphertext
         }
     }
-        
-public struct DirectRequestPublicationBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPublicationBody"
-            public let signatureDomain: String
-            public let protocolVersion: String
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let requestId: OperationId
-            public let firstMessageId: OperationId
-            public let conversationId: OperationId
-            public let recipientDid: BareDid
-            public let origin: DirectRequestOrigin
-            public let profile: DirectRequestProfile
-            public let preparationDigest: Bytes
-            public let contextHash: Bytes
-            public let next: ConversationCoordinates
-            public let importUntil: CanonicalDatetime
-            public let artifacts: DirectRequestBootstrapArtifacts
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
-            public let preparationRequestDigest: Bytes
+
+    public struct DirectRequestPublicationBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPublicationBody"
+        public let signatureDomain: String
+        public let protocolVersion: String
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let requestId: OperationId
+        public let firstMessageId: OperationId
+        public let conversationId: OperationId
+        public let recipientDid: BareDid
+        public let origin: DirectRequestOrigin
+        public let profile: DirectRequestProfile
+        public let preparationDigest: Bytes
+        public let contextHash: Bytes
+        public let next: ConversationCoordinates
+        public let importUntil: CanonicalDatetime
+        public let artifacts: DirectRequestBootstrapArtifacts
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
+        public let preparationRequestDigest: Bytes
 
         public init(
             signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, requestId: OperationId, firstMessageId: OperationId, conversationId: OperationId, recipientDid: BareDid, origin: DirectRequestOrigin, profile: DirectRequestProfile, preparationDigest: Bytes, contextHash: Bytes, next: ConversationCoordinates, importUntil: CanonicalDatetime, artifacts: DirectRequestBootstrapArtifacts, idempotencyKey: OperationId, signedAt: CanonicalDatetime, preparationRequestDigest: Bytes
@@ -23387,11 +23384,11 @@ public struct DirectRequestPublicationBody: ATProtocolCodable, ATProtocolValue {
             case preparationRequestDigest
         }
     }
-        
-public struct SignedDirectRequestPublication: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestPublication"
-            public let body: SignedDirectRequestPublicationBodyUnion
-            public let signature: Bytes
+
+    public struct SignedDirectRequestPublication: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestPublication"
+        public let body: SignedDirectRequestPublicationBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedDirectRequestPublicationBodyUnion, signature: Bytes
@@ -23459,20 +23456,20 @@ public struct SignedDirectRequestPublication: ATProtocolCodable, ATProtocolValue
             case signature
         }
     }
-        
-public struct DirectRequestCancellationBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestCancellationBody"
-            public let signatureDomain: String
-            public let protocolVersion: String
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let requestId: OperationId
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
-            public let recipientDid: BareDid
-            public let preparationRequestDigest: Bytes
+
+    public struct DirectRequestCancellationBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestCancellationBody"
+        public let signatureDomain: String
+        public let protocolVersion: String
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let requestId: OperationId
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
+        public let recipientDid: BareDid
+        public let preparationRequestDigest: Bytes
 
         public init(
             signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, requestId: OperationId, idempotencyKey: OperationId, signedAt: CanonicalDatetime, recipientDid: BareDid, preparationRequestDigest: Bytes
@@ -23675,11 +23672,11 @@ public struct DirectRequestCancellationBody: ATProtocolCodable, ATProtocolValue 
             case preparationRequestDigest
         }
     }
-        
-public struct SignedDirectRequestCancellation: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestCancellation"
-            public let body: SignedDirectRequestCancellationBodyUnion
-            public let signature: Bytes
+
+    public struct SignedDirectRequestCancellation: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestCancellation"
+        public let body: SignedDirectRequestCancellationBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedDirectRequestCancellationBodyUnion, signature: Bytes
@@ -23747,22 +23744,22 @@ public struct SignedDirectRequestCancellation: ATProtocolCodable, ATProtocolValu
             case signature
         }
     }
-        
-public struct DirectRequestAcceptanceBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestAcceptanceBody"
-            public let signatureDomain: String
-            public let protocolVersion: String
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let requestId: OperationId
-            public let transitionId: OperationId
-            public let prior: ConversationCoordinates
-            public let next: ConversationCoordinates
-            public let invitationProvenance: InvitationProvenance
-            public let idempotencyKey: OperationId
-            public let signedAt: CanonicalDatetime
+
+    public struct DirectRequestAcceptanceBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestAcceptanceBody"
+        public let signatureDomain: String
+        public let protocolVersion: String
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let requestId: OperationId
+        public let transitionId: OperationId
+        public let prior: ConversationCoordinates
+        public let next: ConversationCoordinates
+        public let invitationProvenance: InvitationProvenance
+        public let idempotencyKey: OperationId
+        public let signedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, requestId: OperationId, transitionId: OperationId, prior: ConversationCoordinates, next: ConversationCoordinates, invitationProvenance: InvitationProvenance, idempotencyKey: OperationId, signedAt: CanonicalDatetime
@@ -23995,11 +23992,11 @@ public struct DirectRequestAcceptanceBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct SignedDirectRequestAcceptance: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestAcceptance"
-            public let body: SignedDirectRequestAcceptanceBodyUnion
-            public let signature: Bytes
+
+    public struct SignedDirectRequestAcceptance: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestAcceptance"
+        public let body: SignedDirectRequestAcceptanceBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedDirectRequestAcceptanceBodyUnion, signature: Bytes
@@ -24067,10 +24064,10 @@ public struct SignedDirectRequestAcceptance: ATProtocolCodable, ATProtocolValue 
             case signature
         }
     }
-        
-public struct DirectRequestUnknownOutcome: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestUnknownOutcome"
-            public let requestId: OperationId
+
+    public struct DirectRequestUnknownOutcome: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestUnknownOutcome"
+        public let requestId: OperationId
 
         public init(
             requestId: OperationId
@@ -24123,10 +24120,10 @@ public struct DirectRequestUnknownOutcome: ATProtocolCodable, ATProtocolValue {
             case requestId
         }
     }
-        
-public struct DirectRequestPreparedOutcome: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPreparedOutcome"
-            public let preparation: DirectRequestPreparationView
+
+    public struct DirectRequestPreparedOutcome: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPreparedOutcome"
+        public let preparation: DirectRequestPreparationView
 
         public init(
             preparation: DirectRequestPreparationView
@@ -24179,21 +24176,21 @@ public struct DirectRequestPreparedOutcome: ATProtocolCodable, ATProtocolValue {
             case preparation
         }
     }
-        
-public struct DirectRequestPublishedReceipt: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPublishedReceipt"
-            public let requestId: OperationId
-            public let requestDigest: Bytes
-            public let recordedAt: CanonicalDatetime
-            public let conversationId: OperationId
-            public let firstMessageId: OperationId
-            public let coordinates: ConversationCoordinates
-            public let preparationRequestDigest: Bytes
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let actorKeyId: KeyId
-            public let authGeneration: Int
-            public let requestKind: String
+
+    public struct DirectRequestPublishedReceipt: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPublishedReceipt"
+        public let requestId: OperationId
+        public let requestDigest: Bytes
+        public let recordedAt: CanonicalDatetime
+        public let conversationId: OperationId
+        public let firstMessageId: OperationId
+        public let coordinates: ConversationCoordinates
+        public let preparationRequestDigest: Bytes
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let actorKeyId: KeyId
+        public let authGeneration: Int
+        public let requestKind: String
 
         public init(
             requestId: OperationId, requestDigest: Bytes, recordedAt: CanonicalDatetime, conversationId: OperationId, firstMessageId: OperationId, coordinates: ConversationCoordinates, preparationRequestDigest: Bytes, actorDid: BareDid, actorDeviceId: DeviceId, actorKeyId: KeyId, authGeneration: Int, requestKind: String
@@ -24411,18 +24408,18 @@ public struct DirectRequestPublishedReceipt: ATProtocolCodable, ATProtocolValue 
             case requestKind
         }
     }
-        
-public struct DirectRequestCancelledReceipt: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestCancelledReceipt"
-            public let requestId: OperationId
-            public let requestDigest: Bytes
-            public let recordedAt: CanonicalDatetime
-            public let preparationRequestDigest: Bytes
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let actorKeyId: KeyId
-            public let authGeneration: Int
-            public let requestKind: String
+
+    public struct DirectRequestCancelledReceipt: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestCancelledReceipt"
+        public let requestId: OperationId
+        public let requestDigest: Bytes
+        public let recordedAt: CanonicalDatetime
+        public let preparationRequestDigest: Bytes
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let actorKeyId: KeyId
+        public let authGeneration: Int
+        public let requestKind: String
 
         public init(
             requestId: OperationId, requestDigest: Bytes, recordedAt: CanonicalDatetime, preparationRequestDigest: Bytes, actorDid: BareDid, actorDeviceId: DeviceId, actorKeyId: KeyId, authGeneration: Int, requestKind: String
@@ -24595,18 +24592,18 @@ public struct DirectRequestCancelledReceipt: ATProtocolCodable, ATProtocolValue 
             case requestKind
         }
     }
-        
-public struct DirectRequestExpiredReceipt: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestExpiredReceipt"
-            public let requestId: OperationId
-            public let requestDigest: Bytes
-            public let recordedAt: CanonicalDatetime
-            public let preparationRequestDigest: Bytes
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let actorKeyId: KeyId
-            public let authGeneration: Int
-            public let requestKind: String
+
+    public struct DirectRequestExpiredReceipt: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestExpiredReceipt"
+        public let requestId: OperationId
+        public let requestDigest: Bytes
+        public let recordedAt: CanonicalDatetime
+        public let preparationRequestDigest: Bytes
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let actorKeyId: KeyId
+        public let authGeneration: Int
+        public let requestKind: String
 
         public init(
             requestId: OperationId, requestDigest: Bytes, recordedAt: CanonicalDatetime, preparationRequestDigest: Bytes, actorDid: BareDid, actorDeviceId: DeviceId, actorKeyId: KeyId, authGeneration: Int, requestKind: String
@@ -24779,19 +24776,19 @@ public struct DirectRequestExpiredReceipt: ATProtocolCodable, ATProtocolValue {
             case requestKind
         }
     }
-        
-public struct DirectRequestRejectedReceipt: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestRejectedReceipt"
-            public let requestId: OperationId
-            public let requestDigest: Bytes
-            public let recordedAt: CanonicalDatetime
-            public let code: DefsDirectRequestErrorCode
-            public let preparationRequestDigest: Bytes
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let actorKeyId: KeyId
-            public let authGeneration: Int
-            public let requestKind: DirectRequestRejectedReceiptRequestKind
+
+    public struct DirectRequestRejectedReceipt: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestRejectedReceipt"
+        public let requestId: OperationId
+        public let requestDigest: Bytes
+        public let recordedAt: CanonicalDatetime
+        public let code: DefsDirectRequestErrorCode
+        public let preparationRequestDigest: Bytes
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let actorKeyId: KeyId
+        public let authGeneration: Int
+        public let requestKind: DirectRequestRejectedReceiptRequestKind
 
         public init(
             requestId: OperationId, requestDigest: Bytes, recordedAt: CanonicalDatetime, code: DefsDirectRequestErrorCode, preparationRequestDigest: Bytes, actorDid: BareDid, actorDeviceId: DeviceId, actorKeyId: KeyId, authGeneration: Int, requestKind: DirectRequestRejectedReceiptRequestKind
@@ -24979,20 +24976,20 @@ public struct DirectRequestRejectedReceipt: ATProtocolCodable, ATProtocolValue {
             case requestKind
         }
     }
-        
-public struct DirectRequestExistingDirectReceipt: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestExistingDirectReceipt"
-            public let requestId: OperationId
-            public let requestDigest: Bytes
-            public let recordedAt: CanonicalDatetime
-            public let conversationId: OperationId
-            public let requiresAcceptance: Bool
-            public let preparationRequestDigest: Bytes
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let actorKeyId: KeyId
-            public let authGeneration: Int
-            public let requestKind: DirectRequestExistingDirectReceiptRequestKind
+
+    public struct DirectRequestExistingDirectReceipt: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestExistingDirectReceipt"
+        public let requestId: OperationId
+        public let requestDigest: Bytes
+        public let recordedAt: CanonicalDatetime
+        public let conversationId: OperationId
+        public let requiresAcceptance: Bool
+        public let preparationRequestDigest: Bytes
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let actorKeyId: KeyId
+        public let authGeneration: Int
+        public let requestKind: DirectRequestExistingDirectReceiptRequestKind
 
         public init(
             requestId: OperationId, requestDigest: Bytes, recordedAt: CanonicalDatetime, conversationId: OperationId, requiresAcceptance: Bool, preparationRequestDigest: Bytes, actorDid: BareDid, actorDeviceId: DeviceId, actorKeyId: KeyId, authGeneration: Int, requestKind: DirectRequestExistingDirectReceiptRequestKind
@@ -25195,14 +25192,14 @@ public struct DirectRequestExistingDirectReceipt: ATProtocolCodable, ATProtocolV
             case requestKind
         }
     }
-        
-public struct DirectRequestReceiptBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestReceiptBody"
-            public let signatureDomain: String
-            public let protocolVersion: String
-            public let authorityDid: BareDid
-            public let keyId: DirectRequestReceiptKeyId
-            public let receipt: DirectRequestTerminalReceipt
+
+    public struct DirectRequestReceiptBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestReceiptBody"
+        public let signatureDomain: String
+        public let protocolVersion: String
+        public let authorityDid: BareDid
+        public let keyId: DirectRequestReceiptKeyId
+        public let receipt: DirectRequestTerminalReceipt
 
         public init(
             signatureDomain: String, protocolVersion: String, authorityDid: BareDid, keyId: DirectRequestReceiptKeyId, receipt: DirectRequestTerminalReceipt
@@ -25315,11 +25312,11 @@ public struct DirectRequestReceiptBody: ATProtocolCodable, ATProtocolValue {
             case receipt
         }
     }
-        
-public struct SignedDirectRequestReceipt: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestReceipt"
-            public let body: SignedDirectRequestReceiptBodyUnion
-            public let signature: Bytes
+
+    public struct SignedDirectRequestReceipt: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestReceipt"
+        public let body: SignedDirectRequestReceiptBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedDirectRequestReceiptBodyUnion, signature: Bytes
@@ -25387,12 +25384,12 @@ public struct SignedDirectRequestReceipt: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct DirectRequestCoverage: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestCoverage"
-            public let accountDid: BareDid
-            public let includedDeviceIds: [DeviceId]
-            public let unavailableDeviceIds: [DeviceId]
+
+    public struct DirectRequestCoverage: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestCoverage"
+        public let accountDid: BareDid
+        public let includedDeviceIds: [DeviceId]
+        public let unavailableDeviceIds: [DeviceId]
 
         public init(
             accountDid: BareDid, includedDeviceIds: [DeviceId], unavailableDeviceIds: [DeviceId]
@@ -25475,18 +25472,18 @@ public struct DirectRequestCoverage: ATProtocolCodable, ATProtocolValue {
             case unavailableDeviceIds
         }
     }
-        
-public struct DirectRequestState: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestState"
-            public let requestId: OperationId
-            public let firstMessageId: OperationId
-            public let senderDid: BareDid
-            public let recipientDid: BareDid
-            public let consent: DirectRequestStateConsent
-            public let importUntil: CanonicalDatetime
-            public let contextHash: Bytes
-            public let preparationDigest: Bytes
-            public let acceptanceProof: DirectRequestAcceptanceProof?
+
+    public struct DirectRequestState: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestState"
+        public let requestId: OperationId
+        public let firstMessageId: OperationId
+        public let senderDid: BareDid
+        public let recipientDid: BareDid
+        public let consent: DirectRequestStateConsent
+        public let importUntil: CanonicalDatetime
+        public let contextHash: Bytes
+        public let preparationDigest: Bytes
+        public let acceptanceProof: DirectRequestAcceptanceProof?
 
         public init(
             requestId: OperationId, firstMessageId: OperationId, senderDid: BareDid, recipientDid: BareDid, consent: DirectRequestStateConsent, importUntil: CanonicalDatetime, contextHash: Bytes, preparationDigest: Bytes, acceptanceProof: DirectRequestAcceptanceProof? = nil
@@ -25667,14 +25664,14 @@ public struct DirectRequestState: ATProtocolCodable, ATProtocolValue {
             case acceptanceProof
         }
     }
-        
-public struct DirectRequestEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedDirectRequestPublication
-            public let receivedAt: CanonicalDatetime
+
+    public struct DirectRequestEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedDirectRequestPublication
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedDirectRequestPublication, receivedAt: CanonicalDatetime
@@ -25787,14 +25784,14 @@ public struct DirectRequestEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct DirectRequestAcceptanceEntry: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestAcceptanceEntry"
-            public let entryId: OperationId
-            public let conversationId: OperationId
-            public let seq: Int
-            public let signedRequest: SignedDirectRequestAcceptance
-            public let receivedAt: CanonicalDatetime
+
+    public struct DirectRequestAcceptanceEntry: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestAcceptanceEntry"
+        public let entryId: OperationId
+        public let conversationId: OperationId
+        public let seq: Int
+        public let signedRequest: SignedDirectRequestAcceptance
+        public let receivedAt: CanonicalDatetime
 
         public init(
             entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedDirectRequestAcceptance, receivedAt: CanonicalDatetime
@@ -25907,19 +25904,19 @@ public struct DirectRequestAcceptanceEntry: ATProtocolCodable, ATProtocolValue {
             case receivedAt
         }
     }
-        
-public struct DirectRequestWelcomeView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestWelcomeView"
-            public let welcomeId: OperationId
-            public let conversationId: OperationId
-            public let transitionSeq: Int
-            public let coordinates: ConversationCoordinates
-            public let status: DefsWelcomeStatus
-            public let opaqueWelcome: Bytes
-            public let sha256: Bytes
-            public let recipientDid: BareDid
-            public let recipientDeviceId: DeviceId
-            public let provenance: DirectRequestWelcomeProvenance
+
+    public struct DirectRequestWelcomeView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestWelcomeView"
+        public let welcomeId: OperationId
+        public let conversationId: OperationId
+        public let transitionSeq: Int
+        public let coordinates: ConversationCoordinates
+        public let status: DefsWelcomeStatus
+        public let opaqueWelcome: Bytes
+        public let sha256: Bytes
+        public let recipientDid: BareDid
+        public let recipientDeviceId: DeviceId
+        public let provenance: DirectRequestWelcomeProvenance
 
         public init(
             welcomeId: OperationId, conversationId: OperationId, transitionSeq: Int, coordinates: ConversationCoordinates, status: DefsWelcomeStatus, opaqueWelcome: Bytes, sha256: Bytes, recipientDid: BareDid, recipientDeviceId: DeviceId, provenance: DirectRequestWelcomeProvenance
@@ -26107,11 +26104,11 @@ public struct DirectRequestWelcomeView: ATProtocolCodable, ATProtocolValue {
             case provenance
         }
     }
-        
-public struct DirectRequestInventoryScope: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestInventoryScope"
-            public let supportedProtocolVersions: [DefsProtocolVersion]
-            public let scopeDigest: Bytes
+
+    public struct DirectRequestInventoryScope: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestInventoryScope"
+        public let supportedProtocolVersions: [DefsProtocolVersion]
+        public let scopeDigest: Bytes
 
         public init(
             supportedProtocolVersions: [DefsProtocolVersion], scopeDigest: Bytes
@@ -26179,24 +26176,24 @@ public struct DirectRequestInventoryScope: ATProtocolCodable, ATProtocolValue {
             case scopeDigest
         }
     }
-        
-public struct DirectRequestPreparationSnapshot: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPreparationSnapshot"
-            public let protocolVersion: String
-            public let requestId: OperationId
-            public let firstMessageId: OperationId
-            public let conversationId: OperationId
-            public let recipientDid: BareDid
-            public let origin: DirectRequestOrigin
-            public let profile: DirectRequestProfile
-            public let creator: DirectRequestCreator
-            public let selectedDevices: [DirectRequestSelectedDevice]
-            public let preparedAt: CanonicalDatetime
-            public let leaseExpiresAt: CanonicalDatetime
-            public let minimumImportUntil: CanonicalDatetime
-            public let preparationRequestDigest: Bytes
-            public let authorityDid: BareDid
-            public let receiptKeyId: DirectRequestReceiptKeyId
+
+    public struct DirectRequestPreparationSnapshot: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestPreparationSnapshot"
+        public let protocolVersion: String
+        public let requestId: OperationId
+        public let firstMessageId: OperationId
+        public let conversationId: OperationId
+        public let recipientDid: BareDid
+        public let origin: DirectRequestOrigin
+        public let profile: DirectRequestProfile
+        public let creator: DirectRequestCreator
+        public let selectedDevices: [DirectRequestSelectedDevice]
+        public let preparedAt: CanonicalDatetime
+        public let leaseExpiresAt: CanonicalDatetime
+        public let minimumImportUntil: CanonicalDatetime
+        public let preparationRequestDigest: Bytes
+        public let authorityDid: BareDid
+        public let receiptKeyId: DirectRequestReceiptKeyId
 
         public init(
             protocolVersion: String, requestId: OperationId, firstMessageId: OperationId, conversationId: OperationId, recipientDid: BareDid, origin: DirectRequestOrigin, profile: DirectRequestProfile, creator: DirectRequestCreator, selectedDevices: [DirectRequestSelectedDevice], preparedAt: CanonicalDatetime, leaseExpiresAt: CanonicalDatetime, minimumImportUntil: CanonicalDatetime, preparationRequestDigest: Bytes, authorityDid: BareDid, receiptKeyId: DirectRequestReceiptKeyId
@@ -26459,19 +26456,19 @@ public struct DirectRequestPreparationSnapshot: ATProtocolCodable, ATProtocolVal
             case receiptKeyId
         }
     }
-        
-public struct DirectRequestAcceptanceCommitReceiptBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody"
-            public let signatureDomain: String
-            public let protocolVersion: String
-            public let authorityDid: BareDid
-            public let keyId: DirectRequestReceiptKeyId
-            public let requestId: OperationId
-            public let acceptanceDigest: Bytes
-            public let entryHash: Bytes
-            public let prior: ConversationCoordinates
-            public let next: ConversationCoordinates
-            public let recordedAt: CanonicalDatetime
+
+    public struct DirectRequestAcceptanceCommitReceiptBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody"
+        public let signatureDomain: String
+        public let protocolVersion: String
+        public let authorityDid: BareDid
+        public let keyId: DirectRequestReceiptKeyId
+        public let requestId: OperationId
+        public let acceptanceDigest: Bytes
+        public let entryHash: Bytes
+        public let prior: ConversationCoordinates
+        public let next: ConversationCoordinates
+        public let recordedAt: CanonicalDatetime
 
         public init(
             signatureDomain: String, protocolVersion: String, authorityDid: BareDid, keyId: DirectRequestReceiptKeyId, requestId: OperationId, acceptanceDigest: Bytes, entryHash: Bytes, prior: ConversationCoordinates, next: ConversationCoordinates, recordedAt: CanonicalDatetime
@@ -26659,11 +26656,11 @@ public struct DirectRequestAcceptanceCommitReceiptBody: ATProtocolCodable, ATPro
             case recordedAt
         }
     }
-        
-public struct SignedDirectRequestAcceptanceCommitReceipt: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestAcceptanceCommitReceipt"
-            public let body: SignedDirectRequestAcceptanceCommitReceiptBodyUnion
-            public let signature: Bytes
+
+    public struct SignedDirectRequestAcceptanceCommitReceipt: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedDirectRequestAcceptanceCommitReceipt"
+        public let body: SignedDirectRequestAcceptanceCommitReceiptBodyUnion
+        public let signature: Bytes
 
         public init(
             body: SignedDirectRequestAcceptanceCommitReceiptBodyUnion, signature: Bytes
@@ -26731,11 +26728,11 @@ public struct SignedDirectRequestAcceptanceCommitReceipt: ATProtocolCodable, ATP
             case signature
         }
     }
-        
-public struct DirectRequestAcceptanceProof: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestAcceptanceProof"
-            public let entry: DirectRequestAcceptanceEntry
-            public let receipt: SignedDirectRequestAcceptanceCommitReceipt
+
+    public struct DirectRequestAcceptanceProof: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestAcceptanceProof"
+        public let entry: DirectRequestAcceptanceEntry
+        public let receipt: SignedDirectRequestAcceptanceCommitReceipt
 
         public init(
             entry: DirectRequestAcceptanceEntry, receipt: SignedDirectRequestAcceptanceCommitReceipt
@@ -26803,15 +26800,15 @@ public struct DirectRequestAcceptanceProof: ATProtocolCodable, ATProtocolValue {
             case receipt
         }
     }
-        
-public struct DirectRequestKeyPoolStats: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#directRequestKeyPoolStats"
-            public let enabled: Bool
-            public let revision: Int
-            public let usableCount: Int
-            public let reservedCount: Int
-            public let asOf: CanonicalDatetime
-            public let usableUntil: CanonicalDatetime
+
+    public struct DirectRequestKeyPoolStats: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#directRequestKeyPoolStats"
+        public let enabled: Bool
+        public let revision: Int
+        public let usableCount: Int
+        public let reservedCount: Int
+        public let asOf: CanonicalDatetime
+        public let usableUntil: CanonicalDatetime
 
         public init(
             enabled: Bool, revision: Int, usableCount: Int, reservedCount: Int, asOf: CanonicalDatetime, usableUntil: CanonicalDatetime
@@ -26939,23 +26936,23 @@ public struct DirectRequestKeyPoolStats: ATProtocolCodable, ATProtocolValue {
             case usableUntil
         }
     }
-        
-public struct PushRegistrationBody: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#pushRegistrationBody"
-            public let protocolVersion: PushRegistrationBodyProtocolVersion
-            public let signatureDomain: String
-            public let authorityDid: String
-            public let actorDid: BareDid
-            public let actorDeviceId: DeviceId
-            public let keyId: KeyId
-            public let authGeneration: Int
-            public let registrationId: OperationId
-            public let provider: PushRegistrationBodyProvider
-            public let appId: String
-            public let tokenGeneration: Int
-            public let tokenSha256: Bytes
-            public let enabled: Bool
-            public let signedAt: CanonicalDatetime
+
+    public struct PushRegistrationBody: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#pushRegistrationBody"
+        public let protocolVersion: PushRegistrationBodyProtocolVersion
+        public let signatureDomain: String
+        public let authorityDid: String
+        public let actorDid: BareDid
+        public let actorDeviceId: DeviceId
+        public let keyId: KeyId
+        public let authGeneration: Int
+        public let registrationId: OperationId
+        public let provider: PushRegistrationBodyProvider
+        public let appId: String
+        public let tokenGeneration: Int
+        public let tokenSha256: Bytes
+        public let enabled: Bool
+        public let signedAt: CanonicalDatetime
 
         public init(
             protocolVersion: PushRegistrationBodyProtocolVersion, signatureDomain: String, authorityDid: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, registrationId: OperationId, provider: PushRegistrationBodyProvider, appId: String, tokenGeneration: Int, tokenSha256: Bytes, enabled: Bool, signedAt: CanonicalDatetime
@@ -27203,11 +27200,11 @@ public struct PushRegistrationBody: ATProtocolCodable, ATProtocolValue {
             case signedAt
         }
     }
-        
-public struct SignedPushRegistration: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#signedPushRegistration"
-            public let body: PushRegistrationBody
-            public let signature: Bytes
+
+    public struct SignedPushRegistration: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#signedPushRegistration"
+        public let body: PushRegistrationBody
+        public let signature: Bytes
 
         public init(
             body: PushRegistrationBody, signature: Bytes
@@ -27275,11 +27272,11 @@ public struct SignedPushRegistration: ATProtocolCodable, ATProtocolValue {
             case signature
         }
     }
-        
-public struct PushRegistrationBinding: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.chat.defs#pushRegistrationBinding"
-            public let body: PushRegistrationBody
-            public let bindingDigest: Bytes
+
+    public struct PushRegistrationBinding: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#pushRegistrationBinding"
+        public let body: PushRegistrationBody
+        public let bindingDigest: Bytes
 
         public init(
             body: PushRegistrationBody, bindingDigest: Bytes
@@ -27348,7208 +27345,7024 @@ public struct PushRegistrationBinding: ATProtocolCodable, ATProtocolValue {
         }
     }
 
+    public enum DefsProtocolVersion: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_1 = "1"
+        case value_2 = "2"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsProtocolVersion else { return false }
+            return self == otherValue
+        }
 
-public enum DefsProtocolVersion: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_1 = "1"
-    case value_2 = "2"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsProtocolVersion else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public enum DefsCipherSuite: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_MLS_u5f_256_u5f_XWING_u5f_CHACHA20POLY1305_u5f_SHA256_u5f_Ed25519 = "MLS_256_XWING_CHACHA20POLY1305_SHA256_Ed25519"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsCipherSuite else { return false }
+            return self == otherValue
+        }
 
-public enum DefsCipherSuite: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_MLS_u5f_256_u5f_XWING_u5f_CHACHA20POLY1305_u5f_SHA256_u5f_Ed25519 = "MLS_256_XWING_CHACHA20POLY1305_SHA256_Ed25519"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsCipherSuite else { return false }
-        return self == otherValue
-    }
-
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
-
-public typealias CanonicalDatetime = ATProtocolDate
-
-public typealias DeviceId = String
-
-public typealias OperationId = String
-
-public typealias BareDid = DID
-
-public typealias KeyId = String
-
-
-public enum DefsLifecycle: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_active = "active"
-    case value_superseded = "superseded"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsLifecycle else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public typealias CanonicalDatetime = ATProtocolDate
 
+    public typealias DeviceId = String
 
-public enum DefsConversationKind: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_direct = "direct"
-    case value_group = "group"
+    public typealias OperationId = String
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsConversationKind else { return false }
-        return self == otherValue
-    }
+    public typealias BareDid = DID
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public typealias KeyId = String
 
+    public enum DefsLifecycle: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_active = "active"
+        case value_superseded = "superseded"
 
-public enum DefsMemberRole: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_admin = "admin"
-    case value_member = "member"
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsLifecycle else { return false }
+            return self == otherValue
+        }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsMemberRole else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public enum DefsConversationKind: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_direct = "direct"
+        case value_group = "group"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsConversationKind else { return false }
+            return self == otherValue
+        }
 
-public enum DefsParticipantStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_pending = "pending"
-    case value_active = "active"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsParticipantStatus else { return false }
-        return self == otherValue
-    }
-
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
-
-
-public enum DefsIncomingConsentPolicy: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_all = "all"
-    case value_none = "none"
-    case value_following = "following"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsIncomingConsentPolicy else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public enum DefsMemberRole: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_admin = "admin"
+        case value_member = "member"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsMemberRole else { return false }
+            return self == otherValue
+        }
 
-public enum DefsDeviceStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_active = "active"
-    case value_revoked = "revoked"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsDeviceStatus else { return false }
-        return self == otherValue
-    }
-
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
-
-
-public enum DefsPackageStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_available = "available"
-    case value_reserved = "reserved"
-    case value_consumed = "consumed"
-    case value_expired = "expired"
-    case value_revoked = "revoked"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsPackageStatus else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public enum DefsParticipantStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_pending = "pending"
+        case value_active = "active"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsParticipantStatus else { return false }
+            return self == otherValue
+        }
 
-public enum DefsReservationStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_active = "active"
-    case value_consumed = "consumed"
-    case value_expired = "expired"
-    case value_released = "released"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsReservationStatus else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public enum DefsIncomingConsentPolicy: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_all = "all"
+        case value_none = "none"
+        case value_following = "following"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsIncomingConsentPolicy else { return false }
+            return self == otherValue
+        }
 
-public enum DefsWelcomeStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_pending = "pending"
-    case value_acknowledged = "acknowledged"
-    case value_rejected = "rejected"
-    case value_expired = "expired"
-    case value_superseded = "superseded"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsWelcomeStatus else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public enum DefsDeviceStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_active = "active"
+        case value_revoked = "revoked"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsDeviceStatus else { return false }
+            return self == otherValue
+        }
 
-public enum DefsWelcomeRejectionReason: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_noMatchingKeyPackage = "noMatchingKeyPackage"
-    case value_invalidWelcome = "invalidWelcome"
-    case value_unsupportedCipherSuite = "unsupportedCipherSuite"
-    case value_coordinateMismatch = "coordinateMismatch"
-    case value_localStateConflict = "localStateConflict"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsWelcomeRejectionReason else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public enum DefsPackageStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_available = "available"
+        case value_reserved = "reserved"
+        case value_consumed = "consumed"
+        case value_expired = "expired"
+        case value_revoked = "revoked"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsPackageStatus else { return false }
+            return self == otherValue
+        }
 
-public enum DefsLeafRecoveryStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_open = "open"
-    case value_fulfilled = "fulfilled"
-    case value_cancelled = "cancelled"
-    case value_expired = "expired"
-    case value_superseded = "superseded"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsLeafRecoveryStatus else { return false }
-        return self == otherValue
-    }
-
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
-
-
-public enum DefsRecoveryWorkSourceKind: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_welcomeExpired = "welcomeExpired"
-    case value_welcomeRejected = "welcomeRejected"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsRecoveryWorkSourceKind else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public enum DefsReservationStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_active = "active"
+        case value_consumed = "consumed"
+        case value_expired = "expired"
+        case value_released = "released"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsReservationStatus else { return false }
+            return self == otherValue
+        }
 
-public enum DefsRecoveryWorkStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_pending = "pending"
-    case value_completed = "completed"
-    case value_superseded = "superseded"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsRecoveryWorkStatus else { return false }
-        return self == otherValue
-    }
-
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
-
-
-public enum DefsLeaveRequestStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_pending = "pending"
-    case value_fulfilled = "fulfilled"
-    case value_cancelled = "cancelled"
-    case value_expired = "expired"
-    case value_stale = "stale"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsLeaveRequestStatus else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public enum DefsWelcomeStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_pending = "pending"
+        case value_acknowledged = "acknowledged"
+        case value_rejected = "rejected"
+        case value_expired = "expired"
+        case value_superseded = "superseded"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsWelcomeStatus else { return false }
+            return self == otherValue
+        }
 
-public enum DefsLeafRecoveryKind: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_add = "add"
-    case value_replace = "replace"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsLeafRecoveryKind else { return false }
-        return self == otherValue
-    }
-
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
-
-
-public enum DefsLeafOrigin: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_genesis = "genesis"
-    case value_keyPackage = "keyPackage"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsLeafOrigin else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public enum DefsWelcomeRejectionReason: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_noMatchingKeyPackage = "noMatchingKeyPackage"
+        case value_invalidWelcome = "invalidWelcome"
+        case value_unsupportedCipherSuite = "unsupportedCipherSuite"
+        case value_coordinateMismatch = "coordinateMismatch"
+        case value_localStateConflict = "localStateConflict"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsWelcomeRejectionReason else { return false }
+            return self == otherValue
+        }
 
-public enum DefsResetReason: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_localStateLost = "localStateLost"
-    case value_poisonedState = "poisonedState"
-    case value_epochDivergence = "epochDivergence"
-    case value_manualRecovery = "manualRecovery"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsResetReason else { return false }
-        return self == otherValue
-    }
-
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
-
-
-public enum DefsBlobPurpose: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_attachment = "attachment"
-    case value_metadata = "metadata"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsBlobPurpose else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public enum DefsLeafRecoveryStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_open = "open"
+        case value_fulfilled = "fulfilled"
+        case value_cancelled = "cancelled"
+        case value_expired = "expired"
+        case value_superseded = "superseded"
 
-public typealias ArtifactHash = Bytes
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsLeafRecoveryStatus else { return false }
+            return self == otherValue
+        }
 
-
-
-
-public enum ParticipantChange: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsAddParticipant(BlueCatbirdChatDefs.AddParticipant)
-    case blueCatbirdChatDefsRemoveParticipant(BlueCatbirdChatDefs.RemoveParticipant)
-    case blueCatbirdChatDefsChangeParticipantRole(BlueCatbirdChatDefs.ChangeParticipantRole)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.AddParticipant) {
-        self = .blueCatbirdChatDefsAddParticipant(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.RemoveParticipant) {
-        self = .blueCatbirdChatDefsRemoveParticipant(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.ChangeParticipantRole) {
-        self = .blueCatbirdChatDefsChangeParticipantRole(value)
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
+    public enum DefsRecoveryWorkSourceKind: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_welcomeExpired = "welcomeExpired"
+        case value_welcomeRejected = "welcomeRejected"
 
-        switch typeValue {
-        case "blue.catbird.chat.defs#addParticipant":
-            let value = try BlueCatbirdChatDefs.AddParticipant(from: decoder)
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsRecoveryWorkSourceKind else { return false }
+            return self == otherValue
+        }
+
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
+    }
+
+    public enum DefsRecoveryWorkStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_pending = "pending"
+        case value_completed = "completed"
+        case value_superseded = "superseded"
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsRecoveryWorkStatus else { return false }
+            return self == otherValue
+        }
+
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
+    }
+
+    public enum DefsLeaveRequestStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_pending = "pending"
+        case value_fulfilled = "fulfilled"
+        case value_cancelled = "cancelled"
+        case value_expired = "expired"
+        case value_stale = "stale"
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsLeaveRequestStatus else { return false }
+            return self == otherValue
+        }
+
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
+    }
+
+    public enum DefsLeafRecoveryKind: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_add = "add"
+        case value_replace = "replace"
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsLeafRecoveryKind else { return false }
+            return self == otherValue
+        }
+
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
+    }
+
+    public enum DefsLeafOrigin: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_genesis = "genesis"
+        case value_keyPackage = "keyPackage"
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsLeafOrigin else { return false }
+            return self == otherValue
+        }
+
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
+    }
+
+    public enum DefsResetReason: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_localStateLost = "localStateLost"
+        case value_poisonedState = "poisonedState"
+        case value_epochDivergence = "epochDivergence"
+        case value_manualRecovery = "manualRecovery"
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsResetReason else { return false }
+            return self == otherValue
+        }
+
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
+    }
+
+    public enum DefsBlobPurpose: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_attachment = "attachment"
+        case value_metadata = "metadata"
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsBlobPurpose else { return false }
+            return self == otherValue
+        }
+
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
+    }
+
+    public typealias ArtifactHash = Bytes
+
+    public enum ParticipantChange: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsAddParticipant(BlueCatbirdChatDefs.AddParticipant)
+        case blueCatbirdChatDefsRemoveParticipant(BlueCatbirdChatDefs.RemoveParticipant)
+        case blueCatbirdChatDefsChangeParticipantRole(BlueCatbirdChatDefs.ChangeParticipantRole)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.AddParticipant) {
             self = .blueCatbirdChatDefsAddParticipant(value)
-        case "blue.catbird.chat.defs#removeParticipant":
-            let value = try BlueCatbirdChatDefs.RemoveParticipant(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.RemoveParticipant) {
             self = .blueCatbirdChatDefsRemoveParticipant(value)
-        case "blue.catbird.chat.defs#changeParticipantRole":
-            let value = try BlueCatbirdChatDefs.ChangeParticipantRole(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.ChangeParticipantRole) {
             self = .blueCatbirdChatDefsChangeParticipantRole(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsAddParticipant(let value):
-            try container.encode("blue.catbird.chat.defs#addParticipant", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsRemoveParticipant(let value):
-            try container.encode("blue.catbird.chat.defs#removeParticipant", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsChangeParticipantRole(let value):
-            try container.encode("blue.catbird.chat.defs#changeParticipantRole", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsAddParticipant(let value):
-            hasher.combine("blue.catbird.chat.defs#addParticipant")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsRemoveParticipant(let value):
-            hasher.combine("blue.catbird.chat.defs#removeParticipant")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsChangeParticipantRole(let value):
-            hasher.combine("blue.catbird.chat.defs#changeParticipantRole")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: ParticipantChange, rhs: ParticipantChange) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsAddParticipant(let lhsValue),
-              .blueCatbirdChatDefsAddParticipant(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsRemoveParticipant(let lhsValue),
-              .blueCatbirdChatDefsRemoveParticipant(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsChangeParticipantRole(let lhsValue),
-              .blueCatbirdChatDefsChangeParticipantRole(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? ParticipantChange else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsAddParticipant(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#addParticipant")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#addParticipant":
+                let value = try BlueCatbirdChatDefs.AddParticipant(from: decoder)
+                self = .blueCatbirdChatDefsAddParticipant(value)
+            case "blue.catbird.chat.defs#removeParticipant":
+                let value = try BlueCatbirdChatDefs.RemoveParticipant(from: decoder)
+                self = .blueCatbirdChatDefsRemoveParticipant(value)
+            case "blue.catbird.chat.defs#changeParticipantRole":
+                let value = try BlueCatbirdChatDefs.ChangeParticipantRole(from: decoder)
+                self = .blueCatbirdChatDefsChangeParticipantRole(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .blueCatbirdChatDefsRemoveParticipant(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#removeParticipant")
-            
-            let valueDict = try value.toCBORValue()
+        }
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsChangeParticipantRole(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#changeParticipantRole")
-            
-            let valueDict = try value.toCBORValue()
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch self {
+            case .blueCatbirdChatDefsAddParticipant(let value):
+                try container.encode("blue.catbird.chat.defs#addParticipant", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsRemoveParticipant(let value):
+                try container.encode("blue.catbird.chat.defs#removeParticipant", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsChangeParticipantRole(let value):
+                try container.encode("blue.catbird.chat.defs#changeParticipantRole", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsAddParticipant(let value):
+                hasher.combine("blue.catbird.chat.defs#addParticipant")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsRemoveParticipant(let value):
+                hasher.combine("blue.catbird.chat.defs#removeParticipant")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsChangeParticipantRole(let value):
+                hasher.combine("blue.catbird.chat.defs#changeParticipantRole")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: ParticipantChange, rhs: ParticipantChange) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsAddParticipant(let lhsValue),
+                  .blueCatbirdChatDefsAddParticipant(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsRemoveParticipant(let lhsValue),
+                  .blueCatbirdChatDefsRemoveParticipant(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsChangeParticipantRole(let lhsValue),
+                  .blueCatbirdChatDefsChangeParticipantRole(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? ParticipantChange else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsAddParticipant(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#addParticipant")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsRemoveParticipant(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#removeParticipant")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsChangeParticipantRole(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#changeParticipantRole")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum LeafChange: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsAddLeafByRecovery(BlueCatbirdChatDefs.AddLeafByRecovery)
-    case blueCatbirdChatDefsRemoveLeaf(BlueCatbirdChatDefs.RemoveLeaf)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.AddLeafByRecovery) {
-        self = .blueCatbirdChatDefsAddLeafByRecovery(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.RemoveLeaf) {
-        self = .blueCatbirdChatDefsRemoveLeaf(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#addLeafByRecovery":
-            let value = try BlueCatbirdChatDefs.AddLeafByRecovery(from: decoder)
+    public enum LeafChange: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsAddLeafByRecovery(BlueCatbirdChatDefs.AddLeafByRecovery)
+        case blueCatbirdChatDefsRemoveLeaf(BlueCatbirdChatDefs.RemoveLeaf)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.AddLeafByRecovery) {
             self = .blueCatbirdChatDefsAddLeafByRecovery(value)
-        case "blue.catbird.chat.defs#removeLeaf":
-            let value = try BlueCatbirdChatDefs.RemoveLeaf(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.RemoveLeaf) {
             self = .blueCatbirdChatDefsRemoveLeaf(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsAddLeafByRecovery(let value):
-            try container.encode("blue.catbird.chat.defs#addLeafByRecovery", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsRemoveLeaf(let value):
-            try container.encode("blue.catbird.chat.defs#removeLeaf", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsAddLeafByRecovery(let value):
-            hasher.combine("blue.catbird.chat.defs#addLeafByRecovery")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsRemoveLeaf(let value):
-            hasher.combine("blue.catbird.chat.defs#removeLeaf")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: LeafChange, rhs: LeafChange) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsAddLeafByRecovery(let lhsValue),
-              .blueCatbirdChatDefsAddLeafByRecovery(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsRemoveLeaf(let lhsValue),
-              .blueCatbirdChatDefsRemoveLeaf(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? LeafChange else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsAddLeafByRecovery(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#addLeafByRecovery")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#addLeafByRecovery":
+                let value = try BlueCatbirdChatDefs.AddLeafByRecovery(from: decoder)
+                self = .blueCatbirdChatDefsAddLeafByRecovery(value)
+            case "blue.catbird.chat.defs#removeLeaf":
+                let value = try BlueCatbirdChatDefs.RemoveLeaf(from: decoder)
+                self = .blueCatbirdChatDefsRemoveLeaf(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .blueCatbirdChatDefsRemoveLeaf(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#removeLeaf")
-            
-            let valueDict = try value.toCBORValue()
+        }
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsAddLeafByRecovery(let value):
+                try container.encode("blue.catbird.chat.defs#addLeafByRecovery", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsRemoveLeaf(let value):
+                try container.encode("blue.catbird.chat.defs#removeLeaf", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsAddLeafByRecovery(let value):
+                hasher.combine("blue.catbird.chat.defs#addLeafByRecovery")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsRemoveLeaf(let value):
+                hasher.combine("blue.catbird.chat.defs#removeLeaf")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: LeafChange, rhs: LeafChange) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsAddLeafByRecovery(let lhsValue),
+                  .blueCatbirdChatDefsAddLeafByRecovery(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsRemoveLeaf(let lhsValue),
+                  .blueCatbirdChatDefsRemoveLeaf(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? LeafChange else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsAddLeafByRecovery(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#addLeafByRecovery")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsRemoveLeaf(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#removeLeaf")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-public typealias IdentifierBytes = Bytes
+    public typealias IdentifierBytes = Bytes
 
+    public enum EncryptedImageEmbedMimeType: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_image_u2f_heic = "image/heic"
+        case value_image_u2f_jpeg = "image/jpeg"
+        case value_image_u2f_png = "image/png"
+        case value_image_u2f_webp = "image/webp"
+        case value_image_u2f_gif = "image/gif"
 
-public enum EncryptedImageEmbedMimeType: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_image_u2f_heic = "image/heic"
-    case value_image_u2f_jpeg = "image/jpeg"
-    case value_image_u2f_png = "image/png"
-    case value_image_u2f_webp = "image/webp"
-    case value_image_u2f_gif = "image/gif"
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? EncryptedImageEmbedMimeType else { return false }
+            return self == otherValue
+        }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? EncryptedImageEmbedMimeType else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public enum EncryptedAudioEmbedMimeType: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_audio_u2f_aac = "audio/aac"
+        case value_audio_u2f_mp4 = "audio/mp4"
+        case value_audio_u2f_ogg = "audio/ogg"
+        case value_audio_u2f_opus = "audio/opus"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? EncryptedAudioEmbedMimeType else { return false }
+            return self == otherValue
+        }
 
-public enum EncryptedAudioEmbedMimeType: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_audio_u2f_aac = "audio/aac"
-    case value_audio_u2f_mp4 = "audio/mp4"
-    case value_audio_u2f_ogg = "audio/ogg"
-    case value_audio_u2f_opus = "audio/opus"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? EncryptedAudioEmbedMimeType else { return false }
-        return self == otherValue
-    }
-
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
-
-
-
-
-public enum ApplicationEmbed: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsEncryptedImageEmbedVariant(BlueCatbirdChatDefs.EncryptedImageEmbedVariant)
-    case blueCatbirdChatDefsEncryptedAudioEmbedVariant(BlueCatbirdChatDefs.EncryptedAudioEmbedVariant)
-    case blueCatbirdChatDefsAtprotoRecordEmbedVariant(BlueCatbirdChatDefs.AtprotoRecordEmbedVariant)
-    case blueCatbirdChatDefsExternalLinkEmbedVariant(BlueCatbirdChatDefs.ExternalLinkEmbedVariant)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.EncryptedImageEmbedVariant) {
-        self = .blueCatbirdChatDefsEncryptedImageEmbedVariant(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.EncryptedAudioEmbedVariant) {
-        self = .blueCatbirdChatDefsEncryptedAudioEmbedVariant(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.AtprotoRecordEmbedVariant) {
-        self = .blueCatbirdChatDefsAtprotoRecordEmbedVariant(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.ExternalLinkEmbedVariant) {
-        self = .blueCatbirdChatDefsExternalLinkEmbedVariant(value)
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#encryptedImageEmbedVariant":
-            let value = try BlueCatbirdChatDefs.EncryptedImageEmbedVariant(from: decoder)
+    public enum ApplicationEmbed: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsEncryptedImageEmbedVariant(BlueCatbirdChatDefs.EncryptedImageEmbedVariant)
+        case blueCatbirdChatDefsEncryptedAudioEmbedVariant(BlueCatbirdChatDefs.EncryptedAudioEmbedVariant)
+        case blueCatbirdChatDefsAtprotoRecordEmbedVariant(BlueCatbirdChatDefs.AtprotoRecordEmbedVariant)
+        case blueCatbirdChatDefsExternalLinkEmbedVariant(BlueCatbirdChatDefs.ExternalLinkEmbedVariant)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.EncryptedImageEmbedVariant) {
             self = .blueCatbirdChatDefsEncryptedImageEmbedVariant(value)
-        case "blue.catbird.chat.defs#encryptedAudioEmbedVariant":
-            let value = try BlueCatbirdChatDefs.EncryptedAudioEmbedVariant(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.EncryptedAudioEmbedVariant) {
             self = .blueCatbirdChatDefsEncryptedAudioEmbedVariant(value)
-        case "blue.catbird.chat.defs#atprotoRecordEmbedVariant":
-            let value = try BlueCatbirdChatDefs.AtprotoRecordEmbedVariant(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.AtprotoRecordEmbedVariant) {
             self = .blueCatbirdChatDefsAtprotoRecordEmbedVariant(value)
-        case "blue.catbird.chat.defs#externalLinkEmbedVariant":
-            let value = try BlueCatbirdChatDefs.ExternalLinkEmbedVariant(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.ExternalLinkEmbedVariant) {
             self = .blueCatbirdChatDefsExternalLinkEmbedVariant(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsEncryptedImageEmbedVariant(let value):
-            try container.encode("blue.catbird.chat.defs#encryptedImageEmbedVariant", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsEncryptedAudioEmbedVariant(let value):
-            try container.encode("blue.catbird.chat.defs#encryptedAudioEmbedVariant", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsAtprotoRecordEmbedVariant(let value):
-            try container.encode("blue.catbird.chat.defs#atprotoRecordEmbedVariant", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsExternalLinkEmbedVariant(let value):
-            try container.encode("blue.catbird.chat.defs#externalLinkEmbedVariant", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsEncryptedImageEmbedVariant(let value):
-            hasher.combine("blue.catbird.chat.defs#encryptedImageEmbedVariant")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsEncryptedAudioEmbedVariant(let value):
-            hasher.combine("blue.catbird.chat.defs#encryptedAudioEmbedVariant")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsAtprotoRecordEmbedVariant(let value):
-            hasher.combine("blue.catbird.chat.defs#atprotoRecordEmbedVariant")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsExternalLinkEmbedVariant(let value):
-            hasher.combine("blue.catbird.chat.defs#externalLinkEmbedVariant")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: ApplicationEmbed, rhs: ApplicationEmbed) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsEncryptedImageEmbedVariant(let lhsValue),
-              .blueCatbirdChatDefsEncryptedImageEmbedVariant(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsEncryptedAudioEmbedVariant(let lhsValue),
-              .blueCatbirdChatDefsEncryptedAudioEmbedVariant(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsAtprotoRecordEmbedVariant(let lhsValue),
-              .blueCatbirdChatDefsAtprotoRecordEmbedVariant(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsExternalLinkEmbedVariant(let lhsValue),
-              .blueCatbirdChatDefsExternalLinkEmbedVariant(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? ApplicationEmbed else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsEncryptedImageEmbedVariant(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#encryptedImageEmbedVariant")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#encryptedImageEmbedVariant":
+                let value = try BlueCatbirdChatDefs.EncryptedImageEmbedVariant(from: decoder)
+                self = .blueCatbirdChatDefsEncryptedImageEmbedVariant(value)
+            case "blue.catbird.chat.defs#encryptedAudioEmbedVariant":
+                let value = try BlueCatbirdChatDefs.EncryptedAudioEmbedVariant(from: decoder)
+                self = .blueCatbirdChatDefsEncryptedAudioEmbedVariant(value)
+            case "blue.catbird.chat.defs#atprotoRecordEmbedVariant":
+                let value = try BlueCatbirdChatDefs.AtprotoRecordEmbedVariant(from: decoder)
+                self = .blueCatbirdChatDefsAtprotoRecordEmbedVariant(value)
+            case "blue.catbird.chat.defs#externalLinkEmbedVariant":
+                let value = try BlueCatbirdChatDefs.ExternalLinkEmbedVariant(from: decoder)
+                self = .blueCatbirdChatDefsExternalLinkEmbedVariant(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .blueCatbirdChatDefsEncryptedAudioEmbedVariant(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#encryptedAudioEmbedVariant")
-            
-            let valueDict = try value.toCBORValue()
+        }
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsAtprotoRecordEmbedVariant(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#atprotoRecordEmbedVariant")
-            
-            let valueDict = try value.toCBORValue()
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch self {
+            case .blueCatbirdChatDefsEncryptedImageEmbedVariant(let value):
+                try container.encode("blue.catbird.chat.defs#encryptedImageEmbedVariant", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsEncryptedAudioEmbedVariant(let value):
+                try container.encode("blue.catbird.chat.defs#encryptedAudioEmbedVariant", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsAtprotoRecordEmbedVariant(let value):
+                try container.encode("blue.catbird.chat.defs#atprotoRecordEmbedVariant", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsExternalLinkEmbedVariant(let value):
+                try container.encode("blue.catbird.chat.defs#externalLinkEmbedVariant", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
             }
-            return map
-        case .blueCatbirdChatDefsExternalLinkEmbedVariant(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#externalLinkEmbedVariant")
-            
-            let valueDict = try value.toCBORValue()
+        }
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsEncryptedImageEmbedVariant(let value):
+                hasher.combine("blue.catbird.chat.defs#encryptedImageEmbedVariant")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsEncryptedAudioEmbedVariant(let value):
+                hasher.combine("blue.catbird.chat.defs#encryptedAudioEmbedVariant")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsAtprotoRecordEmbedVariant(let value):
+                hasher.combine("blue.catbird.chat.defs#atprotoRecordEmbedVariant")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsExternalLinkEmbedVariant(let value):
+                hasher.combine("blue.catbird.chat.defs#externalLinkEmbedVariant")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: ApplicationEmbed, rhs: ApplicationEmbed) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsEncryptedImageEmbedVariant(let lhsValue),
+                  .blueCatbirdChatDefsEncryptedImageEmbedVariant(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsEncryptedAudioEmbedVariant(let lhsValue),
+                  .blueCatbirdChatDefsEncryptedAudioEmbedVariant(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsAtprotoRecordEmbedVariant(let lhsValue),
+                  .blueCatbirdChatDefsAtprotoRecordEmbedVariant(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsExternalLinkEmbedVariant(let lhsValue),
+                  .blueCatbirdChatDefsExternalLinkEmbedVariant(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? ApplicationEmbed else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsEncryptedImageEmbedVariant(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#encryptedImageEmbedVariant")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsEncryptedAudioEmbedVariant(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#encryptedAudioEmbedVariant")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsAtprotoRecordEmbedVariant(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#atprotoRecordEmbedVariant")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsExternalLinkEmbedVariant(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#externalLinkEmbedVariant")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
+    public enum ReactionFrameBodyOperation: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_add = "add"
+        case value_remove = "remove"
 
-public enum ReactionFrameBodyOperation: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_add = "add"
-    case value_remove = "remove"
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? ReactionFrameBodyOperation else { return false }
+            return self == otherValue
+        }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? ReactionFrameBodyOperation else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
-
-
-
-
-public enum ApplicationFrameBody: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsMessageFrameVariant(BlueCatbirdChatDefs.MessageFrameVariant)
-    case blueCatbirdChatDefsReactionFrameVariant(BlueCatbirdChatDefs.ReactionFrameVariant)
-    case blueCatbirdChatDefsEditFrameVariant(BlueCatbirdChatDefs.EditFrameVariant)
-    case blueCatbirdChatDefsTombstoneFrameVariant(BlueCatbirdChatDefs.TombstoneFrameVariant)
-    case blueCatbirdChatDefsReadStateFrameVariant(BlueCatbirdChatDefs.ReadStateFrameVariant)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.MessageFrameVariant) {
-        self = .blueCatbirdChatDefsMessageFrameVariant(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.ReactionFrameVariant) {
-        self = .blueCatbirdChatDefsReactionFrameVariant(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.EditFrameVariant) {
-        self = .blueCatbirdChatDefsEditFrameVariant(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.TombstoneFrameVariant) {
-        self = .blueCatbirdChatDefsTombstoneFrameVariant(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.ReadStateFrameVariant) {
-        self = .blueCatbirdChatDefsReadStateFrameVariant(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#messageFrameVariant":
-            let value = try BlueCatbirdChatDefs.MessageFrameVariant(from: decoder)
+    public enum ApplicationFrameBody: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsMessageFrameVariant(BlueCatbirdChatDefs.MessageFrameVariant)
+        case blueCatbirdChatDefsReactionFrameVariant(BlueCatbirdChatDefs.ReactionFrameVariant)
+        case blueCatbirdChatDefsEditFrameVariant(BlueCatbirdChatDefs.EditFrameVariant)
+        case blueCatbirdChatDefsTombstoneFrameVariant(BlueCatbirdChatDefs.TombstoneFrameVariant)
+        case blueCatbirdChatDefsReadStateFrameVariant(BlueCatbirdChatDefs.ReadStateFrameVariant)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.MessageFrameVariant) {
             self = .blueCatbirdChatDefsMessageFrameVariant(value)
-        case "blue.catbird.chat.defs#reactionFrameVariant":
-            let value = try BlueCatbirdChatDefs.ReactionFrameVariant(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.ReactionFrameVariant) {
             self = .blueCatbirdChatDefsReactionFrameVariant(value)
-        case "blue.catbird.chat.defs#editFrameVariant":
-            let value = try BlueCatbirdChatDefs.EditFrameVariant(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.EditFrameVariant) {
             self = .blueCatbirdChatDefsEditFrameVariant(value)
-        case "blue.catbird.chat.defs#tombstoneFrameVariant":
-            let value = try BlueCatbirdChatDefs.TombstoneFrameVariant(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.TombstoneFrameVariant) {
             self = .blueCatbirdChatDefsTombstoneFrameVariant(value)
-        case "blue.catbird.chat.defs#readStateFrameVariant":
-            let value = try BlueCatbirdChatDefs.ReadStateFrameVariant(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.ReadStateFrameVariant) {
             self = .blueCatbirdChatDefsReadStateFrameVariant(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
+
+            switch typeValue {
+            case "blue.catbird.chat.defs#messageFrameVariant":
+                let value = try BlueCatbirdChatDefs.MessageFrameVariant(from: decoder)
+                self = .blueCatbirdChatDefsMessageFrameVariant(value)
+            case "blue.catbird.chat.defs#reactionFrameVariant":
+                let value = try BlueCatbirdChatDefs.ReactionFrameVariant(from: decoder)
+                self = .blueCatbirdChatDefsReactionFrameVariant(value)
+            case "blue.catbird.chat.defs#editFrameVariant":
+                let value = try BlueCatbirdChatDefs.EditFrameVariant(from: decoder)
+                self = .blueCatbirdChatDefsEditFrameVariant(value)
+            case "blue.catbird.chat.defs#tombstoneFrameVariant":
+                let value = try BlueCatbirdChatDefs.TombstoneFrameVariant(from: decoder)
+                self = .blueCatbirdChatDefsTombstoneFrameVariant(value)
+            case "blue.catbird.chat.defs#readStateFrameVariant":
+                let value = try BlueCatbirdChatDefs.ReadStateFrameVariant(from: decoder)
+                self = .blueCatbirdChatDefsReadStateFrameVariant(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsMessageFrameVariant(let value):
+                try container.encode("blue.catbird.chat.defs#messageFrameVariant", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsReactionFrameVariant(let value):
+                try container.encode("blue.catbird.chat.defs#reactionFrameVariant", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsEditFrameVariant(let value):
+                try container.encode("blue.catbird.chat.defs#editFrameVariant", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsTombstoneFrameVariant(let value):
+                try container.encode("blue.catbird.chat.defs#tombstoneFrameVariant", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsReadStateFrameVariant(let value):
+                try container.encode("blue.catbird.chat.defs#readStateFrameVariant", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsMessageFrameVariant(let value):
+                hasher.combine("blue.catbird.chat.defs#messageFrameVariant")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsReactionFrameVariant(let value):
+                hasher.combine("blue.catbird.chat.defs#reactionFrameVariant")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsEditFrameVariant(let value):
+                hasher.combine("blue.catbird.chat.defs#editFrameVariant")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsTombstoneFrameVariant(let value):
+                hasher.combine("blue.catbird.chat.defs#tombstoneFrameVariant")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsReadStateFrameVariant(let value):
+                hasher.combine("blue.catbird.chat.defs#readStateFrameVariant")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: ApplicationFrameBody, rhs: ApplicationFrameBody) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsMessageFrameVariant(let lhsValue),
+                  .blueCatbirdChatDefsMessageFrameVariant(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsReactionFrameVariant(let lhsValue),
+                  .blueCatbirdChatDefsReactionFrameVariant(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsEditFrameVariant(let lhsValue),
+                  .blueCatbirdChatDefsEditFrameVariant(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsTombstoneFrameVariant(let lhsValue),
+                  .blueCatbirdChatDefsTombstoneFrameVariant(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsReadStateFrameVariant(let lhsValue),
+                  .blueCatbirdChatDefsReadStateFrameVariant(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? ApplicationFrameBody else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsMessageFrameVariant(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#messageFrameVariant")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsReactionFrameVariant(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#reactionFrameVariant")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsEditFrameVariant(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#editFrameVariant")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsTombstoneFrameVariant(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#tombstoneFrameVariant")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsReadStateFrameVariant(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#readStateFrameVariant")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+    public enum MetadataAvatarEmbedMimeType: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_image_u2f_heic = "image/heic"
+        case value_image_u2f_jpeg = "image/jpeg"
+        case value_image_u2f_png = "image/png"
+        case value_image_u2f_webp = "image/webp"
 
-        switch self {
-        case .blueCatbirdChatDefsMessageFrameVariant(let value):
-            try container.encode("blue.catbird.chat.defs#messageFrameVariant", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsReactionFrameVariant(let value):
-            try container.encode("blue.catbird.chat.defs#reactionFrameVariant", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsEditFrameVariant(let value):
-            try container.encode("blue.catbird.chat.defs#editFrameVariant", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsTombstoneFrameVariant(let value):
-            try container.encode("blue.catbird.chat.defs#tombstoneFrameVariant", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsReadStateFrameVariant(let value):
-            try container.encode("blue.catbird.chat.defs#readStateFrameVariant", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? MetadataAvatarEmbedMimeType else { return false }
+            return self == otherValue
+        }
+
+        public func toCBORValue() throws -> Any {
+            return rawValue
         }
     }
 
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsMessageFrameVariant(let value):
-            hasher.combine("blue.catbird.chat.defs#messageFrameVariant")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsReactionFrameVariant(let value):
-            hasher.combine("blue.catbird.chat.defs#reactionFrameVariant")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsEditFrameVariant(let value):
-            hasher.combine("blue.catbird.chat.defs#editFrameVariant")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsTombstoneFrameVariant(let value):
-            hasher.combine("blue.catbird.chat.defs#tombstoneFrameVariant")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsReadStateFrameVariant(let value):
-            hasher.combine("blue.catbird.chat.defs#readStateFrameVariant")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
+    public enum ResetRequestViewStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_pending = "pending"
+        case value_stale = "stale"
+        case value_consumed = "consumed"
+        case value_expired = "expired"
+        case value_revoked = "revoked"
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? ResetRequestViewStatus else { return false }
+            return self == otherValue
+        }
+
+        public func toCBORValue() throws -> Any {
+            return rawValue
         }
     }
 
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: ApplicationFrameBody, rhs: ApplicationFrameBody) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsMessageFrameVariant(let lhsValue),
-              .blueCatbirdChatDefsMessageFrameVariant(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsReactionFrameVariant(let lhsValue),
-              .blueCatbirdChatDefsReactionFrameVariant(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsEditFrameVariant(let lhsValue),
-              .blueCatbirdChatDefsEditFrameVariant(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsTombstoneFrameVariant(let lhsValue),
-              .blueCatbirdChatDefsTombstoneFrameVariant(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsReadStateFrameVariant(let lhsValue),
-              .blueCatbirdChatDefsReadStateFrameVariant(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? ApplicationFrameBody else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsMessageFrameVariant(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#messageFrameVariant")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsReactionFrameVariant(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#reactionFrameVariant")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsEditFrameVariant(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#editFrameVariant")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsTombstoneFrameVariant(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#tombstoneFrameVariant")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsReadStateFrameVariant(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#readStateFrameVariant")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
-        }
-    }
-}
-
-
-public enum MetadataAvatarEmbedMimeType: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_image_u2f_heic = "image/heic"
-    case value_image_u2f_jpeg = "image/jpeg"
-    case value_image_u2f_png = "image/png"
-    case value_image_u2f_webp = "image/webp"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? MetadataAvatarEmbedMimeType else { return false }
-        return self == otherValue
-    }
-
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
-
-
-public enum ResetRequestViewStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_pending = "pending"
-    case value_stale = "stale"
-    case value_consumed = "consumed"
-    case value_expired = "expired"
-    case value_revoked = "revoked"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? ResetRequestViewStatus else { return false }
-        return self == otherValue
-    }
-
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
-
-
-
-
-public enum RecoveryWorkView: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsRecoveryWorkPendingView(BlueCatbirdChatDefs.RecoveryWorkPendingView)
-    case blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(BlueCatbirdChatDefs.RecoveryWorkCompletedByTransitionView)
-    case blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(BlueCatbirdChatDefs.RecoveryWorkSupersededByTransitionView)
-    case blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(BlueCatbirdChatDefs.RecoveryWorkSupersededByRevocationView)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.RecoveryWorkPendingView) {
-        self = .blueCatbirdChatDefsRecoveryWorkPendingView(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.RecoveryWorkCompletedByTransitionView) {
-        self = .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.RecoveryWorkSupersededByTransitionView) {
-        self = .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.RecoveryWorkSupersededByRevocationView) {
-        self = .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#recoveryWorkPendingView":
-            let value = try BlueCatbirdChatDefs.RecoveryWorkPendingView(from: decoder)
+    public enum RecoveryWorkView: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsRecoveryWorkPendingView(BlueCatbirdChatDefs.RecoveryWorkPendingView)
+        case blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(BlueCatbirdChatDefs.RecoveryWorkCompletedByTransitionView)
+        case blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(BlueCatbirdChatDefs.RecoveryWorkSupersededByTransitionView)
+        case blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(BlueCatbirdChatDefs.RecoveryWorkSupersededByRevocationView)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.RecoveryWorkPendingView) {
             self = .blueCatbirdChatDefsRecoveryWorkPendingView(value)
-        case "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView":
-            let value = try BlueCatbirdChatDefs.RecoveryWorkCompletedByTransitionView(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.RecoveryWorkCompletedByTransitionView) {
             self = .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(value)
-        case "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView":
-            let value = try BlueCatbirdChatDefs.RecoveryWorkSupersededByTransitionView(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.RecoveryWorkSupersededByTransitionView) {
             self = .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(value)
-        case "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView":
-            let value = try BlueCatbirdChatDefs.RecoveryWorkSupersededByRevocationView(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.RecoveryWorkSupersededByRevocationView) {
             self = .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsRecoveryWorkPendingView(let value):
-            try container.encode("blue.catbird.chat.defs#recoveryWorkPendingView", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let value):
-            try container.encode("blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let value):
-            try container.encode("blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let value):
-            try container.encode("blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsRecoveryWorkPendingView(let value):
-            hasher.combine("blue.catbird.chat.defs#recoveryWorkPendingView")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let value):
-            hasher.combine("blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let value):
-            hasher.combine("blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let value):
-            hasher.combine("blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: RecoveryWorkView, rhs: RecoveryWorkView) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsRecoveryWorkPendingView(let lhsValue),
-              .blueCatbirdChatDefsRecoveryWorkPendingView(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let lhsValue),
-              .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let lhsValue),
-              .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let lhsValue),
-              .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? RecoveryWorkView else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsRecoveryWorkPendingView(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkPendingView")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#recoveryWorkPendingView":
+                let value = try BlueCatbirdChatDefs.RecoveryWorkPendingView(from: decoder)
+                self = .blueCatbirdChatDefsRecoveryWorkPendingView(value)
+            case "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView":
+                let value = try BlueCatbirdChatDefs.RecoveryWorkCompletedByTransitionView(from: decoder)
+                self = .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(value)
+            case "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView":
+                let value = try BlueCatbirdChatDefs.RecoveryWorkSupersededByTransitionView(from: decoder)
+                self = .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(value)
+            case "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView":
+                let value = try BlueCatbirdChatDefs.RecoveryWorkSupersededByRevocationView(from: decoder)
+                self = .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView")
-            
-            let valueDict = try value.toCBORValue()
+        }
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView")
-            
-            let valueDict = try value.toCBORValue()
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch self {
+            case .blueCatbirdChatDefsRecoveryWorkPendingView(let value):
+                try container.encode("blue.catbird.chat.defs#recoveryWorkPendingView", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let value):
+                try container.encode("blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let value):
+                try container.encode("blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let value):
+                try container.encode("blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
             }
-            return map
-        case .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView")
-            
-            let valueDict = try value.toCBORValue()
+        }
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsRecoveryWorkPendingView(let value):
+                hasher.combine("blue.catbird.chat.defs#recoveryWorkPendingView")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let value):
+                hasher.combine("blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let value):
+                hasher.combine("blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let value):
+                hasher.combine("blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: RecoveryWorkView, rhs: RecoveryWorkView) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsRecoveryWorkPendingView(let lhsValue),
+                  .blueCatbirdChatDefsRecoveryWorkPendingView(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let lhsValue),
+                  .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let lhsValue),
+                  .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let lhsValue),
+                  .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? RecoveryWorkView else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsRecoveryWorkPendingView(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkPendingView")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum LeafRecoveryInboxItem: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsLeafRecoveryView(BlueCatbirdChatDefs.LeafRecoveryView)
-    case blueCatbirdChatDefsRecoveryWorkPendingView(BlueCatbirdChatDefs.RecoveryWorkPendingView)
-    case blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(BlueCatbirdChatDefs.RecoveryWorkCompletedByTransitionView)
-    case blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(BlueCatbirdChatDefs.RecoveryWorkSupersededByTransitionView)
-    case blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(BlueCatbirdChatDefs.RecoveryWorkSupersededByRevocationView)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.LeafRecoveryView) {
-        self = .blueCatbirdChatDefsLeafRecoveryView(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.RecoveryWorkPendingView) {
-        self = .blueCatbirdChatDefsRecoveryWorkPendingView(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.RecoveryWorkCompletedByTransitionView) {
-        self = .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.RecoveryWorkSupersededByTransitionView) {
-        self = .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.RecoveryWorkSupersededByRevocationView) {
-        self = .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#leafRecoveryView":
-            let value = try BlueCatbirdChatDefs.LeafRecoveryView(from: decoder)
+    public enum LeafRecoveryInboxItem: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsLeafRecoveryView(BlueCatbirdChatDefs.LeafRecoveryView)
+        case blueCatbirdChatDefsRecoveryWorkPendingView(BlueCatbirdChatDefs.RecoveryWorkPendingView)
+        case blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(BlueCatbirdChatDefs.RecoveryWorkCompletedByTransitionView)
+        case blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(BlueCatbirdChatDefs.RecoveryWorkSupersededByTransitionView)
+        case blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(BlueCatbirdChatDefs.RecoveryWorkSupersededByRevocationView)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.LeafRecoveryView) {
             self = .blueCatbirdChatDefsLeafRecoveryView(value)
-        case "blue.catbird.chat.defs#recoveryWorkPendingView":
-            let value = try BlueCatbirdChatDefs.RecoveryWorkPendingView(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.RecoveryWorkPendingView) {
             self = .blueCatbirdChatDefsRecoveryWorkPendingView(value)
-        case "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView":
-            let value = try BlueCatbirdChatDefs.RecoveryWorkCompletedByTransitionView(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.RecoveryWorkCompletedByTransitionView) {
             self = .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(value)
-        case "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView":
-            let value = try BlueCatbirdChatDefs.RecoveryWorkSupersededByTransitionView(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.RecoveryWorkSupersededByTransitionView) {
             self = .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(value)
-        case "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView":
-            let value = try BlueCatbirdChatDefs.RecoveryWorkSupersededByRevocationView(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.RecoveryWorkSupersededByRevocationView) {
             self = .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
+
+            switch typeValue {
+            case "blue.catbird.chat.defs#leafRecoveryView":
+                let value = try BlueCatbirdChatDefs.LeafRecoveryView(from: decoder)
+                self = .blueCatbirdChatDefsLeafRecoveryView(value)
+            case "blue.catbird.chat.defs#recoveryWorkPendingView":
+                let value = try BlueCatbirdChatDefs.RecoveryWorkPendingView(from: decoder)
+                self = .blueCatbirdChatDefsRecoveryWorkPendingView(value)
+            case "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView":
+                let value = try BlueCatbirdChatDefs.RecoveryWorkCompletedByTransitionView(from: decoder)
+                self = .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(value)
+            case "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView":
+                let value = try BlueCatbirdChatDefs.RecoveryWorkSupersededByTransitionView(from: decoder)
+                self = .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(value)
+            case "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView":
+                let value = try BlueCatbirdChatDefs.RecoveryWorkSupersededByRevocationView(from: decoder)
+                self = .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsLeafRecoveryView(let value):
+                try container.encode("blue.catbird.chat.defs#leafRecoveryView", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsRecoveryWorkPendingView(let value):
+                try container.encode("blue.catbird.chat.defs#recoveryWorkPendingView", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let value):
+                try container.encode("blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let value):
+                try container.encode("blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let value):
+                try container.encode("blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsLeafRecoveryView(let value):
+                hasher.combine("blue.catbird.chat.defs#leafRecoveryView")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsRecoveryWorkPendingView(let value):
+                hasher.combine("blue.catbird.chat.defs#recoveryWorkPendingView")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let value):
+                hasher.combine("blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let value):
+                hasher.combine("blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let value):
+                hasher.combine("blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: LeafRecoveryInboxItem, rhs: LeafRecoveryInboxItem) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsLeafRecoveryView(let lhsValue),
+                  .blueCatbirdChatDefsLeafRecoveryView(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsRecoveryWorkPendingView(let lhsValue),
+                  .blueCatbirdChatDefsRecoveryWorkPendingView(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let lhsValue),
+                  .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let lhsValue),
+                  .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let lhsValue),
+                  .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? LeafRecoveryInboxItem else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsLeafRecoveryView(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leafRecoveryView")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsRecoveryWorkPendingView(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkPendingView")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        switch self {
-        case .blueCatbirdChatDefsLeafRecoveryView(let value):
-            try container.encode("blue.catbird.chat.defs#leafRecoveryView", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsRecoveryWorkPendingView(let value):
-            try container.encode("blue.catbird.chat.defs#recoveryWorkPendingView", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let value):
-            try container.encode("blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let value):
-            try container.encode("blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let value):
-            try container.encode("blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsLeafRecoveryView(let value):
-            hasher.combine("blue.catbird.chat.defs#leafRecoveryView")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsRecoveryWorkPendingView(let value):
-            hasher.combine("blue.catbird.chat.defs#recoveryWorkPendingView")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let value):
-            hasher.combine("blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let value):
-            hasher.combine("blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let value):
-            hasher.combine("blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: LeafRecoveryInboxItem, rhs: LeafRecoveryInboxItem) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsLeafRecoveryView(let lhsValue),
-              .blueCatbirdChatDefsLeafRecoveryView(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsRecoveryWorkPendingView(let lhsValue),
-              .blueCatbirdChatDefsRecoveryWorkPendingView(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let lhsValue),
-              .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let lhsValue),
-              .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let lhsValue),
-              .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? LeafRecoveryInboxItem else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsLeafRecoveryView(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leafRecoveryView")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsRecoveryWorkPendingView(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkPendingView")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsRecoveryWorkCompletedByTransitionView(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsRecoveryWorkSupersededByTransitionView(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsRecoveryWorkSupersededByRevocationView(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
-        }
-    }
-}
-
-
-
-
-public enum LeaveOperationResult: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsDurableLeaveRequestResult(BlueCatbirdChatDefs.DurableLeaveRequestResult)
-    case blueCatbirdChatDefsZeroLeafLeaveResult(BlueCatbirdChatDefs.ZeroLeafLeaveResult)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.DurableLeaveRequestResult) {
-        self = .blueCatbirdChatDefsDurableLeaveRequestResult(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.ZeroLeafLeaveResult) {
-        self = .blueCatbirdChatDefsZeroLeafLeaveResult(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#durableLeaveRequestResult":
-            let value = try BlueCatbirdChatDefs.DurableLeaveRequestResult(from: decoder)
+    public enum LeaveOperationResult: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsDurableLeaveRequestResult(BlueCatbirdChatDefs.DurableLeaveRequestResult)
+        case blueCatbirdChatDefsZeroLeafLeaveResult(BlueCatbirdChatDefs.ZeroLeafLeaveResult)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.DurableLeaveRequestResult) {
             self = .blueCatbirdChatDefsDurableLeaveRequestResult(value)
-        case "blue.catbird.chat.defs#zeroLeafLeaveResult":
-            let value = try BlueCatbirdChatDefs.ZeroLeafLeaveResult(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.ZeroLeafLeaveResult) {
             self = .blueCatbirdChatDefsZeroLeafLeaveResult(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsDurableLeaveRequestResult(let value):
-            try container.encode("blue.catbird.chat.defs#durableLeaveRequestResult", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsZeroLeafLeaveResult(let value):
-            try container.encode("blue.catbird.chat.defs#zeroLeafLeaveResult", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsDurableLeaveRequestResult(let value):
-            hasher.combine("blue.catbird.chat.defs#durableLeaveRequestResult")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsZeroLeafLeaveResult(let value):
-            hasher.combine("blue.catbird.chat.defs#zeroLeafLeaveResult")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: LeaveOperationResult, rhs: LeaveOperationResult) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsDurableLeaveRequestResult(let lhsValue),
-              .blueCatbirdChatDefsDurableLeaveRequestResult(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsZeroLeafLeaveResult(let lhsValue),
-              .blueCatbirdChatDefsZeroLeafLeaveResult(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? LeaveOperationResult else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsDurableLeaveRequestResult(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#durableLeaveRequestResult")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#durableLeaveRequestResult":
+                let value = try BlueCatbirdChatDefs.DurableLeaveRequestResult(from: decoder)
+                self = .blueCatbirdChatDefsDurableLeaveRequestResult(value)
+            case "blue.catbird.chat.defs#zeroLeafLeaveResult":
+                let value = try BlueCatbirdChatDefs.ZeroLeafLeaveResult(from: decoder)
+                self = .blueCatbirdChatDefsZeroLeafLeaveResult(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .blueCatbirdChatDefsZeroLeafLeaveResult(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#zeroLeafLeaveResult")
-            
-            let valueDict = try value.toCBORValue()
+        }
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsDurableLeaveRequestResult(let value):
+                try container.encode("blue.catbird.chat.defs#durableLeaveRequestResult", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsZeroLeafLeaveResult(let value):
+                try container.encode("blue.catbird.chat.defs#zeroLeafLeaveResult", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsDurableLeaveRequestResult(let value):
+                hasher.combine("blue.catbird.chat.defs#durableLeaveRequestResult")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsZeroLeafLeaveResult(let value):
+                hasher.combine("blue.catbird.chat.defs#zeroLeafLeaveResult")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: LeaveOperationResult, rhs: LeaveOperationResult) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsDurableLeaveRequestResult(let lhsValue),
+                  .blueCatbirdChatDefsDurableLeaveRequestResult(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsZeroLeafLeaveResult(let lhsValue),
+                  .blueCatbirdChatDefsZeroLeafLeaveResult(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? LeaveOperationResult else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsDurableLeaveRequestResult(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#durableLeaveRequestResult")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsZeroLeafLeaveResult(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#zeroLeafLeaveResult")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum ConversationCreationResult: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsConversationCreatedResult(BlueCatbirdChatDefs.ConversationCreatedResult)
-    case blueCatbirdChatDefsExistingDirectConversationResult(BlueCatbirdChatDefs.ExistingDirectConversationResult)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.ConversationCreatedResult) {
-        self = .blueCatbirdChatDefsConversationCreatedResult(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.ExistingDirectConversationResult) {
-        self = .blueCatbirdChatDefsExistingDirectConversationResult(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#conversationCreatedResult":
-            let value = try BlueCatbirdChatDefs.ConversationCreatedResult(from: decoder)
+    public enum ConversationCreationResult: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsConversationCreatedResult(BlueCatbirdChatDefs.ConversationCreatedResult)
+        case blueCatbirdChatDefsExistingDirectConversationResult(BlueCatbirdChatDefs.ExistingDirectConversationResult)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.ConversationCreatedResult) {
             self = .blueCatbirdChatDefsConversationCreatedResult(value)
-        case "blue.catbird.chat.defs#existingDirectConversationResult":
-            let value = try BlueCatbirdChatDefs.ExistingDirectConversationResult(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.ExistingDirectConversationResult) {
             self = .blueCatbirdChatDefsExistingDirectConversationResult(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsConversationCreatedResult(let value):
-            try container.encode("blue.catbird.chat.defs#conversationCreatedResult", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsExistingDirectConversationResult(let value):
-            try container.encode("blue.catbird.chat.defs#existingDirectConversationResult", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsConversationCreatedResult(let value):
-            hasher.combine("blue.catbird.chat.defs#conversationCreatedResult")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsExistingDirectConversationResult(let value):
-            hasher.combine("blue.catbird.chat.defs#existingDirectConversationResult")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: ConversationCreationResult, rhs: ConversationCreationResult) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsConversationCreatedResult(let lhsValue),
-              .blueCatbirdChatDefsConversationCreatedResult(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsExistingDirectConversationResult(let lhsValue),
-              .blueCatbirdChatDefsExistingDirectConversationResult(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? ConversationCreationResult else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsConversationCreatedResult(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationCreatedResult")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#conversationCreatedResult":
+                let value = try BlueCatbirdChatDefs.ConversationCreatedResult(from: decoder)
+                self = .blueCatbirdChatDefsConversationCreatedResult(value)
+            case "blue.catbird.chat.defs#existingDirectConversationResult":
+                let value = try BlueCatbirdChatDefs.ExistingDirectConversationResult(from: decoder)
+                self = .blueCatbirdChatDefsExistingDirectConversationResult(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .blueCatbirdChatDefsExistingDirectConversationResult(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#existingDirectConversationResult")
-            
-            let valueDict = try value.toCBORValue()
+        }
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsConversationCreatedResult(let value):
+                try container.encode("blue.catbird.chat.defs#conversationCreatedResult", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsExistingDirectConversationResult(let value):
+                try container.encode("blue.catbird.chat.defs#existingDirectConversationResult", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsConversationCreatedResult(let value):
+                hasher.combine("blue.catbird.chat.defs#conversationCreatedResult")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsExistingDirectConversationResult(let value):
+                hasher.combine("blue.catbird.chat.defs#existingDirectConversationResult")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: ConversationCreationResult, rhs: ConversationCreationResult) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsConversationCreatedResult(let lhsValue),
+                  .blueCatbirdChatDefsConversationCreatedResult(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsExistingDirectConversationResult(let lhsValue),
+                  .blueCatbirdChatDefsExistingDirectConversationResult(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? ConversationCreationResult else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsConversationCreatedResult(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationCreatedResult")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsExistingDirectConversationResult(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#existingDirectConversationResult")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedDeviceEnrollmentBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsDeviceEnrollmentBody(BlueCatbirdChatDefs.DeviceEnrollmentBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.DeviceEnrollmentBody) {
-        self = .blueCatbirdChatDefsDeviceEnrollmentBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#deviceEnrollmentBody":
-            let value = try BlueCatbirdChatDefs.DeviceEnrollmentBody(from: decoder)
+    public enum SignedDeviceEnrollmentBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsDeviceEnrollmentBody(BlueCatbirdChatDefs.DeviceEnrollmentBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.DeviceEnrollmentBody) {
             self = .blueCatbirdChatDefsDeviceEnrollmentBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsDeviceEnrollmentBody(let value):
-            try container.encode("blue.catbird.chat.defs#deviceEnrollmentBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsDeviceEnrollmentBody(let value):
-            hasher.combine("blue.catbird.chat.defs#deviceEnrollmentBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedDeviceEnrollmentBodyUnion, rhs: SignedDeviceEnrollmentBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsDeviceEnrollmentBody(let lhsValue),
-              .blueCatbirdChatDefsDeviceEnrollmentBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedDeviceEnrollmentBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsDeviceEnrollmentBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#deviceEnrollmentBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#deviceEnrollmentBody":
+                let value = try BlueCatbirdChatDefs.DeviceEnrollmentBody(from: decoder)
+                self = .blueCatbirdChatDefsDeviceEnrollmentBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsDeviceEnrollmentBody(let value):
+                try container.encode("blue.catbird.chat.defs#deviceEnrollmentBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsDeviceEnrollmentBody(let value):
+                hasher.combine("blue.catbird.chat.defs#deviceEnrollmentBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedDeviceEnrollmentBodyUnion, rhs: SignedDeviceEnrollmentBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsDeviceEnrollmentBody(let lhsValue),
+                  .blueCatbirdChatDefsDeviceEnrollmentBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedDeviceEnrollmentBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsDeviceEnrollmentBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#deviceEnrollmentBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedKeyPackageReplenishmentBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsKeyPackageReplenishmentBody(BlueCatbirdChatDefs.KeyPackageReplenishmentBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.KeyPackageReplenishmentBody) {
-        self = .blueCatbirdChatDefsKeyPackageReplenishmentBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#keyPackageReplenishmentBody":
-            let value = try BlueCatbirdChatDefs.KeyPackageReplenishmentBody(from: decoder)
+    public enum SignedKeyPackageReplenishmentBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsKeyPackageReplenishmentBody(BlueCatbirdChatDefs.KeyPackageReplenishmentBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.KeyPackageReplenishmentBody) {
             self = .blueCatbirdChatDefsKeyPackageReplenishmentBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsKeyPackageReplenishmentBody(let value):
-            try container.encode("blue.catbird.chat.defs#keyPackageReplenishmentBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsKeyPackageReplenishmentBody(let value):
-            hasher.combine("blue.catbird.chat.defs#keyPackageReplenishmentBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedKeyPackageReplenishmentBodyUnion, rhs: SignedKeyPackageReplenishmentBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsKeyPackageReplenishmentBody(let lhsValue),
-              .blueCatbirdChatDefsKeyPackageReplenishmentBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedKeyPackageReplenishmentBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsKeyPackageReplenishmentBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#keyPackageReplenishmentBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#keyPackageReplenishmentBody":
+                let value = try BlueCatbirdChatDefs.KeyPackageReplenishmentBody(from: decoder)
+                self = .blueCatbirdChatDefsKeyPackageReplenishmentBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsKeyPackageReplenishmentBody(let value):
+                try container.encode("blue.catbird.chat.defs#keyPackageReplenishmentBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsKeyPackageReplenishmentBody(let value):
+                hasher.combine("blue.catbird.chat.defs#keyPackageReplenishmentBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedKeyPackageReplenishmentBodyUnion, rhs: SignedKeyPackageReplenishmentBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsKeyPackageReplenishmentBody(let lhsValue),
+                  .blueCatbirdChatDefsKeyPackageReplenishmentBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedKeyPackageReplenishmentBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsKeyPackageReplenishmentBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#keyPackageReplenishmentBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedDeviceRevocationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsDeviceRevocationBody(BlueCatbirdChatDefs.DeviceRevocationBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.DeviceRevocationBody) {
-        self = .blueCatbirdChatDefsDeviceRevocationBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#deviceRevocationBody":
-            let value = try BlueCatbirdChatDefs.DeviceRevocationBody(from: decoder)
+    public enum SignedDeviceRevocationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsDeviceRevocationBody(BlueCatbirdChatDefs.DeviceRevocationBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.DeviceRevocationBody) {
             self = .blueCatbirdChatDefsDeviceRevocationBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsDeviceRevocationBody(let value):
-            try container.encode("blue.catbird.chat.defs#deviceRevocationBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsDeviceRevocationBody(let value):
-            hasher.combine("blue.catbird.chat.defs#deviceRevocationBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedDeviceRevocationBodyUnion, rhs: SignedDeviceRevocationBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsDeviceRevocationBody(let lhsValue),
-              .blueCatbirdChatDefsDeviceRevocationBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedDeviceRevocationBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsDeviceRevocationBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#deviceRevocationBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#deviceRevocationBody":
+                let value = try BlueCatbirdChatDefs.DeviceRevocationBody(from: decoder)
+                self = .blueCatbirdChatDefsDeviceRevocationBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsDeviceRevocationBody(let value):
+                try container.encode("blue.catbird.chat.defs#deviceRevocationBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsDeviceRevocationBody(let value):
+                hasher.combine("blue.catbird.chat.defs#deviceRevocationBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedDeviceRevocationBodyUnion, rhs: SignedDeviceRevocationBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsDeviceRevocationBody(let lhsValue),
+                  .blueCatbirdChatDefsDeviceRevocationBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedDeviceRevocationBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsDeviceRevocationBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#deviceRevocationBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedBlobUploadPreparationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsBlobUploadPreparationBody(BlueCatbirdChatDefs.BlobUploadPreparationBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.BlobUploadPreparationBody) {
-        self = .blueCatbirdChatDefsBlobUploadPreparationBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#blobUploadPreparationBody":
-            let value = try BlueCatbirdChatDefs.BlobUploadPreparationBody(from: decoder)
+    public enum SignedBlobUploadPreparationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsBlobUploadPreparationBody(BlueCatbirdChatDefs.BlobUploadPreparationBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.BlobUploadPreparationBody) {
             self = .blueCatbirdChatDefsBlobUploadPreparationBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsBlobUploadPreparationBody(let value):
-            try container.encode("blue.catbird.chat.defs#blobUploadPreparationBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsBlobUploadPreparationBody(let value):
-            hasher.combine("blue.catbird.chat.defs#blobUploadPreparationBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedBlobUploadPreparationBodyUnion, rhs: SignedBlobUploadPreparationBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsBlobUploadPreparationBody(let lhsValue),
-              .blueCatbirdChatDefsBlobUploadPreparationBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedBlobUploadPreparationBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsBlobUploadPreparationBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#blobUploadPreparationBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#blobUploadPreparationBody":
+                let value = try BlueCatbirdChatDefs.BlobUploadPreparationBody(from: decoder)
+                self = .blueCatbirdChatDefsBlobUploadPreparationBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsBlobUploadPreparationBody(let value):
+                try container.encode("blue.catbird.chat.defs#blobUploadPreparationBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsBlobUploadPreparationBody(let value):
+                hasher.combine("blue.catbird.chat.defs#blobUploadPreparationBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedBlobUploadPreparationBodyUnion, rhs: SignedBlobUploadPreparationBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsBlobUploadPreparationBody(let lhsValue),
+                  .blueCatbirdChatDefsBlobUploadPreparationBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedBlobUploadPreparationBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsBlobUploadPreparationBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#blobUploadPreparationBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedBlobDeletionBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsBlobDeletionBody(BlueCatbirdChatDefs.BlobDeletionBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.BlobDeletionBody) {
-        self = .blueCatbirdChatDefsBlobDeletionBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#blobDeletionBody":
-            let value = try BlueCatbirdChatDefs.BlobDeletionBody(from: decoder)
+    public enum SignedBlobDeletionBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsBlobDeletionBody(BlueCatbirdChatDefs.BlobDeletionBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.BlobDeletionBody) {
             self = .blueCatbirdChatDefsBlobDeletionBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsBlobDeletionBody(let value):
-            try container.encode("blue.catbird.chat.defs#blobDeletionBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsBlobDeletionBody(let value):
-            hasher.combine("blue.catbird.chat.defs#blobDeletionBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedBlobDeletionBodyUnion, rhs: SignedBlobDeletionBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsBlobDeletionBody(let lhsValue),
-              .blueCatbirdChatDefsBlobDeletionBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedBlobDeletionBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsBlobDeletionBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#blobDeletionBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#blobDeletionBody":
+                let value = try BlueCatbirdChatDefs.BlobDeletionBody(from: decoder)
+                self = .blueCatbirdChatDefsBlobDeletionBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsBlobDeletionBody(let value):
+                try container.encode("blue.catbird.chat.defs#blobDeletionBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsBlobDeletionBody(let value):
+                hasher.combine("blue.catbird.chat.defs#blobDeletionBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedBlobDeletionBodyUnion, rhs: SignedBlobDeletionBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsBlobDeletionBody(let lhsValue),
+                  .blueCatbirdChatDefsBlobDeletionBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedBlobDeletionBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsBlobDeletionBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#blobDeletionBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedCreationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsCreationBody(BlueCatbirdChatDefs.CreationBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.CreationBody) {
-        self = .blueCatbirdChatDefsCreationBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#creationBody":
-            let value = try BlueCatbirdChatDefs.CreationBody(from: decoder)
+    public enum SignedCreationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsCreationBody(BlueCatbirdChatDefs.CreationBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.CreationBody) {
             self = .blueCatbirdChatDefsCreationBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsCreationBody(let value):
-            try container.encode("blue.catbird.chat.defs#creationBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsCreationBody(let value):
-            hasher.combine("blue.catbird.chat.defs#creationBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedCreationBodyUnion, rhs: SignedCreationBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsCreationBody(let lhsValue),
-              .blueCatbirdChatDefsCreationBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedCreationBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsCreationBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#creationBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#creationBody":
+                let value = try BlueCatbirdChatDefs.CreationBody(from: decoder)
+                self = .blueCatbirdChatDefsCreationBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsCreationBody(let value):
+                try container.encode("blue.catbird.chat.defs#creationBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsCreationBody(let value):
+                hasher.combine("blue.catbird.chat.defs#creationBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedCreationBodyUnion, rhs: SignedCreationBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsCreationBody(let lhsValue),
+                  .blueCatbirdChatDefsCreationBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedCreationBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsCreationBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#creationBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedCommitTransitionBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsCommitTransitionBody(BlueCatbirdChatDefs.CommitTransitionBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.CommitTransitionBody) {
-        self = .blueCatbirdChatDefsCommitTransitionBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#commitTransitionBody":
-            let value = try BlueCatbirdChatDefs.CommitTransitionBody(from: decoder)
+    public enum SignedCommitTransitionBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsCommitTransitionBody(BlueCatbirdChatDefs.CommitTransitionBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.CommitTransitionBody) {
             self = .blueCatbirdChatDefsCommitTransitionBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsCommitTransitionBody(let value):
-            try container.encode("blue.catbird.chat.defs#commitTransitionBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsCommitTransitionBody(let value):
-            hasher.combine("blue.catbird.chat.defs#commitTransitionBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedCommitTransitionBodyUnion, rhs: SignedCommitTransitionBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsCommitTransitionBody(let lhsValue),
-              .blueCatbirdChatDefsCommitTransitionBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedCommitTransitionBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsCommitTransitionBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#commitTransitionBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#commitTransitionBody":
+                let value = try BlueCatbirdChatDefs.CommitTransitionBody(from: decoder)
+                self = .blueCatbirdChatDefsCommitTransitionBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsCommitTransitionBody(let value):
+                try container.encode("blue.catbird.chat.defs#commitTransitionBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsCommitTransitionBody(let value):
+                hasher.combine("blue.catbird.chat.defs#commitTransitionBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedCommitTransitionBodyUnion, rhs: SignedCommitTransitionBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsCommitTransitionBody(let lhsValue),
+                  .blueCatbirdChatDefsCommitTransitionBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedCommitTransitionBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsCommitTransitionBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#commitTransitionBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedPolicyTransitionBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsPolicyTransitionBody(BlueCatbirdChatDefs.PolicyTransitionBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.PolicyTransitionBody) {
-        self = .blueCatbirdChatDefsPolicyTransitionBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#policyTransitionBody":
-            let value = try BlueCatbirdChatDefs.PolicyTransitionBody(from: decoder)
+    public enum SignedPolicyTransitionBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsPolicyTransitionBody(BlueCatbirdChatDefs.PolicyTransitionBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.PolicyTransitionBody) {
             self = .blueCatbirdChatDefsPolicyTransitionBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsPolicyTransitionBody(let value):
-            try container.encode("blue.catbird.chat.defs#policyTransitionBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsPolicyTransitionBody(let value):
-            hasher.combine("blue.catbird.chat.defs#policyTransitionBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedPolicyTransitionBodyUnion, rhs: SignedPolicyTransitionBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsPolicyTransitionBody(let lhsValue),
-              .blueCatbirdChatDefsPolicyTransitionBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedPolicyTransitionBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsPolicyTransitionBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#policyTransitionBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#policyTransitionBody":
+                let value = try BlueCatbirdChatDefs.PolicyTransitionBody(from: decoder)
+                self = .blueCatbirdChatDefsPolicyTransitionBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsPolicyTransitionBody(let value):
+                try container.encode("blue.catbird.chat.defs#policyTransitionBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsPolicyTransitionBody(let value):
+                hasher.combine("blue.catbird.chat.defs#policyTransitionBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedPolicyTransitionBodyUnion, rhs: SignedPolicyTransitionBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsPolicyTransitionBody(let lhsValue),
+                  .blueCatbirdChatDefsPolicyTransitionBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedPolicyTransitionBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsPolicyTransitionBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#policyTransitionBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedParticipantAcceptanceBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsParticipantAcceptanceBody(BlueCatbirdChatDefs.ParticipantAcceptanceBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.ParticipantAcceptanceBody) {
-        self = .blueCatbirdChatDefsParticipantAcceptanceBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#participantAcceptanceBody":
-            let value = try BlueCatbirdChatDefs.ParticipantAcceptanceBody(from: decoder)
+    public enum SignedParticipantAcceptanceBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsParticipantAcceptanceBody(BlueCatbirdChatDefs.ParticipantAcceptanceBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.ParticipantAcceptanceBody) {
             self = .blueCatbirdChatDefsParticipantAcceptanceBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsParticipantAcceptanceBody(let value):
-            try container.encode("blue.catbird.chat.defs#participantAcceptanceBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsParticipantAcceptanceBody(let value):
-            hasher.combine("blue.catbird.chat.defs#participantAcceptanceBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedParticipantAcceptanceBodyUnion, rhs: SignedParticipantAcceptanceBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsParticipantAcceptanceBody(let lhsValue),
-              .blueCatbirdChatDefsParticipantAcceptanceBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedParticipantAcceptanceBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsParticipantAcceptanceBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#participantAcceptanceBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#participantAcceptanceBody":
+                let value = try BlueCatbirdChatDefs.ParticipantAcceptanceBody(from: decoder)
+                self = .blueCatbirdChatDefsParticipantAcceptanceBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsParticipantAcceptanceBody(let value):
+                try container.encode("blue.catbird.chat.defs#participantAcceptanceBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsParticipantAcceptanceBody(let value):
+                hasher.combine("blue.catbird.chat.defs#participantAcceptanceBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedParticipantAcceptanceBodyUnion, rhs: SignedParticipantAcceptanceBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsParticipantAcceptanceBody(let lhsValue),
+                  .blueCatbirdChatDefsParticipantAcceptanceBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedParticipantAcceptanceBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsParticipantAcceptanceBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#participantAcceptanceBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedApplicationSendBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsApplicationSendBody(BlueCatbirdChatDefs.ApplicationSendBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.ApplicationSendBody) {
-        self = .blueCatbirdChatDefsApplicationSendBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#applicationSendBody":
-            let value = try BlueCatbirdChatDefs.ApplicationSendBody(from: decoder)
+    public enum SignedApplicationSendBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsApplicationSendBody(BlueCatbirdChatDefs.ApplicationSendBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.ApplicationSendBody) {
             self = .blueCatbirdChatDefsApplicationSendBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsApplicationSendBody(let value):
-            try container.encode("blue.catbird.chat.defs#applicationSendBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsApplicationSendBody(let value):
-            hasher.combine("blue.catbird.chat.defs#applicationSendBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedApplicationSendBodyUnion, rhs: SignedApplicationSendBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsApplicationSendBody(let lhsValue),
-              .blueCatbirdChatDefsApplicationSendBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedApplicationSendBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsApplicationSendBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#applicationSendBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#applicationSendBody":
+                let value = try BlueCatbirdChatDefs.ApplicationSendBody(from: decoder)
+                self = .blueCatbirdChatDefsApplicationSendBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsApplicationSendBody(let value):
+                try container.encode("blue.catbird.chat.defs#applicationSendBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsApplicationSendBody(let value):
+                hasher.combine("blue.catbird.chat.defs#applicationSendBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedApplicationSendBodyUnion, rhs: SignedApplicationSendBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsApplicationSendBody(let lhsValue),
+                  .blueCatbirdChatDefsApplicationSendBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedApplicationSendBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsApplicationSendBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#applicationSendBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedTypingBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsTypingBody(BlueCatbirdChatDefs.TypingBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.TypingBody) {
-        self = .blueCatbirdChatDefsTypingBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#typingBody":
-            let value = try BlueCatbirdChatDefs.TypingBody(from: decoder)
+    public enum SignedTypingBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsTypingBody(BlueCatbirdChatDefs.TypingBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.TypingBody) {
             self = .blueCatbirdChatDefsTypingBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsTypingBody(let value):
-            try container.encode("blue.catbird.chat.defs#typingBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsTypingBody(let value):
-            hasher.combine("blue.catbird.chat.defs#typingBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedTypingBodyUnion, rhs: SignedTypingBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsTypingBody(let lhsValue),
-              .blueCatbirdChatDefsTypingBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedTypingBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsTypingBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#typingBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#typingBody":
+                let value = try BlueCatbirdChatDefs.TypingBody(from: decoder)
+                self = .blueCatbirdChatDefsTypingBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsTypingBody(let value):
+                try container.encode("blue.catbird.chat.defs#typingBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsTypingBody(let value):
+                hasher.combine("blue.catbird.chat.defs#typingBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedTypingBodyUnion, rhs: SignedTypingBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsTypingBody(let lhsValue),
+                  .blueCatbirdChatDefsTypingBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedTypingBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsTypingBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#typingBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedMetadataTransitionBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsMetadataTransitionBody(BlueCatbirdChatDefs.MetadataTransitionBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.MetadataTransitionBody) {
-        self = .blueCatbirdChatDefsMetadataTransitionBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#metadataTransitionBody":
-            let value = try BlueCatbirdChatDefs.MetadataTransitionBody(from: decoder)
+    public enum SignedMetadataTransitionBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsMetadataTransitionBody(BlueCatbirdChatDefs.MetadataTransitionBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.MetadataTransitionBody) {
             self = .blueCatbirdChatDefsMetadataTransitionBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsMetadataTransitionBody(let value):
-            try container.encode("blue.catbird.chat.defs#metadataTransitionBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsMetadataTransitionBody(let value):
-            hasher.combine("blue.catbird.chat.defs#metadataTransitionBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedMetadataTransitionBodyUnion, rhs: SignedMetadataTransitionBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsMetadataTransitionBody(let lhsValue),
-              .blueCatbirdChatDefsMetadataTransitionBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedMetadataTransitionBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsMetadataTransitionBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#metadataTransitionBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#metadataTransitionBody":
+                let value = try BlueCatbirdChatDefs.MetadataTransitionBody(from: decoder)
+                self = .blueCatbirdChatDefsMetadataTransitionBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsMetadataTransitionBody(let value):
+                try container.encode("blue.catbird.chat.defs#metadataTransitionBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsMetadataTransitionBody(let value):
+                hasher.combine("blue.catbird.chat.defs#metadataTransitionBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedMetadataTransitionBodyUnion, rhs: SignedMetadataTransitionBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsMetadataTransitionBody(let lhsValue),
+                  .blueCatbirdChatDefsMetadataTransitionBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedMetadataTransitionBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsMetadataTransitionBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#metadataTransitionBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedResetRequestBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsResetRequestBody(BlueCatbirdChatDefs.ResetRequestBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.ResetRequestBody) {
-        self = .blueCatbirdChatDefsResetRequestBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#resetRequestBody":
-            let value = try BlueCatbirdChatDefs.ResetRequestBody(from: decoder)
+    public enum SignedResetRequestBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsResetRequestBody(BlueCatbirdChatDefs.ResetRequestBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.ResetRequestBody) {
             self = .blueCatbirdChatDefsResetRequestBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsResetRequestBody(let value):
-            try container.encode("blue.catbird.chat.defs#resetRequestBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsResetRequestBody(let value):
-            hasher.combine("blue.catbird.chat.defs#resetRequestBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedResetRequestBodyUnion, rhs: SignedResetRequestBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsResetRequestBody(let lhsValue),
-              .blueCatbirdChatDefsResetRequestBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedResetRequestBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsResetRequestBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#resetRequestBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#resetRequestBody":
+                let value = try BlueCatbirdChatDefs.ResetRequestBody(from: decoder)
+                self = .blueCatbirdChatDefsResetRequestBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsResetRequestBody(let value):
+                try container.encode("blue.catbird.chat.defs#resetRequestBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsResetRequestBody(let value):
+                hasher.combine("blue.catbird.chat.defs#resetRequestBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedResetRequestBodyUnion, rhs: SignedResetRequestBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsResetRequestBody(let lhsValue),
+                  .blueCatbirdChatDefsResetRequestBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedResetRequestBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsResetRequestBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#resetRequestBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedResetActivationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsResetActivationBody(BlueCatbirdChatDefs.ResetActivationBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.ResetActivationBody) {
-        self = .blueCatbirdChatDefsResetActivationBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#resetActivationBody":
-            let value = try BlueCatbirdChatDefs.ResetActivationBody(from: decoder)
+    public enum SignedResetActivationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsResetActivationBody(BlueCatbirdChatDefs.ResetActivationBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.ResetActivationBody) {
             self = .blueCatbirdChatDefsResetActivationBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsResetActivationBody(let value):
-            try container.encode("blue.catbird.chat.defs#resetActivationBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsResetActivationBody(let value):
-            hasher.combine("blue.catbird.chat.defs#resetActivationBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedResetActivationBodyUnion, rhs: SignedResetActivationBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsResetActivationBody(let lhsValue),
-              .blueCatbirdChatDefsResetActivationBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedResetActivationBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsResetActivationBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#resetActivationBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#resetActivationBody":
+                let value = try BlueCatbirdChatDefs.ResetActivationBody(from: decoder)
+                self = .blueCatbirdChatDefsResetActivationBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsResetActivationBody(let value):
+                try container.encode("blue.catbird.chat.defs#resetActivationBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsResetActivationBody(let value):
+                hasher.combine("blue.catbird.chat.defs#resetActivationBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedResetActivationBodyUnion, rhs: SignedResetActivationBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsResetActivationBody(let lhsValue),
+                  .blueCatbirdChatDefsResetActivationBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedResetActivationBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsResetActivationBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#resetActivationBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedLeafRecoveryRequestBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsLeafRecoveryRequestBody(BlueCatbirdChatDefs.LeafRecoveryRequestBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.LeafRecoveryRequestBody) {
-        self = .blueCatbirdChatDefsLeafRecoveryRequestBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#leafRecoveryRequestBody":
-            let value = try BlueCatbirdChatDefs.LeafRecoveryRequestBody(from: decoder)
+    public enum SignedLeafRecoveryRequestBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsLeafRecoveryRequestBody(BlueCatbirdChatDefs.LeafRecoveryRequestBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.LeafRecoveryRequestBody) {
             self = .blueCatbirdChatDefsLeafRecoveryRequestBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsLeafRecoveryRequestBody(let value):
-            try container.encode("blue.catbird.chat.defs#leafRecoveryRequestBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsLeafRecoveryRequestBody(let value):
-            hasher.combine("blue.catbird.chat.defs#leafRecoveryRequestBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedLeafRecoveryRequestBodyUnion, rhs: SignedLeafRecoveryRequestBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsLeafRecoveryRequestBody(let lhsValue),
-              .blueCatbirdChatDefsLeafRecoveryRequestBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedLeafRecoveryRequestBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsLeafRecoveryRequestBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leafRecoveryRequestBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#leafRecoveryRequestBody":
+                let value = try BlueCatbirdChatDefs.LeafRecoveryRequestBody(from: decoder)
+                self = .blueCatbirdChatDefsLeafRecoveryRequestBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsLeafRecoveryRequestBody(let value):
+                try container.encode("blue.catbird.chat.defs#leafRecoveryRequestBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsLeafRecoveryRequestBody(let value):
+                hasher.combine("blue.catbird.chat.defs#leafRecoveryRequestBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedLeafRecoveryRequestBodyUnion, rhs: SignedLeafRecoveryRequestBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsLeafRecoveryRequestBody(let lhsValue),
+                  .blueCatbirdChatDefsLeafRecoveryRequestBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedLeafRecoveryRequestBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsLeafRecoveryRequestBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leafRecoveryRequestBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedLeafRecoveryCancellationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsLeafRecoveryCancellationBody(BlueCatbirdChatDefs.LeafRecoveryCancellationBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.LeafRecoveryCancellationBody) {
-        self = .blueCatbirdChatDefsLeafRecoveryCancellationBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#leafRecoveryCancellationBody":
-            let value = try BlueCatbirdChatDefs.LeafRecoveryCancellationBody(from: decoder)
+    public enum SignedLeafRecoveryCancellationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsLeafRecoveryCancellationBody(BlueCatbirdChatDefs.LeafRecoveryCancellationBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.LeafRecoveryCancellationBody) {
             self = .blueCatbirdChatDefsLeafRecoveryCancellationBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsLeafRecoveryCancellationBody(let value):
-            try container.encode("blue.catbird.chat.defs#leafRecoveryCancellationBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsLeafRecoveryCancellationBody(let value):
-            hasher.combine("blue.catbird.chat.defs#leafRecoveryCancellationBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedLeafRecoveryCancellationBodyUnion, rhs: SignedLeafRecoveryCancellationBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsLeafRecoveryCancellationBody(let lhsValue),
-              .blueCatbirdChatDefsLeafRecoveryCancellationBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedLeafRecoveryCancellationBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsLeafRecoveryCancellationBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leafRecoveryCancellationBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#leafRecoveryCancellationBody":
+                let value = try BlueCatbirdChatDefs.LeafRecoveryCancellationBody(from: decoder)
+                self = .blueCatbirdChatDefsLeafRecoveryCancellationBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsLeafRecoveryCancellationBody(let value):
+                try container.encode("blue.catbird.chat.defs#leafRecoveryCancellationBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsLeafRecoveryCancellationBody(let value):
+                hasher.combine("blue.catbird.chat.defs#leafRecoveryCancellationBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedLeafRecoveryCancellationBodyUnion, rhs: SignedLeafRecoveryCancellationBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsLeafRecoveryCancellationBody(let lhsValue),
+                  .blueCatbirdChatDefsLeafRecoveryCancellationBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedLeafRecoveryCancellationBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsLeafRecoveryCancellationBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leafRecoveryCancellationBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedLeafRecoveryFulfillmentBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsLeafRecoveryFulfillmentBody(BlueCatbirdChatDefs.LeafRecoveryFulfillmentBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.LeafRecoveryFulfillmentBody) {
-        self = .blueCatbirdChatDefsLeafRecoveryFulfillmentBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#leafRecoveryFulfillmentBody":
-            let value = try BlueCatbirdChatDefs.LeafRecoveryFulfillmentBody(from: decoder)
+    public enum SignedLeafRecoveryFulfillmentBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsLeafRecoveryFulfillmentBody(BlueCatbirdChatDefs.LeafRecoveryFulfillmentBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.LeafRecoveryFulfillmentBody) {
             self = .blueCatbirdChatDefsLeafRecoveryFulfillmentBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsLeafRecoveryFulfillmentBody(let value):
-            try container.encode("blue.catbird.chat.defs#leafRecoveryFulfillmentBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsLeafRecoveryFulfillmentBody(let value):
-            hasher.combine("blue.catbird.chat.defs#leafRecoveryFulfillmentBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedLeafRecoveryFulfillmentBodyUnion, rhs: SignedLeafRecoveryFulfillmentBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsLeafRecoveryFulfillmentBody(let lhsValue),
-              .blueCatbirdChatDefsLeafRecoveryFulfillmentBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedLeafRecoveryFulfillmentBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsLeafRecoveryFulfillmentBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leafRecoveryFulfillmentBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#leafRecoveryFulfillmentBody":
+                let value = try BlueCatbirdChatDefs.LeafRecoveryFulfillmentBody(from: decoder)
+                self = .blueCatbirdChatDefsLeafRecoveryFulfillmentBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsLeafRecoveryFulfillmentBody(let value):
+                try container.encode("blue.catbird.chat.defs#leafRecoveryFulfillmentBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsLeafRecoveryFulfillmentBody(let value):
+                hasher.combine("blue.catbird.chat.defs#leafRecoveryFulfillmentBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedLeafRecoveryFulfillmentBodyUnion, rhs: SignedLeafRecoveryFulfillmentBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsLeafRecoveryFulfillmentBody(let lhsValue),
+                  .blueCatbirdChatDefsLeafRecoveryFulfillmentBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedLeafRecoveryFulfillmentBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsLeafRecoveryFulfillmentBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leafRecoveryFulfillmentBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedConversationCloseBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsConversationCloseBody(BlueCatbirdChatDefs.ConversationCloseBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.ConversationCloseBody) {
-        self = .blueCatbirdChatDefsConversationCloseBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#conversationCloseBody":
-            let value = try BlueCatbirdChatDefs.ConversationCloseBody(from: decoder)
+    public enum SignedConversationCloseBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsConversationCloseBody(BlueCatbirdChatDefs.ConversationCloseBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.ConversationCloseBody) {
             self = .blueCatbirdChatDefsConversationCloseBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsConversationCloseBody(let value):
-            try container.encode("blue.catbird.chat.defs#conversationCloseBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsConversationCloseBody(let value):
-            hasher.combine("blue.catbird.chat.defs#conversationCloseBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedConversationCloseBodyUnion, rhs: SignedConversationCloseBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsConversationCloseBody(let lhsValue),
-              .blueCatbirdChatDefsConversationCloseBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedConversationCloseBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsConversationCloseBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationCloseBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#conversationCloseBody":
+                let value = try BlueCatbirdChatDefs.ConversationCloseBody(from: decoder)
+                self = .blueCatbirdChatDefsConversationCloseBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsConversationCloseBody(let value):
+                try container.encode("blue.catbird.chat.defs#conversationCloseBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsConversationCloseBody(let value):
+                hasher.combine("blue.catbird.chat.defs#conversationCloseBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedConversationCloseBodyUnion, rhs: SignedConversationCloseBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsConversationCloseBody(let lhsValue),
+                  .blueCatbirdChatDefsConversationCloseBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedConversationCloseBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsConversationCloseBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationCloseBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedLeaveRequestBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsLeaveRequestBody(BlueCatbirdChatDefs.LeaveRequestBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.LeaveRequestBody) {
-        self = .blueCatbirdChatDefsLeaveRequestBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#leaveRequestBody":
-            let value = try BlueCatbirdChatDefs.LeaveRequestBody(from: decoder)
+    public enum SignedLeaveRequestBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsLeaveRequestBody(BlueCatbirdChatDefs.LeaveRequestBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.LeaveRequestBody) {
             self = .blueCatbirdChatDefsLeaveRequestBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsLeaveRequestBody(let value):
-            try container.encode("blue.catbird.chat.defs#leaveRequestBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsLeaveRequestBody(let value):
-            hasher.combine("blue.catbird.chat.defs#leaveRequestBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedLeaveRequestBodyUnion, rhs: SignedLeaveRequestBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsLeaveRequestBody(let lhsValue),
-              .blueCatbirdChatDefsLeaveRequestBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedLeaveRequestBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsLeaveRequestBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leaveRequestBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#leaveRequestBody":
+                let value = try BlueCatbirdChatDefs.LeaveRequestBody(from: decoder)
+                self = .blueCatbirdChatDefsLeaveRequestBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsLeaveRequestBody(let value):
+                try container.encode("blue.catbird.chat.defs#leaveRequestBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsLeaveRequestBody(let value):
+                hasher.combine("blue.catbird.chat.defs#leaveRequestBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedLeaveRequestBodyUnion, rhs: SignedLeaveRequestBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsLeaveRequestBody(let lhsValue),
+                  .blueCatbirdChatDefsLeaveRequestBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedLeaveRequestBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsLeaveRequestBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leaveRequestBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedZeroLeafLeaveBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsZeroLeafLeaveBody(BlueCatbirdChatDefs.ZeroLeafLeaveBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.ZeroLeafLeaveBody) {
-        self = .blueCatbirdChatDefsZeroLeafLeaveBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#zeroLeafLeaveBody":
-            let value = try BlueCatbirdChatDefs.ZeroLeafLeaveBody(from: decoder)
+    public enum SignedZeroLeafLeaveBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsZeroLeafLeaveBody(BlueCatbirdChatDefs.ZeroLeafLeaveBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.ZeroLeafLeaveBody) {
             self = .blueCatbirdChatDefsZeroLeafLeaveBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsZeroLeafLeaveBody(let value):
-            try container.encode("blue.catbird.chat.defs#zeroLeafLeaveBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsZeroLeafLeaveBody(let value):
-            hasher.combine("blue.catbird.chat.defs#zeroLeafLeaveBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedZeroLeafLeaveBodyUnion, rhs: SignedZeroLeafLeaveBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsZeroLeafLeaveBody(let lhsValue),
-              .blueCatbirdChatDefsZeroLeafLeaveBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedZeroLeafLeaveBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsZeroLeafLeaveBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#zeroLeafLeaveBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#zeroLeafLeaveBody":
+                let value = try BlueCatbirdChatDefs.ZeroLeafLeaveBody(from: decoder)
+                self = .blueCatbirdChatDefsZeroLeafLeaveBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsZeroLeafLeaveBody(let value):
+                try container.encode("blue.catbird.chat.defs#zeroLeafLeaveBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsZeroLeafLeaveBody(let value):
+                hasher.combine("blue.catbird.chat.defs#zeroLeafLeaveBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedZeroLeafLeaveBodyUnion, rhs: SignedZeroLeafLeaveBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsZeroLeafLeaveBody(let lhsValue),
+                  .blueCatbirdChatDefsZeroLeafLeaveBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedZeroLeafLeaveBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsZeroLeafLeaveBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#zeroLeafLeaveBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedLeaveOperation: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsSignedLeaveRequest(BlueCatbirdChatDefs.SignedLeaveRequest)
-    case blueCatbirdChatDefsSignedZeroLeafLeave(BlueCatbirdChatDefs.SignedZeroLeafLeave)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.SignedLeaveRequest) {
-        self = .blueCatbirdChatDefsSignedLeaveRequest(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.SignedZeroLeafLeave) {
-        self = .blueCatbirdChatDefsSignedZeroLeafLeave(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#signedLeaveRequest":
-            let value = try BlueCatbirdChatDefs.SignedLeaveRequest(from: decoder)
+    public enum SignedLeaveOperation: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsSignedLeaveRequest(BlueCatbirdChatDefs.SignedLeaveRequest)
+        case blueCatbirdChatDefsSignedZeroLeafLeave(BlueCatbirdChatDefs.SignedZeroLeafLeave)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.SignedLeaveRequest) {
             self = .blueCatbirdChatDefsSignedLeaveRequest(value)
-        case "blue.catbird.chat.defs#signedZeroLeafLeave":
-            let value = try BlueCatbirdChatDefs.SignedZeroLeafLeave(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.SignedZeroLeafLeave) {
             self = .blueCatbirdChatDefsSignedZeroLeafLeave(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsSignedLeaveRequest(let value):
-            try container.encode("blue.catbird.chat.defs#signedLeaveRequest", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsSignedZeroLeafLeave(let value):
-            try container.encode("blue.catbird.chat.defs#signedZeroLeafLeave", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsSignedLeaveRequest(let value):
-            hasher.combine("blue.catbird.chat.defs#signedLeaveRequest")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsSignedZeroLeafLeave(let value):
-            hasher.combine("blue.catbird.chat.defs#signedZeroLeafLeave")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedLeaveOperation, rhs: SignedLeaveOperation) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsSignedLeaveRequest(let lhsValue),
-              .blueCatbirdChatDefsSignedLeaveRequest(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsSignedZeroLeafLeave(let lhsValue),
-              .blueCatbirdChatDefsSignedZeroLeafLeave(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedLeaveOperation else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsSignedLeaveRequest(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedLeaveRequest")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#signedLeaveRequest":
+                let value = try BlueCatbirdChatDefs.SignedLeaveRequest(from: decoder)
+                self = .blueCatbirdChatDefsSignedLeaveRequest(value)
+            case "blue.catbird.chat.defs#signedZeroLeafLeave":
+                let value = try BlueCatbirdChatDefs.SignedZeroLeafLeave(from: decoder)
+                self = .blueCatbirdChatDefsSignedZeroLeafLeave(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .blueCatbirdChatDefsSignedZeroLeafLeave(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedZeroLeafLeave")
-            
-            let valueDict = try value.toCBORValue()
+        }
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsSignedLeaveRequest(let value):
+                try container.encode("blue.catbird.chat.defs#signedLeaveRequest", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsSignedZeroLeafLeave(let value):
+                try container.encode("blue.catbird.chat.defs#signedZeroLeafLeave", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsSignedLeaveRequest(let value):
+                hasher.combine("blue.catbird.chat.defs#signedLeaveRequest")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsSignedZeroLeafLeave(let value):
+                hasher.combine("blue.catbird.chat.defs#signedZeroLeafLeave")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedLeaveOperation, rhs: SignedLeaveOperation) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsSignedLeaveRequest(let lhsValue),
+                  .blueCatbirdChatDefsSignedLeaveRequest(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsSignedZeroLeafLeave(let lhsValue),
+                  .blueCatbirdChatDefsSignedZeroLeafLeave(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedLeaveOperation else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsSignedLeaveRequest(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedLeaveRequest")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsSignedZeroLeafLeave(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedZeroLeafLeave")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedLeaveCancellationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsLeaveCancellationBody(BlueCatbirdChatDefs.LeaveCancellationBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.LeaveCancellationBody) {
-        self = .blueCatbirdChatDefsLeaveCancellationBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#leaveCancellationBody":
-            let value = try BlueCatbirdChatDefs.LeaveCancellationBody(from: decoder)
+    public enum SignedLeaveCancellationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsLeaveCancellationBody(BlueCatbirdChatDefs.LeaveCancellationBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.LeaveCancellationBody) {
             self = .blueCatbirdChatDefsLeaveCancellationBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsLeaveCancellationBody(let value):
-            try container.encode("blue.catbird.chat.defs#leaveCancellationBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsLeaveCancellationBody(let value):
-            hasher.combine("blue.catbird.chat.defs#leaveCancellationBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedLeaveCancellationBodyUnion, rhs: SignedLeaveCancellationBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsLeaveCancellationBody(let lhsValue),
-              .blueCatbirdChatDefsLeaveCancellationBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedLeaveCancellationBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsLeaveCancellationBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leaveCancellationBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#leaveCancellationBody":
+                let value = try BlueCatbirdChatDefs.LeaveCancellationBody(from: decoder)
+                self = .blueCatbirdChatDefsLeaveCancellationBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsLeaveCancellationBody(let value):
+                try container.encode("blue.catbird.chat.defs#leaveCancellationBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsLeaveCancellationBody(let value):
+                hasher.combine("blue.catbird.chat.defs#leaveCancellationBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedLeaveCancellationBodyUnion, rhs: SignedLeaveCancellationBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsLeaveCancellationBody(let lhsValue),
+                  .blueCatbirdChatDefsLeaveCancellationBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedLeaveCancellationBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsLeaveCancellationBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leaveCancellationBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedLeaveCommitFulfillmentBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsLeaveCommitFulfillmentBody(BlueCatbirdChatDefs.LeaveCommitFulfillmentBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.LeaveCommitFulfillmentBody) {
-        self = .blueCatbirdChatDefsLeaveCommitFulfillmentBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#leaveCommitFulfillmentBody":
-            let value = try BlueCatbirdChatDefs.LeaveCommitFulfillmentBody(from: decoder)
+    public enum SignedLeaveCommitFulfillmentBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsLeaveCommitFulfillmentBody(BlueCatbirdChatDefs.LeaveCommitFulfillmentBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.LeaveCommitFulfillmentBody) {
             self = .blueCatbirdChatDefsLeaveCommitFulfillmentBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsLeaveCommitFulfillmentBody(let value):
-            try container.encode("blue.catbird.chat.defs#leaveCommitFulfillmentBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsLeaveCommitFulfillmentBody(let value):
-            hasher.combine("blue.catbird.chat.defs#leaveCommitFulfillmentBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedLeaveCommitFulfillmentBodyUnion, rhs: SignedLeaveCommitFulfillmentBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsLeaveCommitFulfillmentBody(let lhsValue),
-              .blueCatbirdChatDefsLeaveCommitFulfillmentBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedLeaveCommitFulfillmentBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsLeaveCommitFulfillmentBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leaveCommitFulfillmentBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#leaveCommitFulfillmentBody":
+                let value = try BlueCatbirdChatDefs.LeaveCommitFulfillmentBody(from: decoder)
+                self = .blueCatbirdChatDefsLeaveCommitFulfillmentBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsLeaveCommitFulfillmentBody(let value):
+                try container.encode("blue.catbird.chat.defs#leaveCommitFulfillmentBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsLeaveCommitFulfillmentBody(let value):
+                hasher.combine("blue.catbird.chat.defs#leaveCommitFulfillmentBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedLeaveCommitFulfillmentBodyUnion, rhs: SignedLeaveCommitFulfillmentBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsLeaveCommitFulfillmentBody(let lhsValue),
+                  .blueCatbirdChatDefsLeaveCommitFulfillmentBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedLeaveCommitFulfillmentBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsLeaveCommitFulfillmentBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leaveCommitFulfillmentBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedWelcomeAcknowledgementBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsWelcomeAcknowledgementBody(BlueCatbirdChatDefs.WelcomeAcknowledgementBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.WelcomeAcknowledgementBody) {
-        self = .blueCatbirdChatDefsWelcomeAcknowledgementBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#welcomeAcknowledgementBody":
-            let value = try BlueCatbirdChatDefs.WelcomeAcknowledgementBody(from: decoder)
+    public enum SignedWelcomeAcknowledgementBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsWelcomeAcknowledgementBody(BlueCatbirdChatDefs.WelcomeAcknowledgementBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.WelcomeAcknowledgementBody) {
             self = .blueCatbirdChatDefsWelcomeAcknowledgementBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsWelcomeAcknowledgementBody(let value):
-            try container.encode("blue.catbird.chat.defs#welcomeAcknowledgementBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsWelcomeAcknowledgementBody(let value):
-            hasher.combine("blue.catbird.chat.defs#welcomeAcknowledgementBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedWelcomeAcknowledgementBodyUnion, rhs: SignedWelcomeAcknowledgementBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsWelcomeAcknowledgementBody(let lhsValue),
-              .blueCatbirdChatDefsWelcomeAcknowledgementBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedWelcomeAcknowledgementBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsWelcomeAcknowledgementBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#welcomeAcknowledgementBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#welcomeAcknowledgementBody":
+                let value = try BlueCatbirdChatDefs.WelcomeAcknowledgementBody(from: decoder)
+                self = .blueCatbirdChatDefsWelcomeAcknowledgementBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsWelcomeAcknowledgementBody(let value):
+                try container.encode("blue.catbird.chat.defs#welcomeAcknowledgementBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsWelcomeAcknowledgementBody(let value):
+                hasher.combine("blue.catbird.chat.defs#welcomeAcknowledgementBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedWelcomeAcknowledgementBodyUnion, rhs: SignedWelcomeAcknowledgementBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsWelcomeAcknowledgementBody(let lhsValue),
+                  .blueCatbirdChatDefsWelcomeAcknowledgementBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedWelcomeAcknowledgementBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsWelcomeAcknowledgementBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#welcomeAcknowledgementBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedWelcomeRejectionBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsWelcomeRejectionBody(BlueCatbirdChatDefs.WelcomeRejectionBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.WelcomeRejectionBody) {
-        self = .blueCatbirdChatDefsWelcomeRejectionBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#welcomeRejectionBody":
-            let value = try BlueCatbirdChatDefs.WelcomeRejectionBody(from: decoder)
+    public enum SignedWelcomeRejectionBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsWelcomeRejectionBody(BlueCatbirdChatDefs.WelcomeRejectionBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.WelcomeRejectionBody) {
             self = .blueCatbirdChatDefsWelcomeRejectionBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsWelcomeRejectionBody(let value):
-            try container.encode("blue.catbird.chat.defs#welcomeRejectionBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsWelcomeRejectionBody(let value):
-            hasher.combine("blue.catbird.chat.defs#welcomeRejectionBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedWelcomeRejectionBodyUnion, rhs: SignedWelcomeRejectionBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsWelcomeRejectionBody(let lhsValue),
-              .blueCatbirdChatDefsWelcomeRejectionBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedWelcomeRejectionBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsWelcomeRejectionBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#welcomeRejectionBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#welcomeRejectionBody":
+                let value = try BlueCatbirdChatDefs.WelcomeRejectionBody(from: decoder)
+                self = .blueCatbirdChatDefsWelcomeRejectionBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsWelcomeRejectionBody(let value):
+                try container.encode("blue.catbird.chat.defs#welcomeRejectionBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsWelcomeRejectionBody(let value):
+                hasher.combine("blue.catbird.chat.defs#welcomeRejectionBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedWelcomeRejectionBodyUnion, rhs: SignedWelcomeRejectionBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsWelcomeRejectionBody(let lhsValue),
+                  .blueCatbirdChatDefsWelcomeRejectionBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedWelcomeRejectionBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsWelcomeRejectionBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#welcomeRejectionBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedTransition: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsSignedCommitTransition(BlueCatbirdChatDefs.SignedCommitTransition)
-    case blueCatbirdChatDefsSignedPolicyTransition(BlueCatbirdChatDefs.SignedPolicyTransition)
-    case blueCatbirdChatDefsSignedLeafRecoveryFulfillment(BlueCatbirdChatDefs.SignedLeafRecoveryFulfillment)
-    case blueCatbirdChatDefsSignedMetadataTransition(BlueCatbirdChatDefs.SignedMetadataTransition)
-    case blueCatbirdChatDefsSignedLeaveCommitFulfillment(BlueCatbirdChatDefs.SignedLeaveCommitFulfillment)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.SignedCommitTransition) {
-        self = .blueCatbirdChatDefsSignedCommitTransition(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.SignedPolicyTransition) {
-        self = .blueCatbirdChatDefsSignedPolicyTransition(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.SignedLeafRecoveryFulfillment) {
-        self = .blueCatbirdChatDefsSignedLeafRecoveryFulfillment(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.SignedMetadataTransition) {
-        self = .blueCatbirdChatDefsSignedMetadataTransition(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.SignedLeaveCommitFulfillment) {
-        self = .blueCatbirdChatDefsSignedLeaveCommitFulfillment(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#signedCommitTransition":
-            let value = try BlueCatbirdChatDefs.SignedCommitTransition(from: decoder)
+    public enum SignedTransition: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsSignedCommitTransition(BlueCatbirdChatDefs.SignedCommitTransition)
+        case blueCatbirdChatDefsSignedPolicyTransition(BlueCatbirdChatDefs.SignedPolicyTransition)
+        case blueCatbirdChatDefsSignedLeafRecoveryFulfillment(BlueCatbirdChatDefs.SignedLeafRecoveryFulfillment)
+        case blueCatbirdChatDefsSignedMetadataTransition(BlueCatbirdChatDefs.SignedMetadataTransition)
+        case blueCatbirdChatDefsSignedLeaveCommitFulfillment(BlueCatbirdChatDefs.SignedLeaveCommitFulfillment)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.SignedCommitTransition) {
             self = .blueCatbirdChatDefsSignedCommitTransition(value)
-        case "blue.catbird.chat.defs#signedPolicyTransition":
-            let value = try BlueCatbirdChatDefs.SignedPolicyTransition(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.SignedPolicyTransition) {
             self = .blueCatbirdChatDefsSignedPolicyTransition(value)
-        case "blue.catbird.chat.defs#signedLeafRecoveryFulfillment":
-            let value = try BlueCatbirdChatDefs.SignedLeafRecoveryFulfillment(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.SignedLeafRecoveryFulfillment) {
             self = .blueCatbirdChatDefsSignedLeafRecoveryFulfillment(value)
-        case "blue.catbird.chat.defs#signedMetadataTransition":
-            let value = try BlueCatbirdChatDefs.SignedMetadataTransition(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.SignedMetadataTransition) {
             self = .blueCatbirdChatDefsSignedMetadataTransition(value)
-        case "blue.catbird.chat.defs#signedLeaveCommitFulfillment":
-            let value = try BlueCatbirdChatDefs.SignedLeaveCommitFulfillment(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.SignedLeaveCommitFulfillment) {
             self = .blueCatbirdChatDefsSignedLeaveCommitFulfillment(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
+
+            switch typeValue {
+            case "blue.catbird.chat.defs#signedCommitTransition":
+                let value = try BlueCatbirdChatDefs.SignedCommitTransition(from: decoder)
+                self = .blueCatbirdChatDefsSignedCommitTransition(value)
+            case "blue.catbird.chat.defs#signedPolicyTransition":
+                let value = try BlueCatbirdChatDefs.SignedPolicyTransition(from: decoder)
+                self = .blueCatbirdChatDefsSignedPolicyTransition(value)
+            case "blue.catbird.chat.defs#signedLeafRecoveryFulfillment":
+                let value = try BlueCatbirdChatDefs.SignedLeafRecoveryFulfillment(from: decoder)
+                self = .blueCatbirdChatDefsSignedLeafRecoveryFulfillment(value)
+            case "blue.catbird.chat.defs#signedMetadataTransition":
+                let value = try BlueCatbirdChatDefs.SignedMetadataTransition(from: decoder)
+                self = .blueCatbirdChatDefsSignedMetadataTransition(value)
+            case "blue.catbird.chat.defs#signedLeaveCommitFulfillment":
+                let value = try BlueCatbirdChatDefs.SignedLeaveCommitFulfillment(from: decoder)
+                self = .blueCatbirdChatDefsSignedLeaveCommitFulfillment(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsSignedCommitTransition(let value):
+                try container.encode("blue.catbird.chat.defs#signedCommitTransition", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsSignedPolicyTransition(let value):
+                try container.encode("blue.catbird.chat.defs#signedPolicyTransition", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsSignedLeafRecoveryFulfillment(let value):
+                try container.encode("blue.catbird.chat.defs#signedLeafRecoveryFulfillment", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsSignedMetadataTransition(let value):
+                try container.encode("blue.catbird.chat.defs#signedMetadataTransition", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsSignedLeaveCommitFulfillment(let value):
+                try container.encode("blue.catbird.chat.defs#signedLeaveCommitFulfillment", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsSignedCommitTransition(let value):
+                hasher.combine("blue.catbird.chat.defs#signedCommitTransition")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsSignedPolicyTransition(let value):
+                hasher.combine("blue.catbird.chat.defs#signedPolicyTransition")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsSignedLeafRecoveryFulfillment(let value):
+                hasher.combine("blue.catbird.chat.defs#signedLeafRecoveryFulfillment")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsSignedMetadataTransition(let value):
+                hasher.combine("blue.catbird.chat.defs#signedMetadataTransition")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsSignedLeaveCommitFulfillment(let value):
+                hasher.combine("blue.catbird.chat.defs#signedLeaveCommitFulfillment")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedTransition, rhs: SignedTransition) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsSignedCommitTransition(let lhsValue),
+                  .blueCatbirdChatDefsSignedCommitTransition(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsSignedPolicyTransition(let lhsValue),
+                  .blueCatbirdChatDefsSignedPolicyTransition(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsSignedLeafRecoveryFulfillment(let lhsValue),
+                  .blueCatbirdChatDefsSignedLeafRecoveryFulfillment(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsSignedMetadataTransition(let lhsValue),
+                  .blueCatbirdChatDefsSignedMetadataTransition(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsSignedLeaveCommitFulfillment(let lhsValue),
+                  .blueCatbirdChatDefsSignedLeaveCommitFulfillment(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedTransition else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsSignedCommitTransition(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedCommitTransition")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsSignedPolicyTransition(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedPolicyTransition")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsSignedLeafRecoveryFulfillment(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedLeafRecoveryFulfillment")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsSignedMetadataTransition(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedMetadataTransition")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsSignedLeaveCommitFulfillment(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedLeaveCommitFulfillment")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        switch self {
-        case .blueCatbirdChatDefsSignedCommitTransition(let value):
-            try container.encode("blue.catbird.chat.defs#signedCommitTransition", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsSignedPolicyTransition(let value):
-            try container.encode("blue.catbird.chat.defs#signedPolicyTransition", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsSignedLeafRecoveryFulfillment(let value):
-            try container.encode("blue.catbird.chat.defs#signedLeafRecoveryFulfillment", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsSignedMetadataTransition(let value):
-            try container.encode("blue.catbird.chat.defs#signedMetadataTransition", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsSignedLeaveCommitFulfillment(let value):
-            try container.encode("blue.catbird.chat.defs#signedLeaveCommitFulfillment", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsSignedCommitTransition(let value):
-            hasher.combine("blue.catbird.chat.defs#signedCommitTransition")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsSignedPolicyTransition(let value):
-            hasher.combine("blue.catbird.chat.defs#signedPolicyTransition")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsSignedLeafRecoveryFulfillment(let value):
-            hasher.combine("blue.catbird.chat.defs#signedLeafRecoveryFulfillment")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsSignedMetadataTransition(let value):
-            hasher.combine("blue.catbird.chat.defs#signedMetadataTransition")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsSignedLeaveCommitFulfillment(let value):
-            hasher.combine("blue.catbird.chat.defs#signedLeaveCommitFulfillment")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedTransition, rhs: SignedTransition) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsSignedCommitTransition(let lhsValue),
-              .blueCatbirdChatDefsSignedCommitTransition(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsSignedPolicyTransition(let lhsValue),
-              .blueCatbirdChatDefsSignedPolicyTransition(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsSignedLeafRecoveryFulfillment(let lhsValue),
-              .blueCatbirdChatDefsSignedLeafRecoveryFulfillment(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsSignedMetadataTransition(let lhsValue),
-              .blueCatbirdChatDefsSignedMetadataTransition(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsSignedLeaveCommitFulfillment(let lhsValue),
-              .blueCatbirdChatDefsSignedLeaveCommitFulfillment(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedTransition else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsSignedCommitTransition(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedCommitTransition")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsSignedPolicyTransition(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedPolicyTransition")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsSignedLeafRecoveryFulfillment(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedLeafRecoveryFulfillment")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsSignedMetadataTransition(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedMetadataTransition")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsSignedLeaveCommitFulfillment(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedLeaveCommitFulfillment")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
-        }
-    }
-}
-
-
-
-
-public enum ConversationInventoryItem: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsConversationInventoryState(BlueCatbirdChatDefs.ConversationInventoryState)
-    case blueCatbirdChatDefsConversationRemovalTombstone(BlueCatbirdChatDefs.ConversationRemovalTombstone)
-    case blueCatbirdChatDefsConversationCloseTombstone(BlueCatbirdChatDefs.ConversationCloseTombstone)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.ConversationInventoryState) {
-        self = .blueCatbirdChatDefsConversationInventoryState(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.ConversationRemovalTombstone) {
-        self = .blueCatbirdChatDefsConversationRemovalTombstone(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.ConversationCloseTombstone) {
-        self = .blueCatbirdChatDefsConversationCloseTombstone(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#conversationInventoryState":
-            let value = try BlueCatbirdChatDefs.ConversationInventoryState(from: decoder)
+    public enum ConversationInventoryItem: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsConversationInventoryState(BlueCatbirdChatDefs.ConversationInventoryState)
+        case blueCatbirdChatDefsConversationRemovalTombstone(BlueCatbirdChatDefs.ConversationRemovalTombstone)
+        case blueCatbirdChatDefsConversationCloseTombstone(BlueCatbirdChatDefs.ConversationCloseTombstone)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.ConversationInventoryState) {
             self = .blueCatbirdChatDefsConversationInventoryState(value)
-        case "blue.catbird.chat.defs#conversationRemovalTombstone":
-            let value = try BlueCatbirdChatDefs.ConversationRemovalTombstone(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.ConversationRemovalTombstone) {
             self = .blueCatbirdChatDefsConversationRemovalTombstone(value)
-        case "blue.catbird.chat.defs#conversationCloseTombstone":
-            let value = try BlueCatbirdChatDefs.ConversationCloseTombstone(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.ConversationCloseTombstone) {
             self = .blueCatbirdChatDefsConversationCloseTombstone(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsConversationInventoryState(let value):
-            try container.encode("blue.catbird.chat.defs#conversationInventoryState", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsConversationRemovalTombstone(let value):
-            try container.encode("blue.catbird.chat.defs#conversationRemovalTombstone", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsConversationCloseTombstone(let value):
-            try container.encode("blue.catbird.chat.defs#conversationCloseTombstone", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsConversationInventoryState(let value):
-            hasher.combine("blue.catbird.chat.defs#conversationInventoryState")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsConversationRemovalTombstone(let value):
-            hasher.combine("blue.catbird.chat.defs#conversationRemovalTombstone")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsConversationCloseTombstone(let value):
-            hasher.combine("blue.catbird.chat.defs#conversationCloseTombstone")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: ConversationInventoryItem, rhs: ConversationInventoryItem) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsConversationInventoryState(let lhsValue),
-              .blueCatbirdChatDefsConversationInventoryState(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsConversationRemovalTombstone(let lhsValue),
-              .blueCatbirdChatDefsConversationRemovalTombstone(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsConversationCloseTombstone(let lhsValue),
-              .blueCatbirdChatDefsConversationCloseTombstone(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? ConversationInventoryItem else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsConversationInventoryState(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationInventoryState")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#conversationInventoryState":
+                let value = try BlueCatbirdChatDefs.ConversationInventoryState(from: decoder)
+                self = .blueCatbirdChatDefsConversationInventoryState(value)
+            case "blue.catbird.chat.defs#conversationRemovalTombstone":
+                let value = try BlueCatbirdChatDefs.ConversationRemovalTombstone(from: decoder)
+                self = .blueCatbirdChatDefsConversationRemovalTombstone(value)
+            case "blue.catbird.chat.defs#conversationCloseTombstone":
+                let value = try BlueCatbirdChatDefs.ConversationCloseTombstone(from: decoder)
+                self = .blueCatbirdChatDefsConversationCloseTombstone(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .blueCatbirdChatDefsConversationRemovalTombstone(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationRemovalTombstone")
-            
-            let valueDict = try value.toCBORValue()
+        }
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsConversationCloseTombstone(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationCloseTombstone")
-            
-            let valueDict = try value.toCBORValue()
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch self {
+            case .blueCatbirdChatDefsConversationInventoryState(let value):
+                try container.encode("blue.catbird.chat.defs#conversationInventoryState", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsConversationRemovalTombstone(let value):
+                try container.encode("blue.catbird.chat.defs#conversationRemovalTombstone", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsConversationCloseTombstone(let value):
+                try container.encode("blue.catbird.chat.defs#conversationCloseTombstone", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsConversationInventoryState(let value):
+                hasher.combine("blue.catbird.chat.defs#conversationInventoryState")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsConversationRemovalTombstone(let value):
+                hasher.combine("blue.catbird.chat.defs#conversationRemovalTombstone")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsConversationCloseTombstone(let value):
+                hasher.combine("blue.catbird.chat.defs#conversationCloseTombstone")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: ConversationInventoryItem, rhs: ConversationInventoryItem) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsConversationInventoryState(let lhsValue),
+                  .blueCatbirdChatDefsConversationInventoryState(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsConversationRemovalTombstone(let lhsValue),
+                  .blueCatbirdChatDefsConversationRemovalTombstone(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsConversationCloseTombstone(let lhsValue),
+                  .blueCatbirdChatDefsConversationCloseTombstone(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? ConversationInventoryItem else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsConversationInventoryState(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationInventoryState")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsConversationRemovalTombstone(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationRemovalTombstone")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsConversationCloseTombstone(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationCloseTombstone")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum ConversationEntry: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsApplicationEntry(BlueCatbirdChatDefs.ApplicationEntry)
-    case blueCatbirdChatDefsCommitEntry(BlueCatbirdChatDefs.CommitEntry)
-    case blueCatbirdChatDefsPolicyEntry(BlueCatbirdChatDefs.PolicyEntry)
-    case blueCatbirdChatDefsMetadataEntry(BlueCatbirdChatDefs.MetadataEntry)
-    case blueCatbirdChatDefsCreationEntry(BlueCatbirdChatDefs.CreationEntry)
-    case blueCatbirdChatDefsParticipantAcceptanceEntry(BlueCatbirdChatDefs.ParticipantAcceptanceEntry)
-    case blueCatbirdChatDefsConversationCloseEntry(BlueCatbirdChatDefs.ConversationCloseEntry)
-    case blueCatbirdChatDefsResetRequestEntry(BlueCatbirdChatDefs.ResetRequestEntry)
-    case blueCatbirdChatDefsResetActivationEntry(BlueCatbirdChatDefs.ResetActivationEntry)
-    case blueCatbirdChatDefsLeafRecoveryFulfillmentEntry(BlueCatbirdChatDefs.LeafRecoveryFulfillmentEntry)
-    case blueCatbirdChatDefsLeaveRequestEntry(BlueCatbirdChatDefs.LeaveRequestEntry)
-    case blueCatbirdChatDefsZeroLeafLeaveEntry(BlueCatbirdChatDefs.ZeroLeafLeaveEntry)
-    case blueCatbirdChatDefsLeaveCancellationEntry(BlueCatbirdChatDefs.LeaveCancellationEntry)
-    case blueCatbirdChatDefsLeaveCommitFulfillmentEntry(BlueCatbirdChatDefs.LeaveCommitFulfillmentEntry)
-    case blueCatbirdChatDefsDirectRequestEntry(BlueCatbirdChatDefs.DirectRequestEntry)
-    case blueCatbirdChatDefsDirectRequestAcceptanceEntry(BlueCatbirdChatDefs.DirectRequestAcceptanceEntry)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.ApplicationEntry) {
-        self = .blueCatbirdChatDefsApplicationEntry(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.CommitEntry) {
-        self = .blueCatbirdChatDefsCommitEntry(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.PolicyEntry) {
-        self = .blueCatbirdChatDefsPolicyEntry(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.MetadataEntry) {
-        self = .blueCatbirdChatDefsMetadataEntry(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.CreationEntry) {
-        self = .blueCatbirdChatDefsCreationEntry(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.ParticipantAcceptanceEntry) {
-        self = .blueCatbirdChatDefsParticipantAcceptanceEntry(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.ConversationCloseEntry) {
-        self = .blueCatbirdChatDefsConversationCloseEntry(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.ResetRequestEntry) {
-        self = .blueCatbirdChatDefsResetRequestEntry(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.ResetActivationEntry) {
-        self = .blueCatbirdChatDefsResetActivationEntry(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.LeafRecoveryFulfillmentEntry) {
-        self = .blueCatbirdChatDefsLeafRecoveryFulfillmentEntry(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.LeaveRequestEntry) {
-        self = .blueCatbirdChatDefsLeaveRequestEntry(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.ZeroLeafLeaveEntry) {
-        self = .blueCatbirdChatDefsZeroLeafLeaveEntry(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.LeaveCancellationEntry) {
-        self = .blueCatbirdChatDefsLeaveCancellationEntry(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.LeaveCommitFulfillmentEntry) {
-        self = .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestEntry) {
-        self = .blueCatbirdChatDefsDirectRequestEntry(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestAcceptanceEntry) {
-        self = .blueCatbirdChatDefsDirectRequestAcceptanceEntry(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#applicationEntry":
-            let value = try BlueCatbirdChatDefs.ApplicationEntry(from: decoder)
+    public enum ConversationEntry: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsApplicationEntry(BlueCatbirdChatDefs.ApplicationEntry)
+        case blueCatbirdChatDefsCommitEntry(BlueCatbirdChatDefs.CommitEntry)
+        case blueCatbirdChatDefsPolicyEntry(BlueCatbirdChatDefs.PolicyEntry)
+        case blueCatbirdChatDefsMetadataEntry(BlueCatbirdChatDefs.MetadataEntry)
+        case blueCatbirdChatDefsCreationEntry(BlueCatbirdChatDefs.CreationEntry)
+        case blueCatbirdChatDefsParticipantAcceptanceEntry(BlueCatbirdChatDefs.ParticipantAcceptanceEntry)
+        case blueCatbirdChatDefsConversationCloseEntry(BlueCatbirdChatDefs.ConversationCloseEntry)
+        case blueCatbirdChatDefsResetRequestEntry(BlueCatbirdChatDefs.ResetRequestEntry)
+        case blueCatbirdChatDefsResetActivationEntry(BlueCatbirdChatDefs.ResetActivationEntry)
+        case blueCatbirdChatDefsLeafRecoveryFulfillmentEntry(BlueCatbirdChatDefs.LeafRecoveryFulfillmentEntry)
+        case blueCatbirdChatDefsLeaveRequestEntry(BlueCatbirdChatDefs.LeaveRequestEntry)
+        case blueCatbirdChatDefsZeroLeafLeaveEntry(BlueCatbirdChatDefs.ZeroLeafLeaveEntry)
+        case blueCatbirdChatDefsLeaveCancellationEntry(BlueCatbirdChatDefs.LeaveCancellationEntry)
+        case blueCatbirdChatDefsLeaveCommitFulfillmentEntry(BlueCatbirdChatDefs.LeaveCommitFulfillmentEntry)
+        case blueCatbirdChatDefsDirectRequestEntry(BlueCatbirdChatDefs.DirectRequestEntry)
+        case blueCatbirdChatDefsDirectRequestAcceptanceEntry(BlueCatbirdChatDefs.DirectRequestAcceptanceEntry)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.ApplicationEntry) {
             self = .blueCatbirdChatDefsApplicationEntry(value)
-        case "blue.catbird.chat.defs#commitEntry":
-            let value = try BlueCatbirdChatDefs.CommitEntry(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.CommitEntry) {
             self = .blueCatbirdChatDefsCommitEntry(value)
-        case "blue.catbird.chat.defs#policyEntry":
-            let value = try BlueCatbirdChatDefs.PolicyEntry(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.PolicyEntry) {
             self = .blueCatbirdChatDefsPolicyEntry(value)
-        case "blue.catbird.chat.defs#metadataEntry":
-            let value = try BlueCatbirdChatDefs.MetadataEntry(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.MetadataEntry) {
             self = .blueCatbirdChatDefsMetadataEntry(value)
-        case "blue.catbird.chat.defs#creationEntry":
-            let value = try BlueCatbirdChatDefs.CreationEntry(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.CreationEntry) {
             self = .blueCatbirdChatDefsCreationEntry(value)
-        case "blue.catbird.chat.defs#participantAcceptanceEntry":
-            let value = try BlueCatbirdChatDefs.ParticipantAcceptanceEntry(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.ParticipantAcceptanceEntry) {
             self = .blueCatbirdChatDefsParticipantAcceptanceEntry(value)
-        case "blue.catbird.chat.defs#conversationCloseEntry":
-            let value = try BlueCatbirdChatDefs.ConversationCloseEntry(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.ConversationCloseEntry) {
             self = .blueCatbirdChatDefsConversationCloseEntry(value)
-        case "blue.catbird.chat.defs#resetRequestEntry":
-            let value = try BlueCatbirdChatDefs.ResetRequestEntry(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.ResetRequestEntry) {
             self = .blueCatbirdChatDefsResetRequestEntry(value)
-        case "blue.catbird.chat.defs#resetActivationEntry":
-            let value = try BlueCatbirdChatDefs.ResetActivationEntry(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.ResetActivationEntry) {
             self = .blueCatbirdChatDefsResetActivationEntry(value)
-        case "blue.catbird.chat.defs#leafRecoveryFulfillmentEntry":
-            let value = try BlueCatbirdChatDefs.LeafRecoveryFulfillmentEntry(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.LeafRecoveryFulfillmentEntry) {
             self = .blueCatbirdChatDefsLeafRecoveryFulfillmentEntry(value)
-        case "blue.catbird.chat.defs#leaveRequestEntry":
-            let value = try BlueCatbirdChatDefs.LeaveRequestEntry(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.LeaveRequestEntry) {
             self = .blueCatbirdChatDefsLeaveRequestEntry(value)
-        case "blue.catbird.chat.defs#zeroLeafLeaveEntry":
-            let value = try BlueCatbirdChatDefs.ZeroLeafLeaveEntry(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.ZeroLeafLeaveEntry) {
             self = .blueCatbirdChatDefsZeroLeafLeaveEntry(value)
-        case "blue.catbird.chat.defs#leaveCancellationEntry":
-            let value = try BlueCatbirdChatDefs.LeaveCancellationEntry(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.LeaveCancellationEntry) {
             self = .blueCatbirdChatDefsLeaveCancellationEntry(value)
-        case "blue.catbird.chat.defs#leaveCommitFulfillmentEntry":
-            let value = try BlueCatbirdChatDefs.LeaveCommitFulfillmentEntry(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.LeaveCommitFulfillmentEntry) {
             self = .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(value)
-        case "blue.catbird.chat.defs#directRequestEntry":
-            let value = try BlueCatbirdChatDefs.DirectRequestEntry(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestEntry) {
             self = .blueCatbirdChatDefsDirectRequestEntry(value)
-        case "blue.catbird.chat.defs#directRequestAcceptanceEntry":
-            let value = try BlueCatbirdChatDefs.DirectRequestAcceptanceEntry(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestAcceptanceEntry) {
             self = .blueCatbirdChatDefsDirectRequestAcceptanceEntry(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
+
+            switch typeValue {
+            case "blue.catbird.chat.defs#applicationEntry":
+                let value = try BlueCatbirdChatDefs.ApplicationEntry(from: decoder)
+                self = .blueCatbirdChatDefsApplicationEntry(value)
+            case "blue.catbird.chat.defs#commitEntry":
+                let value = try BlueCatbirdChatDefs.CommitEntry(from: decoder)
+                self = .blueCatbirdChatDefsCommitEntry(value)
+            case "blue.catbird.chat.defs#policyEntry":
+                let value = try BlueCatbirdChatDefs.PolicyEntry(from: decoder)
+                self = .blueCatbirdChatDefsPolicyEntry(value)
+            case "blue.catbird.chat.defs#metadataEntry":
+                let value = try BlueCatbirdChatDefs.MetadataEntry(from: decoder)
+                self = .blueCatbirdChatDefsMetadataEntry(value)
+            case "blue.catbird.chat.defs#creationEntry":
+                let value = try BlueCatbirdChatDefs.CreationEntry(from: decoder)
+                self = .blueCatbirdChatDefsCreationEntry(value)
+            case "blue.catbird.chat.defs#participantAcceptanceEntry":
+                let value = try BlueCatbirdChatDefs.ParticipantAcceptanceEntry(from: decoder)
+                self = .blueCatbirdChatDefsParticipantAcceptanceEntry(value)
+            case "blue.catbird.chat.defs#conversationCloseEntry":
+                let value = try BlueCatbirdChatDefs.ConversationCloseEntry(from: decoder)
+                self = .blueCatbirdChatDefsConversationCloseEntry(value)
+            case "blue.catbird.chat.defs#resetRequestEntry":
+                let value = try BlueCatbirdChatDefs.ResetRequestEntry(from: decoder)
+                self = .blueCatbirdChatDefsResetRequestEntry(value)
+            case "blue.catbird.chat.defs#resetActivationEntry":
+                let value = try BlueCatbirdChatDefs.ResetActivationEntry(from: decoder)
+                self = .blueCatbirdChatDefsResetActivationEntry(value)
+            case "blue.catbird.chat.defs#leafRecoveryFulfillmentEntry":
+                let value = try BlueCatbirdChatDefs.LeafRecoveryFulfillmentEntry(from: decoder)
+                self = .blueCatbirdChatDefsLeafRecoveryFulfillmentEntry(value)
+            case "blue.catbird.chat.defs#leaveRequestEntry":
+                let value = try BlueCatbirdChatDefs.LeaveRequestEntry(from: decoder)
+                self = .blueCatbirdChatDefsLeaveRequestEntry(value)
+            case "blue.catbird.chat.defs#zeroLeafLeaveEntry":
+                let value = try BlueCatbirdChatDefs.ZeroLeafLeaveEntry(from: decoder)
+                self = .blueCatbirdChatDefsZeroLeafLeaveEntry(value)
+            case "blue.catbird.chat.defs#leaveCancellationEntry":
+                let value = try BlueCatbirdChatDefs.LeaveCancellationEntry(from: decoder)
+                self = .blueCatbirdChatDefsLeaveCancellationEntry(value)
+            case "blue.catbird.chat.defs#leaveCommitFulfillmentEntry":
+                let value = try BlueCatbirdChatDefs.LeaveCommitFulfillmentEntry(from: decoder)
+                self = .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(value)
+            case "blue.catbird.chat.defs#directRequestEntry":
+                let value = try BlueCatbirdChatDefs.DirectRequestEntry(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestEntry(value)
+            case "blue.catbird.chat.defs#directRequestAcceptanceEntry":
+                let value = try BlueCatbirdChatDefs.DirectRequestAcceptanceEntry(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestAcceptanceEntry(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsApplicationEntry(let value):
+                try container.encode("blue.catbird.chat.defs#applicationEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsCommitEntry(let value):
+                try container.encode("blue.catbird.chat.defs#commitEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsPolicyEntry(let value):
+                try container.encode("blue.catbird.chat.defs#policyEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsMetadataEntry(let value):
+                try container.encode("blue.catbird.chat.defs#metadataEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsCreationEntry(let value):
+                try container.encode("blue.catbird.chat.defs#creationEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsParticipantAcceptanceEntry(let value):
+                try container.encode("blue.catbird.chat.defs#participantAcceptanceEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsConversationCloseEntry(let value):
+                try container.encode("blue.catbird.chat.defs#conversationCloseEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsResetRequestEntry(let value):
+                try container.encode("blue.catbird.chat.defs#resetRequestEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsResetActivationEntry(let value):
+                try container.encode("blue.catbird.chat.defs#resetActivationEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsLeafRecoveryFulfillmentEntry(let value):
+                try container.encode("blue.catbird.chat.defs#leafRecoveryFulfillmentEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsLeaveRequestEntry(let value):
+                try container.encode("blue.catbird.chat.defs#leaveRequestEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsZeroLeafLeaveEntry(let value):
+                try container.encode("blue.catbird.chat.defs#zeroLeafLeaveEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsLeaveCancellationEntry(let value):
+                try container.encode("blue.catbird.chat.defs#leaveCancellationEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(let value):
+                try container.encode("blue.catbird.chat.defs#leaveCommitFulfillmentEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsDirectRequestEntry(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsDirectRequestAcceptanceEntry(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestAcceptanceEntry", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsApplicationEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#applicationEntry")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsCommitEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#commitEntry")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsPolicyEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#policyEntry")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsMetadataEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#metadataEntry")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsCreationEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#creationEntry")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsParticipantAcceptanceEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#participantAcceptanceEntry")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsConversationCloseEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#conversationCloseEntry")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsResetRequestEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#resetRequestEntry")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsResetActivationEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#resetActivationEntry")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsLeafRecoveryFulfillmentEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#leafRecoveryFulfillmentEntry")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsLeaveRequestEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#leaveRequestEntry")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsZeroLeafLeaveEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#zeroLeafLeaveEntry")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsLeaveCancellationEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#leaveCancellationEntry")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#leaveCommitFulfillmentEntry")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsDirectRequestEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestEntry")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsDirectRequestAcceptanceEntry(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestAcceptanceEntry")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: ConversationEntry, rhs: ConversationEntry) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsApplicationEntry(let lhsValue),
+                  .blueCatbirdChatDefsApplicationEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsCommitEntry(let lhsValue),
+                  .blueCatbirdChatDefsCommitEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsPolicyEntry(let lhsValue),
+                  .blueCatbirdChatDefsPolicyEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsMetadataEntry(let lhsValue),
+                  .blueCatbirdChatDefsMetadataEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsCreationEntry(let lhsValue),
+                  .blueCatbirdChatDefsCreationEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsParticipantAcceptanceEntry(let lhsValue),
+                  .blueCatbirdChatDefsParticipantAcceptanceEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsConversationCloseEntry(let lhsValue),
+                  .blueCatbirdChatDefsConversationCloseEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsResetRequestEntry(let lhsValue),
+                  .blueCatbirdChatDefsResetRequestEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsResetActivationEntry(let lhsValue),
+                  .blueCatbirdChatDefsResetActivationEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsLeafRecoveryFulfillmentEntry(let lhsValue),
+                  .blueCatbirdChatDefsLeafRecoveryFulfillmentEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsLeaveRequestEntry(let lhsValue),
+                  .blueCatbirdChatDefsLeaveRequestEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsZeroLeafLeaveEntry(let lhsValue),
+                  .blueCatbirdChatDefsZeroLeafLeaveEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsLeaveCancellationEntry(let lhsValue),
+                  .blueCatbirdChatDefsLeaveCancellationEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsLeaveCommitFulfillmentEntry(let lhsValue),
+                  .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsDirectRequestEntry(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsDirectRequestAcceptanceEntry(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestAcceptanceEntry(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? ConversationEntry else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsApplicationEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#applicationEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsCommitEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#commitEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsPolicyEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#policyEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsMetadataEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#metadataEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsCreationEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#creationEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsParticipantAcceptanceEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#participantAcceptanceEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsConversationCloseEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationCloseEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsResetRequestEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#resetRequestEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsResetActivationEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#resetActivationEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsLeafRecoveryFulfillmentEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leafRecoveryFulfillmentEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsLeaveRequestEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leaveRequestEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsZeroLeafLeaveEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#zeroLeafLeaveEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsLeaveCancellationEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leaveCancellationEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leaveCommitFulfillmentEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsDirectRequestEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsDirectRequestAcceptanceEntry(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestAcceptanceEntry")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        switch self {
-        case .blueCatbirdChatDefsApplicationEntry(let value):
-            try container.encode("blue.catbird.chat.defs#applicationEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsCommitEntry(let value):
-            try container.encode("blue.catbird.chat.defs#commitEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsPolicyEntry(let value):
-            try container.encode("blue.catbird.chat.defs#policyEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsMetadataEntry(let value):
-            try container.encode("blue.catbird.chat.defs#metadataEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsCreationEntry(let value):
-            try container.encode("blue.catbird.chat.defs#creationEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsParticipantAcceptanceEntry(let value):
-            try container.encode("blue.catbird.chat.defs#participantAcceptanceEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsConversationCloseEntry(let value):
-            try container.encode("blue.catbird.chat.defs#conversationCloseEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsResetRequestEntry(let value):
-            try container.encode("blue.catbird.chat.defs#resetRequestEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsResetActivationEntry(let value):
-            try container.encode("blue.catbird.chat.defs#resetActivationEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsLeafRecoveryFulfillmentEntry(let value):
-            try container.encode("blue.catbird.chat.defs#leafRecoveryFulfillmentEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsLeaveRequestEntry(let value):
-            try container.encode("blue.catbird.chat.defs#leaveRequestEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsZeroLeafLeaveEntry(let value):
-            try container.encode("blue.catbird.chat.defs#zeroLeafLeaveEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsLeaveCancellationEntry(let value):
-            try container.encode("blue.catbird.chat.defs#leaveCancellationEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(let value):
-            try container.encode("blue.catbird.chat.defs#leaveCommitFulfillmentEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsDirectRequestEntry(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsDirectRequestAcceptanceEntry(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestAcceptanceEntry", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsApplicationEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#applicationEntry")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsCommitEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#commitEntry")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsPolicyEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#policyEntry")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsMetadataEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#metadataEntry")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsCreationEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#creationEntry")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsParticipantAcceptanceEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#participantAcceptanceEntry")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsConversationCloseEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#conversationCloseEntry")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsResetRequestEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#resetRequestEntry")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsResetActivationEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#resetActivationEntry")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsLeafRecoveryFulfillmentEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#leafRecoveryFulfillmentEntry")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsLeaveRequestEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#leaveRequestEntry")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsZeroLeafLeaveEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#zeroLeafLeaveEntry")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsLeaveCancellationEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#leaveCancellationEntry")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#leaveCommitFulfillmentEntry")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsDirectRequestEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestEntry")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsDirectRequestAcceptanceEntry(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestAcceptanceEntry")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: ConversationEntry, rhs: ConversationEntry) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsApplicationEntry(let lhsValue),
-              .blueCatbirdChatDefsApplicationEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsCommitEntry(let lhsValue),
-              .blueCatbirdChatDefsCommitEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsPolicyEntry(let lhsValue),
-              .blueCatbirdChatDefsPolicyEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsMetadataEntry(let lhsValue),
-              .blueCatbirdChatDefsMetadataEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsCreationEntry(let lhsValue),
-              .blueCatbirdChatDefsCreationEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsParticipantAcceptanceEntry(let lhsValue),
-              .blueCatbirdChatDefsParticipantAcceptanceEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsConversationCloseEntry(let lhsValue),
-              .blueCatbirdChatDefsConversationCloseEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsResetRequestEntry(let lhsValue),
-              .blueCatbirdChatDefsResetRequestEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsResetActivationEntry(let lhsValue),
-              .blueCatbirdChatDefsResetActivationEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsLeafRecoveryFulfillmentEntry(let lhsValue),
-              .blueCatbirdChatDefsLeafRecoveryFulfillmentEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsLeaveRequestEntry(let lhsValue),
-              .blueCatbirdChatDefsLeaveRequestEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsZeroLeafLeaveEntry(let lhsValue),
-              .blueCatbirdChatDefsZeroLeafLeaveEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsLeaveCancellationEntry(let lhsValue),
-              .blueCatbirdChatDefsLeaveCancellationEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsLeaveCommitFulfillmentEntry(let lhsValue),
-              .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsDirectRequestEntry(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsDirectRequestAcceptanceEntry(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestAcceptanceEntry(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? ConversationEntry else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsApplicationEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#applicationEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsCommitEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#commitEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsPolicyEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#policyEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsMetadataEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#metadataEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsCreationEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#creationEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsParticipantAcceptanceEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#participantAcceptanceEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsConversationCloseEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationCloseEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsResetRequestEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#resetRequestEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsResetActivationEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#resetActivationEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsLeafRecoveryFulfillmentEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leafRecoveryFulfillmentEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsLeaveRequestEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leaveRequestEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsZeroLeafLeaveEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#zeroLeafLeaveEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsLeaveCancellationEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leaveCancellationEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsLeaveCommitFulfillmentEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leaveCommitFulfillmentEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsDirectRequestEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsDirectRequestAcceptanceEntry(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestAcceptanceEntry")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
-        }
-    }
-}
-
-
-
-
-public enum ProtocolEventPayload: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsConversationChangedEvent(BlueCatbirdChatDefs.ConversationChangedEvent)
-    case blueCatbirdChatDefsConversationClosedEvent(BlueCatbirdChatDefs.ConversationClosedEvent)
-    case blueCatbirdChatDefsMessageAvailableEvent(BlueCatbirdChatDefs.MessageAvailableEvent)
-    case blueCatbirdChatDefsWelcomeAvailableEvent(BlueCatbirdChatDefs.WelcomeAvailableEvent)
-    case blueCatbirdChatDefsWelcomeDispositionEvent(BlueCatbirdChatDefs.WelcomeDispositionEvent)
-    case blueCatbirdChatDefsResetRequestedEvent(BlueCatbirdChatDefs.ResetRequestedEvent)
-    case blueCatbirdChatDefsLeafRecoveryEvent(BlueCatbirdChatDefs.LeafRecoveryEvent)
-    case blueCatbirdChatDefsLeaveRequestEvent(BlueCatbirdChatDefs.LeaveRequestEvent)
-    case blueCatbirdChatDefsAccessEndedEvent(BlueCatbirdChatDefs.AccessEndedEvent)
-    case blueCatbirdChatDefsWatermarkEvent(BlueCatbirdChatDefs.WatermarkEvent)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.ConversationChangedEvent) {
-        self = .blueCatbirdChatDefsConversationChangedEvent(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.ConversationClosedEvent) {
-        self = .blueCatbirdChatDefsConversationClosedEvent(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.MessageAvailableEvent) {
-        self = .blueCatbirdChatDefsMessageAvailableEvent(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.WelcomeAvailableEvent) {
-        self = .blueCatbirdChatDefsWelcomeAvailableEvent(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.WelcomeDispositionEvent) {
-        self = .blueCatbirdChatDefsWelcomeDispositionEvent(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.ResetRequestedEvent) {
-        self = .blueCatbirdChatDefsResetRequestedEvent(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.LeafRecoveryEvent) {
-        self = .blueCatbirdChatDefsLeafRecoveryEvent(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.LeaveRequestEvent) {
-        self = .blueCatbirdChatDefsLeaveRequestEvent(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.AccessEndedEvent) {
-        self = .blueCatbirdChatDefsAccessEndedEvent(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.WatermarkEvent) {
-        self = .blueCatbirdChatDefsWatermarkEvent(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#conversationChangedEvent":
-            let value = try BlueCatbirdChatDefs.ConversationChangedEvent(from: decoder)
+    public enum ProtocolEventPayload: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsConversationChangedEvent(BlueCatbirdChatDefs.ConversationChangedEvent)
+        case blueCatbirdChatDefsConversationClosedEvent(BlueCatbirdChatDefs.ConversationClosedEvent)
+        case blueCatbirdChatDefsMessageAvailableEvent(BlueCatbirdChatDefs.MessageAvailableEvent)
+        case blueCatbirdChatDefsWelcomeAvailableEvent(BlueCatbirdChatDefs.WelcomeAvailableEvent)
+        case blueCatbirdChatDefsWelcomeDispositionEvent(BlueCatbirdChatDefs.WelcomeDispositionEvent)
+        case blueCatbirdChatDefsResetRequestedEvent(BlueCatbirdChatDefs.ResetRequestedEvent)
+        case blueCatbirdChatDefsLeafRecoveryEvent(BlueCatbirdChatDefs.LeafRecoveryEvent)
+        case blueCatbirdChatDefsLeaveRequestEvent(BlueCatbirdChatDefs.LeaveRequestEvent)
+        case blueCatbirdChatDefsAccessEndedEvent(BlueCatbirdChatDefs.AccessEndedEvent)
+        case blueCatbirdChatDefsWatermarkEvent(BlueCatbirdChatDefs.WatermarkEvent)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.ConversationChangedEvent) {
             self = .blueCatbirdChatDefsConversationChangedEvent(value)
-        case "blue.catbird.chat.defs#conversationClosedEvent":
-            let value = try BlueCatbirdChatDefs.ConversationClosedEvent(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.ConversationClosedEvent) {
             self = .blueCatbirdChatDefsConversationClosedEvent(value)
-        case "blue.catbird.chat.defs#messageAvailableEvent":
-            let value = try BlueCatbirdChatDefs.MessageAvailableEvent(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.MessageAvailableEvent) {
             self = .blueCatbirdChatDefsMessageAvailableEvent(value)
-        case "blue.catbird.chat.defs#welcomeAvailableEvent":
-            let value = try BlueCatbirdChatDefs.WelcomeAvailableEvent(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.WelcomeAvailableEvent) {
             self = .blueCatbirdChatDefsWelcomeAvailableEvent(value)
-        case "blue.catbird.chat.defs#welcomeDispositionEvent":
-            let value = try BlueCatbirdChatDefs.WelcomeDispositionEvent(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.WelcomeDispositionEvent) {
             self = .blueCatbirdChatDefsWelcomeDispositionEvent(value)
-        case "blue.catbird.chat.defs#resetRequestedEvent":
-            let value = try BlueCatbirdChatDefs.ResetRequestedEvent(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.ResetRequestedEvent) {
             self = .blueCatbirdChatDefsResetRequestedEvent(value)
-        case "blue.catbird.chat.defs#leafRecoveryEvent":
-            let value = try BlueCatbirdChatDefs.LeafRecoveryEvent(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.LeafRecoveryEvent) {
             self = .blueCatbirdChatDefsLeafRecoveryEvent(value)
-        case "blue.catbird.chat.defs#leaveRequestEvent":
-            let value = try BlueCatbirdChatDefs.LeaveRequestEvent(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.LeaveRequestEvent) {
             self = .blueCatbirdChatDefsLeaveRequestEvent(value)
-        case "blue.catbird.chat.defs#accessEndedEvent":
-            let value = try BlueCatbirdChatDefs.AccessEndedEvent(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.AccessEndedEvent) {
             self = .blueCatbirdChatDefsAccessEndedEvent(value)
-        case "blue.catbird.chat.defs#watermarkEvent":
-            let value = try BlueCatbirdChatDefs.WatermarkEvent(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.WatermarkEvent) {
             self = .blueCatbirdChatDefsWatermarkEvent(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
+
+            switch typeValue {
+            case "blue.catbird.chat.defs#conversationChangedEvent":
+                let value = try BlueCatbirdChatDefs.ConversationChangedEvent(from: decoder)
+                self = .blueCatbirdChatDefsConversationChangedEvent(value)
+            case "blue.catbird.chat.defs#conversationClosedEvent":
+                let value = try BlueCatbirdChatDefs.ConversationClosedEvent(from: decoder)
+                self = .blueCatbirdChatDefsConversationClosedEvent(value)
+            case "blue.catbird.chat.defs#messageAvailableEvent":
+                let value = try BlueCatbirdChatDefs.MessageAvailableEvent(from: decoder)
+                self = .blueCatbirdChatDefsMessageAvailableEvent(value)
+            case "blue.catbird.chat.defs#welcomeAvailableEvent":
+                let value = try BlueCatbirdChatDefs.WelcomeAvailableEvent(from: decoder)
+                self = .blueCatbirdChatDefsWelcomeAvailableEvent(value)
+            case "blue.catbird.chat.defs#welcomeDispositionEvent":
+                let value = try BlueCatbirdChatDefs.WelcomeDispositionEvent(from: decoder)
+                self = .blueCatbirdChatDefsWelcomeDispositionEvent(value)
+            case "blue.catbird.chat.defs#resetRequestedEvent":
+                let value = try BlueCatbirdChatDefs.ResetRequestedEvent(from: decoder)
+                self = .blueCatbirdChatDefsResetRequestedEvent(value)
+            case "blue.catbird.chat.defs#leafRecoveryEvent":
+                let value = try BlueCatbirdChatDefs.LeafRecoveryEvent(from: decoder)
+                self = .blueCatbirdChatDefsLeafRecoveryEvent(value)
+            case "blue.catbird.chat.defs#leaveRequestEvent":
+                let value = try BlueCatbirdChatDefs.LeaveRequestEvent(from: decoder)
+                self = .blueCatbirdChatDefsLeaveRequestEvent(value)
+            case "blue.catbird.chat.defs#accessEndedEvent":
+                let value = try BlueCatbirdChatDefs.AccessEndedEvent(from: decoder)
+                self = .blueCatbirdChatDefsAccessEndedEvent(value)
+            case "blue.catbird.chat.defs#watermarkEvent":
+                let value = try BlueCatbirdChatDefs.WatermarkEvent(from: decoder)
+                self = .blueCatbirdChatDefsWatermarkEvent(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsConversationChangedEvent(let value):
+                try container.encode("blue.catbird.chat.defs#conversationChangedEvent", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsConversationClosedEvent(let value):
+                try container.encode("blue.catbird.chat.defs#conversationClosedEvent", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsMessageAvailableEvent(let value):
+                try container.encode("blue.catbird.chat.defs#messageAvailableEvent", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsWelcomeAvailableEvent(let value):
+                try container.encode("blue.catbird.chat.defs#welcomeAvailableEvent", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsWelcomeDispositionEvent(let value):
+                try container.encode("blue.catbird.chat.defs#welcomeDispositionEvent", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsResetRequestedEvent(let value):
+                try container.encode("blue.catbird.chat.defs#resetRequestedEvent", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsLeafRecoveryEvent(let value):
+                try container.encode("blue.catbird.chat.defs#leafRecoveryEvent", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsLeaveRequestEvent(let value):
+                try container.encode("blue.catbird.chat.defs#leaveRequestEvent", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsAccessEndedEvent(let value):
+                try container.encode("blue.catbird.chat.defs#accessEndedEvent", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsWatermarkEvent(let value):
+                try container.encode("blue.catbird.chat.defs#watermarkEvent", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsConversationChangedEvent(let value):
+                hasher.combine("blue.catbird.chat.defs#conversationChangedEvent")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsConversationClosedEvent(let value):
+                hasher.combine("blue.catbird.chat.defs#conversationClosedEvent")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsMessageAvailableEvent(let value):
+                hasher.combine("blue.catbird.chat.defs#messageAvailableEvent")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsWelcomeAvailableEvent(let value):
+                hasher.combine("blue.catbird.chat.defs#welcomeAvailableEvent")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsWelcomeDispositionEvent(let value):
+                hasher.combine("blue.catbird.chat.defs#welcomeDispositionEvent")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsResetRequestedEvent(let value):
+                hasher.combine("blue.catbird.chat.defs#resetRequestedEvent")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsLeafRecoveryEvent(let value):
+                hasher.combine("blue.catbird.chat.defs#leafRecoveryEvent")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsLeaveRequestEvent(let value):
+                hasher.combine("blue.catbird.chat.defs#leaveRequestEvent")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsAccessEndedEvent(let value):
+                hasher.combine("blue.catbird.chat.defs#accessEndedEvent")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsWatermarkEvent(let value):
+                hasher.combine("blue.catbird.chat.defs#watermarkEvent")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: ProtocolEventPayload, rhs: ProtocolEventPayload) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsConversationChangedEvent(let lhsValue),
+                  .blueCatbirdChatDefsConversationChangedEvent(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsConversationClosedEvent(let lhsValue),
+                  .blueCatbirdChatDefsConversationClosedEvent(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsMessageAvailableEvent(let lhsValue),
+                  .blueCatbirdChatDefsMessageAvailableEvent(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsWelcomeAvailableEvent(let lhsValue),
+                  .blueCatbirdChatDefsWelcomeAvailableEvent(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsWelcomeDispositionEvent(let lhsValue),
+                  .blueCatbirdChatDefsWelcomeDispositionEvent(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsResetRequestedEvent(let lhsValue),
+                  .blueCatbirdChatDefsResetRequestedEvent(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsLeafRecoveryEvent(let lhsValue),
+                  .blueCatbirdChatDefsLeafRecoveryEvent(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsLeaveRequestEvent(let lhsValue),
+                  .blueCatbirdChatDefsLeaveRequestEvent(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsAccessEndedEvent(let lhsValue),
+                  .blueCatbirdChatDefsAccessEndedEvent(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsWatermarkEvent(let lhsValue),
+                  .blueCatbirdChatDefsWatermarkEvent(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? ProtocolEventPayload else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsConversationChangedEvent(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationChangedEvent")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsConversationClosedEvent(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationClosedEvent")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsMessageAvailableEvent(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#messageAvailableEvent")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsWelcomeAvailableEvent(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#welcomeAvailableEvent")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsWelcomeDispositionEvent(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#welcomeDispositionEvent")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsResetRequestedEvent(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#resetRequestedEvent")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsLeafRecoveryEvent(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leafRecoveryEvent")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsLeaveRequestEvent(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leaveRequestEvent")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsAccessEndedEvent(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#accessEndedEvent")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsWatermarkEvent(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#watermarkEvent")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        switch self {
-        case .blueCatbirdChatDefsConversationChangedEvent(let value):
-            try container.encode("blue.catbird.chat.defs#conversationChangedEvent", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsConversationClosedEvent(let value):
-            try container.encode("blue.catbird.chat.defs#conversationClosedEvent", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsMessageAvailableEvent(let value):
-            try container.encode("blue.catbird.chat.defs#messageAvailableEvent", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsWelcomeAvailableEvent(let value):
-            try container.encode("blue.catbird.chat.defs#welcomeAvailableEvent", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsWelcomeDispositionEvent(let value):
-            try container.encode("blue.catbird.chat.defs#welcomeDispositionEvent", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsResetRequestedEvent(let value):
-            try container.encode("blue.catbird.chat.defs#resetRequestedEvent", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsLeafRecoveryEvent(let value):
-            try container.encode("blue.catbird.chat.defs#leafRecoveryEvent", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsLeaveRequestEvent(let value):
-            try container.encode("blue.catbird.chat.defs#leaveRequestEvent", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsAccessEndedEvent(let value):
-            try container.encode("blue.catbird.chat.defs#accessEndedEvent", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsWatermarkEvent(let value):
-            try container.encode("blue.catbird.chat.defs#watermarkEvent", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsConversationChangedEvent(let value):
-            hasher.combine("blue.catbird.chat.defs#conversationChangedEvent")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsConversationClosedEvent(let value):
-            hasher.combine("blue.catbird.chat.defs#conversationClosedEvent")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsMessageAvailableEvent(let value):
-            hasher.combine("blue.catbird.chat.defs#messageAvailableEvent")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsWelcomeAvailableEvent(let value):
-            hasher.combine("blue.catbird.chat.defs#welcomeAvailableEvent")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsWelcomeDispositionEvent(let value):
-            hasher.combine("blue.catbird.chat.defs#welcomeDispositionEvent")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsResetRequestedEvent(let value):
-            hasher.combine("blue.catbird.chat.defs#resetRequestedEvent")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsLeafRecoveryEvent(let value):
-            hasher.combine("blue.catbird.chat.defs#leafRecoveryEvent")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsLeaveRequestEvent(let value):
-            hasher.combine("blue.catbird.chat.defs#leaveRequestEvent")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsAccessEndedEvent(let value):
-            hasher.combine("blue.catbird.chat.defs#accessEndedEvent")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsWatermarkEvent(let value):
-            hasher.combine("blue.catbird.chat.defs#watermarkEvent")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: ProtocolEventPayload, rhs: ProtocolEventPayload) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsConversationChangedEvent(let lhsValue),
-              .blueCatbirdChatDefsConversationChangedEvent(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsConversationClosedEvent(let lhsValue),
-              .blueCatbirdChatDefsConversationClosedEvent(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsMessageAvailableEvent(let lhsValue),
-              .blueCatbirdChatDefsMessageAvailableEvent(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsWelcomeAvailableEvent(let lhsValue),
-              .blueCatbirdChatDefsWelcomeAvailableEvent(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsWelcomeDispositionEvent(let lhsValue),
-              .blueCatbirdChatDefsWelcomeDispositionEvent(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsResetRequestedEvent(let lhsValue),
-              .blueCatbirdChatDefsResetRequestedEvent(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsLeafRecoveryEvent(let lhsValue),
-              .blueCatbirdChatDefsLeafRecoveryEvent(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsLeaveRequestEvent(let lhsValue),
-              .blueCatbirdChatDefsLeaveRequestEvent(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsAccessEndedEvent(let lhsValue),
-              .blueCatbirdChatDefsAccessEndedEvent(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsWatermarkEvent(let lhsValue),
-              .blueCatbirdChatDefsWatermarkEvent(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? ProtocolEventPayload else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsConversationChangedEvent(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationChangedEvent")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsConversationClosedEvent(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#conversationClosedEvent")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsMessageAvailableEvent(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#messageAvailableEvent")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsWelcomeAvailableEvent(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#welcomeAvailableEvent")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsWelcomeDispositionEvent(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#welcomeDispositionEvent")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsResetRequestedEvent(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#resetRequestedEvent")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsLeafRecoveryEvent(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leafRecoveryEvent")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsLeaveRequestEvent(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#leaveRequestEvent")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsAccessEndedEvent(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#accessEndedEvent")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsWatermarkEvent(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#watermarkEvent")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
-        }
-    }
-}
-
-
-
-
-public enum SubscriptionMessage: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsEventEnvelope(BlueCatbirdChatDefs.EventEnvelope)
-    case blueCatbirdChatDefsTypingEvent(BlueCatbirdChatDefs.TypingEvent)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.EventEnvelope) {
-        self = .blueCatbirdChatDefsEventEnvelope(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.TypingEvent) {
-        self = .blueCatbirdChatDefsTypingEvent(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#eventEnvelope":
-            let value = try BlueCatbirdChatDefs.EventEnvelope(from: decoder)
+    public enum SubscriptionMessage: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsEventEnvelope(BlueCatbirdChatDefs.EventEnvelope)
+        case blueCatbirdChatDefsTypingEvent(BlueCatbirdChatDefs.TypingEvent)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.EventEnvelope) {
             self = .blueCatbirdChatDefsEventEnvelope(value)
-        case "blue.catbird.chat.defs#typingEvent":
-            let value = try BlueCatbirdChatDefs.TypingEvent(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.TypingEvent) {
             self = .blueCatbirdChatDefsTypingEvent(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsEventEnvelope(let value):
-            try container.encode("blue.catbird.chat.defs#eventEnvelope", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsTypingEvent(let value):
-            try container.encode("blue.catbird.chat.defs#typingEvent", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsEventEnvelope(let value):
-            hasher.combine("blue.catbird.chat.defs#eventEnvelope")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsTypingEvent(let value):
-            hasher.combine("blue.catbird.chat.defs#typingEvent")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SubscriptionMessage, rhs: SubscriptionMessage) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsEventEnvelope(let lhsValue),
-              .blueCatbirdChatDefsEventEnvelope(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsTypingEvent(let lhsValue),
-              .blueCatbirdChatDefsTypingEvent(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SubscriptionMessage else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsEventEnvelope(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#eventEnvelope")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#eventEnvelope":
+                let value = try BlueCatbirdChatDefs.EventEnvelope(from: decoder)
+                self = .blueCatbirdChatDefsEventEnvelope(value)
+            case "blue.catbird.chat.defs#typingEvent":
+                let value = try BlueCatbirdChatDefs.TypingEvent(from: decoder)
+                self = .blueCatbirdChatDefsTypingEvent(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .blueCatbirdChatDefsTypingEvent(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#typingEvent")
-            
-            let valueDict = try value.toCBORValue()
+        }
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsEventEnvelope(let value):
+                try container.encode("blue.catbird.chat.defs#eventEnvelope", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsTypingEvent(let value):
+                try container.encode("blue.catbird.chat.defs#typingEvent", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsEventEnvelope(let value):
+                hasher.combine("blue.catbird.chat.defs#eventEnvelope")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsTypingEvent(let value):
+                hasher.combine("blue.catbird.chat.defs#typingEvent")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SubscriptionMessage, rhs: SubscriptionMessage) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsEventEnvelope(let lhsValue),
+                  .blueCatbirdChatDefsEventEnvelope(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsTypingEvent(let lhsValue),
+                  .blueCatbirdChatDefsTypingEvent(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SubscriptionMessage else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsEventEnvelope(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#eventEnvelope")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsTypingEvent(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#typingEvent")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-public typealias DirectRequestProfile = String
+    public typealias DirectRequestProfile = String
 
-
-
-
-public enum DirectRequestOrigin: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsFreshDirectOrigin(BlueCatbirdChatDefs.FreshDirectOrigin)
-    case blueCatbirdChatDefsLegacyPendingDirectOrigin(BlueCatbirdChatDefs.LegacyPendingDirectOrigin)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.FreshDirectOrigin) {
-        self = .blueCatbirdChatDefsFreshDirectOrigin(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.LegacyPendingDirectOrigin) {
-        self = .blueCatbirdChatDefsLegacyPendingDirectOrigin(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#freshDirectOrigin":
-            let value = try BlueCatbirdChatDefs.FreshDirectOrigin(from: decoder)
+    public enum DirectRequestOrigin: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsFreshDirectOrigin(BlueCatbirdChatDefs.FreshDirectOrigin)
+        case blueCatbirdChatDefsLegacyPendingDirectOrigin(BlueCatbirdChatDefs.LegacyPendingDirectOrigin)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.FreshDirectOrigin) {
             self = .blueCatbirdChatDefsFreshDirectOrigin(value)
-        case "blue.catbird.chat.defs#legacyPendingDirectOrigin":
-            let value = try BlueCatbirdChatDefs.LegacyPendingDirectOrigin(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.LegacyPendingDirectOrigin) {
             self = .blueCatbirdChatDefsLegacyPendingDirectOrigin(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsFreshDirectOrigin(let value):
-            try container.encode("blue.catbird.chat.defs#freshDirectOrigin", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsLegacyPendingDirectOrigin(let value):
-            try container.encode("blue.catbird.chat.defs#legacyPendingDirectOrigin", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsFreshDirectOrigin(let value):
-            hasher.combine("blue.catbird.chat.defs#freshDirectOrigin")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsLegacyPendingDirectOrigin(let value):
-            hasher.combine("blue.catbird.chat.defs#legacyPendingDirectOrigin")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: DirectRequestOrigin, rhs: DirectRequestOrigin) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsFreshDirectOrigin(let lhsValue),
-              .blueCatbirdChatDefsFreshDirectOrigin(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsLegacyPendingDirectOrigin(let lhsValue),
-              .blueCatbirdChatDefsLegacyPendingDirectOrigin(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? DirectRequestOrigin else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsFreshDirectOrigin(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#freshDirectOrigin")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#freshDirectOrigin":
+                let value = try BlueCatbirdChatDefs.FreshDirectOrigin(from: decoder)
+                self = .blueCatbirdChatDefsFreshDirectOrigin(value)
+            case "blue.catbird.chat.defs#legacyPendingDirectOrigin":
+                let value = try BlueCatbirdChatDefs.LegacyPendingDirectOrigin(from: decoder)
+                self = .blueCatbirdChatDefsLegacyPendingDirectOrigin(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .blueCatbirdChatDefsLegacyPendingDirectOrigin(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#legacyPendingDirectOrigin")
-            
-            let valueDict = try value.toCBORValue()
+        }
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsFreshDirectOrigin(let value):
+                try container.encode("blue.catbird.chat.defs#freshDirectOrigin", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsLegacyPendingDirectOrigin(let value):
+                try container.encode("blue.catbird.chat.defs#legacyPendingDirectOrigin", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsFreshDirectOrigin(let value):
+                hasher.combine("blue.catbird.chat.defs#freshDirectOrigin")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsLegacyPendingDirectOrigin(let value):
+                hasher.combine("blue.catbird.chat.defs#legacyPendingDirectOrigin")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: DirectRequestOrigin, rhs: DirectRequestOrigin) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsFreshDirectOrigin(let lhsValue),
+                  .blueCatbirdChatDefsFreshDirectOrigin(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsLegacyPendingDirectOrigin(let lhsValue),
+                  .blueCatbirdChatDefsLegacyPendingDirectOrigin(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? DirectRequestOrigin else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsFreshDirectOrigin(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#freshDirectOrigin")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsLegacyPendingDirectOrigin(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#legacyPendingDirectOrigin")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedDirectRequestGrantBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsDirectRequestGrantBody(BlueCatbirdChatDefs.DirectRequestGrantBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestGrantBody) {
-        self = .blueCatbirdChatDefsDirectRequestGrantBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#directRequestGrantBody":
-            let value = try BlueCatbirdChatDefs.DirectRequestGrantBody(from: decoder)
+    public enum SignedDirectRequestGrantBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsDirectRequestGrantBody(BlueCatbirdChatDefs.DirectRequestGrantBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestGrantBody) {
             self = .blueCatbirdChatDefsDirectRequestGrantBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestGrantBody(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestGrantBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestGrantBody(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestGrantBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedDirectRequestGrantBodyUnion, rhs: SignedDirectRequestGrantBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsDirectRequestGrantBody(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestGrantBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedDirectRequestGrantBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestGrantBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestGrantBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#directRequestGrantBody":
+                let value = try BlueCatbirdChatDefs.DirectRequestGrantBody(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestGrantBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestGrantBody(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestGrantBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestGrantBody(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestGrantBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedDirectRequestGrantBodyUnion, rhs: SignedDirectRequestGrantBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsDirectRequestGrantBody(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestGrantBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedDirectRequestGrantBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestGrantBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestGrantBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedDirectRequestKeysPublicationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsDirectRequestKeysPublicationBody(BlueCatbirdChatDefs.DirectRequestKeysPublicationBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestKeysPublicationBody) {
-        self = .blueCatbirdChatDefsDirectRequestKeysPublicationBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#directRequestKeysPublicationBody":
-            let value = try BlueCatbirdChatDefs.DirectRequestKeysPublicationBody(from: decoder)
+    public enum SignedDirectRequestKeysPublicationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsDirectRequestKeysPublicationBody(BlueCatbirdChatDefs.DirectRequestKeysPublicationBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestKeysPublicationBody) {
             self = .blueCatbirdChatDefsDirectRequestKeysPublicationBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestKeysPublicationBody(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestKeysPublicationBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestKeysPublicationBody(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestKeysPublicationBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedDirectRequestKeysPublicationBodyUnion, rhs: SignedDirectRequestKeysPublicationBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsDirectRequestKeysPublicationBody(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestKeysPublicationBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedDirectRequestKeysPublicationBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestKeysPublicationBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestKeysPublicationBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#directRequestKeysPublicationBody":
+                let value = try BlueCatbirdChatDefs.DirectRequestKeysPublicationBody(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestKeysPublicationBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestKeysPublicationBody(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestKeysPublicationBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestKeysPublicationBody(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestKeysPublicationBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedDirectRequestKeysPublicationBodyUnion, rhs: SignedDirectRequestKeysPublicationBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsDirectRequestKeysPublicationBody(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestKeysPublicationBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedDirectRequestKeysPublicationBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestKeysPublicationBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestKeysPublicationBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedDirectRequestPreparationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsDirectRequestPreparationBody(BlueCatbirdChatDefs.DirectRequestPreparationBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestPreparationBody) {
-        self = .blueCatbirdChatDefsDirectRequestPreparationBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#directRequestPreparationBody":
-            let value = try BlueCatbirdChatDefs.DirectRequestPreparationBody(from: decoder)
+    public enum SignedDirectRequestPreparationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsDirectRequestPreparationBody(BlueCatbirdChatDefs.DirectRequestPreparationBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestPreparationBody) {
             self = .blueCatbirdChatDefsDirectRequestPreparationBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestPreparationBody(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestPreparationBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestPreparationBody(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestPreparationBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedDirectRequestPreparationBodyUnion, rhs: SignedDirectRequestPreparationBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsDirectRequestPreparationBody(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestPreparationBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedDirectRequestPreparationBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestPreparationBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestPreparationBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#directRequestPreparationBody":
+                let value = try BlueCatbirdChatDefs.DirectRequestPreparationBody(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestPreparationBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestPreparationBody(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestPreparationBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestPreparationBody(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestPreparationBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedDirectRequestPreparationBodyUnion, rhs: SignedDirectRequestPreparationBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsDirectRequestPreparationBody(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestPreparationBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedDirectRequestPreparationBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestPreparationBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestPreparationBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedDirectRequestPublicationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsDirectRequestPublicationBody(BlueCatbirdChatDefs.DirectRequestPublicationBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestPublicationBody) {
-        self = .blueCatbirdChatDefsDirectRequestPublicationBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#directRequestPublicationBody":
-            let value = try BlueCatbirdChatDefs.DirectRequestPublicationBody(from: decoder)
+    public enum SignedDirectRequestPublicationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsDirectRequestPublicationBody(BlueCatbirdChatDefs.DirectRequestPublicationBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestPublicationBody) {
             self = .blueCatbirdChatDefsDirectRequestPublicationBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestPublicationBody(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestPublicationBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestPublicationBody(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestPublicationBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedDirectRequestPublicationBodyUnion, rhs: SignedDirectRequestPublicationBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsDirectRequestPublicationBody(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestPublicationBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedDirectRequestPublicationBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestPublicationBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestPublicationBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#directRequestPublicationBody":
+                let value = try BlueCatbirdChatDefs.DirectRequestPublicationBody(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestPublicationBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestPublicationBody(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestPublicationBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestPublicationBody(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestPublicationBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedDirectRequestPublicationBodyUnion, rhs: SignedDirectRequestPublicationBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsDirectRequestPublicationBody(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestPublicationBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedDirectRequestPublicationBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestPublicationBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestPublicationBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedDirectRequestCancellationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsDirectRequestCancellationBody(BlueCatbirdChatDefs.DirectRequestCancellationBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestCancellationBody) {
-        self = .blueCatbirdChatDefsDirectRequestCancellationBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#directRequestCancellationBody":
-            let value = try BlueCatbirdChatDefs.DirectRequestCancellationBody(from: decoder)
+    public enum SignedDirectRequestCancellationBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsDirectRequestCancellationBody(BlueCatbirdChatDefs.DirectRequestCancellationBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestCancellationBody) {
             self = .blueCatbirdChatDefsDirectRequestCancellationBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestCancellationBody(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestCancellationBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestCancellationBody(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestCancellationBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedDirectRequestCancellationBodyUnion, rhs: SignedDirectRequestCancellationBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsDirectRequestCancellationBody(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestCancellationBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedDirectRequestCancellationBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestCancellationBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestCancellationBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#directRequestCancellationBody":
+                let value = try BlueCatbirdChatDefs.DirectRequestCancellationBody(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestCancellationBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestCancellationBody(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestCancellationBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestCancellationBody(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestCancellationBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedDirectRequestCancellationBodyUnion, rhs: SignedDirectRequestCancellationBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsDirectRequestCancellationBody(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestCancellationBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedDirectRequestCancellationBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestCancellationBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestCancellationBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum SignedDirectRequestAcceptanceBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsDirectRequestAcceptanceBody(BlueCatbirdChatDefs.DirectRequestAcceptanceBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestAcceptanceBody) {
-        self = .blueCatbirdChatDefsDirectRequestAcceptanceBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#directRequestAcceptanceBody":
-            let value = try BlueCatbirdChatDefs.DirectRequestAcceptanceBody(from: decoder)
+    public enum SignedDirectRequestAcceptanceBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsDirectRequestAcceptanceBody(BlueCatbirdChatDefs.DirectRequestAcceptanceBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestAcceptanceBody) {
             self = .blueCatbirdChatDefsDirectRequestAcceptanceBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestAcceptanceBody(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestAcceptanceBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestAcceptanceBody(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestAcceptanceBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedDirectRequestAcceptanceBodyUnion, rhs: SignedDirectRequestAcceptanceBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsDirectRequestAcceptanceBody(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestAcceptanceBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedDirectRequestAcceptanceBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestAcceptanceBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestAcceptanceBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#directRequestAcceptanceBody":
+                let value = try BlueCatbirdChatDefs.DirectRequestAcceptanceBody(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestAcceptanceBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestAcceptanceBody(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestAcceptanceBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestAcceptanceBody(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestAcceptanceBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedDirectRequestAcceptanceBodyUnion, rhs: SignedDirectRequestAcceptanceBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsDirectRequestAcceptanceBody(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestAcceptanceBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedDirectRequestAcceptanceBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestAcceptanceBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestAcceptanceBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
+    public enum DefsDirectRequestErrorCode: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_RecipientKeysUnavailable = "RecipientKeysUnavailable"
+        case value_RequestPolicyDenied = "RequestPolicyDenied"
+        case value_PreparationExpired = "PreparationExpired"
+        case value_PreparationCancelled = "PreparationCancelled"
+        case value_PreparationRevoked = "PreparationRevoked"
+        case value_PreparationConflict = "PreparationConflict"
+        case value_ExistingDirect = "ExistingDirect"
+        case value_ArtifactTooLarge = "ArtifactTooLarge"
+        case value_CapacityUnavailable = "CapacityUnavailable"
+        case value_InvalidBootstrap = "InvalidBootstrap"
+        case value_ImportHorizonTooShort = "ImportHorizonTooShort"
+        case value_StaleLegacyPrior = "StaleLegacyPrior"
+        case value_InvalidSignature = "InvalidSignature"
+        case value_IdempotencyConflict = "IdempotencyConflict"
+        case value_ProtocolUpgradeRequired = "ProtocolUpgradeRequired"
+        case value_RequestNotAccepted = "RequestNotAccepted"
+        case value_UnavailableIntroduction = "UnavailableIntroduction"
+        case value_RateLimited = "RateLimited"
+        case value_RecipientAuthorityUnsupported = "RecipientAuthorityUnsupported"
 
-public enum DefsDirectRequestErrorCode: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_RecipientKeysUnavailable = "RecipientKeysUnavailable"
-    case value_RequestPolicyDenied = "RequestPolicyDenied"
-    case value_PreparationExpired = "PreparationExpired"
-    case value_PreparationCancelled = "PreparationCancelled"
-    case value_PreparationRevoked = "PreparationRevoked"
-    case value_PreparationConflict = "PreparationConflict"
-    case value_ExistingDirect = "ExistingDirect"
-    case value_ArtifactTooLarge = "ArtifactTooLarge"
-    case value_CapacityUnavailable = "CapacityUnavailable"
-    case value_InvalidBootstrap = "InvalidBootstrap"
-    case value_ImportHorizonTooShort = "ImportHorizonTooShort"
-    case value_StaleLegacyPrior = "StaleLegacyPrior"
-    case value_InvalidSignature = "InvalidSignature"
-    case value_IdempotencyConflict = "IdempotencyConflict"
-    case value_ProtocolUpgradeRequired = "ProtocolUpgradeRequired"
-    case value_RequestNotAccepted = "RequestNotAccepted"
-    case value_UnavailableIntroduction = "UnavailableIntroduction"
-    case value_RateLimited = "RateLimited"
-    case value_RecipientAuthorityUnsupported = "RecipientAuthorityUnsupported"
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DefsDirectRequestErrorCode else { return false }
+            return self == otherValue
+        }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DefsDirectRequestErrorCode else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public enum DirectRequestRejectedReceiptRequestKind: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_prepare = "prepare"
+        case value_publish = "publish"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DirectRequestRejectedReceiptRequestKind else { return false }
+            return self == otherValue
+        }
 
-public enum DirectRequestRejectedReceiptRequestKind: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_prepare = "prepare"
-    case value_publish = "publish"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DirectRequestRejectedReceiptRequestKind else { return false }
-        return self == otherValue
-    }
-
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
-
-
-public enum DirectRequestExistingDirectReceiptRequestKind: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_prepare = "prepare"
-    case value_publish = "publish"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DirectRequestExistingDirectReceiptRequestKind else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public enum DirectRequestExistingDirectReceiptRequestKind: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_prepare = "prepare"
+        case value_publish = "publish"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DirectRequestExistingDirectReceiptRequestKind else { return false }
+            return self == otherValue
+        }
 
-
-
-public enum DirectRequestTerminalReceipt: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsDirectRequestPublishedReceipt(BlueCatbirdChatDefs.DirectRequestPublishedReceipt)
-    case blueCatbirdChatDefsDirectRequestCancelledReceipt(BlueCatbirdChatDefs.DirectRequestCancelledReceipt)
-    case blueCatbirdChatDefsDirectRequestExpiredReceipt(BlueCatbirdChatDefs.DirectRequestExpiredReceipt)
-    case blueCatbirdChatDefsDirectRequestRejectedReceipt(BlueCatbirdChatDefs.DirectRequestRejectedReceipt)
-    case blueCatbirdChatDefsDirectRequestExistingDirectReceipt(BlueCatbirdChatDefs.DirectRequestExistingDirectReceipt)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestPublishedReceipt) {
-        self = .blueCatbirdChatDefsDirectRequestPublishedReceipt(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestCancelledReceipt) {
-        self = .blueCatbirdChatDefsDirectRequestCancelledReceipt(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestExpiredReceipt) {
-        self = .blueCatbirdChatDefsDirectRequestExpiredReceipt(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestRejectedReceipt) {
-        self = .blueCatbirdChatDefsDirectRequestRejectedReceipt(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestExistingDirectReceipt) {
-        self = .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(value)
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#directRequestPublishedReceipt":
-            let value = try BlueCatbirdChatDefs.DirectRequestPublishedReceipt(from: decoder)
+    public enum DirectRequestTerminalReceipt: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsDirectRequestPublishedReceipt(BlueCatbirdChatDefs.DirectRequestPublishedReceipt)
+        case blueCatbirdChatDefsDirectRequestCancelledReceipt(BlueCatbirdChatDefs.DirectRequestCancelledReceipt)
+        case blueCatbirdChatDefsDirectRequestExpiredReceipt(BlueCatbirdChatDefs.DirectRequestExpiredReceipt)
+        case blueCatbirdChatDefsDirectRequestRejectedReceipt(BlueCatbirdChatDefs.DirectRequestRejectedReceipt)
+        case blueCatbirdChatDefsDirectRequestExistingDirectReceipt(BlueCatbirdChatDefs.DirectRequestExistingDirectReceipt)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestPublishedReceipt) {
             self = .blueCatbirdChatDefsDirectRequestPublishedReceipt(value)
-        case "blue.catbird.chat.defs#directRequestCancelledReceipt":
-            let value = try BlueCatbirdChatDefs.DirectRequestCancelledReceipt(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestCancelledReceipt) {
             self = .blueCatbirdChatDefsDirectRequestCancelledReceipt(value)
-        case "blue.catbird.chat.defs#directRequestExpiredReceipt":
-            let value = try BlueCatbirdChatDefs.DirectRequestExpiredReceipt(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestExpiredReceipt) {
             self = .blueCatbirdChatDefsDirectRequestExpiredReceipt(value)
-        case "blue.catbird.chat.defs#directRequestRejectedReceipt":
-            let value = try BlueCatbirdChatDefs.DirectRequestRejectedReceipt(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestRejectedReceipt) {
             self = .blueCatbirdChatDefsDirectRequestRejectedReceipt(value)
-        case "blue.catbird.chat.defs#directRequestExistingDirectReceipt":
-            let value = try BlueCatbirdChatDefs.DirectRequestExistingDirectReceipt(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestExistingDirectReceipt) {
             self = .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
+
+            switch typeValue {
+            case "blue.catbird.chat.defs#directRequestPublishedReceipt":
+                let value = try BlueCatbirdChatDefs.DirectRequestPublishedReceipt(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestPublishedReceipt(value)
+            case "blue.catbird.chat.defs#directRequestCancelledReceipt":
+                let value = try BlueCatbirdChatDefs.DirectRequestCancelledReceipt(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestCancelledReceipt(value)
+            case "blue.catbird.chat.defs#directRequestExpiredReceipt":
+                let value = try BlueCatbirdChatDefs.DirectRequestExpiredReceipt(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestExpiredReceipt(value)
+            case "blue.catbird.chat.defs#directRequestRejectedReceipt":
+                let value = try BlueCatbirdChatDefs.DirectRequestRejectedReceipt(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestRejectedReceipt(value)
+            case "blue.catbird.chat.defs#directRequestExistingDirectReceipt":
+                let value = try BlueCatbirdChatDefs.DirectRequestExistingDirectReceipt(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestPublishedReceipt(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestPublishedReceipt", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsDirectRequestCancelledReceipt(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestCancelledReceipt", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsDirectRequestExpiredReceipt(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestExpiredReceipt", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsDirectRequestRejectedReceipt(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestRejectedReceipt", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestExistingDirectReceipt", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestPublishedReceipt(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestPublishedReceipt")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsDirectRequestCancelledReceipt(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestCancelledReceipt")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsDirectRequestExpiredReceipt(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestExpiredReceipt")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsDirectRequestRejectedReceipt(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestRejectedReceipt")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestExistingDirectReceipt")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: DirectRequestTerminalReceipt, rhs: DirectRequestTerminalReceipt) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsDirectRequestPublishedReceipt(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestPublishedReceipt(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsDirectRequestCancelledReceipt(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestCancelledReceipt(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsDirectRequestExpiredReceipt(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestExpiredReceipt(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsDirectRequestRejectedReceipt(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestRejectedReceipt(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsDirectRequestExistingDirectReceipt(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? DirectRequestTerminalReceipt else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestPublishedReceipt(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestPublishedReceipt")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsDirectRequestCancelledReceipt(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestCancelledReceipt")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsDirectRequestExpiredReceipt(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestExpiredReceipt")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsDirectRequestRejectedReceipt(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestRejectedReceipt")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestExistingDirectReceipt")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestPublishedReceipt(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestPublishedReceipt", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsDirectRequestCancelledReceipt(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestCancelledReceipt", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsDirectRequestExpiredReceipt(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestExpiredReceipt", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsDirectRequestRejectedReceipt(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestRejectedReceipt", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestExistingDirectReceipt", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestPublishedReceipt(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestPublishedReceipt")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsDirectRequestCancelledReceipt(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestCancelledReceipt")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsDirectRequestExpiredReceipt(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestExpiredReceipt")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsDirectRequestRejectedReceipt(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestRejectedReceipt")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestExistingDirectReceipt")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: DirectRequestTerminalReceipt, rhs: DirectRequestTerminalReceipt) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsDirectRequestPublishedReceipt(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestPublishedReceipt(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsDirectRequestCancelledReceipt(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestCancelledReceipt(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsDirectRequestExpiredReceipt(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestExpiredReceipt(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsDirectRequestRejectedReceipt(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestRejectedReceipt(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsDirectRequestExistingDirectReceipt(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? DirectRequestTerminalReceipt else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestPublishedReceipt(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestPublishedReceipt")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsDirectRequestCancelledReceipt(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestCancelledReceipt")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsDirectRequestExpiredReceipt(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestExpiredReceipt")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsDirectRequestRejectedReceipt(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestRejectedReceipt")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsDirectRequestExistingDirectReceipt(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestExistingDirectReceipt")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
-        }
-    }
-}
-
-
-
-
-public enum SignedDirectRequestReceiptBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsDirectRequestReceiptBody(BlueCatbirdChatDefs.DirectRequestReceiptBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestReceiptBody) {
-        self = .blueCatbirdChatDefsDirectRequestReceiptBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#directRequestReceiptBody":
-            let value = try BlueCatbirdChatDefs.DirectRequestReceiptBody(from: decoder)
+    public enum SignedDirectRequestReceiptBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsDirectRequestReceiptBody(BlueCatbirdChatDefs.DirectRequestReceiptBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestReceiptBody) {
             self = .blueCatbirdChatDefsDirectRequestReceiptBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestReceiptBody(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestReceiptBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestReceiptBody(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestReceiptBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedDirectRequestReceiptBodyUnion, rhs: SignedDirectRequestReceiptBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsDirectRequestReceiptBody(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestReceiptBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedDirectRequestReceiptBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestReceiptBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestReceiptBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#directRequestReceiptBody":
+                let value = try BlueCatbirdChatDefs.DirectRequestReceiptBody(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestReceiptBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestReceiptBody(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestReceiptBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestReceiptBody(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestReceiptBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedDirectRequestReceiptBodyUnion, rhs: SignedDirectRequestReceiptBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsDirectRequestReceiptBody(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestReceiptBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedDirectRequestReceiptBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestReceiptBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestReceiptBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
-
-
-
-public enum DirectRequestOutcome: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsDirectRequestUnknownOutcome(BlueCatbirdChatDefs.DirectRequestUnknownOutcome)
-    case blueCatbirdChatDefsDirectRequestPreparedOutcome(BlueCatbirdChatDefs.DirectRequestPreparedOutcome)
-    case blueCatbirdChatDefsSignedDirectRequestReceipt(BlueCatbirdChatDefs.SignedDirectRequestReceipt)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestUnknownOutcome) {
-        self = .blueCatbirdChatDefsDirectRequestUnknownOutcome(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestPreparedOutcome) {
-        self = .blueCatbirdChatDefsDirectRequestPreparedOutcome(value)
-    }
-    public init(_ value: BlueCatbirdChatDefs.SignedDirectRequestReceipt) {
-        self = .blueCatbirdChatDefsSignedDirectRequestReceipt(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#directRequestUnknownOutcome":
-            let value = try BlueCatbirdChatDefs.DirectRequestUnknownOutcome(from: decoder)
+    public enum DirectRequestOutcome: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsDirectRequestUnknownOutcome(BlueCatbirdChatDefs.DirectRequestUnknownOutcome)
+        case blueCatbirdChatDefsDirectRequestPreparedOutcome(BlueCatbirdChatDefs.DirectRequestPreparedOutcome)
+        case blueCatbirdChatDefsSignedDirectRequestReceipt(BlueCatbirdChatDefs.SignedDirectRequestReceipt)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestUnknownOutcome) {
             self = .blueCatbirdChatDefsDirectRequestUnknownOutcome(value)
-        case "blue.catbird.chat.defs#directRequestPreparedOutcome":
-            let value = try BlueCatbirdChatDefs.DirectRequestPreparedOutcome(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestPreparedOutcome) {
             self = .blueCatbirdChatDefsDirectRequestPreparedOutcome(value)
-        case "blue.catbird.chat.defs#signedDirectRequestReceipt":
-            let value = try BlueCatbirdChatDefs.SignedDirectRequestReceipt(from: decoder)
+        }
+        public init(_ value: BlueCatbirdChatDefs.SignedDirectRequestReceipt) {
             self = .blueCatbirdChatDefsSignedDirectRequestReceipt(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestUnknownOutcome(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestUnknownOutcome", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsDirectRequestPreparedOutcome(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestPreparedOutcome", forKey: .type)
-            try value.encode(to: encoder)
-        case .blueCatbirdChatDefsSignedDirectRequestReceipt(let value):
-            try container.encode("blue.catbird.chat.defs#signedDirectRequestReceipt", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestUnknownOutcome(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestUnknownOutcome")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsDirectRequestPreparedOutcome(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestPreparedOutcome")
-            hasher.combine(value)
-        case .blueCatbirdChatDefsSignedDirectRequestReceipt(let value):
-            hasher.combine("blue.catbird.chat.defs#signedDirectRequestReceipt")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: DirectRequestOutcome, rhs: DirectRequestOutcome) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsDirectRequestUnknownOutcome(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestUnknownOutcome(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsDirectRequestPreparedOutcome(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestPreparedOutcome(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.blueCatbirdChatDefsSignedDirectRequestReceipt(let lhsValue),
-              .blueCatbirdChatDefsSignedDirectRequestReceipt(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? DirectRequestOutcome else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestUnknownOutcome(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestUnknownOutcome")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#directRequestUnknownOutcome":
+                let value = try BlueCatbirdChatDefs.DirectRequestUnknownOutcome(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestUnknownOutcome(value)
+            case "blue.catbird.chat.defs#directRequestPreparedOutcome":
+                let value = try BlueCatbirdChatDefs.DirectRequestPreparedOutcome(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestPreparedOutcome(value)
+            case "blue.catbird.chat.defs#signedDirectRequestReceipt":
+                let value = try BlueCatbirdChatDefs.SignedDirectRequestReceipt(from: decoder)
+                self = .blueCatbirdChatDefsSignedDirectRequestReceipt(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .blueCatbirdChatDefsDirectRequestPreparedOutcome(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestPreparedOutcome")
-            
-            let valueDict = try value.toCBORValue()
+        }
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            }
-            return map
-        case .blueCatbirdChatDefsSignedDirectRequestReceipt(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedDirectRequestReceipt")
-            
-            let valueDict = try value.toCBORValue()
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
 
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestUnknownOutcome(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestUnknownOutcome", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsDirectRequestPreparedOutcome(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestPreparedOutcome", forKey: .type)
+                try value.encode(to: encoder)
+            case .blueCatbirdChatDefsSignedDirectRequestReceipt(let value):
+                try container.encode("blue.catbird.chat.defs#signedDirectRequestReceipt", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestUnknownOutcome(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestUnknownOutcome")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsDirectRequestPreparedOutcome(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestPreparedOutcome")
+                hasher.combine(value)
+            case .blueCatbirdChatDefsSignedDirectRequestReceipt(let value):
+                hasher.combine("blue.catbird.chat.defs#signedDirectRequestReceipt")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: DirectRequestOutcome, rhs: DirectRequestOutcome) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsDirectRequestUnknownOutcome(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestUnknownOutcome(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsDirectRequestPreparedOutcome(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestPreparedOutcome(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.blueCatbirdChatDefsSignedDirectRequestReceipt(let lhsValue),
+                  .blueCatbirdChatDefsSignedDirectRequestReceipt(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? DirectRequestOutcome else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestUnknownOutcome(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestUnknownOutcome")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsDirectRequestPreparedOutcome(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestPreparedOutcome")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .blueCatbirdChatDefsSignedDirectRequestReceipt(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedDirectRequestReceipt")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
+    public enum DirectRequestStateConsent: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_incomingPending = "incomingPending"
+        case value_outgoingPending = "outgoingPending"
+        case value_accepted = "accepted"
+        case value_closed = "closed"
 
-public enum DirectRequestStateConsent: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_incomingPending = "incomingPending"
-    case value_outgoingPending = "outgoingPending"
-    case value_accepted = "accepted"
-    case value_closed = "closed"
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? DirectRequestStateConsent else { return false }
+            return self == otherValue
+        }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? DirectRequestStateConsent else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public typealias DirectRequestReceiptKeyId = String
 
-public typealias DirectRequestReceiptKeyId = String
-
-
-
-
-public enum SignedDirectRequestAcceptanceCommitReceiptBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
-    case blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(BlueCatbirdChatDefs.DirectRequestAcceptanceCommitReceiptBody)
-    case unexpected(ATProtocolValueContainer)
-    public init(_ value: BlueCatbirdChatDefs.DirectRequestAcceptanceCommitReceiptBody) {
-        self = .blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(value)
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let typeValue = try container.decode(String.self, forKey: .type)
-
-        switch typeValue {
-        case "blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody":
-            let value = try BlueCatbirdChatDefs.DirectRequestAcceptanceCommitReceiptBody(from: decoder)
+    public enum SignedDirectRequestAcceptanceCommitReceiptBodyUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(BlueCatbirdChatDefs.DirectRequestAcceptanceCommitReceiptBody)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.DirectRequestAcceptanceCommitReceiptBody) {
             self = .blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(value)
-        default:
-            let unknownValue = try ATProtocolValueContainer(from: decoder)
-            self = .unexpected(unknownValue)
         }
-    }
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
 
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(let value):
-            try container.encode("blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody", forKey: .type)
-            try value.encode(to: encoder)
-        case .unexpected(let container):
-            try container.encode(to: encoder)
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(let value):
-            hasher.combine("blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody")
-            hasher.combine(value)
-        case .unexpected(let container):
-            hasher.combine("unexpected")
-            hasher.combine(container)
-        }
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case type = "$type"
-    }
-    
-    public static func == (lhs: SignedDirectRequestAcceptanceCommitReceiptBodyUnion, rhs: SignedDirectRequestAcceptanceCommitReceiptBodyUnion) -> Bool {
-        switch (lhs, rhs) {
-        case (.blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(let lhsValue),
-              .blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-            return lhsValue.isEqual(to: rhsValue)
-        default:
-            return false
-        }
-    }
-    
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? SignedDirectRequestAcceptanceCommitReceiptBodyUnion else { return false }
-        return self == other
-    }
-    
-    // DAGCBOR encoding with field ordering
-    public func toCBORValue() throws -> Any {
-        // Create an ordered map to maintain field order
-        var map = OrderedCBORMap()
-        
-        switch self {
-        case .blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(let value):
-            map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody")
-            
-            let valueDict = try value.toCBORValue()
-
-            // If the value is already an OrderedCBORMap, merge its entries
-            if let orderedMap = valueDict as? OrderedCBORMap {
-                for (key, value) in orderedMap.entries where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
-            } else if let dict = valueDict as? [String: Any] {
-                // Otherwise add each key-value pair from the dictionary
-                for (key, value) in dict where key != "$type" {
-                    map = map.adding(key: key, value: value)
-                }
+            switch typeValue {
+            case "blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody":
+                let value = try BlueCatbirdChatDefs.DirectRequestAcceptanceCommitReceiptBody(from: decoder)
+                self = .blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
             }
-            return map
-        case .unexpected(let container):
-            return try container.toCBORValue()
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(let value):
+                try container.encode("blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(let value):
+                hasher.combine("blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: SignedDirectRequestAcceptanceCommitReceiptBodyUnion, rhs: SignedDirectRequestAcceptanceCommitReceiptBodyUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(let lhsValue),
+                  .blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? SignedDirectRequestAcceptanceCommitReceiptBodyUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsDirectRequestAcceptanceCommitReceiptBody(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
-}
 
+    public enum PushRegistrationBodyProtocolVersion: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_2 = "2"
 
-public enum PushRegistrationBodyProtocolVersion: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_2 = "2"
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? PushRegistrationBodyProtocolVersion else { return false }
+            return self == otherValue
+        }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? PushRegistrationBodyProtocolVersion else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
+    public enum PushRegistrationBodyProvider: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_apns = "apns"
+        case value_fcm = "fcm"
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? PushRegistrationBodyProvider else { return false }
+            return self == otherValue
+        }
+
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
-}
-
-
-public enum PushRegistrationBodyProvider: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_apns = "apns"
-    case value_fcm = "fcm"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? PushRegistrationBodyProvider else { return false }
-        return self == otherValue
-    }
-
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
-
 
 }
-
-
-                           
-

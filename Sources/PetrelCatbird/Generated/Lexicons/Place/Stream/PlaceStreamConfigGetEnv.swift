@@ -4,43 +4,57 @@ import Petrel
 
 // lexicon: 1, id: place.stream.config.getEnv
 
-public enum PlaceStreamConfigGetEnv {
+public struct PlaceStreamConfigGetEnv {
+
     public static let typeIdentifier = "place.stream.config.getEnv"
     public struct Parameters: Parametrizable {
-        public init() {}
+
+        public init(
+        ) {
+
+        }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let playbackWorkerUrl: String?
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             playbackWorkerUrl: String? = nil
 
         ) {
+
             self.playbackWorkerUrl = playbackWorkerUrl
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
             do {
-                playbackWorkerUrl = try container.decodeIfPresent(String.self, forKey: .playbackWorkerUrl)
+                self.playbackWorkerUrl = try container.decodeIfPresent(String.self, forKey: .playbackWorkerUrl)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'playbackWorkerUrl' — degrading to nil: \(error)")
-                playbackWorkerUrl = nil
+                self.playbackWorkerUrl = nil
             }
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(playbackWorkerUrl, forKey: .playbackWorkerUrl)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             if let value = playbackWorkerUrl {
@@ -50,24 +64,26 @@ public enum PlaceStreamConfigGetEnv {
             }
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case playbackWorkerUrl
         }
+
     }
+
 }
 
-public extension ATProtoClient.Place.Stream.Config {
+extension ATProtoClient.Place.Stream.Config {
     // MARK: - getEnv
-
     /// Get client-facing environment configuration from the server.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getEnv(input: PlaceStreamConfigGetEnv.Parameters) async throws -> (responseCode: Int, data: PlaceStreamConfigGetEnv.Output?) {
+    public func getEnv(input: PlaceStreamConfigGetEnv.Parameters) async throws -> (responseCode: Int, data: PlaceStreamConfigGetEnv.Output?) {
         let endpoint = "place.stream.config.getEnv"
 
         let queryItems = input.asQueryItems()
@@ -89,7 +105,8 @@ public extension ATProtoClient.Place.Stream.Config {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -109,6 +126,7 @@ public extension ATProtoClient.Place.Stream.Config {
                 return (responseCode, nil)
             }
         } else {
+
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)

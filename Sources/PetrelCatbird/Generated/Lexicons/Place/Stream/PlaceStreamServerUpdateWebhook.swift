@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: place.stream.server.updateWebhook
 
-public enum PlaceStreamServerUpdateWebhook {
+public struct PlaceStreamServerUpdateWebhook {
+
     public static let typeIdentifier = "place.stream.server.updateWebhook"
     public struct Input: ATProtocolCodable {
         public let id: String
@@ -34,16 +35,16 @@ public enum PlaceStreamServerUpdateWebhook {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            id = try container.decode(String.self, forKey: .id)
-            url = try container.decodeIfPresent(URI.self, forKey: .url)
-            events = try container.decodeIfPresent([InputEvents].self, forKey: .events)
-            active = try container.decodeIfPresent(Bool.self, forKey: .active)
-            prefix = try container.decodeIfPresent(String.self, forKey: .prefix)
-            suffix = try container.decodeIfPresent(String.self, forKey: .suffix)
-            rewrite = try container.decodeIfPresent([PlaceStreamServerDefs.RewriteRule].self, forKey: .rewrite)
-            name = try container.decodeIfPresent(String.self, forKey: .name)
-            description = try container.decodeIfPresent(String.self, forKey: .description)
-            muteWords = try container.decodeIfPresent([String].self, forKey: .muteWords)
+            self.id = try container.decode(String.self, forKey: .id)
+            self.url = try container.decodeIfPresent(URI.self, forKey: .url)
+            self.events = try container.decodeIfPresent([InputEvents].self, forKey: .events)
+            self.active = try container.decodeIfPresent(Bool.self, forKey: .active)
+            self.prefix = try container.decodeIfPresent(String.self, forKey: .prefix)
+            self.suffix = try container.decodeIfPresent(String.self, forKey: .suffix)
+            self.rewrite = try container.decodeIfPresent([PlaceStreamServerDefs.RewriteRule].self, forKey: .rewrite)
+            self.name = try container.decodeIfPresent(String.self, forKey: .name)
+            self.description = try container.decodeIfPresent(String.self, forKey: .description)
+            self.muteWords = try container.decodeIfPresent([String].self, forKey: .muteWords)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -118,40 +119,51 @@ public enum PlaceStreamServerUpdateWebhook {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let webhook: PlaceStreamServerDefs.Webhook
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             webhook: PlaceStreamServerDefs.Webhook
 
         ) {
+
             self.webhook = webhook
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            webhook = try container.decode(PlaceStreamServerDefs.Webhook.self, forKey: .webhook)
+            self.webhook = try container.decode(PlaceStreamServerDefs.Webhook.self, forKey: .webhook)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(webhook, forKey: .webhook)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let webhookValue = try webhook.toCBORValue()
             map = map.adding(key: "webhook", value: webhookValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case webhook
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -164,11 +176,11 @@ public enum PlaceStreamServerUpdateWebhook {
         /// A webhook with this URL already exists for this user.
         case duplicateWebhook = "DuplicateWebhook"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
 
@@ -187,19 +199,20 @@ public enum PlaceStreamServerUpdateWebhook {
             return rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Place.Stream.Server {
+extension ATProtoClient.Place.Stream.Server {
     // MARK: - updateWebhook
-
-    // Update an existing webhook configuration.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Update an existing webhook configuration.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func updateWebhook(
+    public func updateWebhook(
+
         input: PlaceStreamServerUpdateWebhook.Input
 
     ) async throws -> (responseCode: Int, data: PlaceStreamServerUpdateWebhook.Output?) {
@@ -232,7 +245,8 @@ public extension ATProtoClient.Place.Stream.Server {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -242,6 +256,7 @@ public extension ATProtoClient.Place.Stream.Server {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(PlaceStreamServerUpdateWebhook.Output.self, from: responseData)
 
@@ -264,5 +279,7 @@ public extension ATProtoClient.Place.Stream.Server {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

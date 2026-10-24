@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: place.stream.muxl.defs
 
-public enum PlaceStreamMuxlDefs {
+public struct PlaceStreamMuxlDefs {
+
     public static let typeIdentifier = "place.stream.muxl.defs"
 
     public struct Track: ATProtocolCodable, ATProtocolValue {
@@ -30,48 +31,48 @@ public enum PlaceStreamMuxlDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                id = try container.decode(Int.self, forKey: .id)
+                self.id = try container.decode(Int.self, forKey: .id)
             } catch {
                 LogManager.logError("Decoding error for required property 'id': \(error)")
                 throw error
             }
             do {
-                codec = try container.decode(String.self, forKey: .codec)
+                self.codec = try container.decode(String.self, forKey: .codec)
             } catch {
                 LogManager.logError("Decoding error for required property 'codec': \(error)")
                 throw error
             }
             do {
-                width = try container.decodeIfPresent(Int.self, forKey: .width)
+                self.width = try container.decodeIfPresent(Int.self, forKey: .width)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'width' — degrading to nil: \(error)")
-                width = nil
+                self.width = nil
             }
             do {
-                height = try container.decodeIfPresent(Int.self, forKey: .height)
+                self.height = try container.decodeIfPresent(Int.self, forKey: .height)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'height' — degrading to nil: \(error)")
-                height = nil
+                self.height = nil
             }
             do {
-                rate = try container.decodeIfPresent(Int.self, forKey: .rate)
+                self.rate = try container.decodeIfPresent(Int.self, forKey: .rate)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'rate' — degrading to nil: \(error)")
-                rate = nil
+                self.rate = nil
             }
             do {
-                channels = try container.decodeIfPresent(Int.self, forKey: .channels)
+                self.channels = try container.decodeIfPresent(Int.self, forKey: .channels)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'channels' — degrading to nil: \(error)")
-                channels = nil
+                self.channels = nil
             }
         }
 
@@ -174,4 +175,5 @@ public enum PlaceStreamMuxlDefs {
             case channels
         }
     }
+
 }

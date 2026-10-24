@@ -4,11 +4,14 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.purgeMailbox
 
-public enum BlueCatbirdLabyrinthPurgeMailbox {
+public struct BlueCatbirdLabyrinthPurgeMailbox {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.purgeMailbox"
     public struct Input: ATProtocolCodable {
+
         /// Standard public initializer
-        public init() {}
+        public init() {
+        }
 
         public func toCBORValue() throws -> Any {
             return OrderedCBORMap()
@@ -16,50 +19,63 @@ public enum BlueCatbirdLabyrinthPurgeMailbox {
     }
 
     public struct Output: ATProtocolCodable {
+
         // Empty output - no properties (response is {})
 
-        /// Standard public initializer
-        public init() {}
+        // Standard public initializer
+        public init(
+
+        ) {
+
+        }
 
         public init(from decoder: Decoder) throws {
+
             // Empty output - just validate it's an object by trying to get any container
             _ = try decoder.singleValueContainer()
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             // Empty output - encode empty object
             _ = encoder.singleValueContainer()
+
         }
 
         public func toCBORValue() throws -> Any {
+
             // Empty output - return empty CBOR map
             return OrderedCBORMap()
+
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Labyrinth {
+extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - purgeMailbox
-
-    // Delete the caller's whole Labyrinth mailbox: devices, epochs, epoch members, virtual devices (recovery bundles), owner batches, every ORF state and attachment reference of the caller, and the caller's chain in the head directory, so the account can enroll again from epoch 0. Peers that pinned an old head see a directory fork on their next read, which is the intended signal of a reset. Thread records the caller sent are kept (redactMessage and deleteAccountData handle those). Mailbox endpoint on the caller's home DS. Idempotent. Requires a bound Labyrinth device (a current, non-virtual device registered by the calling chat device). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Delete the caller's whole Labyrinth mailbox: devices, epochs, epoch members, virtual devices (recovery bundles), owner batches, every ORF state and attachment reference of the caller, and the caller's chain in the head directory, so the account can enroll again from epoch 0. Peers that pinned an old head see a directory fork on their next read, which is the intended signal of a reset. Thread records the caller sent are kept (redactMessage and deleteAccountData handle those). Mailbox endpoint on the caller's home DS. Idempotent. Requires a bound Labyrinth device (a current, non-virtual device registered by the calling chat device). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func purgeMailbox(
+    public func purgeMailbox(
+
         input: BlueCatbirdLabyrinthPurgeMailbox.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthPurgeMailbox.Output?) {
@@ -92,7 +108,8 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -102,6 +119,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdLabyrinthPurgeMailbox.Output.self, from: responseData)
 
@@ -124,5 +142,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

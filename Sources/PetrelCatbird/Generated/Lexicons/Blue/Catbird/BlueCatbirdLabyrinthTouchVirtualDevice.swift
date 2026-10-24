@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.touchVirtualDevice
 
-public enum BlueCatbirdLabyrinthTouchVirtualDevice {
+public struct BlueCatbirdLabyrinthTouchVirtualDevice {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.touchVirtualDevice"
     public struct Input: ATProtocolCodable {
         public let vdeviceId: Bytes
@@ -16,7 +17,7 @@ public enum BlueCatbirdLabyrinthTouchVirtualDevice {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            vdeviceId = try container.decode(Bytes.self, forKey: .vdeviceId)
+            self.vdeviceId = try container.decode(Bytes.self, forKey: .vdeviceId)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -37,50 +38,63 @@ public enum BlueCatbirdLabyrinthTouchVirtualDevice {
     }
 
     public struct Output: ATProtocolCodable {
+
         // Empty output - no properties (response is {})
 
-        /// Standard public initializer
-        public init() {}
+        // Standard public initializer
+        public init(
+
+        ) {
+
+        }
 
         public init(from decoder: Decoder) throws {
+
             // Empty output - just validate it's an object by trying to get any container
             _ = try decoder.singleValueContainer()
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             // Empty output - encode empty object
             _ = encoder.singleValueContainer()
+
         }
 
         public func toCBORValue() throws -> Any {
+
             // Empty output - return empty CBOR map
             return OrderedCBORMap()
+
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case virtualDeviceNotFound = "VirtualDeviceNotFound"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Labyrinth {
+extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - touchVirtualDevice
-
-    // Record that a recovery bundle is still in use (decision J2): sets its lastUsedAt to the server time. Bundles with mechanism keychain or passkey that go unused for 180 days are deleted by the server together with their ORF state; code and otc bundles never expire. Any enrolled device's sync should touch the bundles it can still open; getVirtualDevice also touches the bundle it returns. Mailbox endpoint. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Record that a recovery bundle is still in use (decision J2): sets its lastUsedAt to the server time. Bundles with mechanism keychain or passkey that go unused for 180 days are deleted by the server together with their ORF state; code and otc bundles never expire. Any enrolled device's sync should touch the bundles it can still open; getVirtualDevice also touches the bundle it returns. Mailbox endpoint. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func touchVirtualDevice(
+    public func touchVirtualDevice(
+
         input: BlueCatbirdLabyrinthTouchVirtualDevice.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthTouchVirtualDevice.Output?) {
@@ -113,7 +127,8 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -123,6 +138,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdLabyrinthTouchVirtualDevice.Output.self, from: responseData)
 
@@ -145,5 +161,7 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

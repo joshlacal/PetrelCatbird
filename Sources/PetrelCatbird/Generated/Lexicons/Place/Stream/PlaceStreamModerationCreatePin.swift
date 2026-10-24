@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: place.stream.moderation.createPin
 
-public enum PlaceStreamModerationCreatePin {
+public struct PlaceStreamModerationCreatePin {
+
     public static let typeIdentifier = "place.stream.moderation.createPin"
     public struct Input: ATProtocolCodable {
         public let streamer: DID
@@ -20,9 +21,9 @@ public enum PlaceStreamModerationCreatePin {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            streamer = try container.decode(DID.self, forKey: .streamer)
-            messageUri = try container.decode(ATProtocolURI.self, forKey: .messageUri)
-            expiresAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expiresAt)
+            self.streamer = try container.decode(DID.self, forKey: .streamer)
+            self.messageUri = try container.decode(ATProtocolURI.self, forKey: .messageUri)
+            self.expiresAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expiresAt)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -53,39 +54,48 @@ public enum PlaceStreamModerationCreatePin {
     }
 
     public struct Output: ATProtocolCodable {
+
         public let uri: ATProtocolURI
 
         public let cid: CID
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             uri: ATProtocolURI,
 
             cid: CID
 
         ) {
+
             self.uri = uri
 
             self.cid = cid
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+            self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
 
-            cid = try container.decode(CID.self, forKey: .cid)
+            self.cid = try container.decode(CID.self, forKey: .cid)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(uri, forKey: .uri)
 
             try container.encode(cid, forKey: .cid)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let uriValue = try uri.toCBORValue()
@@ -95,12 +105,14 @@ public enum PlaceStreamModerationCreatePin {
             map = map.adding(key: "cid", value: cidValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case uri
             case cid
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -111,26 +123,27 @@ public enum PlaceStreamModerationCreatePin {
         /// The streamer's OAuth session could not be found or is invalid.
         case sessionNotFound = "SessionNotFound"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Place.Stream.Moderation {
+extension ATProtoClient.Place.Stream.Moderation {
     // MARK: - createPin
-
-    // Pin a chat message on behalf of a streamer. Requires 'message.pin' permission. Creates a place.stream.chat.pinnedRecord in the streamer's repo, replacing any existing pin.
-    //
-    // - Parameter input: The input parameters for the request
+    /// Pin a chat message on behalf of a streamer. Requires 'message.pin' permission. Creates a place.stream.chat.pinnedRecord in the streamer's repo, replacing any existing pin.
+    ///
+    /// - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func createPin(
+    public func createPin(
+
         input: PlaceStreamModerationCreatePin.Input
 
     ) async throws -> (responseCode: Int, data: PlaceStreamModerationCreatePin.Output?) {
@@ -163,7 +176,8 @@ public extension ATProtoClient.Place.Stream.Moderation {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -173,6 +187,7 @@ public extension ATProtoClient.Place.Stream.Moderation {
             }
 
             do {
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(PlaceStreamModerationCreatePin.Output.self, from: responseData)
 
@@ -195,5 +210,7 @@ public extension ATProtoClient.Place.Stream.Moderation {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
+
     }
+
 }

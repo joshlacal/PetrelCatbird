@@ -4,7 +4,8 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.getAttachmentRef
 
-public enum BlueCatbirdLabyrinthGetAttachmentRef {
+public struct BlueCatbirdLabyrinthGetAttachmentRef {
+
     public static let typeIdentifier = "blue.catbird.labyrinth.getAttachmentRef"
     public struct Parameters: Parametrizable {
         public let deviceKeyPubkey: String
@@ -16,69 +17,81 @@ public enum BlueCatbirdLabyrinthGetAttachmentRef {
         ) {
             self.deviceKeyPubkey = deviceKeyPubkey
             self.blindedIndex = blindedIndex
+
         }
     }
 
     public struct Output: ATProtocolCodable {
+
         public let createdAt: ATProtocolDate
 
-        /// Standard public initializer
+        // Standard public initializer
         public init(
+
             createdAt: ATProtocolDate
 
         ) {
+
             self.createdAt = createdAt
+
         }
 
         public init(from decoder: Decoder) throws {
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+            self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+
         }
 
         public func encode(to encoder: Encoder) throws {
+
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(createdAt, forKey: .createdAt)
+
         }
 
         public func toCBORValue() throws -> Any {
+
             var map = OrderedCBORMap()
 
             let createdAtValue = try createdAt.toCBORValue()
             map = map.adding(key: "createdAt", value: createdAtValue)
 
             return map
+
         }
 
         private enum CodingKeys: String, CodingKey {
             case createdAt
         }
+
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case orfStateNotFound = "OrfStateNotFound"
         case notFound = "NotFound"
         public var description: String {
-            return rawValue
+            return self.rawValue
         }
 
         public var errorName: String {
-            return rawValue
+            return self.rawValue
         }
     }
+
 }
 
-public extension ATProtoClient.Blue.Catbird.Labyrinth {
+extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - getAttachmentRef
-
     /// Whether an attachment reference exists at this blinded index (decision J4: the server keeps no readable conversation, message or blob linkage to return). ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    func getAttachmentRef(input: BlueCatbirdLabyrinthGetAttachmentRef.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetAttachmentRef.Output?) {
+    public func getAttachmentRef(input: BlueCatbirdLabyrinthGetAttachmentRef.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetAttachmentRef.Output?) {
         let endpoint = "blue.catbird.labyrinth.getAttachmentRef"
 
         let queryItems = input.asQueryItems()
@@ -100,7 +113,8 @@ public extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200 ... 299).contains(responseCode) {
+        if (200...299).contains(responseCode) {
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
