@@ -10,7 +10,7 @@ The corresponding Petrel core uses the exact October 22 upstream snapshot
 `ac0c9f15392f6f0298d71dc52aa88c05036150be`. Petrel verifies all 30 Spaces and
 simpleSpace schema bytes against its recorded upstream archive. This overlay's
 189 JSON files have aggregate SHA-256
-`35ba46d6d9c994b6f91710a7927db4918b477790981910edfe1f5826d1c4a9d4`.
+`a627cf74bcf876c954f79cbc4b3cab6618a1eed2401385655310575bf63e853f`.
 The aggregate hashes sorted lines of each file's SHA-256, two spaces, its path
 relative to `lexicons`, and LF. `Package.swift` pins a published Petrel revision
 so package resolution does not depend on the neighboring checkout.
@@ -42,3 +42,9 @@ files with identical inventory and bytes. The shared Rust projection lives in
 and raw relay output without editing generated declarations. Wire contract tests
 and builds establish local serialization and compilation only. They do not
 establish membership enforcement, migration, app rendering, or live deployment.
+
+The terminal-deletion contract also declares `SpaceDeleted` for `findMeks` and
+`getAttachmentBlob`. A deleted conversation storage generation returns no data;
+callers must not rebind or fall back to another placement. The overlay merges
+current main `3dc8b613abbab900f650f7e1a4e42884cc42b0e1` while retaining all 48
+main-only source changes plus the newer chat security definitions.
