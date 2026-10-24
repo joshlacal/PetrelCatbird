@@ -83,6 +83,8 @@ public struct BlueCatbirdLabyrinthGetAttachmentBlob {
         case notFound = "NotFound"
         case attachmentsUnavailable = "AttachmentsUnavailable"
         case relayUnavailable = "RelayUnavailable"
+        /// The conversation Space storage generation is permanently deleted.
+        case spaceDeleted = "SpaceDeleted"
         public var description: String {
             return self.rawValue
         }
@@ -96,7 +98,7 @@ public struct BlueCatbirdLabyrinthGetAttachmentBlob {
 
 extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - getAttachmentBlob
-    /// Read an attachment blob with the ORF access token, for a restored device that has no application interval at the attachment's entry. The server recomputes the token MAC from blindedTokenSalt and the presented threadId and messageId, checks that the blob is still bound to that message and not deleted or expired, and that the message still exists for the caller: an unredacted thread item readable by the caller, or an item of the caller's own owner archive (whitepaper p.42). Every refusal reads as NotFound. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    /// Read an attachment blob with the ORF access token, for a restored device that has no application interval at the attachment's entry. The server recomputes the token MAC from blindedTokenSalt and the presented threadId and messageId, checks that the blob is still bound to that message and not deleted or expired, and that the message still exists for the caller: an unredacted thread item readable by the caller, or an item of the caller's own owner archive (whitepaper p.42). Blob/token visibility refusals read as NotFound. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded. For a thread backed by a conversation Space, a permanently deleted storage generation returns SpaceDeleted without returning data. This is terminal: do not retry by rebinding to another generation or falling back to another storage placement.
     ///
     /// - Parameter input: The input parameters for the request
     ///

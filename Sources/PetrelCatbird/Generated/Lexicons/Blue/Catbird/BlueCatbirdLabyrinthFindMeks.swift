@@ -205,6 +205,8 @@ public struct BlueCatbirdLabyrinthFindMeks {
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case notRecipient = "NotRecipient"
+        /// The conversation Space storage generation is permanently deleted.
+        case spaceDeleted = "SpaceDeleted"
         public var description: String {
             return self.rawValue
         }
@@ -218,7 +220,7 @@ public struct BlueCatbirdLabyrinthFindMeks {
 
 extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - findMeks
-    /// Every MEK record with this id that the caller wrote or is a recipient of. Thread endpoint on the conversation's sequencer DS; threadId is the chat conversation id ([CB-2]). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    /// Every MEK record with this id that the caller wrote or is a recipient of. Thread endpoint on the conversation's sequencer DS; threadId is the chat conversation id ([CB-2]). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded. For a thread backed by a conversation Space, a permanently deleted storage generation returns SpaceDeleted without returning data. This is terminal: do not retry by rebinding to another generation or falling back to another storage placement.
     ///
     /// - Parameter input: The input parameters for the request
     ///
