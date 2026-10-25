@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: place.stream.defs
 
-public struct PlaceStreamDefs {
-
+public enum PlaceStreamDefs {
     public static let typeIdentifier = "place.stream.defs"
 
     public struct BlockView: ATProtocolCodable, ATProtocolValue {
@@ -29,31 +28,31 @@ public struct PlaceStreamDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                uri = try container.decode(ATProtocolURI.self, forKey: .uri)
             } catch {
                 LogManager.logError("Decoding error for required property 'uri': \(error)")
                 throw error
             }
             do {
-                self.cid = try container.decode(CID.self, forKey: .cid)
+                cid = try container.decode(CID.self, forKey: .cid)
             } catch {
                 LogManager.logError("Decoding error for required property 'cid': \(error)")
                 throw error
             }
             do {
-                self.blocker = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .blocker)
+                blocker = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .blocker)
             } catch {
                 LogManager.logError("Decoding error for required property 'blocker': \(error)")
                 throw error
             }
             do {
-                self.record = try container.decode(AppBskyGraphBlock.self, forKey: .record)
+                record = try container.decode(AppBskyGraphBlock.self, forKey: .record)
             } catch {
                 LogManager.logError("Decoding error for required property 'record': \(error)")
                 throw error
             }
             do {
-                self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
+                indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'indexedAt': \(error)")
                 throw error
@@ -141,7 +140,7 @@ public struct PlaceStreamDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.renditions = try container.decode([Rendition].self, forKey: .renditions)
+                renditions = try container.decode([Rendition].self, forKey: .renditions)
             } catch {
                 LogManager.logError("Decoding error for required property 'renditions': \(error)")
                 throw error
@@ -197,7 +196,7 @@ public struct PlaceStreamDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.name = try container.decode(String.self, forKey: .name)
+                name = try container.decode(String.self, forKey: .name)
             } catch {
                 LogManager.logError("Decoding error for required property 'name': \(error)")
                 throw error
@@ -239,5 +238,4 @@ public struct PlaceStreamDefs {
             case name
         }
     }
-
 }

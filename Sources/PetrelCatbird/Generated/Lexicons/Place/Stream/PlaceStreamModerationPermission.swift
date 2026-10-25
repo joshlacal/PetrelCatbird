@@ -5,7 +5,6 @@ import Petrel
 // lexicon: 1, id: place.stream.moderation.permission
 
 public struct PlaceStreamModerationPermission: ATProtocolCodable, ATProtocolValue {
-
     public static let typeIdentifier = "place.stream.moderation.permission"
     public let moderator: DID
     public let permissions: [PlaceStreamModerationPermissionPermissions]
@@ -21,15 +20,15 @@ public struct PlaceStreamModerationPermission: ATProtocolCodable, ATProtocolValu
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.moderator = try container.decode(DID.self, forKey: .moderator)
-        self.permissions = try container.decode([PlaceStreamModerationPermissionPermissions].self, forKey: .permissions)
-        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        moderator = try container.decode(DID.self, forKey: .moderator)
+        permissions = try container.decode([PlaceStreamModerationPermissionPermissions].self, forKey: .permissions)
+        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            self.expirationTime = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expirationTime)
+            expirationTime = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expirationTime)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'expirationTime' — degrading to nil: \(error)")
-            self.expirationTime = nil
+            expirationTime = nil
         }
     }
 
@@ -113,5 +112,4 @@ public struct PlaceStreamModerationPermission: ATProtocolCodable, ATProtocolValu
             return rawValue
         }
     }
-
 }

@@ -5,7 +5,6 @@ import Petrel
 // lexicon: 1, id: place.stream.key
 
 public struct PlaceStreamKey: ATProtocolCodable, ATProtocolValue {
-
     public static let typeIdentifier = "place.stream.key"
     public let signingKey: String
     public let createdAt: ATProtocolDate
@@ -19,14 +18,14 @@ public struct PlaceStreamKey: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.signingKey = try container.decode(String.self, forKey: .signingKey)
-        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        signingKey = try container.decode(String.self, forKey: .signingKey)
+        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            self.createdBy = try container.decodeIfPresent(String.self, forKey: .createdBy)
+            createdBy = try container.decodeIfPresent(String.self, forKey: .createdBy)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'createdBy' — degrading to nil: \(error)")
-            self.createdBy = nil
+            createdBy = nil
         }
     }
 
@@ -86,5 +85,4 @@ public struct PlaceStreamKey: ATProtocolCodable, ATProtocolValue {
         case createdAt
         case createdBy
     }
-
 }

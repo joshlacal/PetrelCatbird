@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: place.stream.playback.getPlaybackServer
 
-public struct PlaceStreamPlaybackGetPlaybackServer {
-
+public enum PlaceStreamPlaybackGetPlaybackServer {
     public static let typeIdentifier = "place.stream.playback.getPlaybackServer"
     public struct Parameters: Parametrizable {
         public let stream: String
@@ -14,69 +13,57 @@ public struct PlaceStreamPlaybackGetPlaybackServer {
             stream: String
         ) {
             self.stream = stream
-
         }
     }
 
     public struct Output: ATProtocolCodable {
-
         public let servers: [String]
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             servers: [String]
 
         ) {
-
             self.servers = servers
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.servers = try container.decode([String].self, forKey: .servers)
-
+            servers = try container.decode([String].self, forKey: .servers)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(servers, forKey: .servers)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let serversValue = try servers.toCBORValue()
             map = map.adding(key: "servers", value: serversValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case servers
         }
-
     }
-
 }
 
-extension ATProtoClient.Place.Stream.Playback {
+public extension ATProtoClient.Place.Stream.Playback {
     // MARK: - getPlaybackServer
+
     /// Get available playback servers for a livestream.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getPlaybackServer(input: PlaceStreamPlaybackGetPlaybackServer.Parameters) async throws -> (responseCode: Int, data: PlaceStreamPlaybackGetPlaybackServer.Output?) {
+    func getPlaybackServer(input: PlaceStreamPlaybackGetPlaybackServer.Parameters) async throws -> (responseCode: Int, data: PlaceStreamPlaybackGetPlaybackServer.Output?) {
         let endpoint = "place.stream.playback.getPlaybackServer"
 
         let queryItems = input.asQueryItems()
@@ -98,8 +85,7 @@ extension ATProtoClient.Place.Stream.Playback {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -119,7 +105,6 @@ extension ATProtoClient.Place.Stream.Playback {
                 return (responseCode, nil)
             }
         } else {
-
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)

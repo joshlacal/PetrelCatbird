@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.getDevice
 
-public struct BlueCatbirdLabyrinthGetDevice {
-
+public enum BlueCatbirdLabyrinthGetDevice {
     public static let typeIdentifier = "blue.catbird.labyrinth.getDevice"
     public struct Parameters: Parametrizable {
         public let deviceKeyPubkey: String
@@ -14,80 +13,68 @@ public struct BlueCatbirdLabyrinthGetDevice {
             deviceKeyPubkey: String
         ) {
             self.deviceKeyPubkey = deviceKeyPubkey
-
         }
     }
 
     public struct Output: ATProtocolCodable {
-
         public let record: ATProtocolValueContainer
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             record: ATProtocolValueContainer
 
         ) {
-
             self.record = record
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
-
+            record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(record, forKey: .record)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let recordValue = try record.toCBORValue()
             map = map.adding(key: "record", value: recordValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case record
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case deviceNotFound = "DeviceNotFound"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Labyrinth {
+public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - getDevice
+
     /// One device record. Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getDevice(input: BlueCatbirdLabyrinthGetDevice.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetDevice.Output?) {
+    func getDevice(input: BlueCatbirdLabyrinthGetDevice.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetDevice.Output?) {
         let endpoint = "blue.catbird.labyrinth.getDevice"
 
         let queryItems = input.asQueryItems()
@@ -109,8 +96,7 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

@@ -5,7 +5,6 @@ import Petrel
 // lexicon: 1, id: place.stream.livestream
 
 public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
-
     public static let typeIdentifier = "place.stream.livestream"
     public let title: String
     public let url: URI?
@@ -35,70 +34,70 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.title = try container.decode(String.self, forKey: .title)
+        title = try container.decode(String.self, forKey: .title)
         do {
-            self.url = try container.decodeIfPresent(URI.self, forKey: .url)
+            url = try container.decodeIfPresent(URI.self, forKey: .url)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'url' — degrading to nil: \(error)")
-            self.url = nil
+            url = nil
         }
-        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            self.lastSeenAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastSeenAt)
+            lastSeenAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastSeenAt)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'lastSeenAt' — degrading to nil: \(error)")
-            self.lastSeenAt = nil
+            lastSeenAt = nil
         }
         do {
-            self.endedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .endedAt)
+            endedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .endedAt)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'endedAt' — degrading to nil: \(error)")
-            self.endedAt = nil
+            endedAt = nil
         }
         do {
-            self.idleTimeoutSeconds = try container.decodeIfPresent(Int.self, forKey: .idleTimeoutSeconds)
+            idleTimeoutSeconds = try container.decodeIfPresent(Int.self, forKey: .idleTimeoutSeconds)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'idleTimeoutSeconds' — degrading to nil: \(error)")
-            self.idleTimeoutSeconds = nil
+            idleTimeoutSeconds = nil
         }
         do {
-            self.post = try container.decodeIfPresent(ComAtprotoRepoStrongRef.self, forKey: .post)
+            post = try container.decodeIfPresent(ComAtprotoRepoStrongRef.self, forKey: .post)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'post' — degrading to nil: \(error)")
-            self.post = nil
+            post = nil
         }
         do {
-            self.agent = try container.decodeIfPresent(String.self, forKey: .agent)
+            agent = try container.decodeIfPresent(String.self, forKey: .agent)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'agent' — degrading to nil: \(error)")
-            self.agent = nil
+            agent = nil
         }
         do {
-            self.canonicalUrl = try container.decodeIfPresent(URI.self, forKey: .canonicalUrl)
+            canonicalUrl = try container.decodeIfPresent(URI.self, forKey: .canonicalUrl)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'canonicalUrl' — degrading to nil: \(error)")
-            self.canonicalUrl = nil
+            canonicalUrl = nil
         }
         do {
-            self.thumb = try container.decodeIfPresent(Blob.self, forKey: .thumb)
+            thumb = try container.decodeIfPresent(Blob.self, forKey: .thumb)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'thumb' — degrading to nil: \(error)")
-            self.thumb = nil
+            thumb = nil
         }
         do {
-            self.notificationSettings = try container.decodeIfPresent(PlaceStreamLivestream.NotificationSettings.self, forKey: .notificationSettings)
+            notificationSettings = try container.decodeIfPresent(PlaceStreamLivestream.NotificationSettings.self, forKey: .notificationSettings)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'notificationSettings' — degrading to nil: \(error)")
-            self.notificationSettings = nil
+            notificationSettings = nil
         }
     }
 
@@ -284,12 +283,12 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.pushNotification = try container.decodeIfPresent(Bool.self, forKey: .pushNotification)
+                pushNotification = try container.decodeIfPresent(Bool.self, forKey: .pushNotification)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'pushNotification' — degrading to nil: \(error)")
-                self.pushNotification = nil
+                pushNotification = nil
             }
         }
 
@@ -358,42 +357,42 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                uri = try container.decode(ATProtocolURI.self, forKey: .uri)
             } catch {
                 LogManager.logError("Decoding error for required property 'uri': \(error)")
                 throw error
             }
             do {
-                self.cid = try container.decode(CID.self, forKey: .cid)
+                cid = try container.decode(CID.self, forKey: .cid)
             } catch {
                 LogManager.logError("Decoding error for required property 'cid': \(error)")
                 throw error
             }
             do {
-                self.author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .author)
+                author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .author)
             } catch {
                 LogManager.logError("Decoding error for required property 'author': \(error)")
                 throw error
             }
             do {
-                self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+                record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
             } catch {
                 LogManager.logError("Decoding error for required property 'record': \(error)")
                 throw error
             }
             do {
-                self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
+                indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'indexedAt': \(error)")
                 throw error
             }
             do {
-                self.viewerCount = try container.decodeIfPresent(ViewerCount.self, forKey: .viewerCount)
+                viewerCount = try container.decodeIfPresent(ViewerCount.self, forKey: .viewerCount)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'viewerCount' — degrading to nil: \(error)")
-                self.viewerCount = nil
+                viewerCount = nil
             }
         }
 
@@ -492,7 +491,7 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.count = try container.decode(Int.self, forKey: .count)
+                count = try container.decode(Int.self, forKey: .count)
             } catch {
                 LogManager.logError("Decoding error for required property 'count': \(error)")
                 throw error
@@ -556,33 +555,33 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.teleportUri = try container.decode(ATProtocolURI.self, forKey: .teleportUri)
+                teleportUri = try container.decode(ATProtocolURI.self, forKey: .teleportUri)
             } catch {
                 LogManager.logError("Decoding error for required property 'teleportUri': \(error)")
                 throw error
             }
             do {
-                self.source = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .source)
+                source = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .source)
             } catch {
                 LogManager.logError("Decoding error for required property 'source': \(error)")
                 throw error
             }
             do {
-                self.chatProfile = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: .chatProfile)
+                chatProfile = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: .chatProfile)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'chatProfile' — degrading to nil: \(error)")
-                self.chatProfile = nil
+                chatProfile = nil
             }
             do {
-                self.viewerCount = try container.decode(Int.self, forKey: .viewerCount)
+                viewerCount = try container.decode(Int.self, forKey: .viewerCount)
             } catch {
                 LogManager.logError("Decoding error for required property 'viewerCount': \(error)")
                 throw error
             }
             do {
-                self.startsAt = try container.decode(ATProtocolDate.self, forKey: .startsAt)
+                startsAt = try container.decode(ATProtocolDate.self, forKey: .startsAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'startsAt': \(error)")
                 throw error
@@ -678,13 +677,13 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.teleportUri = try container.decode(ATProtocolURI.self, forKey: .teleportUri)
+                teleportUri = try container.decode(ATProtocolURI.self, forKey: .teleportUri)
             } catch {
                 LogManager.logError("Decoding error for required property 'teleportUri': \(error)")
                 throw error
             }
             do {
-                self.reason = try container.decode(TeleportCanceledReason.self, forKey: .reason)
+                reason = try container.decode(TeleportCanceledReason.self, forKey: .reason)
             } catch {
                 LogManager.logError("Decoding error for required property 'reason': \(error)")
                 throw error
@@ -748,7 +747,7 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.livestream = try container.decode(StreamplaceAnythingLivestreamUnion.self, forKey: .livestream)
+                livestream = try container.decode(StreamplaceAnythingLivestreamUnion.self, forKey: .livestream)
             } catch {
                 LogManager.logError("Decoding error for required property 'livestream': \(error)")
                 throw error
@@ -820,27 +819,35 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
         public init(_ value: PlaceStreamLivestream.LivestreamView) {
             self = .placeStreamLivestreamLivestreamView(value)
         }
+
         public init(_ value: PlaceStreamLivestream.ViewerCount) {
             self = .placeStreamLivestreamViewerCount(value)
         }
+
         public init(_ value: PlaceStreamLivestream.TeleportArrival) {
             self = .placeStreamLivestreamTeleportArrival(value)
         }
+
         public init(_ value: PlaceStreamLivestream.TeleportCanceled) {
             self = .placeStreamLivestreamTeleportCanceled(value)
         }
+
         public init(_ value: PlaceStreamDefs.BlockView) {
             self = .placeStreamDefsBlockView(value)
         }
+
         public init(_ value: PlaceStreamDefs.Renditions) {
             self = .placeStreamDefsRenditions(value)
         }
+
         public init(_ value: PlaceStreamDefs.Rendition) {
             self = .placeStreamDefsRendition(value)
         }
+
         public init(_ value: PlaceStreamChatDefs.MessageView) {
             self = .placeStreamChatDefsMessageView(value)
         }
+
         public init(_ value: PlaceStreamChatDefs.PinnedRecordView) {
             self = .placeStreamChatDefsPinnedRecordView(value)
         }
@@ -887,68 +894,68 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             switch self {
-            case .placeStreamLivestreamLivestreamView(let value):
+            case let .placeStreamLivestreamLivestreamView(value):
                 try container.encode("place.stream.livestream#livestreamView", forKey: .type)
                 try value.encode(to: encoder)
-            case .placeStreamLivestreamViewerCount(let value):
+            case let .placeStreamLivestreamViewerCount(value):
                 try container.encode("place.stream.livestream#viewerCount", forKey: .type)
                 try value.encode(to: encoder)
-            case .placeStreamLivestreamTeleportArrival(let value):
+            case let .placeStreamLivestreamTeleportArrival(value):
                 try container.encode("place.stream.livestream#teleportArrival", forKey: .type)
                 try value.encode(to: encoder)
-            case .placeStreamLivestreamTeleportCanceled(let value):
+            case let .placeStreamLivestreamTeleportCanceled(value):
                 try container.encode("place.stream.livestream#teleportCanceled", forKey: .type)
                 try value.encode(to: encoder)
-            case .placeStreamDefsBlockView(let value):
+            case let .placeStreamDefsBlockView(value):
                 try container.encode("place.stream.defs#blockView", forKey: .type)
                 try value.encode(to: encoder)
-            case .placeStreamDefsRenditions(let value):
+            case let .placeStreamDefsRenditions(value):
                 try container.encode("place.stream.defs#renditions", forKey: .type)
                 try value.encode(to: encoder)
-            case .placeStreamDefsRendition(let value):
+            case let .placeStreamDefsRendition(value):
                 try container.encode("place.stream.defs#rendition", forKey: .type)
                 try value.encode(to: encoder)
-            case .placeStreamChatDefsMessageView(let value):
+            case let .placeStreamChatDefsMessageView(value):
                 try container.encode("place.stream.chat.defs#messageView", forKey: .type)
                 try value.encode(to: encoder)
-            case .placeStreamChatDefsPinnedRecordView(let value):
+            case let .placeStreamChatDefsPinnedRecordView(value):
                 try container.encode("place.stream.chat.defs#pinnedRecordView", forKey: .type)
                 try value.encode(to: encoder)
-            case .unexpected(let container):
+            case let .unexpected(container):
                 try container.encode(to: encoder)
             }
         }
 
         public func hash(into hasher: inout Hasher) {
             switch self {
-            case .placeStreamLivestreamLivestreamView(let value):
+            case let .placeStreamLivestreamLivestreamView(value):
                 hasher.combine("place.stream.livestream#livestreamView")
                 hasher.combine(value)
-            case .placeStreamLivestreamViewerCount(let value):
+            case let .placeStreamLivestreamViewerCount(value):
                 hasher.combine("place.stream.livestream#viewerCount")
                 hasher.combine(value)
-            case .placeStreamLivestreamTeleportArrival(let value):
+            case let .placeStreamLivestreamTeleportArrival(value):
                 hasher.combine("place.stream.livestream#teleportArrival")
                 hasher.combine(value)
-            case .placeStreamLivestreamTeleportCanceled(let value):
+            case let .placeStreamLivestreamTeleportCanceled(value):
                 hasher.combine("place.stream.livestream#teleportCanceled")
                 hasher.combine(value)
-            case .placeStreamDefsBlockView(let value):
+            case let .placeStreamDefsBlockView(value):
                 hasher.combine("place.stream.defs#blockView")
                 hasher.combine(value)
-            case .placeStreamDefsRenditions(let value):
+            case let .placeStreamDefsRenditions(value):
                 hasher.combine("place.stream.defs#renditions")
                 hasher.combine(value)
-            case .placeStreamDefsRendition(let value):
+            case let .placeStreamDefsRendition(value):
                 hasher.combine("place.stream.defs#rendition")
                 hasher.combine(value)
-            case .placeStreamChatDefsMessageView(let value):
+            case let .placeStreamChatDefsMessageView(value):
                 hasher.combine("place.stream.chat.defs#messageView")
                 hasher.combine(value)
-            case .placeStreamChatDefsPinnedRecordView(let value):
+            case let .placeStreamChatDefsPinnedRecordView(value):
                 hasher.combine("place.stream.chat.defs#pinnedRecordView")
                 hasher.combine(value)
-            case .unexpected(let container):
+            case let .unexpected(container):
                 hasher.combine("unexpected")
                 hasher.combine(container)
             }
@@ -960,34 +967,34 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
 
         public static func == (lhs: StreamplaceAnythingLivestreamUnion, rhs: StreamplaceAnythingLivestreamUnion) -> Bool {
             switch (lhs, rhs) {
-            case (.placeStreamLivestreamLivestreamView(let lhsValue),
-                  .placeStreamLivestreamLivestreamView(let rhsValue)):
+            case let (.placeStreamLivestreamLivestreamView(lhsValue),
+                      .placeStreamLivestreamLivestreamView(rhsValue)):
                 return lhsValue == rhsValue
-            case (.placeStreamLivestreamViewerCount(let lhsValue),
-                  .placeStreamLivestreamViewerCount(let rhsValue)):
+            case let (.placeStreamLivestreamViewerCount(lhsValue),
+                      .placeStreamLivestreamViewerCount(rhsValue)):
                 return lhsValue == rhsValue
-            case (.placeStreamLivestreamTeleportArrival(let lhsValue),
-                  .placeStreamLivestreamTeleportArrival(let rhsValue)):
+            case let (.placeStreamLivestreamTeleportArrival(lhsValue),
+                      .placeStreamLivestreamTeleportArrival(rhsValue)):
                 return lhsValue == rhsValue
-            case (.placeStreamLivestreamTeleportCanceled(let lhsValue),
-                  .placeStreamLivestreamTeleportCanceled(let rhsValue)):
+            case let (.placeStreamLivestreamTeleportCanceled(lhsValue),
+                      .placeStreamLivestreamTeleportCanceled(rhsValue)):
                 return lhsValue == rhsValue
-            case (.placeStreamDefsBlockView(let lhsValue),
-                  .placeStreamDefsBlockView(let rhsValue)):
+            case let (.placeStreamDefsBlockView(lhsValue),
+                      .placeStreamDefsBlockView(rhsValue)):
                 return lhsValue == rhsValue
-            case (.placeStreamDefsRenditions(let lhsValue),
-                  .placeStreamDefsRenditions(let rhsValue)):
+            case let (.placeStreamDefsRenditions(lhsValue),
+                      .placeStreamDefsRenditions(rhsValue)):
                 return lhsValue == rhsValue
-            case (.placeStreamDefsRendition(let lhsValue),
-                  .placeStreamDefsRendition(let rhsValue)):
+            case let (.placeStreamDefsRendition(lhsValue),
+                      .placeStreamDefsRendition(rhsValue)):
                 return lhsValue == rhsValue
-            case (.placeStreamChatDefsMessageView(let lhsValue),
-                  .placeStreamChatDefsMessageView(let rhsValue)):
+            case let (.placeStreamChatDefsMessageView(lhsValue),
+                      .placeStreamChatDefsMessageView(rhsValue)):
                 return lhsValue == rhsValue
-            case (.placeStreamChatDefsPinnedRecordView(let lhsValue),
-                  .placeStreamChatDefsPinnedRecordView(let rhsValue)):
+            case let (.placeStreamChatDefsPinnedRecordView(lhsValue),
+                      .placeStreamChatDefsPinnedRecordView(rhsValue)):
                 return lhsValue == rhsValue
-            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+            case let (.unexpected(lhsValue), .unexpected(rhsValue)):
                 return lhsValue.isEqual(to: rhsValue)
             default:
                 return false
@@ -999,13 +1006,13 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
             return self == other
         }
 
-        // DAGCBOR encoding with field ordering
+        /// DAGCBOR encoding with field ordering
         public func toCBORValue() throws -> Any {
             // Create an ordered map to maintain field order
             var map = OrderedCBORMap()
 
             switch self {
-            case .placeStreamLivestreamLivestreamView(let value):
+            case let .placeStreamLivestreamLivestreamView(value):
                 map = map.adding(key: "$type", value: "place.stream.livestream#livestreamView")
 
                 let valueDict = try value.toCBORValue()
@@ -1022,7 +1029,7 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case .placeStreamLivestreamViewerCount(let value):
+            case let .placeStreamLivestreamViewerCount(value):
                 map = map.adding(key: "$type", value: "place.stream.livestream#viewerCount")
 
                 let valueDict = try value.toCBORValue()
@@ -1039,7 +1046,7 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case .placeStreamLivestreamTeleportArrival(let value):
+            case let .placeStreamLivestreamTeleportArrival(value):
                 map = map.adding(key: "$type", value: "place.stream.livestream#teleportArrival")
 
                 let valueDict = try value.toCBORValue()
@@ -1056,7 +1063,7 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case .placeStreamLivestreamTeleportCanceled(let value):
+            case let .placeStreamLivestreamTeleportCanceled(value):
                 map = map.adding(key: "$type", value: "place.stream.livestream#teleportCanceled")
 
                 let valueDict = try value.toCBORValue()
@@ -1073,7 +1080,7 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case .placeStreamDefsBlockView(let value):
+            case let .placeStreamDefsBlockView(value):
                 map = map.adding(key: "$type", value: "place.stream.defs#blockView")
 
                 let valueDict = try value.toCBORValue()
@@ -1090,7 +1097,7 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case .placeStreamDefsRenditions(let value):
+            case let .placeStreamDefsRenditions(value):
                 map = map.adding(key: "$type", value: "place.stream.defs#renditions")
 
                 let valueDict = try value.toCBORValue()
@@ -1107,7 +1114,7 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case .placeStreamDefsRendition(let value):
+            case let .placeStreamDefsRendition(value):
                 map = map.adding(key: "$type", value: "place.stream.defs#rendition")
 
                 let valueDict = try value.toCBORValue()
@@ -1124,7 +1131,7 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case .placeStreamChatDefsMessageView(let value):
+            case let .placeStreamChatDefsMessageView(value):
                 map = map.adding(key: "$type", value: "place.stream.chat.defs#messageView")
 
                 let valueDict = try value.toCBORValue()
@@ -1141,7 +1148,7 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case .placeStreamChatDefsPinnedRecordView(let value):
+            case let .placeStreamChatDefsPinnedRecordView(value):
                 map = map.adding(key: "$type", value: "place.stream.chat.defs#pinnedRecordView")
 
                 let valueDict = try value.toCBORValue()
@@ -1158,10 +1165,9 @@ public struct PlaceStreamLivestream: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case .unexpected(let container):
+            case let .unexpected(container):
                 return try container.toCBORValue()
             }
         }
     }
-
 }

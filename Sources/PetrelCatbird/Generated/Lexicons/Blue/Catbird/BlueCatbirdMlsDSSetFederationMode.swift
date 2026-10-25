@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.mlsDS.setFederationMode
 
-public struct BlueCatbirdMlsDSSetFederationMode {
-
+public enum BlueCatbirdMlsDSSetFederationMode {
     public static let typeIdentifier = "blue.catbird.mlsDS.setFederationMode"
     public struct Input: ATProtocolCodable {
         public let mode: String
@@ -17,7 +16,7 @@ public struct BlueCatbirdMlsDSSetFederationMode {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.mode = try container.decode(String.self, forKey: .mode)
+            mode = try container.decode(String.self, forKey: .mode)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -38,7 +37,6 @@ public struct BlueCatbirdMlsDSSetFederationMode {
     }
 
     public struct Output: ATProtocolCodable {
-
         public let updated: Bool
 
         public let effectiveMode: String
@@ -47,9 +45,8 @@ public struct BlueCatbirdMlsDSSetFederationMode {
 
         public let envMode: String
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             updated: Bool,
 
             effectiveMode: String,
@@ -59,7 +56,6 @@ public struct BlueCatbirdMlsDSSetFederationMode {
             envMode: String
 
         ) {
-
             self.updated = updated
 
             self.effectiveMode = effectiveMode
@@ -67,31 +63,27 @@ public struct BlueCatbirdMlsDSSetFederationMode {
             self.overrideMode = overrideMode
 
             self.envMode = envMode
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.updated = try container.decode(Bool.self, forKey: .updated)
+            updated = try container.decode(Bool.self, forKey: .updated)
 
-            self.effectiveMode = try container.decode(String.self, forKey: .effectiveMode)
+            effectiveMode = try container.decode(String.self, forKey: .effectiveMode)
 
             do {
-                self.overrideMode = try container.decodeIfPresent(String.self, forKey: .overrideMode)
+                overrideMode = try container.decodeIfPresent(String.self, forKey: .overrideMode)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'overrideMode' — degrading to nil: \(error)")
-                self.overrideMode = nil
+                overrideMode = nil
             }
 
-            self.envMode = try container.decode(String.self, forKey: .envMode)
-
+            envMode = try container.decode(String.self, forKey: .envMode)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(updated, forKey: .updated)
@@ -102,11 +94,9 @@ public struct BlueCatbirdMlsDSSetFederationMode {
             try container.encodeIfPresent(overrideMode, forKey: .overrideMode)
 
             try container.encode(envMode, forKey: .envMode)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let updatedValue = try updated.toCBORValue()
@@ -125,7 +115,6 @@ public struct BlueCatbirdMlsDSSetFederationMode {
             map = map.adding(key: "envMode", value: envModeValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -134,22 +123,20 @@ public struct BlueCatbirdMlsDSSetFederationMode {
             case overrideMode
             case envMode
         }
-
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.MlsDS {
+public extension ATProtoClient.Blue.Catbird.MlsDS {
     // MARK: - setFederationMode
-    /// Set the federation mode at runtime (admin only). Set a runtime override for the federation mode. Requires federation admin privileges.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Set the federation mode at runtime (admin only). Set a runtime override for the federation mode. Requires federation admin privileges.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func setFederationMode(
-
+    func setFederationMode(
         input: BlueCatbirdMlsDSSetFederationMode.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdMlsDSSetFederationMode.Output?) {
@@ -182,8 +169,7 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -193,7 +179,6 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdMlsDSSetFederationMode.Output.self, from: responseData)
 
@@ -204,11 +189,8 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
                 return (responseCode, nil)
             }
         } else {
-
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

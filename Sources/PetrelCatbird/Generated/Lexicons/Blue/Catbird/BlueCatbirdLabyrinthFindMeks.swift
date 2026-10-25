@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.findMeks
 
-public struct BlueCatbirdLabyrinthFindMeks {
-
+public enum BlueCatbirdLabyrinthFindMeks {
     public static let typeIdentifier = "blue.catbird.labyrinth.findMeks"
 
     public struct AuthoredView: ATProtocolCodable, ATProtocolValue {
@@ -27,25 +26,25 @@ public struct BlueCatbirdLabyrinthFindMeks {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.author = try container.decode(DID.self, forKey: .author)
+                author = try container.decode(DID.self, forKey: .author)
             } catch {
                 LogManager.logError("Decoding error for required property 'author': \(error)")
                 throw error
             }
             do {
-                self.rkey = try container.decode(String.self, forKey: .rkey)
+                rkey = try container.decode(String.self, forKey: .rkey)
             } catch {
                 LogManager.logError("Decoding error for required property 'rkey': \(error)")
                 throw error
             }
             do {
-                self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+                record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
             } catch {
                 LogManager.logError("Decoding error for required property 'record': \(error)")
                 throw error
             }
             do {
-                self.order = try container.decode(BlueCatbirdLabyrinthDefs.ServerOrder.self, forKey: .order)
+                order = try container.decode(BlueCatbirdLabyrinthDefs.ServerOrder.self, forKey: .order)
             } catch {
                 LogManager.logError("Decoding error for required property 'order': \(error)")
                 throw error
@@ -111,6 +110,7 @@ public struct BlueCatbirdLabyrinthFindMeks {
             case order
         }
     }
+
     public struct Parameters: Parametrizable {
         public let threadId: String
         public let mekId: String
@@ -127,60 +127,50 @@ public struct BlueCatbirdLabyrinthFindMeks {
             self.mekId = mekId
             self.cursor = cursor
             self.limit = limit
-
         }
     }
 
     public struct Output: ATProtocolCodable {
-
         public let items: [AuthoredView]
 
         public let cursor: String?
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             items: [AuthoredView],
 
             cursor: String? = nil
 
         ) {
-
             self.items = items
 
             self.cursor = cursor
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.items = try container.decode([AuthoredView].self, forKey: .items)
+            items = try container.decode([AuthoredView].self, forKey: .items)
 
             do {
-                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
+                cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
-                self.cursor = nil
+                cursor = nil
             }
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(items, forKey: .items)
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(cursor, forKey: .cursor)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let itemsValue = try items.toCBORValue()
@@ -193,14 +183,12 @@ public struct BlueCatbirdLabyrinthFindMeks {
             }
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case items
             case cursor
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -208,25 +196,25 @@ public struct BlueCatbirdLabyrinthFindMeks {
         /// The conversation Space storage generation is permanently deleted.
         case spaceDeleted = "SpaceDeleted"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Labyrinth {
+public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - findMeks
+
     /// Every MEK record with this id that the caller wrote or is a recipient of. Thread endpoint on the conversation's sequencer DS; threadId is the chat conversation id ([CB-2]). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded. For a thread backed by a conversation Space, a permanently deleted storage generation returns SpaceDeleted without returning data. This is terminal: do not retry by rebinding to another generation or falling back to another storage placement.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func findMeks(input: BlueCatbirdLabyrinthFindMeks.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthFindMeks.Output?) {
+    func findMeks(input: BlueCatbirdLabyrinthFindMeks.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthFindMeks.Output?) {
         let endpoint = "blue.catbird.labyrinth.findMeks"
 
         let queryItems = input.asQueryItems()
@@ -248,8 +236,7 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

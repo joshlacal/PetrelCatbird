@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.getMemberDevices
 
-public struct BlueCatbirdLabyrinthGetMemberDevices {
-
+public enum BlueCatbirdLabyrinthGetMemberDevices {
     public static let typeIdentifier = "blue.catbird.labyrinth.getMemberDevices"
 
     public struct MemberDevice: ATProtocolCodable, ATProtocolValue {
@@ -27,30 +26,30 @@ public struct BlueCatbirdLabyrinthGetMemberDevices {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.keyId = try container.decode(String.self, forKey: .keyId)
+                keyId = try container.decode(String.self, forKey: .keyId)
             } catch {
                 LogManager.logError("Decoding error for required property 'keyId': \(error)")
                 throw error
             }
             do {
-                self.signingPublicKey = try container.decode(Bytes.self, forKey: .signingPublicKey)
+                signingPublicKey = try container.decode(Bytes.self, forKey: .signingPublicKey)
             } catch {
                 LogManager.logError("Decoding error for required property 'signingPublicKey': \(error)")
                 throw error
             }
             do {
-                self.joinedSeq = try container.decode(Int.self, forKey: .joinedSeq)
+                joinedSeq = try container.decode(Int.self, forKey: .joinedSeq)
             } catch {
                 LogManager.logError("Decoding error for required property 'joinedSeq': \(error)")
                 throw error
             }
             do {
-                self.removedSeq = try container.decodeIfPresent(Int.self, forKey: .removedSeq)
+                removedSeq = try container.decodeIfPresent(Int.self, forKey: .removedSeq)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'removedSeq' — degrading to nil: \(error)")
-                self.removedSeq = nil
+                removedSeq = nil
             }
         }
 
@@ -119,6 +118,7 @@ public struct BlueCatbirdLabyrinthGetMemberDevices {
             case removedSeq
         }
     }
+
     public struct Parameters: Parametrizable {
         public let threadId: String
         public let did: DID
@@ -135,60 +135,50 @@ public struct BlueCatbirdLabyrinthGetMemberDevices {
             self.did = did
             self.cursor = cursor
             self.limit = limit
-
         }
     }
 
     public struct Output: ATProtocolCodable {
-
         public let items: [MemberDevice]
 
         public let cursor: String?
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             items: [MemberDevice],
 
             cursor: String? = nil
 
         ) {
-
             self.items = items
 
             self.cursor = cursor
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.items = try container.decode([MemberDevice].self, forKey: .items)
+            items = try container.decode([MemberDevice].self, forKey: .items)
 
             do {
-                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
+                cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
-                self.cursor = nil
+                cursor = nil
             }
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(items, forKey: .items)
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(cursor, forKey: .cursor)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let itemsValue = try items.toCBORValue()
@@ -201,38 +191,36 @@ public struct BlueCatbirdLabyrinthGetMemberDevices {
             }
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case items
             case cursor
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case conversationNotFound = "ConversationNotFound"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Labyrinth {
+public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - getMemberDevices
+
     /// The DID's device leaves in one conversation with the chat seqs of the commits that added and removed them (chat.member_devices). Readers bound a key's vouching by them ([CB-27]). Directory endpoint: any authenticated chat device may call it. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getMemberDevices(input: BlueCatbirdLabyrinthGetMemberDevices.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetMemberDevices.Output?) {
+    func getMemberDevices(input: BlueCatbirdLabyrinthGetMemberDevices.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetMemberDevices.Output?) {
         let endpoint = "blue.catbird.labyrinth.getMemberDevices"
 
         let queryItems = input.asQueryItems()
@@ -254,8 +242,7 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

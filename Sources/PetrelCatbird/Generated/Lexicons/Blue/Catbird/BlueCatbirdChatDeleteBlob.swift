@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.deleteBlob
 
-public struct BlueCatbirdChatDeleteBlob {
-
+public enum BlueCatbirdChatDeleteBlob {
     public static let typeIdentifier = "blue.catbird.chat.deleteBlob"
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedBlobDeletion
@@ -17,7 +16,7 @@ public struct BlueCatbirdChatDeleteBlob {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedBlobDeletion.self, forKey: .signedRequest)
+            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedBlobDeletion.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -38,48 +37,39 @@ public struct BlueCatbirdChatDeleteBlob {
     }
 
     public struct Output: ATProtocolCodable {
-
         public let blobId: BlueCatbirdChatDefs.OperationId
 
         public let deletedAt: BlueCatbirdChatDefs.CanonicalDatetime
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             blobId: BlueCatbirdChatDefs.OperationId,
 
             deletedAt: BlueCatbirdChatDefs.CanonicalDatetime
 
         ) {
-
             self.blobId = blobId
 
             self.deletedAt = deletedAt
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.blobId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .blobId)
+            blobId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .blobId)
 
-            self.deletedAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .deletedAt)
-
+            deletedAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .deletedAt)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(blobId, forKey: .blobId)
 
             try container.encode(deletedAt, forKey: .deletedAt)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let blobIdValue = try blobId.toCBORValue()
@@ -89,14 +79,12 @@ public struct BlueCatbirdChatDeleteBlob {
             map = map.adding(key: "deletedAt", value: deletedAtValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case blobId
             case deletedAt
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -115,27 +103,26 @@ public struct BlueCatbirdChatDeleteBlob {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Chat {
+public extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - deleteBlob
-    /// Delete only the signer-owned completed upload that is still unbound, without requiring current conversation coordinates so removed uploaders can release quota. Bound blobs are immutable history. Upload tickets expire after five minutes; completed-unbound uploads expire after one hour; blob IDs and tombstones are never reused.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Delete only the signer-owned completed upload that is still unbound, without requiring current conversation coordinates so removed uploaders can release quota. Bound blobs are immutable history. Upload tickets expire after five minutes; completed-unbound uploads expire after one hour; blob IDs and tombstones are never reused.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func deleteBlob(
-
+    func deleteBlob(
         input: BlueCatbirdChatDeleteBlob.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatDeleteBlob.Output?) {
@@ -168,8 +155,7 @@ extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -179,7 +165,6 @@ extension ATProtoClient.Blue.Catbird.Chat {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatDeleteBlob.Output.self, from: responseData)
 
@@ -202,7 +187,5 @@ extension ATProtoClient.Blue.Catbird.Chat {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

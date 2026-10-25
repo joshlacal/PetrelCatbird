@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: place.stream.moderation.deleteGate
 
-public struct PlaceStreamModerationDeleteGate {
-
+public enum PlaceStreamModerationDeleteGate {
     public static let typeIdentifier = "place.stream.moderation.deleteGate"
     public struct Input: ATProtocolCodable {
         public let streamer: DID
@@ -19,8 +18,8 @@ public struct PlaceStreamModerationDeleteGate {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.streamer = try container.decode(DID.self, forKey: .streamer)
-            self.gateUri = try container.decode(ATProtocolURI.self, forKey: .gateUri)
+            streamer = try container.decode(DID.self, forKey: .streamer)
+            gateUri = try container.decode(ATProtocolURI.self, forKey: .gateUri)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -45,37 +44,25 @@ public struct PlaceStreamModerationDeleteGate {
     }
 
     public struct Output: ATProtocolCodable {
-
         // Empty output - no properties (response is {})
 
-        // Standard public initializer
-        public init(
-
-        ) {
-
-        }
+        /// Standard public initializer
+        public init() {}
 
         public init(from decoder: Decoder) throws {
-
             // Empty output - just validate it's an object by trying to get any container
             _ = try decoder.singleValueContainer()
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             // Empty output - encode empty object
             _ = encoder.singleValueContainer()
-
         }
 
         public func toCBORValue() throws -> Any {
-
             // Empty output - return empty CBOR map
             return OrderedCBORMap()
-
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -86,27 +73,26 @@ public struct PlaceStreamModerationDeleteGate {
         /// The streamer's OAuth session could not be found or is invalid.
         case sessionNotFound = "SessionNotFound"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Place.Stream.Moderation {
+public extension ATProtoClient.Place.Stream.Moderation {
     // MARK: - deleteGate
-    /// Delete a gate (unhide message) on behalf of a streamer. Requires 'hide' permission. Deletes a place.stream.chat.gate record from the streamer's repository.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Delete a gate (unhide message) on behalf of a streamer. Requires 'hide' permission. Deletes a place.stream.chat.gate record from the streamer's repository.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func deleteGate(
-
+    func deleteGate(
         input: PlaceStreamModerationDeleteGate.Input
 
     ) async throws -> (responseCode: Int, data: PlaceStreamModerationDeleteGate.Output?) {
@@ -139,8 +125,7 @@ extension ATProtoClient.Place.Stream.Moderation {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -150,7 +135,6 @@ extension ATProtoClient.Place.Stream.Moderation {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(PlaceStreamModerationDeleteGate.Output.self, from: responseData)
 
@@ -173,7 +157,5 @@ extension ATProtoClient.Place.Stream.Moderation {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

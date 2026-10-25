@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.submitTransition
 
-public struct BlueCatbirdChatSubmitTransition {
-
+public enum BlueCatbirdChatSubmitTransition {
     public static let typeIdentifier = "blue.catbird.chat.submitTransition"
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedTransition
@@ -17,7 +16,7 @@ public struct BlueCatbirdChatSubmitTransition {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedTransition.self, forKey: .signedRequest)
+            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedTransition.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -38,16 +37,14 @@ public struct BlueCatbirdChatSubmitTransition {
     }
 
     public struct Output: ATProtocolCodable {
-
         public let coordinates: BlueCatbirdChatDefs.ConversationCoordinates
 
         public let entry: BlueCatbirdChatDefs.ConversationEntry
 
         public let welcomes: [BlueCatbirdChatDefs.WelcomeView]
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             coordinates: BlueCatbirdChatDefs.ConversationCoordinates,
 
             entry: BlueCatbirdChatDefs.ConversationEntry,
@@ -55,29 +52,24 @@ public struct BlueCatbirdChatSubmitTransition {
             welcomes: [BlueCatbirdChatDefs.WelcomeView]
 
         ) {
-
             self.coordinates = coordinates
 
             self.entry = entry
 
             self.welcomes = welcomes
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.coordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .coordinates)
+            coordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .coordinates)
 
-            self.entry = try container.decode(BlueCatbirdChatDefs.ConversationEntry.self, forKey: .entry)
+            entry = try container.decode(BlueCatbirdChatDefs.ConversationEntry.self, forKey: .entry)
 
-            self.welcomes = try container.decode([BlueCatbirdChatDefs.WelcomeView].self, forKey: .welcomes)
-
+            welcomes = try container.decode([BlueCatbirdChatDefs.WelcomeView].self, forKey: .welcomes)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(coordinates, forKey: .coordinates)
@@ -85,11 +77,9 @@ public struct BlueCatbirdChatSubmitTransition {
             try container.encode(entry, forKey: .entry)
 
             try container.encode(welcomes, forKey: .welcomes)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let coordinatesValue = try coordinates.toCBORValue()
@@ -102,7 +92,6 @@ public struct BlueCatbirdChatSubmitTransition {
             map = map.adding(key: "welcomes", value: welcomesValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -110,7 +99,6 @@ public struct BlueCatbirdChatSubmitTransition {
             case entry
             case welcomes
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -163,27 +151,26 @@ public struct BlueCatbirdChatSubmitTransition {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Chat {
+public extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - submitTransition
-    /// Submits exactly one closed signed transition: ordinary public Commit, group-only policy change, leaf-recovery fulfillment, metadata update, or group leave fulfillment. Generic signedCommitTransition has zero Add proposals and zero membership changes; only signedLeafRecoveryFulfillment may contain exactly one target-device-signed request-bound Add, fulfilled by a different current leaf with one Welcome. No admin/current leaf can reserve and Add another device. Direct participant and role mutations are forbidden. Group invitation changes recheck consent, pending limits, and every-pair block policy; recovery selection and final Add consume a fresh complete exact-scope policy projection under lock. Self-exit fulfillment is never denied by relationship state. Epoch-changing forms carry a fresh-nonce final-epoch metadata snapshot. The server validates and merges the public Commit in disposable OpenMLS storage before atomically replacing its digest-bound deterministic PublicGroup snapshot. External commits, standalone proposals, post-GroupInfo artifacts, and committer self-removal are forbidden.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Submits exactly one closed signed transition: ordinary public Commit, group-only policy change, leaf-recovery fulfillment, metadata update, or group leave fulfillment. Generic signedCommitTransition has zero Add proposals and zero membership changes; only signedLeafRecoveryFulfillment may contain exactly one target-device-signed request-bound Add, fulfilled by a different current leaf with one Welcome. No admin/current leaf can reserve and Add another device. Direct participant and role mutations are forbidden. Group invitation changes recheck consent, pending limits, and every-pair block policy; recovery selection and final Add consume a fresh complete exact-scope policy projection under lock. Self-exit fulfillment is never denied by relationship state. Epoch-changing forms carry a fresh-nonce final-epoch metadata snapshot. The server validates and merges the public Commit in disposable OpenMLS storage before atomically replacing its digest-bound deterministic PublicGroup snapshot. External commits, standalone proposals, post-GroupInfo artifacts, and committer self-removal are forbidden.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func submitTransition(
-
+    func submitTransition(
         input: BlueCatbirdChatSubmitTransition.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatSubmitTransition.Output?) {
@@ -216,8 +203,7 @@ extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -227,7 +213,6 @@ extension ATProtoClient.Blue.Catbird.Chat {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatSubmitTransition.Output.self, from: responseData)
 
@@ -250,7 +235,5 @@ extension ATProtoClient.Blue.Catbird.Chat {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

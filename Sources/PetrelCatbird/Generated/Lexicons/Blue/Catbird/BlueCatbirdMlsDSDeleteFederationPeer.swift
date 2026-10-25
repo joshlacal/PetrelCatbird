@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.mlsDS.deleteFederationPeer
 
-public struct BlueCatbirdMlsDSDeleteFederationPeer {
-
+public enum BlueCatbirdMlsDSDeleteFederationPeer {
     public static let typeIdentifier = "blue.catbird.mlsDS.deleteFederationPeer"
     public struct Input: ATProtocolCodable {
         public let dsDid: String
@@ -17,7 +16,7 @@ public struct BlueCatbirdMlsDSDeleteFederationPeer {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.dsDid = try container.decode(String.self, forKey: .dsDid)
+            dsDid = try container.decode(String.self, forKey: .dsDid)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -38,48 +37,39 @@ public struct BlueCatbirdMlsDSDeleteFederationPeer {
     }
 
     public struct Output: ATProtocolCodable {
-
         public let deleted: Bool
 
         public let dsDid: String
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             deleted: Bool,
 
             dsDid: String
 
         ) {
-
             self.deleted = deleted
 
             self.dsDid = dsDid
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.deleted = try container.decode(Bool.self, forKey: .deleted)
+            deleted = try container.decode(Bool.self, forKey: .deleted)
 
-            self.dsDid = try container.decode(String.self, forKey: .dsDid)
-
+            dsDid = try container.decode(String.self, forKey: .dsDid)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(deleted, forKey: .deleted)
 
             try container.encode(dsDid, forKey: .dsDid)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let deletedValue = try deleted.toCBORValue()
@@ -89,29 +79,26 @@ public struct BlueCatbirdMlsDSDeleteFederationPeer {
             map = map.adding(key: "dsDid", value: dsDidValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case deleted
             case dsDid
         }
-
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.MlsDS {
+public extension ATProtoClient.Blue.Catbird.MlsDS {
     // MARK: - deleteFederationPeer
-    /// Delete a federation peer policy (admin only). Remove a federation peer policy record. Requires federation admin privileges.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Delete a federation peer policy (admin only). Remove a federation peer policy record. Requires federation admin privileges.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func deleteFederationPeer(
-
+    func deleteFederationPeer(
         input: BlueCatbirdMlsDSDeleteFederationPeer.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdMlsDSDeleteFederationPeer.Output?) {
@@ -144,8 +131,7 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -155,7 +141,6 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdMlsDSDeleteFederationPeer.Output.self, from: responseData)
 
@@ -166,11 +151,8 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
                 return (responseCode, nil)
             }
         } else {
-
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

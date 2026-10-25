@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: place.stream.ingest.defs
 
-public struct PlaceStreamIngestDefs {
-
+public enum PlaceStreamIngestDefs {
     public static let typeIdentifier = "place.stream.ingest.defs"
 
     public struct Ingest: ATProtocolCodable, ATProtocolValue {
@@ -23,13 +22,13 @@ public struct PlaceStreamIngestDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.type = try container.decode(String.self, forKey: .type)
+                type = try container.decode(String.self, forKey: .type)
             } catch {
                 LogManager.logError("Decoding error for required property 'type': \(error)")
                 throw error
             }
             do {
-                self.url = try container.decode(URI.self, forKey: .url)
+                url = try container.decode(URI.self, forKey: .url)
             } catch {
                 LogManager.logError("Decoding error for required property 'url': \(error)")
                 throw error
@@ -79,5 +78,4 @@ public struct PlaceStreamIngestDefs {
             case url
         }
     }
-
 }

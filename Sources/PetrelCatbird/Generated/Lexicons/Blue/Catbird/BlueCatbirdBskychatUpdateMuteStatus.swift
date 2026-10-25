@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.bskychat.updateMuteStatus
 
-public struct BlueCatbirdBskychatUpdateMuteStatus {
-
+public enum BlueCatbirdBskychatUpdateMuteStatus {
     public static let typeIdentifier = "blue.catbird.bskychat.updateMuteStatus"
     public struct Input: ATProtocolCodable {
         public let convoId: String
@@ -19,8 +18,8 @@ public struct BlueCatbirdBskychatUpdateMuteStatus {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.convoId = try container.decode(String.self, forKey: .convoId)
-            self.muted = try container.decode(Bool.self, forKey: .muted)
+            convoId = try container.decode(String.self, forKey: .convoId)
+            muted = try container.decode(Bool.self, forKey: .muted)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -45,66 +44,54 @@ public struct BlueCatbirdBskychatUpdateMuteStatus {
     }
 
     public struct Output: ATProtocolCodable {
-
         public let success: Bool
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             success: Bool
 
         ) {
-
             self.success = success
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.success = try container.decode(Bool.self, forKey: .success)
-
+            success = try container.decode(Bool.self, forKey: .success)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(success, forKey: .success)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let successValue = try success.toCBORValue()
             map = map.adding(key: "success", value: successValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case success
         }
-
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Bskychat {
+public extension ATProtoClient.Blue.Catbird.Bskychat {
     // MARK: - updateMuteStatus
-    /// Update the server-side mute status for a conversation. Used for push notification suppression.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Update the server-side mute status for a conversation. Used for push notification suppression.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func updateMuteStatus(
-
+    func updateMuteStatus(
         input: BlueCatbirdBskychatUpdateMuteStatus.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdBskychatUpdateMuteStatus.Output?) {
@@ -137,8 +124,7 @@ extension ATProtoClient.Blue.Catbird.Bskychat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -148,7 +134,6 @@ extension ATProtoClient.Blue.Catbird.Bskychat {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdBskychatUpdateMuteStatus.Output.self, from: responseData)
 
@@ -159,11 +144,8 @@ extension ATProtoClient.Blue.Catbird.Bskychat {
                 return (responseCode, nil)
             }
         } else {
-
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

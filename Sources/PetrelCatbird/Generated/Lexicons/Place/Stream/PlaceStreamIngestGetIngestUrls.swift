@@ -4,63 +4,47 @@ import Petrel
 
 // lexicon: 1, id: place.stream.ingest.getIngestUrls
 
-public struct PlaceStreamIngestGetIngestUrls {
-
+public enum PlaceStreamIngestGetIngestUrls {
     public static let typeIdentifier = "place.stream.ingest.getIngestUrls"
     public struct Parameters: Parametrizable {
-
-        public init(
-        ) {
-
-        }
+        public init() {}
     }
 
     public struct Output: ATProtocolCodable {
-
         public let ingests: [OutputIngestsUnion]
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             ingests: [OutputIngestsUnion]
 
         ) {
-
             self.ingests = ingests
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.ingests = try container.decode([OutputIngestsUnion].self, forKey: .ingests)
-
+            ingests = try container.decode([OutputIngestsUnion].self, forKey: .ingests)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(ingests, forKey: .ingests)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let ingestsValue = try ingests.toCBORValue()
             map = map.adding(key: "ingests", value: ingestsValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case ingests
         }
-
     }
 
     public enum OutputIngestsUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
@@ -88,20 +72,20 @@ public struct PlaceStreamIngestGetIngestUrls {
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             switch self {
-            case .placeStreamIngestDefsIngest(let value):
+            case let .placeStreamIngestDefsIngest(value):
                 try container.encode("place.stream.ingest.defs#ingest", forKey: .type)
                 try value.encode(to: encoder)
-            case .unexpected(let container):
+            case let .unexpected(container):
                 try container.encode(to: encoder)
             }
         }
 
         public func hash(into hasher: inout Hasher) {
             switch self {
-            case .placeStreamIngestDefsIngest(let value):
+            case let .placeStreamIngestDefsIngest(value):
                 hasher.combine("place.stream.ingest.defs#ingest")
                 hasher.combine(value)
-            case .unexpected(let container):
+            case let .unexpected(container):
                 hasher.combine("unexpected")
                 hasher.combine(container)
             }
@@ -113,10 +97,10 @@ public struct PlaceStreamIngestGetIngestUrls {
 
         public static func == (lhs: OutputIngestsUnion, rhs: OutputIngestsUnion) -> Bool {
             switch (lhs, rhs) {
-            case (.placeStreamIngestDefsIngest(let lhsValue),
-                  .placeStreamIngestDefsIngest(let rhsValue)):
+            case let (.placeStreamIngestDefsIngest(lhsValue),
+                      .placeStreamIngestDefsIngest(rhsValue)):
                 return lhsValue == rhsValue
-            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+            case let (.unexpected(lhsValue), .unexpected(rhsValue)):
                 return lhsValue.isEqual(to: rhsValue)
             default:
                 return false
@@ -128,13 +112,13 @@ public struct PlaceStreamIngestGetIngestUrls {
             return self == other
         }
 
-        // DAGCBOR encoding with field ordering
+        /// DAGCBOR encoding with field ordering
         public func toCBORValue() throws -> Any {
             // Create an ordered map to maintain field order
             var map = OrderedCBORMap()
 
             switch self {
-            case .placeStreamIngestDefsIngest(let value):
+            case let .placeStreamIngestDefsIngest(value):
                 map = map.adding(key: "$type", value: "place.stream.ingest.defs#ingest")
 
                 let valueDict = try value.toCBORValue()
@@ -151,23 +135,23 @@ public struct PlaceStreamIngestGetIngestUrls {
                     }
                 }
                 return map
-            case .unexpected(let container):
+            case let .unexpected(container):
                 return try container.toCBORValue()
             }
         }
     }
-
 }
 
-extension ATProtoClient.Place.Stream.Ingest {
+public extension ATProtoClient.Place.Stream.Ingest {
     // MARK: - getIngestUrls
+
     /// Get ingest URLs for a Streamplace station.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getIngestUrls(input: PlaceStreamIngestGetIngestUrls.Parameters) async throws -> (responseCode: Int, data: PlaceStreamIngestGetIngestUrls.Output?) {
+    func getIngestUrls(input: PlaceStreamIngestGetIngestUrls.Parameters) async throws -> (responseCode: Int, data: PlaceStreamIngestGetIngestUrls.Output?) {
         let endpoint = "place.stream.ingest.getIngestUrls"
 
         let queryItems = input.asQueryItems()
@@ -189,8 +173,7 @@ extension ATProtoClient.Place.Stream.Ingest {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -210,7 +193,6 @@ extension ATProtoClient.Place.Stream.Ingest {
                 return (responseCode, nil)
             }
         } else {
-
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)

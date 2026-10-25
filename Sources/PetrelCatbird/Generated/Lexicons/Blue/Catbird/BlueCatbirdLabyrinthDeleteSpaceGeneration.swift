@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.deleteSpaceGeneration
 
-public struct BlueCatbirdLabyrinthDeleteSpaceGeneration {
-
+public enum BlueCatbirdLabyrinthDeleteSpaceGeneration {
     public static let typeIdentifier = "blue.catbird.labyrinth.deleteSpaceGeneration"
     public struct Input: ATProtocolCodable {
         public let space: SpaceRef
@@ -19,8 +18,8 @@ public struct BlueCatbirdLabyrinthDeleteSpaceGeneration {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.space = try container.decode(SpaceRef.self, forKey: .space)
-            self.generation = try container.decode(String.self, forKey: .generation)
+            space = try container.decode(SpaceRef.self, forKey: .space)
+            generation = try container.decode(String.self, forKey: .generation)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -45,16 +44,14 @@ public struct BlueCatbirdLabyrinthDeleteSpaceGeneration {
     }
 
     public struct Output: ATProtocolCodable {
-
         public let space: SpaceRef
 
         public let generation: String
 
         public let deleted: Bool
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             space: SpaceRef,
 
             generation: String,
@@ -62,29 +59,24 @@ public struct BlueCatbirdLabyrinthDeleteSpaceGeneration {
             deleted: Bool
 
         ) {
-
             self.space = space
 
             self.generation = generation
 
             self.deleted = deleted
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.space = try container.decode(SpaceRef.self, forKey: .space)
+            space = try container.decode(SpaceRef.self, forKey: .space)
 
-            self.generation = try container.decode(String.self, forKey: .generation)
+            generation = try container.decode(String.self, forKey: .generation)
 
-            self.deleted = try container.decode(Bool.self, forKey: .deleted)
-
+            deleted = try container.decode(Bool.self, forKey: .deleted)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(space, forKey: .space)
@@ -92,11 +84,9 @@ public struct BlueCatbirdLabyrinthDeleteSpaceGeneration {
             try container.encode(generation, forKey: .generation)
 
             try container.encode(deleted, forKey: .deleted)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let spaceValue = try space.toCBORValue()
@@ -109,7 +99,6 @@ public struct BlueCatbirdLabyrinthDeleteSpaceGeneration {
             map = map.adding(key: "deleted", value: deletedValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -117,7 +106,6 @@ public struct BlueCatbirdLabyrinthDeleteSpaceGeneration {
             case generation
             case deleted
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -125,27 +113,26 @@ public struct BlueCatbirdLabyrinthDeleteSpaceGeneration {
         case storageGenerationMismatch = "StorageGenerationMismatch"
         case storageNotConfigured = "StorageNotConfigured"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Labyrinth {
+public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - deleteSpaceGeneration
-    /// Internal authority callback that permanently deletes exactly one conversation Space generation. Requires the exact authority service JWT, DS audience, exact lxm, unique jti and a lifetime of at most 60 seconds. The authority must persist pending deletion and stop credential issuance before calling; only after success may it acknowledge deletion and durably notify registered repositories. Repeating the same exact generation with a fresh JWT is idempotent. No rebind or undelete exists.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Internal authority callback that permanently deletes exactly one conversation Space generation. Requires the exact authority service JWT, DS audience, exact lxm, unique jti and a lifetime of at most 60 seconds. The authority must persist pending deletion and stop credential issuance before calling; only after success may it acknowledge deletion and durably notify registered repositories. Repeating the same exact generation with a fresh JWT is idempotent. No rebind or undelete exists.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func deleteSpaceGeneration(
-
+    func deleteSpaceGeneration(
         input: BlueCatbirdLabyrinthDeleteSpaceGeneration.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthDeleteSpaceGeneration.Output?) {
@@ -178,8 +165,7 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -189,7 +175,6 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdLabyrinthDeleteSpaceGeneration.Output.self, from: responseData)
 
@@ -212,7 +197,5 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

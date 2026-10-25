@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.getDevices
 
-public struct BlueCatbirdChatGetDevices {
-
+public enum BlueCatbirdChatGetDevices {
     public static let typeIdentifier = "blue.catbird.chat.getDevices"
     public struct Parameters: Parametrizable {
         public let actorDeviceId: String
@@ -17,56 +16,44 @@ public struct BlueCatbirdChatGetDevices {
         ) {
             self.actorDeviceId = actorDeviceId
             self.userDids = userDids
-
         }
     }
 
     public struct Output: ATProtocolCodable {
-
         public let devices: [BlueCatbirdChatDefs.AddressableDevice]
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             devices: [BlueCatbirdChatDefs.AddressableDevice]
 
         ) {
-
             self.devices = devices
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.devices = try container.decode([BlueCatbirdChatDefs.AddressableDevice].self, forKey: .devices)
-
+            devices = try container.decode([BlueCatbirdChatDefs.AddressableDevice].self, forKey: .devices)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(devices, forKey: .devices)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let devicesValue = try devices.toCBORValue()
             map = map.adding(key: "devices", value: devicesValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case devices
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -80,25 +67,25 @@ public struct BlueCatbirdChatGetDevices {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Chat {
+public extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - getDevices
+
     /// Return the complete active addressable-device set for one to five strictly ordered, duplicate-free bare DIDs. At most 20 active devices exist per DID, so the bounded response is never truncated. Output devices are strictly ordered by (userDid exact UTF-8 bytes, deviceId raw UUID bytes). actorDeviceId identifies the authenticated caller's active device and is validated against the service-authenticated DID.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getDevices(input: BlueCatbirdChatGetDevices.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetDevices.Output?) {
+    func getDevices(input: BlueCatbirdChatGetDevices.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetDevices.Output?) {
         let endpoint = "blue.catbird.chat.getDevices"
 
         let queryItems = input.asQueryItems()
@@ -120,8 +107,7 @@ extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

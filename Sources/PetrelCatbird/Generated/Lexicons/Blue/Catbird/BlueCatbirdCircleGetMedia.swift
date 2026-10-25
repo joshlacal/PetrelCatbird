@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.circle.getMedia
 
-public struct BlueCatbirdCircleGetMedia {
-
+public enum BlueCatbirdCircleGetMedia {
     public static let typeIdentifier = "blue.catbird.circle.getMedia"
     public struct Parameters: Parametrizable {
         public let space: SpaceRef
@@ -20,56 +19,44 @@ public struct BlueCatbirdCircleGetMedia {
             self.space = space
             self.did = did
             self.cid = cid
-
         }
     }
 
     public struct Output: ATProtocolCodable {
-
         public let data: Data
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             data: Data
 
         ) {
-
             self.data = data
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.data = try container.decode(Data.self, forKey: .data)
-
+            data = try container.decode(Data.self, forKey: .data)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(data, forKey: .data)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let dataValue = try data.toCBORValue()
             map = map.adding(key: "data", value: dataValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case data
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -79,25 +66,25 @@ public struct BlueCatbirdCircleGetMedia {
         case protocolRevisionMismatch = "ProtocolRevisionMismatch"
         case upstreamUnavailable = "UpstreamUnavailable"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Circle {
+public extension ATProtoClient.Blue.Catbird.Circle {
     // MARK: - getMedia
+
     /// Get media associated with a post in a Circle Space
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getMedia(input: BlueCatbirdCircleGetMedia.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdCircleGetMedia.Output?) {
+    func getMedia(input: BlueCatbirdCircleGetMedia.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdCircleGetMedia.Output?) {
         let endpoint = "blue.catbird.circle.getMedia"
 
         let queryItems = input.asQueryItems()
@@ -119,8 +106,7 @@ extension ATProtoClient.Blue.Catbird.Circle {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             // Wildcard encoding ("*/*") — accept any Content-Type, including a missing one.
 
             let decodedData = BlueCatbirdCircleGetMedia.Output(data: responseData)

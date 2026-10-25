@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.requestReset
 
-public struct BlueCatbirdChatRequestReset {
-
+public enum BlueCatbirdChatRequestReset {
     public static let typeIdentifier = "blue.catbird.chat.requestReset"
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedResetRequest
@@ -17,7 +16,7 @@ public struct BlueCatbirdChatRequestReset {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedResetRequest.self, forKey: .signedRequest)
+            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedResetRequest.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -38,48 +37,39 @@ public struct BlueCatbirdChatRequestReset {
     }
 
     public struct Output: ATProtocolCodable {
-
         public let resetRequest: BlueCatbirdChatDefs.ResetRequestView
 
         public let entry: BlueCatbirdChatDefs.ResetRequestEntry
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             resetRequest: BlueCatbirdChatDefs.ResetRequestView,
 
             entry: BlueCatbirdChatDefs.ResetRequestEntry
 
         ) {
-
             self.resetRequest = resetRequest
 
             self.entry = entry
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.resetRequest = try container.decode(BlueCatbirdChatDefs.ResetRequestView.self, forKey: .resetRequest)
+            resetRequest = try container.decode(BlueCatbirdChatDefs.ResetRequestView.self, forKey: .resetRequest)
 
-            self.entry = try container.decode(BlueCatbirdChatDefs.ResetRequestEntry.self, forKey: .entry)
-
+            entry = try container.decode(BlueCatbirdChatDefs.ResetRequestEntry.self, forKey: .entry)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(resetRequest, forKey: .resetRequest)
 
             try container.encode(entry, forKey: .entry)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let resetRequestValue = try resetRequest.toCBORValue()
@@ -89,14 +79,12 @@ public struct BlueCatbirdChatRequestReset {
             map = map.adding(key: "entry", value: entryValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case resetRequest
             case entry
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -117,27 +105,26 @@ public struct BlueCatbirdChatRequestReset {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Chat {
+public extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - requestReset
-    /// Durably records an idempotent signed reset request at the exact prior coordinate from any active registered device of an active logical participant; the device need not be an MLS leaf. Pending participants may accept or close but cannot request reset. The request expires after exactly 24 hours and any coordinate change makes it stale. This does not itself mutate or retire the MLS group.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Durably records an idempotent signed reset request at the exact prior coordinate from any active registered device of an active logical participant; the device need not be an MLS leaf. Pending participants may accept or close but cannot request reset. The request expires after exactly 24 hours and any coordinate change makes it stale. This does not itself mutate or retire the MLS group.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func requestReset(
-
+    func requestReset(
         input: BlueCatbirdChatRequestReset.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatRequestReset.Output?) {
@@ -170,8 +157,7 @@ extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -181,7 +167,6 @@ extension ATProtoClient.Blue.Catbird.Chat {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatRequestReset.Output.self, from: responseData)
 
@@ -204,7 +189,5 @@ extension ATProtoClient.Blue.Catbird.Chat {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

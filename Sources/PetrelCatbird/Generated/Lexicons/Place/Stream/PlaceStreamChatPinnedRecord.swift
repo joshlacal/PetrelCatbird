@@ -5,7 +5,6 @@ import Petrel
 // lexicon: 1, id: place.stream.chat.pinnedRecord
 
 public struct PlaceStreamChatPinnedRecord: ATProtocolCodable, ATProtocolValue {
-
     public static let typeIdentifier = "place.stream.chat.pinnedRecord"
     public let pinnedMessage: ATProtocolURI
     public let pinnedBy: DID?
@@ -21,21 +20,21 @@ public struct PlaceStreamChatPinnedRecord: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.pinnedMessage = try container.decode(ATProtocolURI.self, forKey: .pinnedMessage)
+        pinnedMessage = try container.decode(ATProtocolURI.self, forKey: .pinnedMessage)
         do {
-            self.pinnedBy = try container.decodeIfPresent(DID.self, forKey: .pinnedBy)
+            pinnedBy = try container.decodeIfPresent(DID.self, forKey: .pinnedBy)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'pinnedBy' — degrading to nil: \(error)")
-            self.pinnedBy = nil
+            pinnedBy = nil
         }
-        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            self.expiresAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expiresAt)
+            expiresAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expiresAt)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'expiresAt' — degrading to nil: \(error)")
-            self.expiresAt = nil
+            expiresAt = nil
         }
     }
 
@@ -109,5 +108,4 @@ public struct PlaceStreamChatPinnedRecord: ATProtocolCodable, ATProtocolValue {
         case createdAt
         case expiresAt
     }
-
 }

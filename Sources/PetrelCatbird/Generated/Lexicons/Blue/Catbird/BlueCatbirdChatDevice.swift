@@ -5,7 +5,6 @@ import Petrel
 // lexicon: 1, id: blue.catbird.chat.device
 
 public struct BlueCatbirdChatDevice: ATProtocolCodable, ATProtocolValue {
-
     public static let typeIdentifier = "blue.catbird.chat.device"
     public let mlsSignaturePublicKey: Bytes
     public let algorithm: String
@@ -19,9 +18,9 @@ public struct BlueCatbirdChatDevice: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.mlsSignaturePublicKey = try container.decode(Bytes.self, forKey: .mlsSignaturePublicKey)
-        self.algorithm = try container.decode(String.self, forKey: .algorithm)
-        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        mlsSignaturePublicKey = try container.decode(Bytes.self, forKey: .mlsSignaturePublicKey)
+        algorithm = try container.decode(String.self, forKey: .algorithm)
+        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -74,5 +73,4 @@ public struct BlueCatbirdChatDevice: ATProtocolCodable, ATProtocolValue {
         case algorithm
         case createdAt
     }
-
 }

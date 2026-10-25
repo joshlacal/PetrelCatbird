@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: place.stream.live.subscribeSegments
 
-public struct PlaceStreamLiveSubscribeSegments {
-
+public enum PlaceStreamLiveSubscribeSegments {
     public static let typeIdentifier = "place.stream.live.subscribeSegments"
     public struct Parameters: Parametrizable {
         public let streamer: String
@@ -14,11 +13,10 @@ public struct PlaceStreamLiveSubscribeSegments {
             streamer: String
         ) {
             self.streamer = streamer
-
         }
     }
-    public enum Message: Codable, Sendable {
 
+    public enum Message: Codable, Sendable {
         case bytes(Bytes)
 
         enum CodingKeys: String, CodingKey {
@@ -30,7 +28,6 @@ public struct PlaceStreamLiveSubscribeSegments {
             let type = try container.decode(String.self, forKey: .type)
 
             switch type {
-
             case "place.stream.live.subscribeSegments#segment":
                 let value = try Bytes(from: decoder)
                 self = .bytes(value)
@@ -46,38 +43,33 @@ public struct PlaceStreamLiveSubscribeSegments {
 
         public func encode(to encoder: Encoder) throws {
             switch self {
-
-            case .bytes(let value):
+            case let .bytes(value):
                 try value.encode(to: encoder)
-
             }
         }
     }
 
     public typealias Segment = Bytes
-
 }
 
-/// Subscribe to a stream's new segments as they come in!
+// Subscribe to a stream's new segments as they come in!
 
-extension ATProtoClient.Place.Stream.Live {
-
-    public func subscribeSegments(
+public extension ATProtoClient.Place.Stream.Live {
+    func subscribeSegments(
         streamer: String
     ) async throws -> AsyncThrowingStream<PlaceStreamLiveSubscribeSegments.Message, Error> {
         let params = PlaceStreamLiveSubscribeSegments.Parameters(streamer: streamer)
-        return try await self.networkService.subscribe(
+        return try await networkService.subscribe(
             endpoint: "place.stream.live.subscribeSegments",
             parameters: params
         )
     }
 
     /// Alternative signature accepting input struct
-    public func subscribeSegments(input: PlaceStreamLiveSubscribeSegments.Parameters) async throws -> AsyncThrowingStream<PlaceStreamLiveSubscribeSegments.Message, Error> {
-        return try await self.networkService.subscribe(
+    func subscribeSegments(input: PlaceStreamLiveSubscribeSegments.Parameters) async throws -> AsyncThrowingStream<PlaceStreamLiveSubscribeSegments.Message, Error> {
+        return try await networkService.subscribe(
             endpoint: "place.stream.live.subscribeSegments",
             parameters: input
         )
     }
-
 }

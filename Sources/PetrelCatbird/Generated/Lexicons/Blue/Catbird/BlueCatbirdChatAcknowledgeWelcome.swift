@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.acknowledgeWelcome
 
-public struct BlueCatbirdChatAcknowledgeWelcome {
-
+public enum BlueCatbirdChatAcknowledgeWelcome {
     public static let typeIdentifier = "blue.catbird.chat.acknowledgeWelcome"
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedWelcomeAcknowledgement
@@ -17,7 +16,7 @@ public struct BlueCatbirdChatAcknowledgeWelcome {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedWelcomeAcknowledgement.self, forKey: .signedRequest)
+            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedWelcomeAcknowledgement.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -38,48 +37,39 @@ public struct BlueCatbirdChatAcknowledgeWelcome {
     }
 
     public struct Output: ATProtocolCodable {
-
         public let status: String
 
         public let acknowledgedAt: BlueCatbirdChatDefs.CanonicalDatetime
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             status: String,
 
             acknowledgedAt: BlueCatbirdChatDefs.CanonicalDatetime
 
         ) {
-
             self.status = status
 
             self.acknowledgedAt = acknowledgedAt
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.status = try container.decode(String.self, forKey: .status)
+            status = try container.decode(String.self, forKey: .status)
 
-            self.acknowledgedAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .acknowledgedAt)
-
+            acknowledgedAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .acknowledgedAt)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(status, forKey: .status)
 
             try container.encode(acknowledgedAt, forKey: .acknowledgedAt)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let statusValue = try status.toCBORValue()
@@ -89,14 +79,12 @@ public struct BlueCatbirdChatAcknowledgeWelcome {
             map = map.adding(key: "acknowledgedAt", value: acknowledgedAtValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case status
             case acknowledgedAt
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -117,27 +105,26 @@ public struct BlueCatbirdChatAcknowledgeWelcome {
         /// The bounded encrypted request lifecycle reserve cannot accommodate this operation. No first-execution effects are committed; retry the same signed operation after capacity is available.
         case capacityUnavailable = "CapacityUnavailable"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Chat {
+public extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - acknowledgeWelcome
-    /// Idempotently acknowledges one historically addressed Welcome after local join succeeds. Authorization is tied to the immutable recipient device and transition coordinate, not current coordinates or current membership.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Idempotently acknowledges one historically addressed Welcome after local join succeeds. Authorization is tied to the immutable recipient device and transition coordinate, not current coordinates or current membership.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func acknowledgeWelcome(
-
+    func acknowledgeWelcome(
         input: BlueCatbirdChatAcknowledgeWelcome.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatAcknowledgeWelcome.Output?) {
@@ -170,8 +157,7 @@ extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -181,7 +167,6 @@ extension ATProtoClient.Blue.Catbird.Chat {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatAcknowledgeWelcome.Output.self, from: responseData)
 
@@ -204,7 +189,5 @@ extension ATProtoClient.Blue.Catbird.Chat {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

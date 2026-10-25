@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.getThreadStorage
 
-public struct BlueCatbirdLabyrinthGetThreadStorage {
-
+public enum BlueCatbirdLabyrinthGetThreadStorage {
     public static let typeIdentifier = "blue.catbird.labyrinth.getThreadStorage"
     public struct Parameters: Parametrizable {
         public let threadId: String
@@ -17,21 +16,18 @@ public struct BlueCatbirdLabyrinthGetThreadStorage {
         ) {
             self.threadId = threadId
             self.actorDeviceId = actorDeviceId
-
         }
     }
 
     public struct Output: ATProtocolCodable {
-
         public let placement: String
 
         public let generation: String
 
         public let space: SpaceRef?
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             placement: String,
 
             generation: String,
@@ -39,35 +35,30 @@ public struct BlueCatbirdLabyrinthGetThreadStorage {
             space: SpaceRef? = nil
 
         ) {
-
             self.placement = placement
 
             self.generation = generation
 
             self.space = space
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.placement = try container.decode(String.self, forKey: .placement)
+            placement = try container.decode(String.self, forKey: .placement)
 
-            self.generation = try container.decode(String.self, forKey: .generation)
+            generation = try container.decode(String.self, forKey: .generation)
 
             do {
-                self.space = try container.decodeIfPresent(SpaceRef.self, forKey: .space)
+                space = try container.decodeIfPresent(SpaceRef.self, forKey: .space)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'space' — degrading to nil: \(error)")
-                self.space = nil
+                space = nil
             }
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(placement, forKey: .placement)
@@ -76,11 +67,9 @@ public struct BlueCatbirdLabyrinthGetThreadStorage {
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(space, forKey: .space)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let placementValue = try placement.toCBORValue()
@@ -96,7 +85,6 @@ public struct BlueCatbirdLabyrinthGetThreadStorage {
             }
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -104,7 +92,6 @@ public struct BlueCatbirdLabyrinthGetThreadStorage {
             case generation
             case space
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -113,25 +100,25 @@ public struct BlueCatbirdLabyrinthGetThreadStorage {
         case storageNotConfigured = "StorageNotConfigured"
         case spaceDeleted = "SpaceDeleted"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Labyrinth {
+public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - getThreadStorage
+
     /// Resolve the authenticated current chat device's conversation-history placement. A Space placement requires the returned immutable generation and Space reference on every subsequent operation. This endpoint does not grant Spaces or MLS device authorization.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getThreadStorage(input: BlueCatbirdLabyrinthGetThreadStorage.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetThreadStorage.Output?) {
+    func getThreadStorage(input: BlueCatbirdLabyrinthGetThreadStorage.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetThreadStorage.Output?) {
         let endpoint = "blue.catbird.labyrinth.getThreadStorage"
 
         let queryItems = input.asQueryItems()
@@ -153,8 +140,7 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

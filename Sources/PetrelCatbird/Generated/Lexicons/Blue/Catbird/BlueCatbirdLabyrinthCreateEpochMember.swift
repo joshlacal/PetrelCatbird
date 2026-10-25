@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.createEpochMember
 
-public struct BlueCatbirdLabyrinthCreateEpochMember {
-
+public enum BlueCatbirdLabyrinthCreateEpochMember {
     public static let typeIdentifier = "blue.catbird.labyrinth.createEpochMember"
     public struct Input: ATProtocolCodable {
         public let record: ATProtocolValueContainer
@@ -17,7 +16,7 @@ public struct BlueCatbirdLabyrinthCreateEpochMember {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+            record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -38,37 +37,25 @@ public struct BlueCatbirdLabyrinthCreateEpochMember {
     }
 
     public struct Output: ATProtocolCodable {
-
         // Empty output - no properties (response is {})
 
-        // Standard public initializer
-        public init(
-
-        ) {
-
-        }
+        /// Standard public initializer
+        public init() {}
 
         public init(from decoder: Decoder) throws {
-
             // Empty output - just validate it's an object by trying to get any container
             _ = try decoder.singleValueContainer()
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             // Empty output - encode empty object
             _ = encoder.singleValueContainer()
-
         }
 
         public func toCBORValue() throws -> Any {
-
             // Empty output - return empty CBOR map
             return OrderedCBORMap()
-
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -77,27 +64,26 @@ public struct BlueCatbirdLabyrinthCreateEpochMember {
         case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
         case memberDeviceNotRegistered = "MemberDeviceNotRegistered"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Labyrinth {
+public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - createEpochMember
-    /// Add a device to an existing epoch (create-if-absent). Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Add a device to an existing epoch (create-if-absent). Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func createEpochMember(
-
+    func createEpochMember(
         input: BlueCatbirdLabyrinthCreateEpochMember.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthCreateEpochMember.Output?) {
@@ -130,8 +116,7 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -141,7 +126,6 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdLabyrinthCreateEpochMember.Output.self, from: responseData)
 
@@ -164,7 +148,5 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

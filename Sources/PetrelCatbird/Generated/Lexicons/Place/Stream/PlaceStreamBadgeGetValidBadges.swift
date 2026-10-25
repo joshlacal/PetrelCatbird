@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: place.stream.badge.getValidBadges
 
-public struct PlaceStreamBadgeGetValidBadges {
-
+public enum PlaceStreamBadgeGetValidBadges {
     public static let typeIdentifier = "place.stream.badge.getValidBadges"
     public struct Parameters: Parametrizable {
         public let streamer: DID?
@@ -14,69 +13,57 @@ public struct PlaceStreamBadgeGetValidBadges {
             streamer: DID? = nil
         ) {
             self.streamer = streamer
-
         }
     }
 
     public struct Output: ATProtocolCodable {
-
         public let badges: [PlaceStreamBadgeDefs.BadgeView]
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             badges: [PlaceStreamBadgeDefs.BadgeView]
 
         ) {
-
             self.badges = badges
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.badges = try container.decode([PlaceStreamBadgeDefs.BadgeView].self, forKey: .badges)
-
+            badges = try container.decode([PlaceStreamBadgeDefs.BadgeView].self, forKey: .badges)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(badges, forKey: .badges)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let badgesValue = try badges.toCBORValue()
             map = map.adding(key: "badges", value: badgesValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case badges
         }
-
     }
-
 }
 
-extension ATProtoClient.Place.Stream.Badge {
+public extension ATProtoClient.Place.Stream.Badge {
     // MARK: - getValidBadges
+
     /// Get valid badges for the authenticated user, optionally in the context of a specific streamer's chat
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getValidBadges(input: PlaceStreamBadgeGetValidBadges.Parameters) async throws -> (responseCode: Int, data: PlaceStreamBadgeGetValidBadges.Output?) {
+    func getValidBadges(input: PlaceStreamBadgeGetValidBadges.Parameters) async throws -> (responseCode: Int, data: PlaceStreamBadgeGetValidBadges.Output?) {
         let endpoint = "place.stream.badge.getValidBadges"
 
         let queryItems = input.asQueryItems()
@@ -98,8 +85,7 @@ extension ATProtoClient.Place.Stream.Badge {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -119,7 +105,6 @@ extension ATProtoClient.Place.Stream.Badge {
                 return (responseCode, nil)
             }
         } else {
-
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)

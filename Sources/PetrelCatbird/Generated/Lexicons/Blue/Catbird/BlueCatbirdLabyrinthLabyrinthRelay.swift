@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.labyrinthRelay
 
-public struct BlueCatbirdLabyrinthLabyrinthRelay {
-
+public enum BlueCatbirdLabyrinthLabyrinthRelay {
     public static let typeIdentifier = "blue.catbird.labyrinth.labyrinthRelay"
     public struct Input: ATProtocolCodable {
         public let op: String
@@ -33,15 +32,15 @@ public struct BlueCatbirdLabyrinthLabyrinthRelay {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.op = try container.decode(String.self, forKey: .op)
-            self.actorDid = try container.decode(DID.self, forKey: .actorDid)
-            self.actorDeviceId = try container.decodeIfPresent(String.self, forKey: .actorDeviceId)
-            self.query = try container.decodeIfPresent(String.self, forKey: .query)
-            self.payload = try container.decodeIfPresent(Bytes.self, forKey: .payload)
-            self.writeBody = try container.decodeIfPresent(String.self, forKey: .writeBody)
-            self.writeSignature = try container.decodeIfPresent(String.self, forKey: .writeSignature)
-            self.readHeader = try container.decodeIfPresent(String.self, forKey: .readHeader)
-            self.readSignature = try container.decodeIfPresent(String.self, forKey: .readSignature)
+            op = try container.decode(String.self, forKey: .op)
+            actorDid = try container.decode(DID.self, forKey: .actorDid)
+            actorDeviceId = try container.decodeIfPresent(String.self, forKey: .actorDeviceId)
+            query = try container.decodeIfPresent(String.self, forKey: .query)
+            payload = try container.decodeIfPresent(Bytes.self, forKey: .payload)
+            writeBody = try container.decodeIfPresent(String.self, forKey: .writeBody)
+            writeSignature = try container.decodeIfPresent(String.self, forKey: .writeSignature)
+            readHeader = try container.decodeIfPresent(String.self, forKey: .readHeader)
+            readSignature = try container.decodeIfPresent(String.self, forKey: .readSignature)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -108,37 +107,25 @@ public struct BlueCatbirdLabyrinthLabyrinthRelay {
     }
 
     public struct Output: ATProtocolCodable {
-
         // Empty output - no properties (response is {})
 
-        // Standard public initializer
-        public init(
-
-        ) {
-
-        }
+        /// Standard public initializer
+        public init() {}
 
         public init(from decoder: Decoder) throws {
-
             // Empty output - just validate it's an object by trying to get any container
             _ = try decoder.singleValueContainer()
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             // Empty output - encode empty object
             _ = encoder.singleValueContainer()
-
         }
 
         public func toCBORValue() throws -> Any {
-
             // Empty output - return empty CBOR map
             return OrderedCBORMap()
-
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -146,27 +133,26 @@ public struct BlueCatbirdLabyrinthLabyrinthRelay {
         case notSequencer = "NotSequencer"
         case invalidSignature = "InvalidSignature"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Labyrinth {
+public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - labyrinthRelay
-    /// Server-to-server only (design Y3). A device's home DS uses this to forward a Labyrinth thread operation for a conversation that the receiving DS sequences. Authentication is standard DS service auth: iss is the home DS, aud is the sequencer, lxm is this NSID, under the federation peer policy. The receiver requires three things: the requesting DS is the actor's home DS in the conversation's participant rows, the actor's chat device is current in its replicated device table, for writes, the device's labyrinthWriteBody signature over the forwarded payload re-verifies, and for reads the device's signed read claim (readHeader/readSignature) re-verifies. The output and errors are exactly those of the relayed endpoint.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Server-to-server only (design Y3). A device's home DS uses this to forward a Labyrinth thread operation for a conversation that the receiving DS sequences. Authentication is standard DS service auth: iss is the home DS, aud is the sequencer, lxm is this NSID, under the federation peer policy. The receiver requires three things: the requesting DS is the actor's home DS in the conversation's participant rows, the actor's chat device is current in its replicated device table, for writes, the device's labyrinthWriteBody signature over the forwarded payload re-verifies, and for reads the device's signed read claim (readHeader/readSignature) re-verifies. The output and errors are exactly those of the relayed endpoint.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func labyrinthRelay(
-
+    func labyrinthRelay(
         input: BlueCatbirdLabyrinthLabyrinthRelay.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthLabyrinthRelay.Output?) {
@@ -199,8 +185,7 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -210,7 +195,6 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdLabyrinthLabyrinthRelay.Output.self, from: responseData)
 
@@ -233,7 +217,5 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

@@ -5,7 +5,6 @@ import Petrel
 // lexicon: 1, id: place.stream.live.teleport
 
 public struct PlaceStreamLiveTeleport: ATProtocolCodable, ATProtocolValue {
-
     public static let typeIdentifier = "place.stream.live.teleport"
     public let streamer: DID
     public let startsAt: ATProtocolDate
@@ -19,14 +18,14 @@ public struct PlaceStreamLiveTeleport: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.streamer = try container.decode(DID.self, forKey: .streamer)
-        self.startsAt = try container.decode(ATProtocolDate.self, forKey: .startsAt)
+        streamer = try container.decode(DID.self, forKey: .streamer)
+        startsAt = try container.decode(ATProtocolDate.self, forKey: .startsAt)
         do {
-            self.durationSeconds = try container.decodeIfPresent(Int.self, forKey: .durationSeconds)
+            durationSeconds = try container.decodeIfPresent(Int.self, forKey: .durationSeconds)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'durationSeconds' — degrading to nil: \(error)")
-            self.durationSeconds = nil
+            durationSeconds = nil
         }
     }
 
@@ -86,5 +85,4 @@ public struct PlaceStreamLiveTeleport: ATProtocolCodable, ATProtocolValue {
         case startsAt
         case durationSeconds
     }
-
 }
