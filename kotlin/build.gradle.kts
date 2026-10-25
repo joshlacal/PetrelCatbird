@@ -21,21 +21,21 @@ dependencies {
     implementation(kotlin("stdlib"))
 
     // Compose runtime (required for Compose compiler stability metadata)
-    implementation("androidx.compose.runtime:runtime:1.8.3")
+    implementation("androidx.compose.runtime:runtime:1.12.1")
 
     // Kotlin Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
 
     // Kotlin Serialization (generated types use @Serializable)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.12.0")
 
     // Ktor client (generated endpoints go through petrel-kotlin's NetworkService)
-    implementation("io.ktor:ktor-client-core:3.0.2")
-    implementation("io.ktor:ktor-client-cio:3.0.2")
-    implementation("io.ktor:ktor-client-content-negotiation:3.0.2")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.2")
-    implementation("io.ktor:ktor-client-websockets:3.0.2")
+    implementation("io.ktor:ktor-client-core:3.6.0")
+    implementation("io.ktor:ktor-client-cio:3.6.0")
+    implementation("io.ktor:ktor-client-content-negotiation:3.6.0")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:3.6.0")
+    implementation("io.ktor:ktor-client-websockets:3.6.0")
 
     testImplementation(kotlin("test"))
 }
