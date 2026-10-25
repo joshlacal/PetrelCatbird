@@ -16,7 +16,7 @@ let package = Package(
         // no manifest records and no other machine reproduces.
         .package(
             url: "https://github.com/joshlacal/Petrel.git",
-            revision: "cc2999e1f4746a7c246d76dce09f4176ec0768a1"
+            revision: "819e6fc3363e4b0973b191a593af6b0f25b63bf3"
         ),
     ],
     targets: [
