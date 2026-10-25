@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.circle.activateCircle
 
-public struct BlueCatbirdCircleActivateCircle {
-
+public enum BlueCatbirdCircleActivateCircle {
     public static let typeIdentifier = "blue.catbird.circle.activateCircle"
     public struct Input: ATProtocolCodable {
         public let space: SpaceRef
@@ -17,7 +16,7 @@ public struct BlueCatbirdCircleActivateCircle {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.space = try container.decode(SpaceRef.self, forKey: .space)
+            space = try container.decode(SpaceRef.self, forKey: .space)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -38,51 +37,40 @@ public struct BlueCatbirdCircleActivateCircle {
     }
 
     public struct Output: ATProtocolCodable {
-
         public let circle: BlueCatbirdCircleDefs.CircleSummary
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             circle: BlueCatbirdCircleDefs.CircleSummary
 
         ) {
-
             self.circle = circle
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.circle = try container.decode(BlueCatbirdCircleDefs.CircleSummary.self, forKey: .circle)
-
+            circle = try container.decode(BlueCatbirdCircleDefs.CircleSummary.self, forKey: .circle)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(circle, forKey: .circle)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let circleValue = try circle.toCBORValue()
             map = map.adding(key: "circle", value: circleValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case circle
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -97,27 +85,26 @@ public struct BlueCatbirdCircleActivateCircle {
         case protocolRevisionMismatch = "ProtocolRevisionMismatch"
         case upstreamUnavailable = "UpstreamUnavailable"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Circle {
+public extension ATProtoClient.Blue.Catbird.Circle {
     // MARK: - activateCircle
-    /// Ask this service to begin indexing a Circle Space. The service verifies the Space independently against the owner's PDS; it does not trust the caller's claim that the Space exists. Idempotent: activating an already-active Circle returns its current summary.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Ask this service to begin indexing a Circle Space. The service verifies the Space independently against the owner's PDS; it does not trust the caller's claim that the Space exists. Idempotent: activating an already-active Circle returns its current summary.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func activateCircle(
-
+    func activateCircle(
         input: BlueCatbirdCircleActivateCircle.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdCircleActivateCircle.Output?) {
@@ -150,8 +137,7 @@ extension ATProtoClient.Blue.Catbird.Circle {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -161,7 +147,6 @@ extension ATProtoClient.Blue.Catbird.Circle {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdCircleActivateCircle.Output.self, from: responseData)
 
@@ -184,7 +169,5 @@ extension ATProtoClient.Blue.Catbird.Circle {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

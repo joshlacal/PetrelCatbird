@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
@@ -16,7 +16,7 @@ let package = Package(
         // no manifest records and no other machine reproduces.
         .package(
             url: "https://github.com/joshlacal/Petrel.git",
-            revision: "e115236537041a900ec971be05185a70cca73e8a"
+            revision: "819e6fc3363e4b0973b191a593af6b0f25b63bf3"
         ),
     ],
     targets: [

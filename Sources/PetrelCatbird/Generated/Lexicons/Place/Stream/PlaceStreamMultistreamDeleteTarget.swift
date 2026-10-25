@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: place.stream.multistream.deleteTarget
 
-public struct PlaceStreamMultistreamDeleteTarget {
-
+public enum PlaceStreamMultistreamDeleteTarget {
     public static let typeIdentifier = "place.stream.multistream.deleteTarget"
     public struct Input: ATProtocolCodable {
         public let rkey: RecordKey
@@ -17,7 +16,7 @@ public struct PlaceStreamMultistreamDeleteTarget {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.rkey = try container.decode(RecordKey.self, forKey: .rkey)
+            rkey = try container.decode(RecordKey.self, forKey: .rkey)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -38,52 +37,39 @@ public struct PlaceStreamMultistreamDeleteTarget {
     }
 
     public struct Output: ATProtocolCodable {
-
         // Empty output - no properties (response is {})
 
-        // Standard public initializer
-        public init(
-
-        ) {
-
-        }
+        /// Standard public initializer
+        public init() {}
 
         public init(from decoder: Decoder) throws {
-
             // Empty output - just validate it's an object by trying to get any container
             _ = try decoder.singleValueContainer()
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             // Empty output - encode empty object
             _ = encoder.singleValueContainer()
-
         }
 
         public func toCBORValue() throws -> Any {
-
             // Empty output - return empty CBOR map
             return OrderedCBORMap()
-
         }
-
     }
-
 }
 
-extension ATProtoClient.Place.Stream.Multistream {
+public extension ATProtoClient.Place.Stream.Multistream {
     // MARK: - deleteTarget
-    /// Delete a target for rebroadcasting a Streamplace stream.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Delete a target for rebroadcasting a Streamplace stream.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func deleteTarget(
-
+    func deleteTarget(
         input: PlaceStreamMultistreamDeleteTarget.Input
 
     ) async throws -> (responseCode: Int, data: PlaceStreamMultistreamDeleteTarget.Output?) {
@@ -116,8 +102,7 @@ extension ATProtoClient.Place.Stream.Multistream {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -127,7 +112,6 @@ extension ATProtoClient.Place.Stream.Multistream {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(PlaceStreamMultistreamDeleteTarget.Output.self, from: responseData)
 
@@ -138,11 +122,8 @@ extension ATProtoClient.Place.Stream.Multistream {
                 return (responseCode, nil)
             }
         } else {
-
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

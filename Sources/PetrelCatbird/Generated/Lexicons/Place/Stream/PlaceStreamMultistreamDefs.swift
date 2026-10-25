@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: place.stream.multistream.defs
 
-public struct PlaceStreamMultistreamDefs {
-
+public enum PlaceStreamMultistreamDefs {
     public static let typeIdentifier = "place.stream.multistream.defs"
 
     public struct TargetView: ATProtocolCodable, ATProtocolValue {
@@ -27,30 +26,30 @@ public struct PlaceStreamMultistreamDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                uri = try container.decode(ATProtocolURI.self, forKey: .uri)
             } catch {
                 LogManager.logError("Decoding error for required property 'uri': \(error)")
                 throw error
             }
             do {
-                self.cid = try container.decode(CID.self, forKey: .cid)
+                cid = try container.decode(CID.self, forKey: .cid)
             } catch {
                 LogManager.logError("Decoding error for required property 'cid': \(error)")
                 throw error
             }
             do {
-                self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+                record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
             } catch {
                 LogManager.logError("Decoding error for required property 'record': \(error)")
                 throw error
             }
             do {
-                self.latestEvent = try container.decodeIfPresent(PlaceStreamMultistreamDefs.Event.self, forKey: .latestEvent)
+                latestEvent = try container.decodeIfPresent(PlaceStreamMultistreamDefs.Event.self, forKey: .latestEvent)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'latestEvent' — degrading to nil: \(error)")
-                self.latestEvent = nil
+                latestEvent = nil
             }
         }
 
@@ -137,19 +136,19 @@ public struct PlaceStreamMultistreamDefs {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.message = try container.decode(String.self, forKey: .message)
+                message = try container.decode(String.self, forKey: .message)
             } catch {
                 LogManager.logError("Decoding error for required property 'message': \(error)")
                 throw error
             }
             do {
-                self.status = try container.decode(EventStatus.self, forKey: .status)
+                status = try container.decode(EventStatus.self, forKey: .status)
             } catch {
                 LogManager.logError("Decoding error for required property 'status': \(error)")
                 throw error
             }
             do {
-                self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+                createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'createdAt': \(error)")
                 throw error
@@ -223,5 +222,4 @@ public struct PlaceStreamMultistreamDefs {
             return rawValue
         }
     }
-
 }

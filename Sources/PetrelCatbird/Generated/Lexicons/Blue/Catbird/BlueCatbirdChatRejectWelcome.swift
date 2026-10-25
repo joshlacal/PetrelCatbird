@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.rejectWelcome
 
-public struct BlueCatbirdChatRejectWelcome {
-
+public enum BlueCatbirdChatRejectWelcome {
     public static let typeIdentifier = "blue.catbird.chat.rejectWelcome"
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedWelcomeRejection
@@ -17,7 +16,7 @@ public struct BlueCatbirdChatRejectWelcome {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedWelcomeRejection.self, forKey: .signedRequest)
+            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedWelcomeRejection.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -38,48 +37,39 @@ public struct BlueCatbirdChatRejectWelcome {
     }
 
     public struct Output: ATProtocolCodable {
-
         public let status: String
 
         public let rejectedAt: BlueCatbirdChatDefs.CanonicalDatetime
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             status: String,
 
             rejectedAt: BlueCatbirdChatDefs.CanonicalDatetime
 
         ) {
-
             self.status = status
 
             self.rejectedAt = rejectedAt
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.status = try container.decode(String.self, forKey: .status)
+            status = try container.decode(String.self, forKey: .status)
 
-            self.rejectedAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .rejectedAt)
-
+            rejectedAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .rejectedAt)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(status, forKey: .status)
 
             try container.encode(rejectedAt, forKey: .rejectedAt)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let statusValue = try status.toCBORValue()
@@ -89,14 +79,12 @@ public struct BlueCatbirdChatRejectWelcome {
             map = map.adding(key: "rejectedAt", value: rejectedAtValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case status
             case rejectedAt
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -117,27 +105,26 @@ public struct BlueCatbirdChatRejectWelcome {
         /// The bounded encrypted request lifecycle reserve cannot accommodate this operation. No first-execution effects are committed; retry the same signed operation after capacity is available.
         case capacityUnavailable = "CapacityUnavailable"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Chat {
+public extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - rejectWelcome
-    /// Idempotently records a signed terminal rejection of one historically addressed Welcome. Authorization is tied to the immutable recipient device and transition coordinate, not current coordinates or current membership.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Idempotently records a signed terminal rejection of one historically addressed Welcome. Authorization is tied to the immutable recipient device and transition coordinate, not current coordinates or current membership.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func rejectWelcome(
-
+    func rejectWelcome(
         input: BlueCatbirdChatRejectWelcome.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatRejectWelcome.Output?) {
@@ -170,8 +157,7 @@ extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -181,7 +167,6 @@ extension ATProtoClient.Blue.Catbird.Chat {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatRejectWelcome.Output.self, from: responseData)
 
@@ -204,7 +189,5 @@ extension ATProtoClient.Blue.Catbird.Chat {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

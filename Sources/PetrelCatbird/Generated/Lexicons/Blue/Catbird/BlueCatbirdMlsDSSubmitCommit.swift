@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.mlsDS.submitCommit
 
-public struct BlueCatbirdMlsDSSubmitCommit {
-
+public enum BlueCatbirdMlsDSSubmitCommit {
     public static let typeIdentifier = "blue.catbird.mlsDS.submitCommit"
     public struct Input: ATProtocolCodable {
         public let header: BlueCatbirdMlsDSDefs.EnvelopeHeaderV1
@@ -19,8 +18,8 @@ public struct BlueCatbirdMlsDSSubmitCommit {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.header = try container.decode(BlueCatbirdMlsDSDefs.EnvelopeHeaderV1.self, forKey: .header)
-            self.signedRequestBytes = try container.decode(Bytes.self, forKey: .signedRequestBytes)
+            header = try container.decode(BlueCatbirdMlsDSDefs.EnvelopeHeaderV1.self, forKey: .header)
+            signedRequestBytes = try container.decode(Bytes.self, forKey: .signedRequestBytes)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -45,7 +44,6 @@ public struct BlueCatbirdMlsDSSubmitCommit {
     }
 
     public struct Output: ATProtocolCodable {
-
         public let coordinates: BlueCatbirdChatDefs.ConversationCoordinates
 
         public let commitEntry: BlueCatbirdChatDefs.CommitEntry
@@ -54,9 +52,8 @@ public struct BlueCatbirdMlsDSSubmitCommit {
 
         public let receipt: BlueCatbirdMlsDSDefs.FederationReceiptV1
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             coordinates: BlueCatbirdChatDefs.ConversationCoordinates,
 
             commitEntry: BlueCatbirdChatDefs.CommitEntry,
@@ -66,7 +63,6 @@ public struct BlueCatbirdMlsDSSubmitCommit {
             receipt: BlueCatbirdMlsDSDefs.FederationReceiptV1
 
         ) {
-
             self.coordinates = coordinates
 
             self.commitEntry = commitEntry
@@ -74,25 +70,21 @@ public struct BlueCatbirdMlsDSSubmitCommit {
             self.welcomes = welcomes
 
             self.receipt = receipt
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.coordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .coordinates)
+            coordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .coordinates)
 
-            self.commitEntry = try container.decode(BlueCatbirdChatDefs.CommitEntry.self, forKey: .commitEntry)
+            commitEntry = try container.decode(BlueCatbirdChatDefs.CommitEntry.self, forKey: .commitEntry)
 
-            self.welcomes = try container.decode([BlueCatbirdChatDefs.WelcomeView].self, forKey: .welcomes)
+            welcomes = try container.decode([BlueCatbirdChatDefs.WelcomeView].self, forKey: .welcomes)
 
-            self.receipt = try container.decode(BlueCatbirdMlsDSDefs.FederationReceiptV1.self, forKey: .receipt)
-
+            receipt = try container.decode(BlueCatbirdMlsDSDefs.FederationReceiptV1.self, forKey: .receipt)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(coordinates, forKey: .coordinates)
@@ -102,11 +94,9 @@ public struct BlueCatbirdMlsDSSubmitCommit {
             try container.encode(welcomes, forKey: .welcomes)
 
             try container.encode(receipt, forKey: .receipt)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let coordinatesValue = try coordinates.toCBORValue()
@@ -122,7 +112,6 @@ public struct BlueCatbirdMlsDSSubmitCommit {
             map = map.adding(key: "receipt", value: receiptValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -131,7 +120,6 @@ public struct BlueCatbirdMlsDSSubmitCommit {
             case welcomes
             case receipt
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -142,27 +130,26 @@ public struct BlueCatbirdMlsDSSubmitCommit {
         case invalidEnvelope = "InvalidEnvelope"
         case unauthorizedParticipantDs = "UnauthorizedParticipantDs"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.MlsDS {
+public extension ATProtoClient.Blue.Catbird.MlsDS {
     // MARK: - submitCommit
-    /// Submit an actor-signed MLS commit to the sequencer DS for canonical transition planning and execution. Submit a signed commit transition to the sequencer DS for execution through the canonical submitTransition planner and executor.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Submit an actor-signed MLS commit to the sequencer DS for canonical transition planning and execution. Submit a signed commit transition to the sequencer DS for execution through the canonical submitTransition planner and executor.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func submitCommit(
-
+    func submitCommit(
         input: BlueCatbirdMlsDSSubmitCommit.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdMlsDSSubmitCommit.Output?) {
@@ -195,8 +182,7 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -206,7 +192,6 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdMlsDSSubmitCommit.Output.self, from: responseData)
 
@@ -229,7 +214,5 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

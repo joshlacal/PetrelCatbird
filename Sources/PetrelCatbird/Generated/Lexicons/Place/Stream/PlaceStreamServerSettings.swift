@@ -5,7 +5,6 @@ import Petrel
 // lexicon: 1, id: place.stream.server.settings
 
 public struct PlaceStreamServerSettings: ATProtocolCodable, ATProtocolValue {
-
     public static let typeIdentifier = "place.stream.server.settings"
     public let debugRecording: Bool?
 
@@ -16,11 +15,11 @@ public struct PlaceStreamServerSettings: ATProtocolCodable, ATProtocolValue {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         do {
-            self.debugRecording = try container.decodeIfPresent(Bool.self, forKey: .debugRecording)
+            debugRecording = try container.decodeIfPresent(Bool.self, forKey: .debugRecording)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'debugRecording' — degrading to nil: \(error)")
-            self.debugRecording = nil
+            debugRecording = nil
         }
     }
 
@@ -64,5 +63,4 @@ public struct PlaceStreamServerSettings: ATProtocolCodable, ATProtocolValue {
         case typeIdentifier = "$type"
         case debugRecording
     }
-
 }

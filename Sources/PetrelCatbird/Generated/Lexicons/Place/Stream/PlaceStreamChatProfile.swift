@@ -5,7 +5,6 @@ import Petrel
 // lexicon: 1, id: place.stream.chat.profile
 
 public struct PlaceStreamChatProfile: ATProtocolCodable, ATProtocolValue {
-
     public static let typeIdentifier = "place.stream.chat.profile"
     public let color: Color?
 
@@ -16,11 +15,11 @@ public struct PlaceStreamChatProfile: ATProtocolCodable, ATProtocolValue {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         do {
-            self.color = try container.decodeIfPresent(Color.self, forKey: .color)
+            color = try container.decodeIfPresent(Color.self, forKey: .color)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'color' — degrading to nil: \(error)")
-            self.color = nil
+            color = nil
         }
     }
 
@@ -82,19 +81,19 @@ public struct PlaceStreamChatProfile: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.red = try container.decode(Int.self, forKey: .red)
+                red = try container.decode(Int.self, forKey: .red)
             } catch {
                 LogManager.logError("Decoding error for required property 'red': \(error)")
                 throw error
             }
             do {
-                self.green = try container.decode(Int.self, forKey: .green)
+                green = try container.decode(Int.self, forKey: .green)
             } catch {
                 LogManager.logError("Decoding error for required property 'green': \(error)")
                 throw error
             }
             do {
-                self.blue = try container.decode(Int.self, forKey: .blue)
+                blue = try container.decode(Int.self, forKey: .blue)
             } catch {
                 LogManager.logError("Decoding error for required property 'blue': \(error)")
                 throw error
@@ -152,5 +151,4 @@ public struct PlaceStreamChatProfile: ATProtocolCodable, ATProtocolValue {
             case blue
         }
     }
-
 }

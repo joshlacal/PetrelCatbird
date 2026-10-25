@@ -5,7 +5,6 @@ import Petrel
 // lexicon: 1, id: place.stream.chat.message
 
 public struct PlaceStreamChatMessage: ATProtocolCodable, ATProtocolValue {
-
     public static let typeIdentifier = "place.stream.chat.message"
     public let text: String
     public let createdAt: ATProtocolDate
@@ -23,22 +22,22 @@ public struct PlaceStreamChatMessage: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.text = try container.decode(String.self, forKey: .text)
-        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        text = try container.decode(String.self, forKey: .text)
+        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            self.facets = try container.decodeIfPresent([PlaceStreamRichtextFacet].self, forKey: .facets)
+            facets = try container.decodeIfPresent([PlaceStreamRichtextFacet].self, forKey: .facets)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'facets' — degrading to nil: \(error)")
-            self.facets = nil
+            facets = nil
         }
-        self.streamer = try container.decode(DID.self, forKey: .streamer)
+        streamer = try container.decode(DID.self, forKey: .streamer)
         do {
-            self.reply = try container.decodeIfPresent(ReplyRef.self, forKey: .reply)
+            reply = try container.decodeIfPresent(ReplyRef.self, forKey: .reply)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'reply' — degrading to nil: \(error)")
-            self.reply = nil
+            reply = nil
         }
     }
 
@@ -136,13 +135,13 @@ public struct PlaceStreamChatMessage: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.root = try container.decode(ComAtprotoRepoStrongRef.self, forKey: .root)
+                root = try container.decode(ComAtprotoRepoStrongRef.self, forKey: .root)
             } catch {
                 LogManager.logError("Decoding error for required property 'root': \(error)")
                 throw error
             }
             do {
-                self.parent = try container.decode(ComAtprotoRepoStrongRef.self, forKey: .parent)
+                parent = try container.decode(ComAtprotoRepoStrongRef.self, forKey: .parent)
             } catch {
                 LogManager.logError("Decoding error for required property 'parent': \(error)")
                 throw error
@@ -192,5 +191,4 @@ public struct PlaceStreamChatMessage: ATProtocolCodable, ATProtocolValue {
             case parent
         }
     }
-
 }

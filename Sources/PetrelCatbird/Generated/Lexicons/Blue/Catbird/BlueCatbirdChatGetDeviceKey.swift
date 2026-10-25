@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.getDeviceKey
 
-public struct BlueCatbirdChatGetDeviceKey {
-
+public enum BlueCatbirdChatGetDeviceKey {
     public static let typeIdentifier = "blue.catbird.chat.getDeviceKey"
     public struct Parameters: Parametrizable {
         public let actorDeviceId: String
@@ -23,12 +22,10 @@ public struct BlueCatbirdChatGetDeviceKey {
             self.ownerDid = ownerDid
             self.deviceId = deviceId
             self.keyId = keyId
-
         }
     }
 
     public struct Output: ATProtocolCodable {
-
         public let ownerDid: BlueCatbirdChatDefs.BareDid
 
         public let deviceId: BlueCatbirdChatDefs.DeviceId
@@ -37,9 +34,8 @@ public struct BlueCatbirdChatGetDeviceKey {
 
         public let signaturePublicKey: Bytes
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             ownerDid: BlueCatbirdChatDefs.BareDid,
 
             deviceId: BlueCatbirdChatDefs.DeviceId,
@@ -49,7 +45,6 @@ public struct BlueCatbirdChatGetDeviceKey {
             signaturePublicKey: Bytes
 
         ) {
-
             self.ownerDid = ownerDid
 
             self.deviceId = deviceId
@@ -57,25 +52,21 @@ public struct BlueCatbirdChatGetDeviceKey {
             self.keyId = keyId
 
             self.signaturePublicKey = signaturePublicKey
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.ownerDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .ownerDid)
+            ownerDid = try container.decode(BlueCatbirdChatDefs.BareDid.self, forKey: .ownerDid)
 
-            self.deviceId = try container.decode(BlueCatbirdChatDefs.DeviceId.self, forKey: .deviceId)
+            deviceId = try container.decode(BlueCatbirdChatDefs.DeviceId.self, forKey: .deviceId)
 
-            self.keyId = try container.decode(BlueCatbirdChatDefs.KeyId.self, forKey: .keyId)
+            keyId = try container.decode(BlueCatbirdChatDefs.KeyId.self, forKey: .keyId)
 
-            self.signaturePublicKey = try container.decode(Bytes.self, forKey: .signaturePublicKey)
-
+            signaturePublicKey = try container.decode(Bytes.self, forKey: .signaturePublicKey)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(ownerDid, forKey: .ownerDid)
@@ -85,11 +76,9 @@ public struct BlueCatbirdChatGetDeviceKey {
             try container.encode(keyId, forKey: .keyId)
 
             try container.encode(signaturePublicKey, forKey: .signaturePublicKey)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let ownerDidValue = try ownerDid.toCBORValue()
@@ -105,7 +94,6 @@ public struct BlueCatbirdChatGetDeviceKey {
             map = map.adding(key: "signaturePublicKey", value: signaturePublicKeyValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -114,7 +102,6 @@ public struct BlueCatbirdChatGetDeviceKey {
             case keyId
             case signaturePublicKey
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -129,25 +116,25 @@ public struct BlueCatbirdChatGetDeviceKey {
         case rateLimited = "RateLimited"
         case deviceKeyNotFound = "DeviceKeyNotFound"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Chat {
+public extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - getDeviceKey
+
     /// Return one immutable candidate Ed25519 device key for the exact ownerDid, deviceId and keyId tuple, including retained revoked devices. The authenticated caller must name its own active enrolled actorDeviceId. This lookup asserts neither current nor historical authorization: consumers must verify the key fingerprint, device signature and independently authenticated entry or receipt authority. No target status filtering, enumeration, truncation or authorization flags are provided.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getDeviceKey(input: BlueCatbirdChatGetDeviceKey.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetDeviceKey.Output?) {
+    func getDeviceKey(input: BlueCatbirdChatGetDeviceKey.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetDeviceKey.Output?) {
         let endpoint = "blue.catbird.chat.getDeviceKey"
 
         let queryItems = input.asQueryItems()
@@ -169,8 +156,7 @@ extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

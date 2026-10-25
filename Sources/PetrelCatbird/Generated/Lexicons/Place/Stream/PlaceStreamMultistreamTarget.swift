@@ -5,7 +5,6 @@ import Petrel
 // lexicon: 1, id: place.stream.multistream.target
 
 public struct PlaceStreamMultistreamTarget: ATProtocolCodable, ATProtocolValue {
-
     public static let typeIdentifier = "place.stream.multistream.target"
     public let url: URI
     public let active: Bool
@@ -21,15 +20,15 @@ public struct PlaceStreamMultistreamTarget: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.url = try container.decode(URI.self, forKey: .url)
-        self.active = try container.decode(Bool.self, forKey: .active)
-        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        url = try container.decode(URI.self, forKey: .url)
+        active = try container.decode(Bool.self, forKey: .active)
+        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            self.name = try container.decodeIfPresent(String.self, forKey: .name)
+            name = try container.decodeIfPresent(String.self, forKey: .name)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'name' — degrading to nil: \(error)")
-            self.name = nil
+            name = nil
         }
     }
 
@@ -97,5 +96,4 @@ public struct PlaceStreamMultistreamTarget: ATProtocolCodable, ATProtocolValue {
         case createdAt
         case name
     }
-
 }

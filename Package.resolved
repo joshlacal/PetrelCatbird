@@ -1,21 +1,12 @@
 {
-  "originHash" : "93694edf4bf0b093bb1255c2084704e3da3b4698a9ec93fadb4a279a57d7db2e",
+  "originHash" : "3139a3af48b9f76a5251ade990574fe21c95b3e9ba80cb537a1e69d7f93c2860",
   "pins" : [
     {
       "identity" : "petrel",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/joshlacal/Petrel.git",
       "state" : {
-        "revision" : "e115236537041a900ec971be05185a70cca73e8a"
-      }
-    },
-    {
-      "identity" : "secp256k1.swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/GigaBitcoin/secp256k1.swift.git",
-      "state" : {
-        "revision" : "4c77c7384768acf1093d66ccaacf298d322b10b7",
-        "version" : "0.15.0"
+        "revision" : "cc2999e1f4746a7c246d76dce09f4176ec0768a1"
       }
     },
     {
@@ -23,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-asn1.git",
       "state" : {
-        "revision" : "a9a5efd40eaf558a2bcd48d64b1d1646be686008",
-        "version" : "1.7.1"
+        "revision" : "3b6410f7dee09eb33cdd26260c5fd47fda19b0e2",
+        "version" : "1.7.3"
       }
     },
     {
@@ -32,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-async-dns-resolver",
       "state" : {
-        "revision" : "e145f21e97cc40ee744e1276b21426ed47ab9d88",
-        "version" : "0.7.1"
+        "revision" : "1bd427a37a8fa276a96189f22c714e79b7d5ac03",
+        "version" : "0.8.0"
       }
     },
     {
@@ -41,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-crypto.git",
       "state" : {
-        "revision" : "95ba0316a9b733e92bb6b071255ff46263bbe7dc",
-        "version" : "3.15.1"
+        "revision" : "c2cbadd7263439d8015189668f96ff5b5be565ce",
+        "version" : "5.0.3"
       }
     },
     {
@@ -50,8 +41,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "3ffafb9722d5d918c614feb496c8789a3b59d222",
-        "version" : "1.15.0"
+        "revision" : "c9c6bb9d275ec0d95c3ad16391f3f045dc623104",
+        "version" : "1.16.2"
+      }
+    },
+    {
+      "identity" : "swift-secp256k1",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/21-DOT-DEV/swift-secp256k1.git",
+      "state" : {
+        "revision" : "bcd6dd8e615ce243eab7097f213c8c4b39305a2e",
+        "version" : "0.24.0"
       }
     },
     {

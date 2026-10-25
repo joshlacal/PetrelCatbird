@@ -5,7 +5,6 @@ import Petrel
 // lexicon: 1, id: blue.catbird.labyrinth.epoch
 
 public struct BlueCatbirdLabyrinthEpoch: ATProtocolCodable, ATProtocolValue {
-
     public static let typeIdentifier = "blue.catbird.labyrinth.epoch"
     public let `public`: BlueCatbirdLabyrinthDefs.EpochPublic
     public let encryptedPreviousEpochNumber: Bytes?
@@ -13,8 +12,8 @@ public struct BlueCatbirdLabyrinthEpoch: ATProtocolCodable, ATProtocolValue {
     public let openedBy: Bytes
     public let createdAt: ATProtocolDate
 
-    public init(`public`: BlueCatbirdLabyrinthDefs.EpochPublic, encryptedPreviousEpochNumber: Bytes? = nil, encryptedPreviousEpochRootKey: Bytes? = nil, openedBy: Bytes, createdAt: ATProtocolDate) {
-        self.`public` = `public`
+    public init(public: BlueCatbirdLabyrinthDefs.EpochPublic, encryptedPreviousEpochNumber: Bytes? = nil, encryptedPreviousEpochRootKey: Bytes? = nil, openedBy: Bytes, createdAt: ATProtocolDate) {
+        self.public = `public`
         self.encryptedPreviousEpochNumber = encryptedPreviousEpochNumber
         self.encryptedPreviousEpochRootKey = encryptedPreviousEpochRootKey
         self.openedBy = openedBy
@@ -23,29 +22,29 @@ public struct BlueCatbirdLabyrinthEpoch: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.`public` = try container.decode(BlueCatbirdLabyrinthDefs.EpochPublic.self, forKey: .`public`)
+        self.public = try container.decode(BlueCatbirdLabyrinthDefs.EpochPublic.self, forKey: .public)
         do {
-            self.encryptedPreviousEpochNumber = try container.decodeIfPresent(Bytes.self, forKey: .encryptedPreviousEpochNumber)
+            encryptedPreviousEpochNumber = try container.decodeIfPresent(Bytes.self, forKey: .encryptedPreviousEpochNumber)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'encryptedPreviousEpochNumber' — degrading to nil: \(error)")
-            self.encryptedPreviousEpochNumber = nil
+            encryptedPreviousEpochNumber = nil
         }
         do {
-            self.encryptedPreviousEpochRootKey = try container.decodeIfPresent(Bytes.self, forKey: .encryptedPreviousEpochRootKey)
+            encryptedPreviousEpochRootKey = try container.decodeIfPresent(Bytes.self, forKey: .encryptedPreviousEpochRootKey)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'encryptedPreviousEpochRootKey' — degrading to nil: \(error)")
-            self.encryptedPreviousEpochRootKey = nil
+            encryptedPreviousEpochRootKey = nil
         }
-        self.openedBy = try container.decode(Bytes.self, forKey: .openedBy)
-        self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        openedBy = try container.decode(Bytes.self, forKey: .openedBy)
+        createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(`public`, forKey: .`public`)
+        try container.encode(`public`, forKey: .public)
         try container.encodeIfPresent(encryptedPreviousEpochNumber, forKey: .encryptedPreviousEpochNumber)
         try container.encodeIfPresent(encryptedPreviousEpochRootKey, forKey: .encryptedPreviousEpochRootKey)
         try container.encode(openedBy, forKey: .openedBy)
@@ -58,7 +57,7 @@ public struct BlueCatbirdLabyrinthEpoch: ATProtocolCodable, ATProtocolValue {
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if `public` != other.`public` {
+        if `public` != other.public {
             return false
         }
         if encryptedPreviousEpochNumber != other.encryptedPreviousEpochNumber {
@@ -120,5 +119,4 @@ public struct BlueCatbirdLabyrinthEpoch: ATProtocolCodable, ATProtocolValue {
         case openedBy
         case createdAt
     }
-
 }

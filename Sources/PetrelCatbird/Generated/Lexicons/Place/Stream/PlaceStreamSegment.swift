@@ -5,7 +5,6 @@ import Petrel
 // lexicon: 1, id: place.stream.segment
 
 public struct PlaceStreamSegment: ATProtocolCodable, ATProtocolValue {
-
     public static let typeIdentifier = "place.stream.segment"
     public let id: String
     public let signingKey: String
@@ -35,58 +34,58 @@ public struct PlaceStreamSegment: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.id = try container.decode(String.self, forKey: .id)
-        self.signingKey = try container.decode(String.self, forKey: .signingKey)
-        self.startTime = try container.decode(ATProtocolDate.self, forKey: .startTime)
+        id = try container.decode(String.self, forKey: .id)
+        signingKey = try container.decode(String.self, forKey: .signingKey)
+        startTime = try container.decode(ATProtocolDate.self, forKey: .startTime)
         do {
-            self.duration = try container.decodeIfPresent(Int.self, forKey: .duration)
+            duration = try container.decodeIfPresent(Int.self, forKey: .duration)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'duration' — degrading to nil: \(error)")
-            self.duration = nil
+            duration = nil
         }
-        self.creator = try container.decode(DID.self, forKey: .creator)
+        creator = try container.decode(DID.self, forKey: .creator)
         do {
-            self.video = try container.decodeIfPresent([Video].self, forKey: .video)
+            video = try container.decodeIfPresent([Video].self, forKey: .video)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'video' — degrading to nil: \(error)")
-            self.video = nil
+            video = nil
         }
         do {
-            self.audio = try container.decodeIfPresent([Audio].self, forKey: .audio)
+            audio = try container.decodeIfPresent([Audio].self, forKey: .audio)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'audio' — degrading to nil: \(error)")
-            self.audio = nil
+            audio = nil
         }
         do {
-            self.size = try container.decodeIfPresent(Int.self, forKey: .size)
+            size = try container.decodeIfPresent(Int.self, forKey: .size)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'size' — degrading to nil: \(error)")
-            self.size = nil
+            size = nil
         }
         do {
-            self.contentWarnings = try container.decodeIfPresent(PlaceStreamMetadataContentWarnings.self, forKey: .contentWarnings)
+            contentWarnings = try container.decodeIfPresent(PlaceStreamMetadataContentWarnings.self, forKey: .contentWarnings)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'contentWarnings' — degrading to nil: \(error)")
-            self.contentWarnings = nil
+            contentWarnings = nil
         }
         do {
-            self.contentRights = try container.decodeIfPresent(PlaceStreamMetadataContentRights.self, forKey: .contentRights)
+            contentRights = try container.decodeIfPresent(PlaceStreamMetadataContentRights.self, forKey: .contentRights)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'contentRights' — degrading to nil: \(error)")
-            self.contentRights = nil
+            contentRights = nil
         }
         do {
-            self.distributionPolicy = try container.decodeIfPresent(PlaceStreamMetadataDistributionPolicy.self, forKey: .distributionPolicy)
+            distributionPolicy = try container.decodeIfPresent(PlaceStreamMetadataDistributionPolicy.self, forKey: .distributionPolicy)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'distributionPolicy' — degrading to nil: \(error)")
-            self.distributionPolicy = nil
+            distributionPolicy = nil
         }
     }
 
@@ -264,19 +263,19 @@ public struct PlaceStreamSegment: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.codec = try container.decode(AudioCodec.self, forKey: .codec)
+                codec = try container.decode(AudioCodec.self, forKey: .codec)
             } catch {
                 LogManager.logError("Decoding error for required property 'codec': \(error)")
                 throw error
             }
             do {
-                self.rate = try container.decode(Int.self, forKey: .rate)
+                rate = try container.decode(Int.self, forKey: .rate)
             } catch {
                 LogManager.logError("Decoding error for required property 'rate': \(error)")
                 throw error
             }
             do {
-                self.channels = try container.decode(Int.self, forKey: .channels)
+                channels = try container.decode(Int.self, forKey: .channels)
             } catch {
                 LogManager.logError("Decoding error for required property 'channels': \(error)")
                 throw error
@@ -356,38 +355,38 @@ public struct PlaceStreamSegment: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.codec = try container.decode(VideoCodec.self, forKey: .codec)
+                codec = try container.decode(VideoCodec.self, forKey: .codec)
             } catch {
                 LogManager.logError("Decoding error for required property 'codec': \(error)")
                 throw error
             }
             do {
-                self.width = try container.decode(Int.self, forKey: .width)
+                width = try container.decode(Int.self, forKey: .width)
             } catch {
                 LogManager.logError("Decoding error for required property 'width': \(error)")
                 throw error
             }
             do {
-                self.height = try container.decode(Int.self, forKey: .height)
+                height = try container.decode(Int.self, forKey: .height)
             } catch {
                 LogManager.logError("Decoding error for required property 'height': \(error)")
                 throw error
             }
             do {
-                self.framerate = try container.decodeIfPresent(Framerate.self, forKey: .framerate)
+                framerate = try container.decodeIfPresent(Framerate.self, forKey: .framerate)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'framerate' — degrading to nil: \(error)")
-                self.framerate = nil
+                framerate = nil
             }
             do {
-                self.bframes = try container.decodeIfPresent(Bool.self, forKey: .bframes)
+                bframes = try container.decodeIfPresent(Bool.self, forKey: .bframes)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
                 // must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'bframes' — degrading to nil: \(error)")
-                self.bframes = nil
+                bframes = nil
             }
         }
 
@@ -486,13 +485,13 @@ public struct PlaceStreamSegment: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.num = try container.decode(Int.self, forKey: .num)
+                num = try container.decode(Int.self, forKey: .num)
             } catch {
                 LogManager.logError("Decoding error for required property 'num': \(error)")
                 throw error
             }
             do {
-                self.den = try container.decode(Int.self, forKey: .den)
+                den = try container.decode(Int.self, forKey: .den)
             } catch {
                 LogManager.logError("Decoding error for required property 'den': \(error)")
                 throw error
@@ -558,13 +557,13 @@ public struct PlaceStreamSegment: ATProtocolCodable, ATProtocolValue {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             do {
-                self.cid = try container.decode(CID.self, forKey: .cid)
+                cid = try container.decode(CID.self, forKey: .cid)
             } catch {
                 LogManager.logError("Decoding error for required property 'cid': \(error)")
                 throw error
             }
             do {
-                self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+                record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
             } catch {
                 LogManager.logError("Decoding error for required property 'record': \(error)")
                 throw error
@@ -640,5 +639,4 @@ public struct PlaceStreamSegment: ATProtocolCodable, ATProtocolValue {
             return rawValue
         }
     }
-
 }

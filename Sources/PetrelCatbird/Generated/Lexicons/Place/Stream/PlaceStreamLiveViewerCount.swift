@@ -5,7 +5,6 @@ import Petrel
 // lexicon: 1, id: place.stream.live.viewerCount
 
 public struct PlaceStreamLiveViewerCount: ATProtocolCodable, ATProtocolValue {
-
     public static let typeIdentifier = "place.stream.live.viewerCount"
     public let streamer: DID
     public let server: DID
@@ -21,15 +20,15 @@ public struct PlaceStreamLiveViewerCount: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.streamer = try container.decode(DID.self, forKey: .streamer)
-        self.server = try container.decode(DID.self, forKey: .server)
-        self.count = try container.decode(Int.self, forKey: .count)
+        streamer = try container.decode(DID.self, forKey: .streamer)
+        server = try container.decode(DID.self, forKey: .server)
+        count = try container.decode(Int.self, forKey: .count)
         do {
-            self.updatedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .updatedAt)
+            updatedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .updatedAt)
         } catch {
             // Forward compatibility: a malformed optional field must not fail the whole record.
             LogManager.logWarning("Decoding error for optional property 'updatedAt' — degrading to nil: \(error)")
-            self.updatedAt = nil
+            updatedAt = nil
         }
     }
 
@@ -97,5 +96,4 @@ public struct PlaceStreamLiveViewerCount: ATProtocolCodable, ATProtocolValue {
         case count
         case updatedAt
     }
-
 }

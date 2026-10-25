@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.getBlob
 
-public struct BlueCatbirdChatGetBlob {
-
+public enum BlueCatbirdChatGetBlob {
     public static let typeIdentifier = "blue.catbird.chat.getBlob"
     public struct Parameters: Parametrizable {
         public let actorDeviceId: String
@@ -17,56 +16,44 @@ public struct BlueCatbirdChatGetBlob {
         ) {
             self.actorDeviceId = actorDeviceId
             self.blobId = blobId
-
         }
     }
 
     public struct Output: ATProtocolCodable {
-
         public let data: Data
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             data: Data
 
         ) {
-
             self.data = data
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.data = try container.decode(Data.self, forKey: .data)
-
+            data = try container.decode(Data.self, forKey: .data)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(data, forKey: .data)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let dataValue = try data.toCBORValue()
             map = map.adding(key: "data", value: dataValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case data
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -81,25 +68,25 @@ public struct BlueCatbirdChatGetBlob {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Chat {
+public extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - getBlob
+
     /// Download immutable opaque ciphertext under purpose-specific authorization. An attachment is readable only when its binding seq lies inside the caller's exact application interval; pre-join history and re-add gaps are denied even if the caller is currently a participant. A metadata avatar is readable by any current logical participant from the current metadata snapshot, including a title-only snapshot that reuses an older avatar binding. A completed unbound upload is visible only to its verified owner.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getBlob(input: BlueCatbirdChatGetBlob.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetBlob.Output?) {
+    func getBlob(input: BlueCatbirdChatGetBlob.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetBlob.Output?) {
         let endpoint = "blue.catbird.chat.getBlob"
 
         let queryItems = input.asQueryItems()
@@ -121,8 +108,7 @@ extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/octet-stream", actual: "nil")
             }

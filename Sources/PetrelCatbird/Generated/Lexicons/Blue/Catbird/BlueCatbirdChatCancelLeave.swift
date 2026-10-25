@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.cancelLeave
 
-public struct BlueCatbirdChatCancelLeave {
-
+public enum BlueCatbirdChatCancelLeave {
     public static let typeIdentifier = "blue.catbird.chat.cancelLeave"
     public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedLeaveCancellation
@@ -17,7 +16,7 @@ public struct BlueCatbirdChatCancelLeave {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.signedRequest = try container.decode(BlueCatbirdChatDefs.SignedLeaveCancellation.self, forKey: .signedRequest)
+            signedRequest = try container.decode(BlueCatbirdChatDefs.SignedLeaveCancellation.self, forKey: .signedRequest)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -38,48 +37,39 @@ public struct BlueCatbirdChatCancelLeave {
     }
 
     public struct Output: ATProtocolCodable {
-
         public let leaveRequest: BlueCatbirdChatDefs.LeaveRequestView
 
         public let entry: BlueCatbirdChatDefs.LeaveCancellationEntry
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             leaveRequest: BlueCatbirdChatDefs.LeaveRequestView,
 
             entry: BlueCatbirdChatDefs.LeaveCancellationEntry
 
         ) {
-
             self.leaveRequest = leaveRequest
 
             self.entry = entry
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.leaveRequest = try container.decode(BlueCatbirdChatDefs.LeaveRequestView.self, forKey: .leaveRequest)
+            leaveRequest = try container.decode(BlueCatbirdChatDefs.LeaveRequestView.self, forKey: .leaveRequest)
 
-            self.entry = try container.decode(BlueCatbirdChatDefs.LeaveCancellationEntry.self, forKey: .entry)
-
+            entry = try container.decode(BlueCatbirdChatDefs.LeaveCancellationEntry.self, forKey: .entry)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(leaveRequest, forKey: .leaveRequest)
 
             try container.encode(entry, forKey: .entry)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let leaveRequestValue = try leaveRequest.toCBORValue()
@@ -89,14 +79,12 @@ public struct BlueCatbirdChatCancelLeave {
             map = map.adding(key: "entry", value: entryValue)
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case leaveRequest
             case entry
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -115,27 +103,26 @@ public struct BlueCatbirdChatCancelLeave {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Chat {
+public extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - cancelLeave
-    /// Cancels an exact pending leave request before fulfillment. Exact replay returns the recorded cancellation; changed bytes or a terminal request state conflict.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Cancels an exact pending leave request before fulfillment. Exact replay returns the recorded cancellation; changed bytes or a terminal request state conflict.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func cancelLeave(
-
+    func cancelLeave(
         input: BlueCatbirdChatCancelLeave.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatCancelLeave.Output?) {
@@ -168,8 +155,7 @@ extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -179,7 +165,6 @@ extension ATProtoClient.Blue.Catbird.Chat {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatCancelLeave.Output.self, from: responseData)
 
@@ -202,7 +187,5 @@ extension ATProtoClient.Blue.Catbird.Chat {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

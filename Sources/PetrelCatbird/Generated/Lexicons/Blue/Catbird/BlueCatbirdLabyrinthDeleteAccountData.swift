@@ -4,14 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.deleteAccountData
 
-public struct BlueCatbirdLabyrinthDeleteAccountData {
-
+public enum BlueCatbirdLabyrinthDeleteAccountData {
     public static let typeIdentifier = "blue.catbird.labyrinth.deleteAccountData"
     public struct Input: ATProtocolCodable {
-
         /// Standard public initializer
-        public init() {
-        }
+        public init() {}
 
         public func toCBORValue() throws -> Any {
             return OrderedCBORMap()
@@ -19,63 +16,50 @@ public struct BlueCatbirdLabyrinthDeleteAccountData {
     }
 
     public struct Output: ATProtocolCodable {
-
         // Empty output - no properties (response is {})
 
-        // Standard public initializer
-        public init(
-
-        ) {
-
-        }
+        /// Standard public initializer
+        public init() {}
 
         public init(from decoder: Decoder) throws {
-
             // Empty output - just validate it's an object by trying to get any container
             _ = try decoder.singleValueContainer()
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             // Empty output - encode empty object
             _ = encoder.singleValueContainer()
-
         }
 
         public func toCBORValue() throws -> Any {
-
             // Empty output - return empty CBOR map
             return OrderedCBORMap()
-
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Labyrinth {
+public extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - deleteAccountData
-    /// Account deletion (decision J1). Requires a bound Labyrinth device. Locally, in one transaction: purge the mailbox exactly as purgeMailbox does (including every ORF state), redact every thread item the DID authored in conversations this DS sequences with a server redaction (defs#redaction variant 2: by, reason accountDeleted, redactedAt, and a DS signature), and queue a durable purgeAuthor job for the sequencer of every other conversation the DID takes or took part in; those are delivered with retries, so an unreachable DS neither blocks nor loses the deletion. Idempotency records are kept (they expire after 7 days), so a replayed pre-deletion write answers from its record instead of running again. MEK records stay, because other members' batches can be sealed under them. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Account deletion (decision J1). Requires a bound Labyrinth device. Locally, in one transaction: purge the mailbox exactly as purgeMailbox does (including every ORF state), redact every thread item the DID authored in conversations this DS sequences with a server redaction (defs#redaction variant 2: by, reason accountDeleted, redactedAt, and a DS signature), and queue a durable purgeAuthor job for the sequencer of every other conversation the DID takes or took part in; those are delivered with retries, so an unreachable DS neither blocks nor loses the deletion. Idempotency records are kept (they expire after 7 days), so a replayed pre-deletion write answers from its record instead of running again. MEK records stay, because other members' batches can be sealed under them. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func deleteAccountData(
-
+    func deleteAccountData(
         input: BlueCatbirdLabyrinthDeleteAccountData.Input
 
     ) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthDeleteAccountData.Output?) {
@@ -108,8 +92,7 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -119,7 +102,6 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdLabyrinthDeleteAccountData.Output.self, from: responseData)
 
@@ -142,7 +124,5 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

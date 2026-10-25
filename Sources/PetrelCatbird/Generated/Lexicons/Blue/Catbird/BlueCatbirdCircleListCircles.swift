@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.circle.listCircles
 
-public struct BlueCatbirdCircleListCircles {
-
+public enum BlueCatbirdCircleListCircles {
     public static let typeIdentifier = "blue.catbird.circle.listCircles"
     public struct Parameters: Parametrizable {
         public let limit: Int?
@@ -17,60 +16,50 @@ public struct BlueCatbirdCircleListCircles {
         ) {
             self.limit = limit
             self.cursor = cursor
-
         }
     }
 
     public struct Output: ATProtocolCodable {
-
         public let circles: [BlueCatbirdCircleDefs.CircleSummary]
 
         public let cursor: String?
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             circles: [BlueCatbirdCircleDefs.CircleSummary],
 
             cursor: String? = nil
 
         ) {
-
             self.circles = circles
 
             self.cursor = cursor
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.circles = try container.decode([BlueCatbirdCircleDefs.CircleSummary].self, forKey: .circles)
+            circles = try container.decode([BlueCatbirdCircleDefs.CircleSummary].self, forKey: .circles)
 
             do {
-                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
+                cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
-                self.cursor = nil
+                cursor = nil
             }
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(circles, forKey: .circles)
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(cursor, forKey: .cursor)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let circlesValue = try circles.toCBORValue()
@@ -83,14 +72,12 @@ public struct BlueCatbirdCircleListCircles {
             }
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case circles
             case cursor
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -100,25 +87,25 @@ public struct BlueCatbirdCircleListCircles {
         case protocolRevisionMismatch = "ProtocolRevisionMismatch"
         case upstreamUnavailable = "UpstreamUnavailable"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Circle {
+public extension ATProtoClient.Blue.Catbird.Circle {
     // MARK: - listCircles
+
     /// List Circle Spaces accessible to the caller
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func listCircles(input: BlueCatbirdCircleListCircles.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdCircleListCircles.Output?) {
+    func listCircles(input: BlueCatbirdCircleListCircles.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdCircleListCircles.Output?) {
         let endpoint = "blue.catbird.circle.listCircles"
 
         let queryItems = input.asQueryItems()
@@ -140,8 +127,7 @@ extension ATProtoClient.Blue.Catbird.Circle {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

@@ -5,7 +5,6 @@ import Petrel
 // lexicon: 1, id: place.stream.richtext.facet
 
 public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
-
     public static let typeIdentifier = "place.stream.richtext.facet"
     public let index: AppBskyRichtextFacet.ByteSlice
     public let features: [PlaceStreamRichtextFacetFeaturesUnion]
@@ -17,8 +16,8 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.index = try container.decode(AppBskyRichtextFacet.ByteSlice.self, forKey: .index)
-        self.features = try container.decode([PlaceStreamRichtextFacetFeaturesUnion].self, forKey: .features)
+        index = try container.decode(AppBskyRichtextFacet.ByteSlice.self, forKey: .index)
+        features = try container.decode([PlaceStreamRichtextFacetFeaturesUnion].self, forKey: .features)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -68,6 +67,7 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
         public init(_ value: AppBskyRichtextFacet.Mention) {
             self = .appBskyRichtextFacetMention(value)
         }
+
         public init(_ value: AppBskyRichtextFacet.Link) {
             self = .appBskyRichtextFacetLink(value)
         }
@@ -93,26 +93,26 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             switch self {
-            case .appBskyRichtextFacetMention(let value):
+            case let .appBskyRichtextFacetMention(value):
                 try container.encode("app.bsky.richtext.facet#mention", forKey: .type)
                 try value.encode(to: encoder)
-            case .appBskyRichtextFacetLink(let value):
+            case let .appBskyRichtextFacetLink(value):
                 try container.encode("app.bsky.richtext.facet#link", forKey: .type)
                 try value.encode(to: encoder)
-            case .unexpected(let container):
+            case let .unexpected(container):
                 try container.encode(to: encoder)
             }
         }
 
         public func hash(into hasher: inout Hasher) {
             switch self {
-            case .appBskyRichtextFacetMention(let value):
+            case let .appBskyRichtextFacetMention(value):
                 hasher.combine("app.bsky.richtext.facet#mention")
                 hasher.combine(value)
-            case .appBskyRichtextFacetLink(let value):
+            case let .appBskyRichtextFacetLink(value):
                 hasher.combine("app.bsky.richtext.facet#link")
                 hasher.combine(value)
-            case .unexpected(let container):
+            case let .unexpected(container):
                 hasher.combine("unexpected")
                 hasher.combine(container)
             }
@@ -124,13 +124,13 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
 
         public static func == (lhs: PlaceStreamRichtextFacetFeaturesUnion, rhs: PlaceStreamRichtextFacetFeaturesUnion) -> Bool {
             switch (lhs, rhs) {
-            case (.appBskyRichtextFacetMention(let lhsValue),
-                  .appBskyRichtextFacetMention(let rhsValue)):
+            case let (.appBskyRichtextFacetMention(lhsValue),
+                      .appBskyRichtextFacetMention(rhsValue)):
                 return lhsValue == rhsValue
-            case (.appBskyRichtextFacetLink(let lhsValue),
-                  .appBskyRichtextFacetLink(let rhsValue)):
+            case let (.appBskyRichtextFacetLink(lhsValue),
+                      .appBskyRichtextFacetLink(rhsValue)):
                 return lhsValue == rhsValue
-            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+            case let (.unexpected(lhsValue), .unexpected(rhsValue)):
                 return lhsValue.isEqual(to: rhsValue)
             default:
                 return false
@@ -142,13 +142,13 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
             return self == other
         }
 
-        // DAGCBOR encoding with field ordering
+        /// DAGCBOR encoding with field ordering
         public func toCBORValue() throws -> Any {
             // Create an ordered map to maintain field order
             var map = OrderedCBORMap()
 
             switch self {
-            case .appBskyRichtextFacetMention(let value):
+            case let .appBskyRichtextFacetMention(value):
                 map = map.adding(key: "$type", value: "app.bsky.richtext.facet#mention")
 
                 let valueDict = try value.toCBORValue()
@@ -165,7 +165,7 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case .appBskyRichtextFacetLink(let value):
+            case let .appBskyRichtextFacetLink(value):
                 map = map.adding(key: "$type", value: "app.bsky.richtext.facet#link")
 
                 let valueDict = try value.toCBORValue()
@@ -182,7 +182,7 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case .unexpected(let container):
+            case let .unexpected(container):
                 return try container.toCBORValue()
             }
         }
@@ -218,14 +218,14 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Features else { return false }
 
-            if self.items != other.items {
+            if items != other.items {
                 return false
             }
 
             return true
         }
 
-        // DAGCBOR encoding with field ordering
+        /// DAGCBOR encoding with field ordering
         public func toCBORValue() throws -> Any {
             // For union arrays, we need to encode each item while preserving its order
             var itemsArray = [Any]()
@@ -237,7 +237,6 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
 
             return itemsArray
         }
-
     }
 
     public enum FeaturesForUnionArray: Codable, ATProtocolCodable, ATProtocolValue {
@@ -247,6 +246,7 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
         public init(_ value: AppBskyRichtextFacetMention) {
             self = .appBskyRichtextFacetMention(value)
         }
+
         public init(_ value: AppBskyRichtextFacetLink) {
             self = .appBskyRichtextFacetLink(value)
         }
@@ -272,26 +272,26 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             switch self {
-            case .appBskyRichtextFacetMention(let value):
+            case let .appBskyRichtextFacetMention(value):
                 try container.encode("AppBskyRichtextFacet.Mention", forKey: .type)
                 try value.encode(to: encoder)
-            case .appBskyRichtextFacetLink(let value):
+            case let .appBskyRichtextFacetLink(value):
                 try container.encode("AppBskyRichtextFacet.Link", forKey: .type)
                 try value.encode(to: encoder)
-            case .unexpected(let ATProtocolValueContainer):
+            case let .unexpected(ATProtocolValueContainer):
                 try ATProtocolValueContainer.encode(to: encoder)
             }
         }
 
         public func hash(into hasher: inout Hasher) {
             switch self {
-            case .appBskyRichtextFacetMention(let value):
+            case let .appBskyRichtextFacetMention(value):
                 hasher.combine("AppBskyRichtextFacet.Mention")
                 hasher.combine(value)
-            case .appBskyRichtextFacetLink(let value):
+            case let .appBskyRichtextFacetLink(value):
                 hasher.combine("AppBskyRichtextFacet.Link")
                 hasher.combine(value)
-            case .unexpected(let ATProtocolValueContainer):
+            case let .unexpected(ATProtocolValueContainer):
                 hasher.combine("unexpected")
                 hasher.combine(ATProtocolValueContainer)
             }
@@ -301,13 +301,13 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
             guard let otherValue = other as? FeaturesForUnionArray else { return false }
 
             switch (self, otherValue) {
-            case (.appBskyRichtextFacetMention(let selfValue),
-                  .appBskyRichtextFacetMention(let otherValue)):
+            case let (.appBskyRichtextFacetMention(selfValue),
+                      .appBskyRichtextFacetMention(otherValue)):
                 return selfValue == otherValue
-            case (.appBskyRichtextFacetLink(let selfValue),
-                  .appBskyRichtextFacetLink(let otherValue)):
+            case let (.appBskyRichtextFacetLink(selfValue),
+                      .appBskyRichtextFacetLink(otherValue)):
                 return selfValue == otherValue
-            case (.unexpected(let selfValue), .unexpected(let otherValue)):
+            case let (.unexpected(selfValue), .unexpected(otherValue)):
                 return selfValue.isEqual(to: otherValue)
             default:
                 return false
@@ -318,12 +318,12 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
             case type = "$type"
         }
 
-        // DAGCBOR encoding with field ordering
+        /// DAGCBOR encoding with field ordering
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
 
             switch self {
-            case .appBskyRichtextFacetMention(let value):
+            case let .appBskyRichtextFacetMention(value):
                 map = map.adding(key: "$type", value: "AppBskyRichtextFacet.Mention")
 
                 let valueDict = try value.toCBORValue()
@@ -340,7 +340,7 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case .appBskyRichtextFacetLink(let value):
+            case let .appBskyRichtextFacetLink(value):
                 map = map.adding(key: "$type", value: "AppBskyRichtextFacet.Link")
 
                 let valueDict = try value.toCBORValue()
@@ -357,10 +357,9 @@ public struct PlaceStreamRichtextFacet: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case .unexpected(let container):
+            case let .unexpected(container):
                 return try container.toCBORValue()
             }
         }
     }
-
 }

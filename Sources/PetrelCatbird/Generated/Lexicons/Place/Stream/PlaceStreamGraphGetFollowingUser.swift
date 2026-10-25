@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: place.stream.graph.getFollowingUser
 
-public struct PlaceStreamGraphGetFollowingUser {
-
+public enum PlaceStreamGraphGetFollowingUser {
     public static let typeIdentifier = "place.stream.graph.getFollowingUser"
     public struct Parameters: Parametrizable {
         public let userDID: DID
@@ -17,50 +16,40 @@ public struct PlaceStreamGraphGetFollowingUser {
         ) {
             self.userDID = userDID
             self.subjectDID = subjectDID
-
         }
     }
 
     public struct Output: ATProtocolCodable {
-
         public let follow: ComAtprotoRepoStrongRef?
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             follow: ComAtprotoRepoStrongRef? = nil
 
         ) {
-
             self.follow = follow
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
             do {
-                self.follow = try container.decodeIfPresent(ComAtprotoRepoStrongRef.self, forKey: .follow)
+                follow = try container.decodeIfPresent(ComAtprotoRepoStrongRef.self, forKey: .follow)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'follow' — degrading to nil: \(error)")
-                self.follow = nil
+                follow = nil
             }
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(follow, forKey: .follow)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             if let value = follow {
@@ -70,26 +59,24 @@ public struct PlaceStreamGraphGetFollowingUser {
             }
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case follow
         }
-
     }
-
 }
 
-extension ATProtoClient.Place.Stream.Graph {
+public extension ATProtoClient.Place.Stream.Graph {
     // MARK: - getFollowingUser
+
     /// Get whether or not user A is following user B.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getFollowingUser(input: PlaceStreamGraphGetFollowingUser.Parameters) async throws -> (responseCode: Int, data: PlaceStreamGraphGetFollowingUser.Output?) {
+    func getFollowingUser(input: PlaceStreamGraphGetFollowingUser.Parameters) async throws -> (responseCode: Int, data: PlaceStreamGraphGetFollowingUser.Output?) {
         let endpoint = "place.stream.graph.getFollowingUser"
 
         let queryItems = input.asQueryItems()
@@ -111,8 +98,7 @@ extension ATProtoClient.Place.Stream.Graph {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -132,7 +118,6 @@ extension ATProtoClient.Place.Stream.Graph {
                 return (responseCode, nil)
             }
         } else {
-
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)

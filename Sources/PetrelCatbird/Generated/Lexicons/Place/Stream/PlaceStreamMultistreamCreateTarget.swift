@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: place.stream.multistream.createTarget
 
-public struct PlaceStreamMultistreamCreateTarget {
-
+public enum PlaceStreamMultistreamCreateTarget {
     public static let typeIdentifier = "place.stream.multistream.createTarget"
     public struct Input: ATProtocolCodable {
         public let multistreamTarget: PlaceStreamMultistreamTarget
@@ -17,7 +16,7 @@ public struct PlaceStreamMultistreamCreateTarget {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.multistreamTarget = try container.decode(PlaceStreamMultistreamTarget.self, forKey: .multistreamTarget)
+            multistreamTarget = try container.decode(PlaceStreamMultistreamTarget.self, forKey: .multistreamTarget)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -36,33 +35,33 @@ public struct PlaceStreamMultistreamCreateTarget {
             case multistreamTarget
         }
     }
+
     public typealias Output = PlaceStreamMultistreamDefs.TargetView
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         /// The provided target URL is invalid or unreachable.
         case invalidTargetUrl = "InvalidTargetUrl"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Place.Stream.Multistream {
+public extension ATProtoClient.Place.Stream.Multistream {
     // MARK: - createTarget
-    /// Create a new target for rebroadcasting a Streamplace stream.
-    ///
-    /// - Parameter input: The input parameters for the request
+
+    // Create a new target for rebroadcasting a Streamplace stream.
+    //
+    // - Parameter input: The input parameters for the request
 
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func createTarget(
-
+    func createTarget(
         input: PlaceStreamMultistreamCreateTarget.Input
 
     ) async throws -> (responseCode: Int, data: PlaceStreamMultistreamCreateTarget.Output?) {
@@ -95,8 +94,7 @@ extension ATProtoClient.Place.Stream.Multistream {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -106,7 +104,6 @@ extension ATProtoClient.Place.Stream.Multistream {
             }
 
             do {
-
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(PlaceStreamMultistreamCreateTarget.Output.self, from: responseData)
 
@@ -129,7 +126,5 @@ extension ATProtoClient.Place.Stream.Multistream {
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-
     }
-
 }

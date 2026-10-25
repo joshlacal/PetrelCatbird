@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.getPendingWelcomes
 
-public struct BlueCatbirdChatGetPendingWelcomes {
-
+public enum BlueCatbirdChatGetPendingWelcomes {
     public static let typeIdentifier = "blue.catbird.chat.getPendingWelcomes"
     public struct Parameters: Parametrizable {
         public let actorDeviceId: String
@@ -26,12 +25,10 @@ public struct BlueCatbirdChatGetPendingWelcomes {
             self.pageCursor = pageCursor
             self.limit = limit
             self.supportedProtocolVersions = supportedProtocolVersions
-
         }
     }
 
     public struct Output: ATProtocolCodable {
-
         public let items: [OutputItemsUnion]
 
         public let inventorySessionId: String
@@ -46,9 +43,8 @@ public struct BlueCatbirdChatGetPendingWelcomes {
 
         public let inventoryScope: BlueCatbirdChatDefs.DirectRequestInventoryScope?
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             items: [OutputItemsUnion],
 
             inventorySessionId: String,
@@ -64,7 +60,6 @@ public struct BlueCatbirdChatGetPendingWelcomes {
             inventoryScope: BlueCatbirdChatDefs.DirectRequestInventoryScope? = nil
 
         ) {
-
             self.items = items
 
             self.inventorySessionId = inventorySessionId
@@ -78,43 +73,39 @@ public struct BlueCatbirdChatGetPendingWelcomes {
             self.snapshotExpiresAt = snapshotExpiresAt
 
             self.inventoryScope = inventoryScope
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.items = try container.decode([OutputItemsUnion].self, forKey: .items)
+            items = try container.decode([OutputItemsUnion].self, forKey: .items)
 
-            self.inventorySessionId = try container.decode(String.self, forKey: .inventorySessionId)
+            inventorySessionId = try container.decode(String.self, forKey: .inventorySessionId)
 
-            self.snapshotEventCursor = try container.decode(String.self, forKey: .snapshotEventCursor)
+            snapshotEventCursor = try container.decode(String.self, forKey: .snapshotEventCursor)
 
             do {
-                self.nextPageCursor = try container.decodeIfPresent(String.self, forKey: .nextPageCursor)
+                nextPageCursor = try container.decodeIfPresent(String.self, forKey: .nextPageCursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'nextPageCursor' — degrading to nil: \(error)")
-                self.nextPageCursor = nil
+                nextPageCursor = nil
             }
 
-            self.hasMore = try container.decode(Bool.self, forKey: .hasMore)
+            hasMore = try container.decode(Bool.self, forKey: .hasMore)
 
-            self.snapshotExpiresAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .snapshotExpiresAt)
+            snapshotExpiresAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .snapshotExpiresAt)
 
             do {
-                self.inventoryScope = try container.decodeIfPresent(BlueCatbirdChatDefs.DirectRequestInventoryScope.self, forKey: .inventoryScope)
+                inventoryScope = try container.decodeIfPresent(BlueCatbirdChatDefs.DirectRequestInventoryScope.self, forKey: .inventoryScope)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'inventoryScope' — degrading to nil: \(error)")
-                self.inventoryScope = nil
+                inventoryScope = nil
             }
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(items, forKey: .items)
@@ -132,11 +123,9 @@ public struct BlueCatbirdChatGetPendingWelcomes {
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(inventoryScope, forKey: .inventoryScope)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let itemsValue = try items.toCBORValue()
@@ -167,7 +156,6 @@ public struct BlueCatbirdChatGetPendingWelcomes {
             }
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -179,7 +167,6 @@ public struct BlueCatbirdChatGetPendingWelcomes {
             case snapshotExpiresAt
             case inventoryScope
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -196,11 +183,11 @@ public struct BlueCatbirdChatGetPendingWelcomes {
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
 
@@ -225,6 +212,7 @@ public struct BlueCatbirdChatGetPendingWelcomes {
         public init(_ value: BlueCatbirdChatDefs.WelcomeView) {
             self = .blueCatbirdChatDefsWelcomeView(value)
         }
+
         public init(_ value: BlueCatbirdChatDefs.DirectRequestWelcomeView) {
             self = .blueCatbirdChatDefsDirectRequestWelcomeView(value)
         }
@@ -250,26 +238,26 @@ public struct BlueCatbirdChatGetPendingWelcomes {
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             switch self {
-            case .blueCatbirdChatDefsWelcomeView(let value):
+            case let .blueCatbirdChatDefsWelcomeView(value):
                 try container.encode("blue.catbird.chat.defs#welcomeView", forKey: .type)
                 try value.encode(to: encoder)
-            case .blueCatbirdChatDefsDirectRequestWelcomeView(let value):
+            case let .blueCatbirdChatDefsDirectRequestWelcomeView(value):
                 try container.encode("blue.catbird.chat.defs#directRequestWelcomeView", forKey: .type)
                 try value.encode(to: encoder)
-            case .unexpected(let container):
+            case let .unexpected(container):
                 try container.encode(to: encoder)
             }
         }
 
         public func hash(into hasher: inout Hasher) {
             switch self {
-            case .blueCatbirdChatDefsWelcomeView(let value):
+            case let .blueCatbirdChatDefsWelcomeView(value):
                 hasher.combine("blue.catbird.chat.defs#welcomeView")
                 hasher.combine(value)
-            case .blueCatbirdChatDefsDirectRequestWelcomeView(let value):
+            case let .blueCatbirdChatDefsDirectRequestWelcomeView(value):
                 hasher.combine("blue.catbird.chat.defs#directRequestWelcomeView")
                 hasher.combine(value)
-            case .unexpected(let container):
+            case let .unexpected(container):
                 hasher.combine("unexpected")
                 hasher.combine(container)
             }
@@ -281,13 +269,13 @@ public struct BlueCatbirdChatGetPendingWelcomes {
 
         public static func == (lhs: OutputItemsUnion, rhs: OutputItemsUnion) -> Bool {
             switch (lhs, rhs) {
-            case (.blueCatbirdChatDefsWelcomeView(let lhsValue),
-                  .blueCatbirdChatDefsWelcomeView(let rhsValue)):
+            case let (.blueCatbirdChatDefsWelcomeView(lhsValue),
+                      .blueCatbirdChatDefsWelcomeView(rhsValue)):
                 return lhsValue == rhsValue
-            case (.blueCatbirdChatDefsDirectRequestWelcomeView(let lhsValue),
-                  .blueCatbirdChatDefsDirectRequestWelcomeView(let rhsValue)):
+            case let (.blueCatbirdChatDefsDirectRequestWelcomeView(lhsValue),
+                      .blueCatbirdChatDefsDirectRequestWelcomeView(rhsValue)):
                 return lhsValue == rhsValue
-            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+            case let (.unexpected(lhsValue), .unexpected(rhsValue)):
                 return lhsValue.isEqual(to: rhsValue)
             default:
                 return false
@@ -299,13 +287,13 @@ public struct BlueCatbirdChatGetPendingWelcomes {
             return self == other
         }
 
-        // DAGCBOR encoding with field ordering
+        /// DAGCBOR encoding with field ordering
         public func toCBORValue() throws -> Any {
             // Create an ordered map to maintain field order
             var map = OrderedCBORMap()
 
             switch self {
-            case .blueCatbirdChatDefsWelcomeView(let value):
+            case let .blueCatbirdChatDefsWelcomeView(value):
                 map = map.adding(key: "$type", value: "blue.catbird.chat.defs#welcomeView")
 
                 let valueDict = try value.toCBORValue()
@@ -322,7 +310,7 @@ public struct BlueCatbirdChatGetPendingWelcomes {
                     }
                 }
                 return map
-            case .blueCatbirdChatDefsDirectRequestWelcomeView(let value):
+            case let .blueCatbirdChatDefsDirectRequestWelcomeView(value):
                 map = map.adding(key: "$type", value: "blue.catbird.chat.defs#directRequestWelcomeView")
 
                 let valueDict = try value.toCBORValue()
@@ -339,7 +327,7 @@ public struct BlueCatbirdChatGetPendingWelcomes {
                     }
                 }
                 return map
-            case .unexpected(let container):
+            case let .unexpected(container):
                 return try container.toCBORValue()
             }
         }
@@ -358,18 +346,18 @@ public struct BlueCatbirdChatGetPendingWelcomes {
             return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Chat {
+public extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - getPendingWelcomes
+
     /// Returns device-addressed pending Welcomes from the retained inventorySession created by getConversations. inventorySessionId is always required; pageCursor is an opaque Welcome-domain cursor bound to the same device, session, audience, fence, and expiry. Every response echoes the exact session event cursor and expiry; nextPageCursor is absent after the final page. Protocol-two scopes bind audience, inventory/page/event cursors and ticket. Unscoped legacy sessions must fail ProtocolUpgradeRequired before any successful partial inventory if unsupported state exists. Omission is never removal evidence.
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func getPendingWelcomes(input: BlueCatbirdChatGetPendingWelcomes.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetPendingWelcomes.Output?) {
+    func getPendingWelcomes(input: BlueCatbirdChatGetPendingWelcomes.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetPendingWelcomes.Output?) {
         let endpoint = "blue.catbird.chat.getPendingWelcomes"
 
         let queryItems = input.asQueryItems()
@@ -391,8 +379,7 @@ extension ATProtoClient.Blue.Catbird.Chat {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }

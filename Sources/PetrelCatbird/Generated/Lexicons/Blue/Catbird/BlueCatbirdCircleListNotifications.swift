@@ -4,8 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.circle.listNotifications
 
-public struct BlueCatbirdCircleListNotifications {
-
+public enum BlueCatbirdCircleListNotifications {
     public static let typeIdentifier = "blue.catbird.circle.listNotifications"
     public struct Parameters: Parametrizable {
         public let limit: Int?
@@ -17,60 +16,50 @@ public struct BlueCatbirdCircleListNotifications {
         ) {
             self.limit = limit
             self.cursor = cursor
-
         }
     }
 
     public struct Output: ATProtocolCodable {
-
         public let notifications: [BlueCatbirdCircleDefs.Notification]
 
         public let cursor: String?
 
-        // Standard public initializer
+        /// Standard public initializer
         public init(
-
             notifications: [BlueCatbirdCircleDefs.Notification],
 
             cursor: String? = nil
 
         ) {
-
             self.notifications = notifications
 
             self.cursor = cursor
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
-            self.notifications = try container.decode([BlueCatbirdCircleDefs.Notification].self, forKey: .notifications)
+            notifications = try container.decode([BlueCatbirdCircleDefs.Notification].self, forKey: .notifications)
 
             do {
-                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
+                cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
             } catch {
                 // Forward compatibility: a malformed optional field must not fail the whole response.
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
-                self.cursor = nil
+                cursor = nil
             }
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(notifications, forKey: .notifications)
 
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(cursor, forKey: .cursor)
-
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
 
             let notificationsValue = try notifications.toCBORValue()
@@ -83,14 +72,12 @@ public struct BlueCatbirdCircleListNotifications {
             }
 
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case notifications
             case cursor
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -100,25 +87,25 @@ public struct BlueCatbirdCircleListNotifications {
         case protocolRevisionMismatch = "ProtocolRevisionMismatch"
         case upstreamUnavailable = "UpstreamUnavailable"
         public var description: String {
-            return self.rawValue
+            return rawValue
         }
 
         public var errorName: String {
-            return self.rawValue
+            return rawValue
         }
     }
-
 }
 
-extension ATProtoClient.Blue.Catbird.Circle {
+public extension ATProtoClient.Blue.Catbird.Circle {
     // MARK: - listNotifications
+
     /// List notifications for the caller across Circle Spaces
     ///
     /// - Parameter input: The input parameters for the request
     ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
-    public func listNotifications(input: BlueCatbirdCircleListNotifications.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdCircleListNotifications.Output?) {
+    func listNotifications(input: BlueCatbirdCircleListNotifications.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdCircleListNotifications.Output?) {
         let endpoint = "blue.catbird.circle.listNotifications"
 
         let queryItems = input.asQueryItems()
@@ -140,8 +127,7 @@ extension ATProtoClient.Blue.Catbird.Circle {
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
+        if (200 ... 299).contains(responseCode) {
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
