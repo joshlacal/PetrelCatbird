@@ -2,21 +2,18 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: place.stream.broadcast.defs
 
-
-public struct PlaceStreamBroadcastDefs { 
+public struct PlaceStreamBroadcastDefs {
 
     public static let typeIdentifier = "place.stream.broadcast.defs"
-        
-public struct BroadcastOriginView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "place.stream.broadcast.defs#broadcastOriginView"
-            public let uri: ATProtocolURI
-            public let cid: CID
-            public let author: AppBskyActorDefs.ProfileViewBasic
-            public let record: ATProtocolValueContainer
+
+    public struct BroadcastOriginView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "place.stream.broadcast.defs#broadcastOriginView"
+        public let uri: ATProtocolURI
+        public let cid: CID
+        public let author: AppBskyActorDefs.ProfileViewBasic
+        public let record: ATProtocolValueContainer
 
         public init(
             uri: ATProtocolURI, cid: CID, author: AppBskyActorDefs.ProfileViewBasic, record: ATProtocolValueContainer
@@ -115,10 +112,4 @@ public struct BroadcastOriginView: ATProtocolCodable, ATProtocolValue {
         }
     }
 
-
-
 }
-
-
-                           
-

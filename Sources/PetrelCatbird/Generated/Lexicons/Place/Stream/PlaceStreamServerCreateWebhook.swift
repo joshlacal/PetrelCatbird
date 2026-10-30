@@ -2,15 +2,12 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: place.stream.server.createWebhook
 
-
-public struct PlaceStreamServerCreateWebhook { 
+public struct PlaceStreamServerCreateWebhook {
 
     public static let typeIdentifier = "place.stream.server.createWebhook"
-public struct Input: ATProtocolCodable {
+    public struct Input: ATProtocolCodable {
         public let url: URI
         public let events: [InputEvents]
         public let active: Bool?
@@ -33,7 +30,6 @@ public struct Input: ATProtocolCodable {
             self.description = description
             self.muteWords = muteWords
         }
-        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -110,140 +106,115 @@ public struct Input: ATProtocolCodable {
             case muteWords
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
+
         public let webhook: PlaceStreamServerDefs.Webhook
-        
-        
-        
+
         // Standard public initializer
         public init(
-            
-            
+
             webhook: PlaceStreamServerDefs.Webhook
-            
-            
+
         ) {
-            
-            
+
             self.webhook = webhook
-            
-            
+
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            
+
             self.webhook = try container.decode(PlaceStreamServerDefs.Webhook.self, forKey: .webhook)
-            
-            
-            
+
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
+
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(webhook, forKey: .webhook)
-            
-            
+
         }
 
         public func toCBORValue() throws -> Any {
-            
+
             var map = OrderedCBORMap()
 
-            
-            
             let webhookValue = try webhook.toCBORValue()
             map = map.adding(key: "webhook", value: webhookValue)
-            
-            
 
             return map
-            
+
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case webhook
         }
-        
-    }
-        
-public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                /// The provided webhook URL is invalid or unreachable.
-                case invalidUrl = "InvalidUrl"
-                /// A webhook with this URL already exists for this user.
-                case duplicateWebhook = "DuplicateWebhook"
-                /// The user has reached their maximum number of webhooks.
-                case tooManyWebhooks = "TooManyWebhooks"
-            public var description: String {
-                return self.rawValue
-            }
 
-            public var errorName: String {
-                return self.rawValue
-            }
+    }
+
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        /// The provided webhook URL is invalid or unreachable.
+        case invalidUrl = "InvalidUrl"
+        /// A webhook with this URL already exists for this user.
+        case duplicateWebhook = "DuplicateWebhook"
+        /// The user has reached their maximum number of webhooks.
+        case tooManyWebhooks = "TooManyWebhooks"
+        public var description: String {
+            return self.rawValue
         }
 
-
-
-public enum InputEvents: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_chat = "chat"
-    case value_livestream = "livestream"
-    case value_follow = "follow"
-    case value_mention = "mention"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? InputEvents else { return false }
-        return self == otherValue
+        public var errorName: String {
+            return self.rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
-}
+    public enum InputEvents: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_chat = "chat"
+        case value_livestream = "livestream"
+        case value_follow = "follow"
+        case value_mention = "mention"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? InputEvents else { return false }
+            return self == otherValue
+        }
+
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
+    }
 
 }
 
 extension ATProtoClient.Place.Stream.Server {
     // MARK: - createWebhook
-
     /// Create a new webhook for receiving Streamplace events.
-    /// 
+    ///
     /// - Parameter input: The input parameters for the request
-    
-    /// 
+
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
     public func createWebhook(
-        
+
         input: PlaceStreamServerCreateWebhook.Input
-        
+
     ) async throws -> (responseCode: Int, data: PlaceStreamServerCreateWebhook.Output?) {
         let endpoint = "place.stream.server.createWebhook"
-        
-        var headers: [String: String] = [:]
-        
-        headers["Content-Type"] = "application/json"
-        
-        
-        
-        headers["Accept"] = "application/json"
-        
 
-        
+        var headers: [String: String] = [:]
+
+        headers["Content-Type"] = "application/json"
+
+        headers["Accept"] = "application/json"
+
         let requestData: Data? = try JSONEncoder().encode(input)
-        
-        
+
         let queryItems: [URLQueryItem]? = nil
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -258,12 +229,11 @@ extension ATProtoClient.Place.Stream.Server {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
         if (200...299).contains(responseCode) {
-            
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -271,13 +241,12 @@ extension ATProtoClient.Place.Stream.Server {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
-                
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(PlaceStreamServerCreateWebhook.Output.self, from: responseData)
-                
+
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -293,14 +262,11 @@ extension ATProtoClient.Place.Stream.Server {
             ) {
                 throw atprotoError
             }
-            
-            
+
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-        
-    }
-    
-}
-                           
 
+    }
+
+}

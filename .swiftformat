@@ -1,0 +1,11 @@
+--indent 4
+--tabwidth 4
+--swift-version 6.0
+--stripunusedargs closure-only
+--wraparguments before-first
+--wrapcollections before-first
+--removelines enabled
+# Generated definitions keep their explicit implementations. Limit this pass to
+# whitespace hygiene: semantic simplification and argument rewriting are
+# quadratic on the complete private chat definition under SwiftFormat 0.61.1.
+--rules indent,linebreaks,consecutiveBlankLines,trailingSpace

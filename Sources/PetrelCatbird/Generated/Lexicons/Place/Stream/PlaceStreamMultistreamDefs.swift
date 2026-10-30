@@ -2,24 +2,21 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: place.stream.multistream.defs
 
-
-public struct PlaceStreamMultistreamDefs { 
+public struct PlaceStreamMultistreamDefs {
 
     public static let typeIdentifier = "place.stream.multistream.defs"
-        
-public struct TargetView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "place.stream.multistream.defs#targetView"
-            public let uri: ATProtocolURI
-            public let cid: CID
-            public let record: ATProtocolValueContainer
-            public let latestEvent: PlaceStreamMultistreamDefs.Event?
+
+    public struct TargetView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "place.stream.multistream.defs#targetView"
+        public let uri: ATProtocolURI
+        public let cid: CID
+        public let record: ATProtocolValueContainer
+        public let latestEvent: PlaceStreamMultistreamDefs.Event?
 
         public init(
-            uri: ATProtocolURI, cid: CID, record: ATProtocolValueContainer, latestEvent: PlaceStreamMultistreamDefs.Event?
+            uri: ATProtocolURI, cid: CID, record: ATProtocolValueContainer, latestEvent: PlaceStreamMultistreamDefs.Event? = nil
         ) {
             self.uri = uri
             self.cid = cid
@@ -122,12 +119,12 @@ public struct TargetView: ATProtocolCodable, ATProtocolValue {
             case latestEvent
         }
     }
-        
-public struct Event: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "place.stream.multistream.defs#event"
-            public let message: String
-            public let status: EventStatus
-            public let createdAt: ATProtocolDate
+
+    public struct Event: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "place.stream.multistream.defs#event"
+        public let message: String
+        public let status: EventStatus
+        public let createdAt: ATProtocolDate
 
         public init(
             message: String, status: EventStatus, createdAt: ATProtocolDate
@@ -211,27 +208,20 @@ public struct Event: ATProtocolCodable, ATProtocolValue {
         }
     }
 
+    public enum EventStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_inactive = "inactive"
+        case value_pending = "pending"
+        case value_active = "active"
+        case value_error = "error"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? EventStatus else { return false }
+            return self == otherValue
+        }
 
-public enum EventStatus: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_inactive = "inactive"
-    case value_pending = "pending"
-    case value_active = "active"
-    case value_error = "error"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? EventStatus else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
 }
-
-
-}
-
-
-                           
-

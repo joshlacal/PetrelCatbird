@@ -2,31 +2,28 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.mlsDS.getFederationPeers
 
-
-public struct BlueCatbirdMlsDSGetFederationPeers { 
+public struct BlueCatbirdMlsDSGetFederationPeers {
 
     public static let typeIdentifier = "blue.catbird.mlsDS.getFederationPeers"
-        
-public struct PeerRecord: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.mlsDS.getFederationPeers#peerRecord"
-            public let dsDid: String
-            public let status: String
-            public let trustScore: Int?
-            public let maxRequestsPerMinute: Int?
-            public let note: String?
-            public let invalidTokenCount: Int?
-            public let rejectedRequestCount: Int?
-            public let successfulRequestCount: Int?
-            public let lastSeenAt: ATProtocolDate?
-            public let createdAt: ATProtocolDate?
-            public let updatedAt: ATProtocolDate?
+
+    public struct PeerRecord: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.mlsDS.getFederationPeers#peerRecord"
+        public let dsDid: String
+        public let status: String
+        public let trustScore: Int?
+        public let maxRequestsPerMinute: Int?
+        public let note: String?
+        public let invalidTokenCount: Int?
+        public let rejectedRequestCount: Int?
+        public let successfulRequestCount: Int?
+        public let lastSeenAt: ATProtocolDate?
+        public let createdAt: ATProtocolDate?
+        public let updatedAt: ATProtocolDate?
 
         public init(
-            dsDid: String, status: String, trustScore: Int?, maxRequestsPerMinute: Int?, note: String?, invalidTokenCount: Int?, rejectedRequestCount: Int?, successfulRequestCount: Int?, lastSeenAt: ATProtocolDate?, createdAt: ATProtocolDate?, updatedAt: ATProtocolDate?
+            dsDid: String, status: String, trustScore: Int? = nil, maxRequestsPerMinute: Int? = nil, note: String? = nil, invalidTokenCount: Int? = nil, rejectedRequestCount: Int? = nil, successfulRequestCount: Int? = nil, lastSeenAt: ATProtocolDate? = nil, createdAt: ATProtocolDate? = nil, updatedAt: ATProtocolDate? = nil
         ) {
             self.dsDid = dsDid
             self.status = status
@@ -297,107 +294,84 @@ public struct PeerRecord: ATProtocolCodable, ATProtocolValue {
             case createdAt
             case updatedAt
         }
-    }    
-public struct Parameters: Parametrizable {
+    }
+    public struct Parameters: Parametrizable {
         public let status: String?
         public let limit: Int?
-        
+
         public init(
-            status: String? = nil, 
+            status: String? = nil,
             limit: Int? = nil
-            ) {
+        ) {
             self.status = status
             self.limit = limit
-            
+
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
+
         public let peers: [PeerRecord]
-        
-        
-        
+
         // Standard public initializer
         public init(
-            
-            
+
             peers: [PeerRecord]
-            
-            
+
         ) {
-            
-            
+
             self.peers = peers
-            
-            
+
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            
+
             self.peers = try container.decode([PeerRecord].self, forKey: .peers)
-            
-            
-            
+
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
+
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(peers, forKey: .peers)
-            
-            
+
         }
 
         public func toCBORValue() throws -> Any {
-            
+
             var map = OrderedCBORMap()
 
-            
-            
             let peersValue = try peers.toCBORValue()
             map = map.adding(key: "peers", value: peersValue)
-            
-            
 
             return map
-            
+
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case peers
         }
-        
+
     }
-
-
-
 
 }
 
-
-
 extension ATProtoClient.Blue.Catbird.MlsDS {
     // MARK: - getFederationPeers
-
     /// List federation peer policies (admin only). Return a list of known federation peer DS policies, optionally filtered by status.
-    /// 
+    ///
     /// - Parameter input: The input parameters for the request
-    /// 
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
     public func getFederationPeers(input: BlueCatbirdMlsDSGetFederationPeers.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsDSGetFederationPeers.Output?) {
         let endpoint = "blue.catbird.mlsDS.getFederationPeers"
 
-        
         let queryItems = input.asQueryItems()
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -416,7 +390,7 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
         if (200...299).contains(responseCode) {
-            
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -424,7 +398,6 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
                 let decoder = JSONDecoder()
@@ -437,13 +410,10 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
                 return (responseCode, nil)
             }
         } else {
-            
-            
+
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
-                           
-

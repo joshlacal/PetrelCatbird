@@ -2,19 +2,10 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.chat.authFull
 
-
-public struct BlueCatbirdChatAuthFull { 
+public struct BlueCatbirdChatAuthFull {
 
     public static let typeIdentifier = "blue.catbird.chat.authFull"
 
-
-
 }
-
-
-                           
-

@@ -2,24 +2,21 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: place.stream.badge.defs
 
-
-public struct PlaceStreamBadgeDefs { 
+public struct PlaceStreamBadgeDefs {
 
     public static let typeIdentifier = "place.stream.badge.defs"
-        
-public struct BadgeView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "place.stream.badge.defs#badgeView"
-            public let badgeType: String
-            public let issuer: DID
-            public let recipient: DID
-            public let signature: String?
+
+    public struct BadgeView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "place.stream.badge.defs#badgeView"
+        public let badgeType: String
+        public let issuer: DID
+        public let recipient: DID
+        public let signature: String?
 
         public init(
-            badgeType: String, issuer: DID, recipient: DID, signature: String?
+            badgeType: String, issuer: DID, recipient: DID, signature: String? = nil
         ) {
             self.badgeType = badgeType
             self.issuer = issuer
@@ -123,10 +120,4 @@ public struct BadgeView: ATProtocolCodable, ATProtocolValue {
         }
     }
 
-
-
 }
-
-
-                           
-

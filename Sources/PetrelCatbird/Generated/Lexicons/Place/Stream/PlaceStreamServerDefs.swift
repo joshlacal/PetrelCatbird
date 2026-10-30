@@ -2,34 +2,31 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: place.stream.server.defs
 
-
-public struct PlaceStreamServerDefs { 
+public struct PlaceStreamServerDefs {
 
     public static let typeIdentifier = "place.stream.server.defs"
-        
-public struct Webhook: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "place.stream.server.defs#webhook"
-            public let id: String
-            public let url: URI
-            public let events: [WebhookEvents]
-            public let active: Bool
-            public let prefix: String?
-            public let suffix: String?
-            public let rewrite: [RewriteRule]?
-            public let createdAt: ATProtocolDate
-            public let updatedAt: ATProtocolDate?
-            public let name: String?
-            public let description: String?
-            public let lastTriggered: ATProtocolDate?
-            public let errorCount: Int?
-            public let muteWords: [String]?
+
+    public struct Webhook: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "place.stream.server.defs#webhook"
+        public let id: String
+        public let url: URI
+        public let events: [WebhookEvents]
+        public let active: Bool
+        public let prefix: String?
+        public let suffix: String?
+        public let rewrite: [RewriteRule]?
+        public let createdAt: ATProtocolDate
+        public let updatedAt: ATProtocolDate?
+        public let name: String?
+        public let description: String?
+        public let lastTriggered: ATProtocolDate?
+        public let errorCount: Int?
+        public let muteWords: [String]?
 
         public init(
-            id: String, url: URI, events: [WebhookEvents], active: Bool, prefix: String?, suffix: String?, rewrite: [RewriteRule]?, createdAt: ATProtocolDate, updatedAt: ATProtocolDate?, name: String?, description: String?, lastTriggered: ATProtocolDate?, errorCount: Int?, muteWords: [String]?
+            id: String, url: URI, events: [WebhookEvents], active: Bool, prefix: String? = nil, suffix: String? = nil, rewrite: [RewriteRule]? = nil, createdAt: ATProtocolDate, updatedAt: ATProtocolDate? = nil, name: String? = nil, description: String? = nil, lastTriggered: ATProtocolDate? = nil, errorCount: Int? = nil, muteWords: [String]? = nil
         ) {
             self.id = id
             self.url = url
@@ -346,11 +343,11 @@ public struct Webhook: ATProtocolCodable, ATProtocolValue {
             case muteWords
         }
     }
-        
-public struct RewriteRule: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "place.stream.server.defs#rewriteRule"
-            public let from: String
-            public let to: String
+
+    public struct RewriteRule: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "place.stream.server.defs#rewriteRule"
+        public let from: String
+        public let to: String
 
         public init(
             from: String, to: String
@@ -419,27 +416,20 @@ public struct RewriteRule: ATProtocolCodable, ATProtocolValue {
         }
     }
 
+    public enum WebhookEvents: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_chat = "chat"
+        case value_livestream = "livestream"
+        case value_follow = "follow"
+        case value_mention = "mention"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? WebhookEvents else { return false }
+            return self == otherValue
+        }
 
-public enum WebhookEvents: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_chat = "chat"
-    case value_livestream = "livestream"
-    case value_follow = "follow"
-    case value_mention = "mention"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? WebhookEvents else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
 }
-
-
-}
-
-
-                           
-

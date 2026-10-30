@@ -2,22 +2,19 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: place.stream.defs
 
-
-public struct PlaceStreamDefs { 
+public struct PlaceStreamDefs {
 
     public static let typeIdentifier = "place.stream.defs"
-        
-public struct BlockView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "place.stream.defs#blockView"
-            public let uri: ATProtocolURI
-            public let cid: CID
-            public let blocker: AppBskyActorDefs.ProfileViewBasic
-            public let record: AppBskyGraphBlock
-            public let indexedAt: ATProtocolDate
+
+    public struct BlockView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "place.stream.defs#blockView"
+        public let uri: ATProtocolURI
+        public let cid: CID
+        public let blocker: AppBskyActorDefs.ProfileViewBasic
+        public let record: AppBskyGraphBlock
+        public let indexedAt: ATProtocolDate
 
         public init(
             uri: ATProtocolURI, cid: CID, blocker: AppBskyActorDefs.ProfileViewBasic, record: AppBskyGraphBlock, indexedAt: ATProtocolDate
@@ -130,10 +127,10 @@ public struct BlockView: ATProtocolCodable, ATProtocolValue {
             case indexedAt
         }
     }
-        
-public struct Renditions: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "place.stream.defs#renditions"
-            public let renditions: [Rendition]
+
+    public struct Renditions: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "place.stream.defs#renditions"
+        public let renditions: [Rendition]
 
         public init(
             renditions: [Rendition]
@@ -186,10 +183,10 @@ public struct Renditions: ATProtocolCodable, ATProtocolValue {
             case renditions
         }
     }
-        
-public struct Rendition: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "place.stream.defs#rendition"
-            public let name: String
+
+    public struct Rendition: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "place.stream.defs#rendition"
+        public let name: String
 
         public init(
             name: String
@@ -243,10 +240,4 @@ public struct Rendition: ATProtocolCodable, ATProtocolValue {
         }
     }
 
-
-
 }
-
-
-                           
-

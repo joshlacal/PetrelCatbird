@@ -2,26 +2,23 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: place.stream.muxl.defs
 
-
-public struct PlaceStreamMuxlDefs { 
+public struct PlaceStreamMuxlDefs {
 
     public static let typeIdentifier = "place.stream.muxl.defs"
-        
-public struct Track: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "place.stream.muxl.defs#track"
-            public let id: Int
-            public let codec: String
-            public let width: Int?
-            public let height: Int?
-            public let rate: Int?
-            public let channels: Int?
+
+    public struct Track: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "place.stream.muxl.defs#track"
+        public let id: Int
+        public let codec: String
+        public let width: Int?
+        public let height: Int?
+        public let rate: Int?
+        public let channels: Int?
 
         public init(
-            id: Int, codec: String, width: Int?, height: Int?, rate: Int?, channels: Int?
+            id: Int, codec: String, width: Int? = nil, height: Int? = nil, rate: Int? = nil, channels: Int? = nil
         ) {
             self.id = id
             self.codec = codec
@@ -179,10 +176,4 @@ public struct Track: ATProtocolCodable, ATProtocolValue {
         }
     }
 
-
-
 }
-
-
-                           
-

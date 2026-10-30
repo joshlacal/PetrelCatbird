@@ -2,26 +2,23 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.circle.defs
 
-
-public struct BlueCatbirdCircleDefs { 
+public struct BlueCatbirdCircleDefs {
 
     public static let typeIdentifier = "blue.catbird.circle.defs"
-        
-public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.circle.defs#circleSummary"
-            public let uri: SpaceRef
-            public let circleId: TID
-            public let name: String
-            public let owner: DID
-            public let memberCount: Int?
-            public let muted: Bool?
+
+    public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.circle.defs#circleSummary"
+        public let uri: SpaceRef
+        public let circleId: TID
+        public let name: String
+        public let owner: DID
+        public let memberCount: Int?
+        public let muted: Bool?
 
         public init(
-            uri: SpaceRef, circleId: TID, name: String, owner: DID, memberCount: Int?, muted: Bool?
+            uri: SpaceRef, circleId: TID, name: String, owner: DID, memberCount: Int? = nil, muted: Bool? = nil
         ) {
             self.uri = uri
             self.circleId = circleId
@@ -162,11 +159,11 @@ public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
             case muted
         }
     }
-        
-public struct FeedItem: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.circle.defs#feedItem"
-            public let post: AppBskyFeedDefs.FeedViewPost
-            public let circle: CircleSummary
+
+    public struct FeedItem: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.circle.defs#feedItem"
+        public let post: AppBskyFeedDefs.FeedViewPost
+        public let circle: CircleSummary
 
         public init(
             post: AppBskyFeedDefs.FeedViewPost, circle: CircleSummary
@@ -234,18 +231,18 @@ public struct FeedItem: ATProtocolCodable, ATProtocolValue {
             case circle
         }
     }
-        
-public struct Notification: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "blue.catbird.circle.defs#notification"
-            public let id: String
-            public let reason: NotificationReason
-            public let actor: AppBskyActorDefs.ProfileViewBasic
-            public let subject: ATProtocolURI?
-            public let indexedAt: ATProtocolDate
-            public let circle: CircleSummary
+
+    public struct Notification: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.circle.defs#notification"
+        public let id: String
+        public let reason: NotificationReason
+        public let actor: AppBskyActorDefs.ProfileViewBasic
+        public let subject: ATProtocolURI?
+        public let indexedAt: ATProtocolDate
+        public let circle: CircleSummary
 
         public init(
-            id: String, reason: NotificationReason, actor: AppBskyActorDefs.ProfileViewBasic, subject: ATProtocolURI?, indexedAt: ATProtocolDate, circle: CircleSummary
+            id: String, reason: NotificationReason, actor: AppBskyActorDefs.ProfileViewBasic, subject: ATProtocolURI? = nil, indexedAt: ATProtocolDate, circle: CircleSummary
         ) {
             self.id = id
             self.reason = reason
@@ -379,26 +376,19 @@ public struct Notification: ATProtocolCodable, ATProtocolValue {
         }
     }
 
+    public enum NotificationReason: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
+        case value_reply = "reply"
+        case value_like = "like"
+        case value_invite = "invite"
 
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let otherValue = other as? NotificationReason else { return false }
+            return self == otherValue
+        }
 
-public enum NotificationReason: String, Codable, ATProtocolCodable, ATProtocolValue, Sendable {
-    case value_reply = "reply"
-    case value_like = "like"
-    case value_invite = "invite"
-
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let otherValue = other as? NotificationReason else { return false }
-        return self == otherValue
+        public func toCBORValue() throws -> Any {
+            return rawValue
+        }
     }
 
-    public func toCBORValue() throws -> Any {
-        return rawValue
-    }
 }
-
-
-}
-
-
-                           
-

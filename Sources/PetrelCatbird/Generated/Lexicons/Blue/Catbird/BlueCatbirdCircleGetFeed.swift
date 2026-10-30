@@ -2,69 +2,55 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.circle.getFeed
 
+public struct BlueCatbirdCircleGetFeed {
 
-public struct BlueCatbirdCircleGetFeed { 
-
-    public static let typeIdentifier = "blue.catbird.circle.getFeed"    
-public struct Parameters: Parametrizable {
+    public static let typeIdentifier = "blue.catbird.circle.getFeed"
+    public struct Parameters: Parametrizable {
         public let space: SpaceRef?
         public let limit: Int?
         public let cursor: String?
-        
+
         public init(
-            space: SpaceRef? = nil, 
-            limit: Int? = nil, 
+            space: SpaceRef? = nil,
+            limit: Int? = nil,
             cursor: String? = nil
-            ) {
+        ) {
             self.space = space
             self.limit = limit
             self.cursor = cursor
-            
+
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
+
         public let feed: [BlueCatbirdCircleDefs.FeedItem]
-        
+
         public let cursor: String?
-        
-        
-        
+
         // Standard public initializer
         public init(
-            
-            
+
             feed: [BlueCatbirdCircleDefs.FeedItem],
-            
+
             cursor: String? = nil
-            
-            
+
         ) {
-            
-            
+
             self.feed = feed
-            
+
             self.cursor = cursor
-            
-            
+
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            
+
             self.feed = try container.decode([BlueCatbirdCircleDefs.FeedItem].self, forKey: .feed)
-            
-            
-            
-            
+
             do {
                 self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
             } catch {
@@ -72,91 +58,74 @@ public struct Output: ATProtocolCodable {
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
                 self.cursor = nil
             }
-            
-            
-            
+
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
+
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(feed, forKey: .feed)
-            
-            
+
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(cursor, forKey: .cursor)
-            
-            
+
         }
 
         public func toCBORValue() throws -> Any {
-            
+
             var map = OrderedCBORMap()
 
-            
-            
             let feedValue = try feed.toCBORValue()
             map = map.adding(key: "feed", value: feedValue)
-            
-            
-            
+
             if let value = cursor {
                 // Encode optional property even if it's an empty array for CBOR
                 let cursorValue = try value.toCBORValue()
                 map = map.adding(key: "cursor", value: cursorValue)
             }
-            
-            
 
             return map
-            
+
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case feed
             case cursor
         }
-        
-    }
-        
-public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                case authRequired = "AuthRequired"
-                case accessRemoved = "AccessRemoved"
-                case unsupportedPDS = "UnsupportedPDS"
-                case protocolRevisionMismatch = "ProtocolRevisionMismatch"
-                case upstreamUnavailable = "UpstreamUnavailable"
-            public var description: String {
-                return self.rawValue
-            }
 
-            public var errorName: String {
-                return self.rawValue
-            }
+    }
+
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case authRequired = "AuthRequired"
+        case accessRemoved = "AccessRemoved"
+        case unsupportedPDS = "UnsupportedPDS"
+        case protocolRevisionMismatch = "ProtocolRevisionMismatch"
+        case upstreamUnavailable = "UpstreamUnavailable"
+        public var description: String {
+            return self.rawValue
         }
 
-
+        public var errorName: String {
+            return self.rawValue
+        }
+    }
 
 }
 
-
-
 extension ATProtoClient.Blue.Catbird.Circle {
     // MARK: - getFeed
-
     /// Get feed items from one Circle Space or unified Circles feed
-    /// 
+    ///
     /// - Parameter input: The input parameters for the request
-    /// 
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
     public func getFeed(input: BlueCatbirdCircleGetFeed.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdCircleGetFeed.Output?) {
         let endpoint = "blue.catbird.circle.getFeed"
 
-        
         let queryItems = input.asQueryItems()
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -175,7 +144,7 @@ extension ATProtoClient.Blue.Catbird.Circle {
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
         if (200...299).contains(responseCode) {
-            
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -183,7 +152,6 @@ extension ATProtoClient.Blue.Catbird.Circle {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
                 let decoder = JSONDecoder()
@@ -204,13 +172,10 @@ extension ATProtoClient.Blue.Catbird.Circle {
             ) {
                 throw atprotoError
             }
-            
-            
+
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
-                           
-

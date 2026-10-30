@@ -2,21 +2,18 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: place.stream.moderation.defs
 
-
-public struct PlaceStreamModerationDefs { 
+public struct PlaceStreamModerationDefs {
 
     public static let typeIdentifier = "place.stream.moderation.defs"
-        
-public struct PermissionView: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "place.stream.moderation.defs#permissionView"
-            public let uri: ATProtocolURI
-            public let cid: CID
-            public let author: AppBskyActorDefs.ProfileViewBasic
-            public let record: ATProtocolValueContainer
+
+    public struct PermissionView: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "place.stream.moderation.defs#permissionView"
+        public let uri: ATProtocolURI
+        public let cid: CID
+        public let author: AppBskyActorDefs.ProfileViewBasic
+        public let record: ATProtocolValueContainer
 
         public init(
             uri: ATProtocolURI, cid: CID, author: AppBskyActorDefs.ProfileViewBasic, record: ATProtocolValueContainer
@@ -115,10 +112,4 @@ public struct PermissionView: ATProtocolCodable, ATProtocolValue {
         }
     }
 
-
-
 }
-
-
-                           
-

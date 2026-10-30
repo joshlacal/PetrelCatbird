@@ -2,22 +2,18 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.chat.enrollDevice
 
-
-public struct BlueCatbirdChatEnrollDevice { 
+public struct BlueCatbirdChatEnrollDevice {
 
     public static let typeIdentifier = "blue.catbird.chat.enrollDevice"
-public struct Input: ATProtocolCodable {
+    public struct Input: ATProtocolCodable {
         public let signedRequest: BlueCatbirdChatDefs.SignedDeviceEnrollment
 
         /// Standard public initializer
         public init(signedRequest: BlueCatbirdChatDefs.SignedDeviceEnrollment) {
             self.signedRequest = signedRequest
         }
-        
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -40,132 +36,108 @@ public struct Input: ATProtocolCodable {
             case signedRequest
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
+
         public let device: BlueCatbirdChatDefs.DeviceView
-        
-        
-        
+
         // Standard public initializer
         public init(
-            
-            
+
             device: BlueCatbirdChatDefs.DeviceView
-            
-            
+
         ) {
-            
-            
+
             self.device = device
-            
-            
+
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            
+
             self.device = try container.decode(BlueCatbirdChatDefs.DeviceView.self, forKey: .device)
-            
-            
-            
+
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
+
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(device, forKey: .device)
-            
-            
+
         }
 
         public func toCBORValue() throws -> Any {
-            
+
             var map = OrderedCBORMap()
 
-            
-            
             let deviceValue = try device.toCBORValue()
             map = map.adding(key: "device", value: deviceValue)
-            
-            
 
             return map
-            
+
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case device
         }
-        
-    }
-        
-public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-                case authenticationGenerationConflict = "AuthenticationGenerationConflict"
-                case cutoverRequired = "CutoverRequired"
-                case deviceAlreadyExists = "DeviceAlreadyExists"
-                case deviceLimitReached = "DeviceLimitReached"
-                case deviceTombstoned = "DeviceTombstoned"
-                case idempotencyConflict = "IdempotencyConflict"
-                case invalidKeyPackage = "InvalidKeyPackage"
-                case invalidRequest = "InvalidRequest"
-                case invalidSignature = "InvalidSignature"
-                case keyPackageInventoryLimitReached = "KeyPackageInventoryLimitReached"
-                case notAuthorized = "NotAuthorized"
-                case accountSessionExpired = "AccountSessionExpired"
-                case deviceBindingMismatch = "DeviceBindingMismatch"
-                case protocolUpgradeRequired = "ProtocolUpgradeRequired"
-                case rateLimited = "RateLimited"
-            public var description: String {
-                return self.rawValue
-            }
 
-            public var errorName: String {
-                return self.rawValue
-            }
+    }
+
+    public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case authenticationGenerationConflict = "AuthenticationGenerationConflict"
+        case cutoverRequired = "CutoverRequired"
+        case deviceAlreadyExists = "DeviceAlreadyExists"
+        case deviceLimitReached = "DeviceLimitReached"
+        case deviceTombstoned = "DeviceTombstoned"
+        case idempotencyConflict = "IdempotencyConflict"
+        case invalidKeyPackage = "InvalidKeyPackage"
+        case invalidRequest = "InvalidRequest"
+        case invalidSignature = "InvalidSignature"
+        case keyPackageInventoryLimitReached = "KeyPackageInventoryLimitReached"
+        case notAuthorized = "NotAuthorized"
+        case accountSessionExpired = "AccountSessionExpired"
+        case deviceBindingMismatch = "DeviceBindingMismatch"
+        case protocolUpgradeRequired = "ProtocolUpgradeRequired"
+        case rateLimited = "RateLimited"
+        public var description: String {
+            return self.rawValue
         }
 
-
+        public var errorName: String {
+            return self.rawValue
+        }
+    }
 
 }
 
 extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - enrollDevice
-
     /// Enroll one client-generated MLS device through a standard ATProto service-authenticated AppView request. The canonical Ed25519-signed body binds the authenticated actor DID, device UUID, immutable signing key, generation-zero absence claim, and initial key packages. Existing login is sufficient when its OAuth scope permits this RPC.
-    /// 
+    ///
     /// - Parameter input: The input parameters for the request
-    
-    /// 
+
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
     public func enrollDevice(
-        
+
         input: BlueCatbirdChatEnrollDevice.Input
-        
+
     ) async throws -> (responseCode: Int, data: BlueCatbirdChatEnrollDevice.Output?) {
         let endpoint = "blue.catbird.chat.enrollDevice"
-        
-        var headers: [String: String] = [:]
-        
-        headers["Content-Type"] = "application/json"
-        
-        
-        
-        headers["Accept"] = "application/json"
-        
 
-        
+        var headers: [String: String] = [:]
+
+        headers["Content-Type"] = "application/json"
+
+        headers["Accept"] = "application/json"
+
         let requestData: Data? = try JSONEncoder().encode(input)
-        
-        
+
         let queryItems: [URLQueryItem]? = nil
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "POST",
@@ -180,12 +152,11 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        
         // Only validate Content-Type and decode on success. Error responses
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled by the caller via the status code.
         if (200...299).contains(responseCode) {
-            
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -193,13 +164,12 @@ extension ATProtoClient.Blue.Catbird.Chat {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
-                
+
                 let decoder = JSONDecoder()
                 let decodedData = try decoder.decode(BlueCatbirdChatEnrollDevice.Output.self, from: responseData)
-                
+
                 return (responseCode, decodedData)
             } catch {
                 // Log the decoding error for debugging but still return the response code
@@ -215,14 +185,11 @@ extension ATProtoClient.Blue.Catbird.Chat {
             ) {
                 throw atprotoError
             }
-            
-            
+
             // Don't try to decode unknown or malformed error responses as success types
             return (responseCode, nil)
         }
-        
-    }
-    
-}
-                           
 
+    }
+
+}

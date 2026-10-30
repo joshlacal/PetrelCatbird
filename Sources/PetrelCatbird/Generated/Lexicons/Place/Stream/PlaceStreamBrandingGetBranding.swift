@@ -2,26 +2,23 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: place.stream.branding.getBranding
 
-
-public struct PlaceStreamBrandingGetBranding { 
+public struct PlaceStreamBrandingGetBranding {
 
     public static let typeIdentifier = "place.stream.branding.getBranding"
-        
-public struct BrandingAsset: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "place.stream.branding.getBranding#brandingAsset"
-            public let key: String
-            public let mimeType: String
-            public let url: String?
-            public let data: String?
-            public let width: Int?
-            public let height: Int?
+
+    public struct BrandingAsset: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "place.stream.branding.getBranding#brandingAsset"
+        public let key: String
+        public let mimeType: String
+        public let url: String?
+        public let data: String?
+        public let width: Int?
+        public let height: Int?
 
         public init(
-            key: String, mimeType: String, url: String?, data: String?, width: Int?, height: Int?
+            key: String, mimeType: String, url: String? = nil, data: String? = nil, width: Int? = nil, height: Int? = nil
         ) {
             self.key = key
             self.mimeType = mimeType
@@ -177,104 +174,81 @@ public struct BrandingAsset: ATProtocolCodable, ATProtocolValue {
             case width
             case height
         }
-    }    
-public struct Parameters: Parametrizable {
+    }
+    public struct Parameters: Parametrizable {
         public let broadcaster: DID?
-        
+
         public init(
             broadcaster: DID? = nil
-            ) {
+        ) {
             self.broadcaster = broadcaster
-            
+
         }
     }
-    
-public struct Output: ATProtocolCodable {
-        
-        
+
+    public struct Output: ATProtocolCodable {
+
         public let assets: [BrandingAsset]
-        
-        
-        
+
         // Standard public initializer
         public init(
-            
-            
+
             assets: [BrandingAsset]
-            
-            
+
         ) {
-            
-            
+
             self.assets = assets
-            
-            
+
         }
-        
+
         public init(from decoder: Decoder) throws {
-            
+
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            
+
             self.assets = try container.decode([BrandingAsset].self, forKey: .assets)
-            
-            
-            
+
         }
-        
+
         public func encode(to encoder: Encoder) throws {
-            
+
             var container = encoder.container(keyedBy: CodingKeys.self)
-            
+
             try container.encode(assets, forKey: .assets)
-            
-            
+
         }
 
         public func toCBORValue() throws -> Any {
-            
+
             var map = OrderedCBORMap()
 
-            
-            
             let assetsValue = try assets.toCBORValue()
             map = map.adding(key: "assets", value: assetsValue)
-            
-            
 
             return map
-            
+
         }
-        
-        
+
         private enum CodingKeys: String, CodingKey {
             case assets
         }
-        
+
     }
-
-
-
 
 }
 
-
-
 extension ATProtoClient.Place.Stream.Branding {
     // MARK: - getBranding
-
     /// Get all branding configuration for the broadcaster.
-    /// 
+    ///
     /// - Parameter input: The input parameters for the request
-    /// 
+    ///
     /// - Returns: A tuple containing the HTTP response code and the decoded response data
     /// - Throws: NetworkError if the request fails or the response cannot be processed
     public func getBranding(input: PlaceStreamBrandingGetBranding.Parameters) async throws -> (responseCode: Int, data: PlaceStreamBrandingGetBranding.Output?) {
         let endpoint = "place.stream.branding.getBranding"
 
-        
         let queryItems = input.asQueryItems()
-        
+
         let urlRequest = try await networkService.createURLRequest(
             endpoint: endpoint,
             method: "GET",
@@ -293,7 +267,7 @@ extension ATProtoClient.Place.Stream.Branding {
         // (4xx/5xx) may have missing or different Content-Type headers and
         // are handled via the status code / structured error parser below.
         if (200...299).contains(responseCode) {
-            
+
             guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
             }
@@ -301,7 +275,6 @@ extension ATProtoClient.Place.Stream.Branding {
             if !contentType.lowercased().contains("application/json") {
                 throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
             }
-            
 
             do {
                 let decoder = JSONDecoder()
@@ -314,13 +287,10 @@ extension ATProtoClient.Place.Stream.Branding {
                 return (responseCode, nil)
             }
         } else {
-            
-            
+
             // If we can't parse a structured error, return the response code
             // (maintains backward compatibility for endpoints without defined errors)
             return (responseCode, nil)
         }
     }
 }
-                           
-

@@ -2,19 +2,16 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: place.stream.ingest.defs
 
-
-public struct PlaceStreamIngestDefs { 
+public struct PlaceStreamIngestDefs {
 
     public static let typeIdentifier = "place.stream.ingest.defs"
-        
-public struct Ingest: ATProtocolCodable, ATProtocolValue {
-            public static let typeIdentifier = "place.stream.ingest.defs#ingest"
-            public let type: String
-            public let url: URI
+
+    public struct Ingest: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "place.stream.ingest.defs#ingest"
+        public let type: String
+        public let url: URI
 
         public init(
             type: String, url: URI
@@ -83,10 +80,4 @@ public struct Ingest: ATProtocolCodable, ATProtocolValue {
         }
     }
 
-
-
 }
-
-
-                           
-

@@ -2,16 +2,13 @@
 import Foundation
 import Petrel
 
-
-
 // lexicon: 1, id: blue.catbird.circle
 
-
-public struct BlueCatbirdCircle { 
+public struct BlueCatbirdCircle {
 
     public static let typeIdentifier = "blue.catbird.circle"
-    
-public struct SpaceDeclarationDescriptor: Sendable, Equatable {
+
+    public struct SpaceDeclarationDescriptor: Sendable, Equatable {
         public let nsid: String
         public let keyType: String
         public let name: String
@@ -23,11 +20,4 @@ public struct SpaceDeclarationDescriptor: Sendable, Equatable {
         name: "Catbird Circle", collections: ["blue.catbird.circle.metadata", "app.bsky.feed.post", "app.bsky.feed.like"]
     )
 
-
-
-
 }
-
-
-                           
-

@@ -43,6 +43,16 @@ public extension ATProtoClient.Blue {
 
         }
 
+        public var labyrinth: Labyrinth { Labyrinth(networkService: networkService) }
+
+        public struct Labyrinth: Sendable {
+            public let networkService: NetworkService
+            public init(networkService: NetworkService) {
+                self.networkService = networkService
+            }
+
+        }
+
         public var mlsDS: MlsDS { MlsDS(networkService: networkService) }
 
         public struct MlsDS: Sendable {
@@ -279,4 +289,3 @@ public extension ATProtoClient {
     }
 
 }
-
