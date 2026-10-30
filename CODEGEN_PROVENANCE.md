@@ -6,9 +6,13 @@ adding immutable conversation Space placement, authenticated history references,
 current membership lookup, and permanent generation deletion. Schemas are the
 source of truth; generated Swift and Kotlin are never patched by hand.
 
-The corresponding Petrel core uses the exact October 22 upstream snapshot
-`ac0c9f15392f6f0298d71dc52aa88c05036150be`. Petrel verifies all 30 Spaces and
-simpleSpace schema bytes against its recorded upstream archive. This overlay's
+The corresponding Petrel core uses the exact October 29 upstream Spaces alpha
+`5d88b414a98de1ada22c94c78fa0667a7028163c` (published as
+`0.0.0-spaces-alpha-20261029171913`). Petrel verifies all 39
+`com.atproto.space`, `memberspace`, `managedspace` and `personalspace` schema
+bytes against its recorded upstream archive. No overlay schema references a
+core definition that release changed, so regenerating this overlay against it
+reproduced the generated Swift and Kotlin byte for byte. This overlay's
 189 JSON files have aggregate SHA-256
 `a627cf74bcf876c954f79cbc4b3cab6618a1eed2401385655310575bf63e853f`.
 The aggregate hashes sorted lines of each file's SHA-256, two spaces, its path
