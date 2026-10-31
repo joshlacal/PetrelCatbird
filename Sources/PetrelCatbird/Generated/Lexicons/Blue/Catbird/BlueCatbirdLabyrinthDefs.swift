@@ -300,6 +300,9 @@ public struct BlueCatbirdLabyrinthDefs {
         public static let typeIdentifier = "blue.catbird.labyrinth.defs#sequencerReceipt"
         public let conversationId: String
         public let generation: Int
+        public let groupId: Bytes
+        public let epoch: Int
+        public let entryId: String
         public let seq: Int
         public let senderDid: DID
         public let senderDeviceId: String
@@ -310,10 +313,13 @@ public struct BlueCatbirdLabyrinthDefs {
         public let signature: Bytes
 
         public init(
-            conversationId: String, generation: Int, seq: Int, senderDid: DID, senderDeviceId: String, archiveCommitment: Bytes, issuedAtMs: Int, sequencerDid: DID, kid: String, signature: Bytes
+            conversationId: String, generation: Int, groupId: Bytes, epoch: Int, entryId: String, seq: Int, senderDid: DID, senderDeviceId: String, archiveCommitment: Bytes, issuedAtMs: Int, sequencerDid: DID, kid: String, signature: Bytes
         ) {
             self.conversationId = conversationId
             self.generation = generation
+            self.groupId = groupId
+            self.epoch = epoch
+            self.entryId = entryId
             self.seq = seq
             self.senderDid = senderDid
             self.senderDeviceId = senderDeviceId
@@ -336,6 +342,24 @@ public struct BlueCatbirdLabyrinthDefs {
                 self.generation = try container.decode(Int.self, forKey: .generation)
             } catch {
                 LogManager.logError("Decoding error for required property 'generation': \(error)")
+                throw error
+            }
+            do {
+                self.groupId = try container.decode(Bytes.self, forKey: .groupId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'groupId': \(error)")
+                throw error
+            }
+            do {
+                self.epoch = try container.decode(Int.self, forKey: .epoch)
+            } catch {
+                LogManager.logError("Decoding error for required property 'epoch': \(error)")
+                throw error
+            }
+            do {
+                self.entryId = try container.decode(String.self, forKey: .entryId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'entryId': \(error)")
                 throw error
             }
             do {
@@ -393,6 +417,9 @@ public struct BlueCatbirdLabyrinthDefs {
             try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(generation, forKey: .generation)
+            try container.encode(groupId, forKey: .groupId)
+            try container.encode(epoch, forKey: .epoch)
+            try container.encode(entryId, forKey: .entryId)
             try container.encode(seq, forKey: .seq)
             try container.encode(senderDid, forKey: .senderDid)
             try container.encode(senderDeviceId, forKey: .senderDeviceId)
@@ -406,6 +433,9 @@ public struct BlueCatbirdLabyrinthDefs {
         public func hash(into hasher: inout Hasher) {
             hasher.combine(conversationId)
             hasher.combine(generation)
+            hasher.combine(groupId)
+            hasher.combine(epoch)
+            hasher.combine(entryId)
             hasher.combine(seq)
             hasher.combine(senderDid)
             hasher.combine(senderDeviceId)
@@ -422,6 +452,15 @@ public struct BlueCatbirdLabyrinthDefs {
                 return false
             }
             if generation != other.generation {
+                return false
+            }
+            if groupId != other.groupId {
+                return false
+            }
+            if epoch != other.epoch {
+                return false
+            }
+            if entryId != other.entryId {
                 return false
             }
             if seq != other.seq {
@@ -462,6 +501,12 @@ public struct BlueCatbirdLabyrinthDefs {
             map = map.adding(key: "conversationId", value: conversationIdValue)
             let generationValue = try generation.toCBORValue()
             map = map.adding(key: "generation", value: generationValue)
+            let groupIdValue = try groupId.toCBORValue()
+            map = map.adding(key: "groupId", value: groupIdValue)
+            let epochValue = try epoch.toCBORValue()
+            map = map.adding(key: "epoch", value: epochValue)
+            let entryIdValue = try entryId.toCBORValue()
+            map = map.adding(key: "entryId", value: entryIdValue)
             let seqValue = try seq.toCBORValue()
             map = map.adding(key: "seq", value: seqValue)
             let senderDidValue = try senderDid.toCBORValue()
@@ -485,6 +530,9 @@ public struct BlueCatbirdLabyrinthDefs {
             case typeIdentifier = "$type"
             case conversationId
             case generation
+            case groupId
+            case epoch
+            case entryId
             case seq
             case senderDid
             case senderDeviceId
@@ -504,12 +552,11 @@ public struct BlueCatbirdLabyrinthDefs {
         public let mekId: Bytes
         public let senderTransportPubkey: Bytes
         public let signedEncMessage: Bytes
-        public let frameNonce: Bytes?
         public let sequencerReceipt: SequencerReceipt?
         public let redaction: Redaction?
 
         public init(
-            messageId: String, seq: Int? = nil, timestamp: Int, mekId: Bytes, senderTransportPubkey: Bytes, signedEncMessage: Bytes, frameNonce: Bytes? = nil, sequencerReceipt: SequencerReceipt? = nil, redaction: Redaction? = nil
+            messageId: String, seq: Int? = nil, timestamp: Int, mekId: Bytes, senderTransportPubkey: Bytes, signedEncMessage: Bytes, sequencerReceipt: SequencerReceipt? = nil, redaction: Redaction? = nil
         ) {
             self.messageId = messageId
             self.seq = seq
@@ -517,7 +564,6 @@ public struct BlueCatbirdLabyrinthDefs {
             self.mekId = mekId
             self.senderTransportPubkey = senderTransportPubkey
             self.signedEncMessage = signedEncMessage
-            self.frameNonce = frameNonce
             self.sequencerReceipt = sequencerReceipt
             self.redaction = redaction
         }
@@ -563,14 +609,6 @@ public struct BlueCatbirdLabyrinthDefs {
                 throw error
             }
             do {
-                self.frameNonce = try container.decodeIfPresent(Bytes.self, forKey: .frameNonce)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'frameNonce' — degrading to nil: \(error)")
-                self.frameNonce = nil
-            }
-            do {
                 self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
@@ -597,7 +635,6 @@ public struct BlueCatbirdLabyrinthDefs {
             try container.encode(mekId, forKey: .mekId)
             try container.encode(senderTransportPubkey, forKey: .senderTransportPubkey)
             try container.encode(signedEncMessage, forKey: .signedEncMessage)
-            try container.encodeIfPresent(frameNonce, forKey: .frameNonce)
             try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encodeIfPresent(redaction, forKey: .redaction)
         }
@@ -613,11 +650,6 @@ public struct BlueCatbirdLabyrinthDefs {
             hasher.combine(mekId)
             hasher.combine(senderTransportPubkey)
             hasher.combine(signedEncMessage)
-            if let value = frameNonce {
-                hasher.combine(value)
-            } else {
-                hasher.combine(nil as Int?)
-            }
             if let value = sequencerReceipt {
                 hasher.combine(value)
             } else {
@@ -650,9 +682,6 @@ public struct BlueCatbirdLabyrinthDefs {
             if signedEncMessage != other.signedEncMessage {
                 return false
             }
-            if frameNonce != other.frameNonce {
-                return false
-            }
             if sequencerReceipt != other.sequencerReceipt {
                 return false
             }
@@ -683,10 +712,6 @@ public struct BlueCatbirdLabyrinthDefs {
             map = map.adding(key: "senderTransportPubkey", value: senderTransportPubkeyValue)
             let signedEncMessageValue = try signedEncMessage.toCBORValue()
             map = map.adding(key: "signedEncMessage", value: signedEncMessageValue)
-            if let value = frameNonce {
-                let frameNonceValue = try value.toCBORValue()
-                map = map.adding(key: "frameNonce", value: frameNonceValue)
-            }
             if let value = sequencerReceipt {
                 let sequencerReceiptValue = try value.toCBORValue()
                 map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
@@ -706,7 +731,6 @@ public struct BlueCatbirdLabyrinthDefs {
             case mekId
             case senderTransportPubkey
             case signedEncMessage
-            case frameNonce
             case sequencerReceipt
             case redaction
         }
@@ -721,11 +745,10 @@ public struct BlueCatbirdLabyrinthDefs {
         public let epochNumber: Int
         public let version: Int
         public let encrypted: Bytes
-        public let frameNonce: Bytes?
         public let sequencerReceipt: SequencerReceipt?
 
         public init(
-            threadId: String, messageId: String, seq: Int? = nil, timestamp: Int, epochNumber: Int, version: Int, encrypted: Bytes, frameNonce: Bytes? = nil, sequencerReceipt: SequencerReceipt? = nil
+            threadId: String, messageId: String, seq: Int? = nil, timestamp: Int, epochNumber: Int, version: Int, encrypted: Bytes, sequencerReceipt: SequencerReceipt? = nil
         ) {
             self.threadId = threadId
             self.messageId = messageId
@@ -734,7 +757,6 @@ public struct BlueCatbirdLabyrinthDefs {
             self.epochNumber = epochNumber
             self.version = version
             self.encrypted = encrypted
-            self.frameNonce = frameNonce
             self.sequencerReceipt = sequencerReceipt
         }
 
@@ -785,14 +807,6 @@ public struct BlueCatbirdLabyrinthDefs {
                 throw error
             }
             do {
-                self.frameNonce = try container.decodeIfPresent(Bytes.self, forKey: .frameNonce)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
-                LogManager.logWarning("Decoding error for optional property 'frameNonce' — degrading to nil: \(error)")
-                self.frameNonce = nil
-            }
-            do {
                 self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
@@ -812,7 +826,6 @@ public struct BlueCatbirdLabyrinthDefs {
             try container.encode(epochNumber, forKey: .epochNumber)
             try container.encode(version, forKey: .version)
             try container.encode(encrypted, forKey: .encrypted)
-            try container.encodeIfPresent(frameNonce, forKey: .frameNonce)
             try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
         }
 
@@ -828,11 +841,6 @@ public struct BlueCatbirdLabyrinthDefs {
             hasher.combine(epochNumber)
             hasher.combine(version)
             hasher.combine(encrypted)
-            if let value = frameNonce {
-                hasher.combine(value)
-            } else {
-                hasher.combine(nil as Int?)
-            }
             if let value = sequencerReceipt {
                 hasher.combine(value)
             } else {
@@ -861,9 +869,6 @@ public struct BlueCatbirdLabyrinthDefs {
                 return false
             }
             if encrypted != other.encrypted {
-                return false
-            }
-            if frameNonce != other.frameNonce {
                 return false
             }
             if sequencerReceipt != other.sequencerReceipt {
@@ -895,10 +900,6 @@ public struct BlueCatbirdLabyrinthDefs {
             map = map.adding(key: "version", value: versionValue)
             let encryptedValue = try encrypted.toCBORValue()
             map = map.adding(key: "encrypted", value: encryptedValue)
-            if let value = frameNonce {
-                let frameNonceValue = try value.toCBORValue()
-                map = map.adding(key: "frameNonce", value: frameNonceValue)
-            }
             if let value = sequencerReceipt {
                 let sequencerReceiptValue = try value.toCBORValue()
                 map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
@@ -915,7 +916,6 @@ public struct BlueCatbirdLabyrinthDefs {
             case epochNumber
             case version
             case encrypted
-            case frameNonce
             case sequencerReceipt
         }
     }

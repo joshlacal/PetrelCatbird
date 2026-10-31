@@ -104,6 +104,9 @@
       "required": [
         "conversationId",
         "generation",
+        "groupId",
+        "epoch",
+        "entryId",
         "seq",
         "senderDid",
         "senderDeviceId",
@@ -123,6 +126,21 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "groupId": {
+          "type": "bytes",
+          "minLength": 32,
+          "maxLength": 32
+        },
+        "epoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "entryId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36
         },
         "seq": {
           "type": "integer",
@@ -165,7 +183,7 @@
     },
     "sealedMessage": {
       "type": "object",
-      "description": "One v1.1 sender-encrypted message (SPEC \u00a77.2, I13). A redacted item ([CB-38]) keeps messageId, timestamp, mekId and senderTransportPubkey, carries redaction, and has an empty signedEncMessage.",
+      "description": "One v1.1 sender-encrypted message (SPEC \u00a77.2, I13). frameNonce lives strictly inside MEK-encrypted signedEncMessage so archiveCommitment remains hiding. A redacted item ([CB-38]) keeps messageId, timestamp, mekId and senderTransportPubkey, carries redaction, and has an empty signedEncMessage.",
       "required": [
         "messageId",
         "timestamp",
@@ -204,15 +222,9 @@
         },
         "signedEncMessage": {
           "type": "bytes",
-          "description": "Ed25519 sig(64) || suite-tagged AEAD ciphertext of the padded frame; empty once redacted.",
+          "description": "Ed25519 sig(64) || suite-tagged AEAD ciphertext of the padded (frameNonce || canonicalPayloadBytes) frame; empty once redacted.",
           "maxLength": 262144,
           "minLength": 0
-        },
-        "frameNonce": {
-          "type": "bytes",
-          "description": "32-byte random nonce committing archiveCommitment = SHA-256('catbird.labyrinth.archive.v1:' || canonicalPlaintextBytes || frameNonce) (I13).",
-          "minLength": 32,
-          "maxLength": 32
         },
         "sequencerReceipt": {
           "type": "ref",
@@ -227,7 +239,7 @@
     },
     "ownerMessage": {
       "type": "object",
-      "description": "One owner-encrypted message or delete-for-me tombstone (SPEC \u00a77.1, [CB-37], [CB-38]).",
+      "description": "One owner-encrypted message or delete-for-me tombstone (SPEC \u00a77.1, [CB-37], [CB-38], I13). frameNonce lives strictly inside owner-encrypted ciphertext.",
       "required": [
         "threadId",
         "messageId",
@@ -272,13 +284,8 @@
         },
         "encrypted": {
           "type": "bytes",
-          "description": "Suite-tagged AEAD ciphertext of the padded frame.",
+          "description": "Suite-tagged AEAD ciphertext of the padded frame (carrying frameNonce inside ciphertext when sequencerReceipt is present).",
           "maxLength": 262144
-        },
-        "frameNonce": {
-          "type": "bytes",
-          "minLength": 32,
-          "maxLength": 32
         },
         "sequencerReceipt": {
           "type": "ref",

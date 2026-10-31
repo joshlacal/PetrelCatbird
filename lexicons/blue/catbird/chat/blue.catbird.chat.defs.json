@@ -1228,7 +1228,7 @@
         "archiveCommitment": {
           "type": "ref",
           "ref": "#artifactHash",
-          "description": "[I13] SHA-256('catbird.labyrinth.archive.v1:' || canonicalPlaintextBytes || frameNonce) bound into live MLS AAD and echoed in sequencerReceipt."
+          "description": "[I13] HMAC-SHA256(key = frameNonce, data = canonicalPayloadBytes) bound into live MLS AAD and echoed in sequencerReceipt."
         }
       },
       "description": "Exact deterministic DAG-CBOR projection prefixed by CATBIRD-CHAT-MLS-AAD-MESSAGE\\0. All UUIDs are raw 16-byte strings and prior is the active bytes-based context exactly equivalent to the outer signed transport coordinate; it never includes the enclosing MLSMessage hash."
@@ -5408,6 +5408,9 @@
       "required": [
         "conversationId",
         "generation",
+        "groupId",
+        "epoch",
+        "entryId",
         "seq",
         "senderDid",
         "senderDeviceId",
@@ -5426,6 +5429,19 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "groupId": {
+          "type": "ref",
+          "ref": "#artifactHash"
+        },
+        "epoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "entryId": {
+          "type": "ref",
+          "ref": "#operationId"
         },
         "seq": {
           "type": "integer",

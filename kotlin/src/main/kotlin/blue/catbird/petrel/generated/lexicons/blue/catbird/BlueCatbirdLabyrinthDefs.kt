@@ -57,7 +57,10 @@ object BlueCatbirdLabyrinthDefsDefs {
     data class BlueCatbirdLabyrinthDefsSequencerReceipt(
         @SerialName("conversationId")
         val conversationId: String,        @SerialName("generation")
-        val generation: Int,        @SerialName("seq")
+        val generation: Int,        @SerialName("groupId")
+        val groupId: Bytes,        @SerialName("epoch")
+        val epoch: Int,        @SerialName("entryId")
+        val entryId: String,        @SerialName("seq")
         val seq: Int,        @SerialName("senderDid")
         val senderDid: DID,        @SerialName("senderDeviceId")
         val senderDeviceId: String,        @SerialName("archiveCommitment")
@@ -72,7 +75,7 @@ object BlueCatbirdLabyrinthDefsDefs {
     }
 
     /**
-     * One v1.1 sender-encrypted message (SPEC §7.2, I13). A redacted item ([CB-38]) keeps messageId, timestamp, mekId and senderTransportPubkey, carries redaction, and has an empty signedEncMessage.
+     * One v1.1 sender-encrypted message (SPEC §7.2, I13). frameNonce lives strictly inside MEK-encrypted signedEncMessage so archiveCommitment remains hiding. A redacted item ([CB-38]) keeps messageId, timestamp, mekId and senderTransportPubkey, carries redaction, and has an empty signedEncMessage.
      */
     @Serializable
     data class BlueCatbirdLabyrinthDefsSealedMessage(
@@ -81,9 +84,8 @@ object BlueCatbirdLabyrinthDefsDefs {
         val seq: Int? = null,/** Milliseconds since Unix epoch. */        @SerialName("timestamp")
         val timestamp: Int,/** 12-byte MEK id. */        @SerialName("mekId")
         val mekId: Bytes,/** Sender chat device Ed25519 key. */        @SerialName("senderTransportPubkey")
-        val senderTransportPubkey: Bytes,/** Ed25519 sig(64) || suite-tagged AEAD ciphertext of the padded frame; empty once redacted. */        @SerialName("signedEncMessage")
-        val signedEncMessage: Bytes,/** 32-byte random nonce committing archiveCommitment = SHA-256('catbird.labyrinth.archive.v1:' || canonicalPlaintextBytes || frameNonce) (I13). */        @SerialName("frameNonce")
-        val frameNonce: Bytes? = null,        @SerialName("sequencerReceipt")
+        val senderTransportPubkey: Bytes,/** Ed25519 sig(64) || suite-tagged AEAD ciphertext of the padded (frameNonce || canonicalPayloadBytes) frame; empty once redacted. */        @SerialName("signedEncMessage")
+        val signedEncMessage: Bytes,        @SerialName("sequencerReceipt")
         val sequencerReceipt: BlueCatbirdLabyrinthDefsSequencerReceipt? = null,/** Present when the author unsent the message ([CB-38]). */        @SerialName("redaction")
         val redaction: BlueCatbirdLabyrinthDefsRedaction? = null    ) {
         companion object {
@@ -92,7 +94,7 @@ object BlueCatbirdLabyrinthDefsDefs {
     }
 
     /**
-     * One owner-encrypted message or delete-for-me tombstone (SPEC §7.1, [CB-37], [CB-38]).
+     * One owner-encrypted message or delete-for-me tombstone (SPEC §7.1, [CB-37], [CB-38], I13). frameNonce lives strictly inside owner-encrypted ciphertext.
      */
     @Serializable
     data class BlueCatbirdLabyrinthDefsOwnerMessage(
@@ -102,9 +104,8 @@ object BlueCatbirdLabyrinthDefsDefs {
         val seq: Int? = null,/** ms since Unix epoch. */        @SerialName("timestamp")
         val timestamp: Int,/** Epoch whose root key derived the message key. */        @SerialName("epochNumber")
         val epochNumber: Int,/** Cipher version. Writers use 5 ([CB-37]: binds messageId and timestamp; content kind byte for delete-for-me tombstones); readers also accept 0, 2, 3 and 4 (SPEC §7.1). */        @SerialName("version")
-        val version: Int,/** Suite-tagged AEAD ciphertext of the padded frame. */        @SerialName("encrypted")
-        val encrypted: Bytes,        @SerialName("frameNonce")
-        val frameNonce: Bytes? = null,        @SerialName("sequencerReceipt")
+        val version: Int,/** Suite-tagged AEAD ciphertext of the padded frame (carrying frameNonce inside ciphertext when sequencerReceipt is present). */        @SerialName("encrypted")
+        val encrypted: Bytes,        @SerialName("sequencerReceipt")
         val sequencerReceipt: BlueCatbirdLabyrinthDefsSequencerReceipt? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsOwnerMessage"

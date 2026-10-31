@@ -17684,6 +17684,9 @@ public struct BlueCatbirdChatDefs {
         public static let typeIdentifier = "blue.catbird.chat.defs#sequencerReceipt"
         public let conversationId: OperationId
         public let generation: Int
+        public let groupId: Bytes
+        public let epoch: Int
+        public let entryId: OperationId
         public let seq: Int
         public let senderDid: BareDid
         public let senderDeviceId: DeviceId
@@ -17694,10 +17697,13 @@ public struct BlueCatbirdChatDefs {
         public let signature: Bytes
 
         public init(
-            conversationId: OperationId, generation: Int, seq: Int, senderDid: BareDid, senderDeviceId: DeviceId, archiveCommitment: Bytes, issuedAtMs: Int, sequencerDid: BareDid, kid: String, signature: Bytes
+            conversationId: OperationId, generation: Int, groupId: Bytes, epoch: Int, entryId: OperationId, seq: Int, senderDid: BareDid, senderDeviceId: DeviceId, archiveCommitment: Bytes, issuedAtMs: Int, sequencerDid: BareDid, kid: String, signature: Bytes
         ) {
             self.conversationId = conversationId
             self.generation = generation
+            self.groupId = groupId
+            self.epoch = epoch
+            self.entryId = entryId
             self.seq = seq
             self.senderDid = senderDid
             self.senderDeviceId = senderDeviceId
@@ -17720,6 +17726,24 @@ public struct BlueCatbirdChatDefs {
                 self.generation = try container.decode(Int.self, forKey: .generation)
             } catch {
                 LogManager.logError("Decoding error for required property 'generation': \(error)")
+                throw error
+            }
+            do {
+                self.groupId = try container.decode(Bytes.self, forKey: .groupId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'groupId': \(error)")
+                throw error
+            }
+            do {
+                self.epoch = try container.decode(Int.self, forKey: .epoch)
+            } catch {
+                LogManager.logError("Decoding error for required property 'epoch': \(error)")
+                throw error
+            }
+            do {
+                self.entryId = try container.decode(OperationId.self, forKey: .entryId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'entryId': \(error)")
                 throw error
             }
             do {
@@ -17777,6 +17801,9 @@ public struct BlueCatbirdChatDefs {
             try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(generation, forKey: .generation)
+            try container.encode(groupId, forKey: .groupId)
+            try container.encode(epoch, forKey: .epoch)
+            try container.encode(entryId, forKey: .entryId)
             try container.encode(seq, forKey: .seq)
             try container.encode(senderDid, forKey: .senderDid)
             try container.encode(senderDeviceId, forKey: .senderDeviceId)
@@ -17790,6 +17817,9 @@ public struct BlueCatbirdChatDefs {
         public func hash(into hasher: inout Hasher) {
             hasher.combine(conversationId)
             hasher.combine(generation)
+            hasher.combine(groupId)
+            hasher.combine(epoch)
+            hasher.combine(entryId)
             hasher.combine(seq)
             hasher.combine(senderDid)
             hasher.combine(senderDeviceId)
@@ -17806,6 +17836,15 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if generation != other.generation {
+                return false
+            }
+            if groupId != other.groupId {
+                return false
+            }
+            if epoch != other.epoch {
+                return false
+            }
+            if entryId != other.entryId {
                 return false
             }
             if seq != other.seq {
@@ -17846,6 +17885,12 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "conversationId", value: conversationIdValue)
             let generationValue = try generation.toCBORValue()
             map = map.adding(key: "generation", value: generationValue)
+            let groupIdValue = try groupId.toCBORValue()
+            map = map.adding(key: "groupId", value: groupIdValue)
+            let epochValue = try epoch.toCBORValue()
+            map = map.adding(key: "epoch", value: epochValue)
+            let entryIdValue = try entryId.toCBORValue()
+            map = map.adding(key: "entryId", value: entryIdValue)
             let seqValue = try seq.toCBORValue()
             map = map.adding(key: "seq", value: seqValue)
             let senderDidValue = try senderDid.toCBORValue()
@@ -17869,6 +17914,9 @@ public struct BlueCatbirdChatDefs {
             case typeIdentifier = "$type"
             case conversationId
             case generation
+            case groupId
+            case epoch
+            case entryId
             case seq
             case senderDid
             case senderDeviceId

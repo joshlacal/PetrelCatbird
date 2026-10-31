@@ -5114,7 +5114,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val conversationId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("generation")
         val generation: Int,        @SerialName("messageId")
         val messageId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("prior")
-        val prior: BlueCatbirdChatDefsMlsAadPriorContext,/** [I13] SHA-256('catbird.labyrinth.archive.v1:' || canonicalPlaintextBytes || frameNonce) bound into live MLS AAD and echoed in sequencerReceipt. */        @SerialName("archiveCommitment")
+        val prior: BlueCatbirdChatDefsMlsAadPriorContext,/** [I13] HMAC-SHA256(key = frameNonce, data = canonicalPayloadBytes) bound into live MLS AAD and echoed in sequencerReceipt. */        @SerialName("archiveCommitment")
         val archiveCommitment: BlueCatbirdChatDefsArtifactHash? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsApplicationAad"
@@ -6729,7 +6729,10 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     data class BlueCatbirdChatDefsSequencerReceipt(
         @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("generation")
-        val generation: Int,        @SerialName("seq")
+        val generation: Int,        @SerialName("groupId")
+        val groupId: BlueCatbirdChatDefsArtifactHash,        @SerialName("epoch")
+        val epoch: Int,        @SerialName("entryId")
+        val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
         val seq: Int,        @SerialName("senderDid")
         val senderDid: BlueCatbirdChatDefsBareDid,        @SerialName("senderDeviceId")
         val senderDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("archiveCommitment")
