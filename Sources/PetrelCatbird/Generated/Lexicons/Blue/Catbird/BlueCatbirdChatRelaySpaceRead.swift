@@ -8,6 +8,7 @@ public struct BlueCatbirdChatRelaySpaceRead {
 
     public static let typeIdentifier = "blue.catbird.chat.relaySpaceRead"
     public struct Input: ATProtocolCodable {
+        public let actorDeviceId: BlueCatbirdChatDefs.DeviceId
         public let targetDid: DID
         public let nsid: String
         public let query: String?
@@ -18,7 +19,8 @@ public struct BlueCatbirdChatRelaySpaceRead {
         public let signature: String
 
         /// Standard public initializer
-        public init(targetDid: DID, nsid: String, query: String? = nil, credential: String, spaceAudience: String, wantMac: String? = nil, signatureInput: String, signature: String) {
+        public init(actorDeviceId: BlueCatbirdChatDefs.DeviceId, targetDid: DID, nsid: String, query: String? = nil, credential: String, spaceAudience: String, wantMac: String? = nil, signatureInput: String, signature: String) {
+            self.actorDeviceId = actorDeviceId
             self.targetDid = targetDid
             self.nsid = nsid
             self.query = query
@@ -31,6 +33,7 @@ public struct BlueCatbirdChatRelaySpaceRead {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.actorDeviceId = try container.decode(BlueCatbirdChatDefs.DeviceId.self, forKey: .actorDeviceId)
             self.targetDid = try container.decode(DID.self, forKey: .targetDid)
             self.nsid = try container.decode(String.self, forKey: .nsid)
             self.query = try container.decodeIfPresent(String.self, forKey: .query)
@@ -43,6 +46,7 @@ public struct BlueCatbirdChatRelaySpaceRead {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
             try container.encode(targetDid, forKey: .targetDid)
             try container.encode(nsid, forKey: .nsid)
             try container.encodeIfPresent(query, forKey: .query)
@@ -55,6 +59,8 @@ public struct BlueCatbirdChatRelaySpaceRead {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
             let targetDidValue = try targetDid.toCBORValue()
             map = map.adding(key: "targetDid", value: targetDidValue)
             let nsidValue = try nsid.toCBORValue()
@@ -79,6 +85,7 @@ public struct BlueCatbirdChatRelaySpaceRead {
         }
 
         private enum CodingKeys: String, CodingKey {
+            case actorDeviceId
             case targetDid
             case nsid
             case query
@@ -139,9 +146,15 @@ public struct BlueCatbirdChatRelaySpaceRead {
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case accountSessionExpired = "AccountSessionExpired"
+        case cutoverRequired = "CutoverRequired"
+        case deviceNotRegistered = "DeviceNotRegistered"
+        case deviceRevoked = "DeviceRevoked"
         case invalidNsid = "InvalidNsid"
+        case invalidRequest = "InvalidRequest"
         case invalidTargetEndpoint = "InvalidTargetEndpoint"
         case notAuthorized = "NotAuthorized"
+        case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case upstreamError = "UpstreamError"
         public var description: String {
             return self.rawValue
@@ -156,7 +169,7 @@ public struct BlueCatbirdChatRelaySpaceRead {
 
 extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - relaySpaceRead
-    /// Stateless zero-persistence home-mls-ds relay (3A) forwarding client-signed RFC 9421 Space read requests (listRepos, getSpace, listRecords, getRecord, listRepoOps, getRepo, getBlob) to a remote Space host or writer PDS, returning raw bytes and preserving the Atproto-Space-Mac header.
+    /// Stateless zero-persistence home-mls-ds relay (3A) forwarding client-signed RFC 9421 Space read requests (listRepos, getSpace, listRecords, getRecord, listRepoOps, getLatestCommit, getRepo, getBlob) to a remote Space host or writer PDS, returning raw bytes and preserving the Atproto-Space-Mac header.
     ///
     /// - Parameter input: The input parameters for the request
 

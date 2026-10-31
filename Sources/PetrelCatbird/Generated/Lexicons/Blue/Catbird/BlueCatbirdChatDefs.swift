@@ -6591,9 +6591,11 @@ public struct BlueCatbirdChatDefs {
         public let height: Int
         public let altText: String?
         public let blurhash: String?
+        public let setterDid: BareDid?
+        public let spaceBlobCid: String?
 
         public init(
-            blobId: Bytes, purpose: String, algorithm: String, key: Bytes, nonce: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, plaintextSize: Int, mimeType: EncryptedImageEmbedMimeType, width: Int, height: Int, altText: String? = nil, blurhash: String? = nil
+            blobId: Bytes, purpose: String, algorithm: String, key: Bytes, nonce: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, plaintextSize: Int, mimeType: EncryptedImageEmbedMimeType, width: Int, height: Int, altText: String? = nil, blurhash: String? = nil, setterDid: BareDid? = nil, spaceBlobCid: String? = nil
         ) {
             self.blobId = blobId
             self.purpose = purpose
@@ -6608,6 +6610,8 @@ public struct BlueCatbirdChatDefs {
             self.height = height
             self.altText = altText
             self.blurhash = blurhash
+            self.setterDid = setterDid
+            self.spaceBlobCid = spaceBlobCid
         }
 
         public init(from decoder: Decoder) throws {
@@ -6694,6 +6698,22 @@ public struct BlueCatbirdChatDefs {
                 LogManager.logWarning("Decoding error for optional property 'blurhash' — degrading to nil: \(error)")
                 self.blurhash = nil
             }
+            do {
+                self.setterDid = try container.decodeIfPresent(BareDid.self, forKey: .setterDid)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'setterDid' — degrading to nil: \(error)")
+                self.setterDid = nil
+            }
+            do {
+                self.spaceBlobCid = try container.decodeIfPresent(String.self, forKey: .spaceBlobCid)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'spaceBlobCid' — degrading to nil: \(error)")
+                self.spaceBlobCid = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -6712,6 +6732,8 @@ public struct BlueCatbirdChatDefs {
             try container.encode(height, forKey: .height)
             try container.encodeIfPresent(altText, forKey: .altText)
             try container.encodeIfPresent(blurhash, forKey: .blurhash)
+            try container.encodeIfPresent(setterDid, forKey: .setterDid)
+            try container.encodeIfPresent(spaceBlobCid, forKey: .spaceBlobCid)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -6732,6 +6754,16 @@ public struct BlueCatbirdChatDefs {
                 hasher.combine(nil as Int?)
             }
             if let value = blurhash {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = setterDid {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = spaceBlobCid {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
@@ -6779,6 +6811,12 @@ public struct BlueCatbirdChatDefs {
             if blurhash != other.blurhash {
                 return false
             }
+            if setterDid != other.setterDid {
+                return false
+            }
+            if spaceBlobCid != other.spaceBlobCid {
+                return false
+            }
             return true
         }
 
@@ -6819,6 +6857,14 @@ public struct BlueCatbirdChatDefs {
                 let blurhashValue = try value.toCBORValue()
                 map = map.adding(key: "blurhash", value: blurhashValue)
             }
+            if let value = setterDid {
+                let setterDidValue = try value.toCBORValue()
+                map = map.adding(key: "setterDid", value: setterDidValue)
+            }
+            if let value = spaceBlobCid {
+                let spaceBlobCidValue = try value.toCBORValue()
+                map = map.adding(key: "spaceBlobCid", value: spaceBlobCidValue)
+            }
             return map
         }
 
@@ -6837,6 +6883,8 @@ public struct BlueCatbirdChatDefs {
             case height
             case altText
             case blurhash
+            case setterDid
+            case spaceBlobCid
         }
     }
 
@@ -6854,9 +6902,11 @@ public struct BlueCatbirdChatDefs {
         public let durationMillis: Int
         public let waveform: Bytes
         public let transcript: String?
+        public let setterDid: BareDid?
+        public let spaceBlobCid: String?
 
         public init(
-            blobId: Bytes, purpose: String, algorithm: String, key: Bytes, nonce: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, plaintextSize: Int, mimeType: EncryptedAudioEmbedMimeType, durationMillis: Int, waveform: Bytes, transcript: String? = nil
+            blobId: Bytes, purpose: String, algorithm: String, key: Bytes, nonce: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, plaintextSize: Int, mimeType: EncryptedAudioEmbedMimeType, durationMillis: Int, waveform: Bytes, transcript: String? = nil, setterDid: BareDid? = nil, spaceBlobCid: String? = nil
         ) {
             self.blobId = blobId
             self.purpose = purpose
@@ -6870,6 +6920,8 @@ public struct BlueCatbirdChatDefs {
             self.durationMillis = durationMillis
             self.waveform = waveform
             self.transcript = transcript
+            self.setterDid = setterDid
+            self.spaceBlobCid = spaceBlobCid
         }
 
         public init(from decoder: Decoder) throws {
@@ -6948,6 +7000,22 @@ public struct BlueCatbirdChatDefs {
                 LogManager.logWarning("Decoding error for optional property 'transcript' — degrading to nil: \(error)")
                 self.transcript = nil
             }
+            do {
+                self.setterDid = try container.decodeIfPresent(BareDid.self, forKey: .setterDid)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'setterDid' — degrading to nil: \(error)")
+                self.setterDid = nil
+            }
+            do {
+                self.spaceBlobCid = try container.decodeIfPresent(String.self, forKey: .spaceBlobCid)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'spaceBlobCid' — degrading to nil: \(error)")
+                self.spaceBlobCid = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -6965,6 +7033,8 @@ public struct BlueCatbirdChatDefs {
             try container.encode(durationMillis, forKey: .durationMillis)
             try container.encode(waveform, forKey: .waveform)
             try container.encodeIfPresent(transcript, forKey: .transcript)
+            try container.encodeIfPresent(setterDid, forKey: .setterDid)
+            try container.encodeIfPresent(spaceBlobCid, forKey: .spaceBlobCid)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -6980,6 +7050,16 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(durationMillis)
             hasher.combine(waveform)
             if let value = transcript {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = setterDid {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = spaceBlobCid {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
@@ -7024,6 +7104,12 @@ public struct BlueCatbirdChatDefs {
             if transcript != other.transcript {
                 return false
             }
+            if setterDid != other.setterDid {
+                return false
+            }
+            if spaceBlobCid != other.spaceBlobCid {
+                return false
+            }
             return true
         }
 
@@ -7060,6 +7146,14 @@ public struct BlueCatbirdChatDefs {
                 let transcriptValue = try value.toCBORValue()
                 map = map.adding(key: "transcript", value: transcriptValue)
             }
+            if let value = setterDid {
+                let setterDidValue = try value.toCBORValue()
+                map = map.adding(key: "setterDid", value: setterDidValue)
+            }
+            if let value = spaceBlobCid {
+                let spaceBlobCidValue = try value.toCBORValue()
+                map = map.adding(key: "spaceBlobCid", value: spaceBlobCidValue)
+            }
             return map
         }
 
@@ -7077,6 +7171,8 @@ public struct BlueCatbirdChatDefs {
             case durationMillis
             case waveform
             case transcript
+            case setterDid
+            case spaceBlobCid
         }
     }
 
@@ -8465,9 +8561,11 @@ public struct BlueCatbirdChatDefs {
         public let blurhash: String?
         public let originTransitionId: Bytes
         public let originalMetadataVersion: Int
+        public let setterDid: BareDid?
+        public let spaceBlobCid: String?
 
         public init(
-            blobId: Bytes, purpose: String, algorithm: String, key: Bytes, nonce: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, plaintextSize: Int, mimeType: MetadataAvatarEmbedMimeType, width: Int, height: Int, altText: String? = nil, blurhash: String? = nil, originTransitionId: Bytes, originalMetadataVersion: Int
+            blobId: Bytes, purpose: String, algorithm: String, key: Bytes, nonce: Bytes, ciphertextSha256: Bytes, ciphertextSize: Int, plaintextSize: Int, mimeType: MetadataAvatarEmbedMimeType, width: Int, height: Int, altText: String? = nil, blurhash: String? = nil, originTransitionId: Bytes, originalMetadataVersion: Int, setterDid: BareDid? = nil, spaceBlobCid: String? = nil
         ) {
             self.blobId = blobId
             self.purpose = purpose
@@ -8484,6 +8582,8 @@ public struct BlueCatbirdChatDefs {
             self.blurhash = blurhash
             self.originTransitionId = originTransitionId
             self.originalMetadataVersion = originalMetadataVersion
+            self.setterDid = setterDid
+            self.spaceBlobCid = spaceBlobCid
         }
 
         public init(from decoder: Decoder) throws {
@@ -8582,6 +8682,22 @@ public struct BlueCatbirdChatDefs {
                 LogManager.logError("Decoding error for required property 'originalMetadataVersion': \(error)")
                 throw error
             }
+            do {
+                self.setterDid = try container.decodeIfPresent(BareDid.self, forKey: .setterDid)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'setterDid' — degrading to nil: \(error)")
+                self.setterDid = nil
+            }
+            do {
+                self.spaceBlobCid = try container.decodeIfPresent(String.self, forKey: .spaceBlobCid)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'spaceBlobCid' — degrading to nil: \(error)")
+                self.spaceBlobCid = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -8602,6 +8718,8 @@ public struct BlueCatbirdChatDefs {
             try container.encodeIfPresent(blurhash, forKey: .blurhash)
             try container.encode(originTransitionId, forKey: .originTransitionId)
             try container.encode(originalMetadataVersion, forKey: .originalMetadataVersion)
+            try container.encodeIfPresent(setterDid, forKey: .setterDid)
+            try container.encodeIfPresent(spaceBlobCid, forKey: .spaceBlobCid)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -8628,6 +8746,16 @@ public struct BlueCatbirdChatDefs {
             }
             hasher.combine(originTransitionId)
             hasher.combine(originalMetadataVersion)
+            if let value = setterDid {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = spaceBlobCid {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
@@ -8677,6 +8805,12 @@ public struct BlueCatbirdChatDefs {
             if originalMetadataVersion != other.originalMetadataVersion {
                 return false
             }
+            if setterDid != other.setterDid {
+                return false
+            }
+            if spaceBlobCid != other.spaceBlobCid {
+                return false
+            }
             return true
         }
 
@@ -8721,6 +8855,14 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "originTransitionId", value: originTransitionIdValue)
             let originalMetadataVersionValue = try originalMetadataVersion.toCBORValue()
             map = map.adding(key: "originalMetadataVersion", value: originalMetadataVersionValue)
+            if let value = setterDid {
+                let setterDidValue = try value.toCBORValue()
+                map = map.adding(key: "setterDid", value: setterDidValue)
+            }
+            if let value = spaceBlobCid {
+                let spaceBlobCidValue = try value.toCBORValue()
+                map = map.adding(key: "spaceBlobCid", value: spaceBlobCidValue)
+            }
             return map
         }
 
@@ -8741,6 +8883,8 @@ public struct BlueCatbirdChatDefs {
             case blurhash
             case originTransitionId
             case originalMetadataVersion
+            case setterDid
+            case spaceBlobCid
         }
     }
 

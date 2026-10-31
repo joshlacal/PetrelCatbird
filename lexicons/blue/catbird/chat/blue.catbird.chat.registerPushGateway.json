@@ -1,7 +1,7 @@
 {
   "lexicon": 1,
   "id": "blue.catbird.chat.registerPushGateway",
-  "description": "Registers an opaque Push Gateway binding (D2) for one authenticated MLS device on the user's home mls-ds. mls-ds never sees raw APNs/FCM tokens and never sends push wakes for remote federated users.",
+  "description": "Registers or clears a device-signed opaque Push Gateway binding (D2, M-F06) for one authenticated MLS device on the user's home mls-ds. mls-ds never sees raw APNs/FCM tokens and never sends push wakes for remote federated users.",
   "defs": {
     "main": {
       "type": "procedure",
@@ -11,14 +11,27 @@
           "type": "object",
           "required": [
             "deviceId",
+            "keyId",
+            "authGeneration",
             "gatewayUrl",
             "appId",
-            "pushKey"
+            "pushKey",
+            "signedAt",
+            "signature"
           ],
           "properties": {
             "deviceId": {
               "type": "ref",
               "ref": "blue.catbird.chat.defs#deviceId"
+            },
+            "keyId": {
+              "type": "ref",
+              "ref": "blue.catbird.chat.defs#keyId"
+            },
+            "authGeneration": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
             },
             "gatewayUrl": {
               "type": "string",
@@ -33,9 +46,21 @@
             },
             "pushKey": {
               "type": "string",
-              "minLength": 32,
+              "minLength": 0,
               "maxLength": 256,
-              "description": "Opaque CSPRNG base64url push routing key issued by the Push Gateway."
+              "description": "Opaque CSPRNG base64url push routing key issued by the Push Gateway (empty when enabled is false)."
+            },
+            "enabled": {
+              "type": "boolean"
+            },
+            "signedAt": {
+              "type": "ref",
+              "ref": "blue.catbird.chat.defs#canonicalDatetime"
+            },
+            "signature": {
+              "type": "bytes",
+              "minLength": 64,
+              "maxLength": 64
             }
           }
         }
@@ -57,6 +82,15 @@
       },
       "errors": [
         {
+          "name": "AccountSessionExpired"
+        },
+        {
+          "name": "CutoverRequired"
+        },
+        {
+          "name": "DeviceBindingMismatch"
+        },
+        {
           "name": "DeviceNotRegistered"
         },
         {
@@ -69,7 +103,13 @@
           "name": "InvalidRequest"
         },
         {
+          "name": "InvalidSignature"
+        },
+        {
           "name": "NotAuthorized"
+        },
+        {
+          "name": "ProtocolUpgradeRequired"
         }
       ]
     }

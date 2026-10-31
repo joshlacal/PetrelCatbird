@@ -11,14 +11,22 @@ public struct BlueCatbirdChatAcknowledgeEntries {
         public let conversationId: BlueCatbirdChatDefs.OperationId
         public let generation: Int
         public let actorDeviceId: BlueCatbirdChatDefs.DeviceId
+        public let keyId: BlueCatbirdChatDefs.KeyId
+        public let authGeneration: Int
         public let upToSeq: Int
+        public let signedAt: BlueCatbirdChatDefs.CanonicalDatetime
+        public let signature: Bytes
 
         /// Standard public initializer
-        public init(conversationId: BlueCatbirdChatDefs.OperationId, generation: Int, actorDeviceId: BlueCatbirdChatDefs.DeviceId, upToSeq: Int) {
+        public init(conversationId: BlueCatbirdChatDefs.OperationId, generation: Int, actorDeviceId: BlueCatbirdChatDefs.DeviceId, keyId: BlueCatbirdChatDefs.KeyId, authGeneration: Int, upToSeq: Int, signedAt: BlueCatbirdChatDefs.CanonicalDatetime, signature: Bytes) {
             self.conversationId = conversationId
             self.generation = generation
             self.actorDeviceId = actorDeviceId
+            self.keyId = keyId
+            self.authGeneration = authGeneration
             self.upToSeq = upToSeq
+            self.signedAt = signedAt
+            self.signature = signature
         }
 
         public init(from decoder: Decoder) throws {
@@ -26,7 +34,11 @@ public struct BlueCatbirdChatAcknowledgeEntries {
             self.conversationId = try container.decode(BlueCatbirdChatDefs.OperationId.self, forKey: .conversationId)
             self.generation = try container.decode(Int.self, forKey: .generation)
             self.actorDeviceId = try container.decode(BlueCatbirdChatDefs.DeviceId.self, forKey: .actorDeviceId)
+            self.keyId = try container.decode(BlueCatbirdChatDefs.KeyId.self, forKey: .keyId)
+            self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
             self.upToSeq = try container.decode(Int.self, forKey: .upToSeq)
+            self.signedAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .signedAt)
+            self.signature = try container.decode(Bytes.self, forKey: .signature)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -34,7 +46,11 @@ public struct BlueCatbirdChatAcknowledgeEntries {
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(generation, forKey: .generation)
             try container.encode(actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(keyId, forKey: .keyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
             try container.encode(upToSeq, forKey: .upToSeq)
+            try container.encode(signedAt, forKey: .signedAt)
+            try container.encode(signature, forKey: .signature)
         }
 
         public func toCBORValue() throws -> Any {
@@ -45,8 +61,16 @@ public struct BlueCatbirdChatAcknowledgeEntries {
             map = map.adding(key: "generation", value: generationValue)
             let actorDeviceIdValue = try actorDeviceId.toCBORValue()
             map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
+            let keyIdValue = try keyId.toCBORValue()
+            map = map.adding(key: "keyId", value: keyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
             let upToSeqValue = try upToSeq.toCBORValue()
             map = map.adding(key: "upToSeq", value: upToSeqValue)
+            let signedAtValue = try signedAt.toCBORValue()
+            map = map.adding(key: "signedAt", value: signedAtValue)
+            let signatureValue = try signature.toCBORValue()
+            map = map.adding(key: "signature", value: signatureValue)
             return map
         }
 
@@ -54,7 +78,11 @@ public struct BlueCatbirdChatAcknowledgeEntries {
             case conversationId
             case generation
             case actorDeviceId
+            case keyId
+            case authGeneration
             case upToSeq
+            case signedAt
+            case signature
         }
     }
 
@@ -121,12 +149,17 @@ public struct BlueCatbirdChatAcknowledgeEntries {
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case accountSessionExpired = "AccountSessionExpired"
         case conversationNotFound = "ConversationNotFound"
+        case cutoverRequired = "CutoverRequired"
+        case deviceBindingMismatch = "DeviceBindingMismatch"
         case deviceNotLeaf = "DeviceNotLeaf"
         case deviceNotRegistered = "DeviceNotRegistered"
         case deviceRevoked = "DeviceRevoked"
         case invalidRequest = "InvalidRequest"
+        case invalidSignature = "InvalidSignature"
         case notAuthorized = "NotAuthorized"
+        case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         public var description: String {
             return self.rawValue
         }
@@ -140,7 +173,7 @@ public struct BlueCatbirdChatAcknowledgeEntries {
 
 extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - acknowledgeEntries
-    /// Post-commit acknowledgment of delivered entries up to upToSeq by an active leaf device. Once all active non-dormant leaf devices acknowledge an applicationMessageEntry, mls-ds prunes accepted_payload_bytes to NULL while preserving seq contiguity and all MLS control entries.
+    /// Device-signed post-commit acknowledgment of delivered entries up to upToSeq by an active leaf device. Once all active non-dormant leaf devices acknowledge an applicationMessageEntry, mls-ds prunes accepted_payload_bytes to NULL while preserving seq contiguity and all MLS control entries.
     ///
     /// - Parameter input: The input parameters for the request
 

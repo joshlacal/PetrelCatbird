@@ -9,52 +9,89 @@ public struct BlueCatbirdChatRegisterPushGateway {
     public static let typeIdentifier = "blue.catbird.chat.registerPushGateway"
     public struct Input: ATProtocolCodable {
         public let deviceId: BlueCatbirdChatDefs.DeviceId
+        public let keyId: BlueCatbirdChatDefs.KeyId
+        public let authGeneration: Int
         public let gatewayUrl: URI
         public let appId: String
         public let pushKey: String
+        public let enabled: Bool?
+        public let signedAt: BlueCatbirdChatDefs.CanonicalDatetime
+        public let signature: Bytes
 
         /// Standard public initializer
-        public init(deviceId: BlueCatbirdChatDefs.DeviceId, gatewayUrl: URI, appId: String, pushKey: String) {
+        public init(deviceId: BlueCatbirdChatDefs.DeviceId, keyId: BlueCatbirdChatDefs.KeyId, authGeneration: Int, gatewayUrl: URI, appId: String, pushKey: String, enabled: Bool? = nil, signedAt: BlueCatbirdChatDefs.CanonicalDatetime, signature: Bytes) {
             self.deviceId = deviceId
+            self.keyId = keyId
+            self.authGeneration = authGeneration
             self.gatewayUrl = gatewayUrl
             self.appId = appId
             self.pushKey = pushKey
+            self.enabled = enabled
+            self.signedAt = signedAt
+            self.signature = signature
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             self.deviceId = try container.decode(BlueCatbirdChatDefs.DeviceId.self, forKey: .deviceId)
+            self.keyId = try container.decode(BlueCatbirdChatDefs.KeyId.self, forKey: .keyId)
+            self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
             self.gatewayUrl = try container.decode(URI.self, forKey: .gatewayUrl)
             self.appId = try container.decode(String.self, forKey: .appId)
             self.pushKey = try container.decode(String.self, forKey: .pushKey)
+            self.enabled = try container.decodeIfPresent(Bool.self, forKey: .enabled)
+            self.signedAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .signedAt)
+            self.signature = try container.decode(Bytes.self, forKey: .signature)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(deviceId, forKey: .deviceId)
+            try container.encode(keyId, forKey: .keyId)
+            try container.encode(authGeneration, forKey: .authGeneration)
             try container.encode(gatewayUrl, forKey: .gatewayUrl)
             try container.encode(appId, forKey: .appId)
             try container.encode(pushKey, forKey: .pushKey)
+            try container.encodeIfPresent(enabled, forKey: .enabled)
+            try container.encode(signedAt, forKey: .signedAt)
+            try container.encode(signature, forKey: .signature)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
             let deviceIdValue = try deviceId.toCBORValue()
             map = map.adding(key: "deviceId", value: deviceIdValue)
+            let keyIdValue = try keyId.toCBORValue()
+            map = map.adding(key: "keyId", value: keyIdValue)
+            let authGenerationValue = try authGeneration.toCBORValue()
+            map = map.adding(key: "authGeneration", value: authGenerationValue)
             let gatewayUrlValue = try gatewayUrl.toCBORValue()
             map = map.adding(key: "gatewayUrl", value: gatewayUrlValue)
             let appIdValue = try appId.toCBORValue()
             map = map.adding(key: "appId", value: appIdValue)
             let pushKeyValue = try pushKey.toCBORValue()
             map = map.adding(key: "pushKey", value: pushKeyValue)
+            if let value = enabled {
+                let enabledValue = try value.toCBORValue()
+                map = map.adding(key: "enabled", value: enabledValue)
+            }
+            let signedAtValue = try signedAt.toCBORValue()
+            map = map.adding(key: "signedAt", value: signedAtValue)
+            let signatureValue = try signature.toCBORValue()
+            map = map.adding(key: "signature", value: signatureValue)
             return map
         }
 
         private enum CodingKeys: String, CodingKey {
             case deviceId
+            case keyId
+            case authGeneration
             case gatewayUrl
             case appId
             case pushKey
+            case enabled
+            case signedAt
+            case signature
         }
     }
 
@@ -107,11 +144,16 @@ public struct BlueCatbirdChatRegisterPushGateway {
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case accountSessionExpired = "AccountSessionExpired"
+        case cutoverRequired = "CutoverRequired"
+        case deviceBindingMismatch = "DeviceBindingMismatch"
         case deviceNotRegistered = "DeviceNotRegistered"
         case deviceRevoked = "DeviceRevoked"
         case invalidGatewayUrl = "InvalidGatewayUrl"
         case invalidRequest = "InvalidRequest"
+        case invalidSignature = "InvalidSignature"
         case notAuthorized = "NotAuthorized"
+        case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         public var description: String {
             return self.rawValue
         }
@@ -125,7 +167,7 @@ public struct BlueCatbirdChatRegisterPushGateway {
 
 extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - registerPushGateway
-    /// Registers an opaque Push Gateway binding (D2) for one authenticated MLS device on the user's home mls-ds. mls-ds never sees raw APNs/FCM tokens and never sends push wakes for remote federated users.
+    /// Registers or clears a device-signed opaque Push Gateway binding (D2, M-F06) for one authenticated MLS device on the user's home mls-ds. mls-ds never sees raw APNs/FCM tokens and never sends push wakes for remote federated users.
     ///
     /// - Parameter input: The input parameters for the request
 

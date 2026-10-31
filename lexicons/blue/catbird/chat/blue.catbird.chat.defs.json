@@ -2212,6 +2212,15 @@
           "type": "string",
           "minLength": 6,
           "maxLength": 256
+        },
+        "setterDid": {
+          "type": "ref",
+          "ref": "#bareDid"
+        },
+        "spaceBlobCid": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 256
         }
       },
       "description": "Runtime requires ciphertextSize == plaintextSize + 16 using checked safe-integer arithmetic; mismatch or overflow rejects. Ciphertext bytes include the appended 16-byte AES-GCM tag and exclude the nonce."
@@ -2291,6 +2300,15 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 16384
+        },
+        "setterDid": {
+          "type": "ref",
+          "ref": "#bareDid"
+        },
+        "spaceBlobCid": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 256
         }
       },
       "description": "Runtime requires ciphertextSize == plaintextSize + 16 using checked safe-integer arithmetic; mismatch or overflow rejects. Ciphertext bytes include the appended 16-byte AES-GCM tag and exclude the nonce."
@@ -2744,6 +2762,15 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 9007199254740991
+        },
+        "setterDid": {
+          "type": "ref",
+          "ref": "#bareDid"
+        },
+        "spaceBlobCid": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 256
         }
       },
       "description": "Runtime requires ciphertextSize == plaintextSize + 16 using checked safe-integer arithmetic; mismatch or overflow rejects, including for metadata avatars. Ciphertext bytes include the appended 16-byte AES-GCM tag and exclude the nonce. The origin fields are immutable and identify the metadata version whose AAD first bound these blob bytes. A later title-only metadata version may reuse the descriptor and existing binding without reencrypting the avatar."
@@ -5519,7 +5546,7 @@
           "ref": "#canonicalDatetime"
         }
       },
-      "description": "conversationId must byte-equal signedRequest.body.prior.conversationId before append or fingerprinting. When payloadPruned is true, signedRequest is absent while seq contiguity and entry metadata remain intact."
+      "description": "conversationId must byte-equal signedRequest.body.prior.conversationId before append or fingerprinting. Clients strictly validate the signed request and verify its 64-byte Ed25519 signature over the exact CATBIRD-CHAT-MESSAGE\\0 canonical signing transcript before decryption, attribution, display, or effects. The immutable outer-entry fingerprint is raw SHA-256 of UTF8(CATBIRD-CHAT-APPLICATION-ENTRY-FINGERPRINT\\0) followed by canonical DAG-CBOR of exactly {entryId: UUID bytes16, conversationId: UUID bytes16, seq: safe integer, requestDigest: bytes32, signature: bytes64, receivedAt: canonical text}. requestDigest is raw SHA-256 of the exact send signing transcript, so it commits every signed actor, device, coordinate, message, artifact, and blob-binding field; signature and server row identity/time are committed separately. Raw JSON, generated DTO bytes, plaintext-only digests, and unsigned outer surrogates are forbidden. Application visibility is per concrete authenticated (userDid,deviceId) MLS leaf. The genesis creator device begins at creation seq; an ordinary Add begins that added device at its Welcome-producing transition; that exact device's Remove or reset closes its interval inclusively. Reset begins only the activator device's successor interval at the same reset seq. A sibling registered device, logical roster member, or zero-leaf device inherits no ciphertext. Re-addition opens a new interval and never backfills the gap. When payloadPruned is true, signedRequest is absent while seq contiguity and entry metadata remain intact."
     },
     "commitEntry": {
       "type": "object",
@@ -6027,7 +6054,7 @@
         "#accountDeletedEntry"
       ],
       "closed": true,
-      "description": "The union is closed across applicationEntry and control variants."
+      "description": "The union is closed. For each of its signed-request non-application variants, the immutable control outer-entry fingerprint is raw SHA-256 of UTF8(CATBIRD-CHAT-CONTROL-ENTRY-FINGERPRINT\\0) followed by canonical DAG-CBOR of exactly {entryKind,entryId:bytes16,conversationId:bytes16,seq:positive-safe-integer,requestDigest:bytes32,signature:bytes64,serverFields,receivedAt:canonical-text}. entryKind is the exact full type ID of the selected conversationEntry variant. requestDigest is raw SHA-256 of the exact variant domain-prefixed canonical unsigned signing transcript. signature is the exact 64-byte signedRequest signature. serverFields is always present: {} for an ordinary five-field control row, {recovery: exact #leafRecoveryView} for participantAcceptanceEntry, or {tombstone: exact #conversationCloseTombstone} for conversationCloseEntry. Unknown, missing, or extra fields reject at the row, selected variant, serverFields, and fingerprint-projection levels. Every nested closed-union value in an unsigned signing projection carries its exact full $type. Missing, wrong, or unknown nested tags reject before signature acceptance. Exact row/body conversation binding, closed variant consistency, canonical transcript reconstruction, and historical Ed25519 signature verification all succeed before fingerprinting. Raw JSON, generated DTO bytes, and signature-containing wrapper bytes are forbidden fingerprint inputs. accountDeletedEntry is sequencer-recorded under #mls-receipt-1."
     },
     "conversationChangedEvent": {
       "type": "object",

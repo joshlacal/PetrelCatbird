@@ -5471,7 +5471,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val width: Int,        @SerialName("height")
         val height: Int,        @SerialName("altText")
         val altText: String? = null,        @SerialName("blurhash")
-        val blurhash: String? = null    ) {
+        val blurhash: String? = null,        @SerialName("setterDid")
+        val setterDid: BlueCatbirdChatDefsBareDid? = null,        @SerialName("spaceBlobCid")
+        val spaceBlobCid: String? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsEncryptedImageEmbed"
         }
@@ -5494,7 +5496,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val mimeType: BlueCatbirdChatDefsEncryptedAudioEmbedMimeType,        @SerialName("durationMillis")
         val durationMillis: Int,        @SerialName("waveform")
         val waveform: Bytes,        @SerialName("transcript")
-        val transcript: String? = null    ) {
+        val transcript: String? = null,        @SerialName("setterDid")
+        val setterDid: BlueCatbirdChatDefsBareDid? = null,        @SerialName("spaceBlobCid")
+        val spaceBlobCid: String? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsEncryptedAudioEmbed"
         }
@@ -5729,7 +5733,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val altText: String? = null,        @SerialName("blurhash")
         val blurhash: String? = null,        @SerialName("originTransitionId")
         val originTransitionId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("originalMetadataVersion")
-        val originalMetadataVersion: Int    ) {
+        val originalMetadataVersion: Int,        @SerialName("setterDid")
+        val setterDid: BlueCatbirdChatDefsBareDid? = null,        @SerialName("spaceBlobCid")
+        val spaceBlobCid: String? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsMetadataAvatarEmbed"
         }
@@ -6747,7 +6753,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     }
 
     /**
-     * conversationId must byte-equal signedRequest.body.prior.conversationId before append or fingerprinting. When payloadPruned is true, signedRequest is absent while seq contiguity and entry metadata remain intact.
+     * conversationId must byte-equal signedRequest.body.prior.conversationId before append or fingerprinting. Clients strictly validate the signed request and verify its 64-byte Ed25519 signature over the exact CATBIRD-CHAT-MESSAGE\0 canonical signing transcript before decryption, attribution, display, or effects. The immutable outer-entry fingerprint is raw SHA-256 of UTF8(CATBIRD-CHAT-APPLICATION-ENTRY-FINGERPRINT\0) followed by canonical DAG-CBOR of exactly {entryId: UUID bytes16, conversationId: UUID bytes16, seq: safe integer, requestDigest: bytes32, signature: bytes64, receivedAt: canonical text}. requestDigest is raw SHA-256 of the exact send signing transcript, so it commits every signed actor, device, coordinate, message, artifact, and blob-binding field; signature and server row identity/time are committed separately. Raw JSON, generated DTO bytes, plaintext-only digests, and unsigned outer surrogates are forbidden. Application visibility is per concrete authenticated (userDid,deviceId) MLS leaf. The genesis creator device begins at creation seq; an ordinary Add begins that added device at its Welcome-producing transition; that exact device's Remove or reset closes its interval inclusively. Reset begins only the activator device's successor interval at the same reset seq. A sibling registered device, logical roster member, or zero-leaf device inherits no ciphertext. Re-addition opens a new interval and never backfills the gap. When payloadPruned is true, signedRequest is absent while seq contiguity and entry metadata remain intact.
      */
     @Serializable
     data class BlueCatbirdChatDefsApplicationEntry(

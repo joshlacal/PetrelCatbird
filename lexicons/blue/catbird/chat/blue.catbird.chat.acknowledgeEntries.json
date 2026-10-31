@@ -1,7 +1,7 @@
 {
   "lexicon": 1,
   "id": "blue.catbird.chat.acknowledgeEntries",
-  "description": "Post-commit acknowledgment of delivered entries up to upToSeq by an active leaf device. Once all active non-dormant leaf devices acknowledge an applicationMessageEntry, mls-ds prunes accepted_payload_bytes to NULL while preserving seq contiguity and all MLS control entries.",
+  "description": "Device-signed post-commit acknowledgment of delivered entries up to upToSeq by an active leaf device. Once all active non-dormant leaf devices acknowledge an applicationMessageEntry, mls-ds prunes accepted_payload_bytes to NULL while preserving seq contiguity and all MLS control entries.",
   "defs": {
     "main": {
       "type": "procedure",
@@ -13,7 +13,11 @@
             "conversationId",
             "generation",
             "actorDeviceId",
-            "upToSeq"
+            "keyId",
+            "authGeneration",
+            "upToSeq",
+            "signedAt",
+            "signature"
           ],
           "properties": {
             "conversationId": {
@@ -29,10 +33,28 @@
               "type": "ref",
               "ref": "blue.catbird.chat.defs#deviceId"
             },
+            "keyId": {
+              "type": "ref",
+              "ref": "blue.catbird.chat.defs#keyId"
+            },
+            "authGeneration": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
             "upToSeq": {
               "type": "integer",
               "minimum": 1,
               "maximum": 9007199254740991
+            },
+            "signedAt": {
+              "type": "ref",
+              "ref": "blue.catbird.chat.defs#canonicalDatetime"
+            },
+            "signature": {
+              "type": "bytes",
+              "minLength": 64,
+              "maxLength": 64
             }
           }
         }
@@ -61,7 +83,16 @@
       },
       "errors": [
         {
+          "name": "AccountSessionExpired"
+        },
+        {
           "name": "ConversationNotFound"
+        },
+        {
+          "name": "CutoverRequired"
+        },
+        {
+          "name": "DeviceBindingMismatch"
         },
         {
           "name": "DeviceNotLeaf"
@@ -76,7 +107,13 @@
           "name": "InvalidRequest"
         },
         {
+          "name": "InvalidSignature"
+        },
+        {
           "name": "NotAuthorized"
+        },
+        {
+          "name": "ProtocolUpgradeRequired"
         }
       ]
     }

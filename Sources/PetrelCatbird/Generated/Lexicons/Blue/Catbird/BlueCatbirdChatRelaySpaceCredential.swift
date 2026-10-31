@@ -8,13 +8,15 @@ public struct BlueCatbirdChatRelaySpaceCredential {
 
     public static let typeIdentifier = "blue.catbird.chat.relaySpaceCredential"
     public struct Input: ATProtocolCodable {
+        public let actorDeviceId: BlueCatbirdChatDefs.DeviceId
         public let authorityDid: DID
         public let space: SpaceRef
         public let delegationToken: String
         public let cnfKey: String?
 
         /// Standard public initializer
-        public init(authorityDid: DID, space: SpaceRef, delegationToken: String, cnfKey: String? = nil) {
+        public init(actorDeviceId: BlueCatbirdChatDefs.DeviceId, authorityDid: DID, space: SpaceRef, delegationToken: String, cnfKey: String? = nil) {
+            self.actorDeviceId = actorDeviceId
             self.authorityDid = authorityDid
             self.space = space
             self.delegationToken = delegationToken
@@ -23,6 +25,7 @@ public struct BlueCatbirdChatRelaySpaceCredential {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.actorDeviceId = try container.decode(BlueCatbirdChatDefs.DeviceId.self, forKey: .actorDeviceId)
             self.authorityDid = try container.decode(DID.self, forKey: .authorityDid)
             self.space = try container.decode(SpaceRef.self, forKey: .space)
             self.delegationToken = try container.decode(String.self, forKey: .delegationToken)
@@ -31,6 +34,7 @@ public struct BlueCatbirdChatRelaySpaceCredential {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(actorDeviceId, forKey: .actorDeviceId)
             try container.encode(authorityDid, forKey: .authorityDid)
             try container.encode(space, forKey: .space)
             try container.encode(delegationToken, forKey: .delegationToken)
@@ -39,6 +43,8 @@ public struct BlueCatbirdChatRelaySpaceCredential {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
+            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
             let authorityDidValue = try authorityDid.toCBORValue()
             map = map.adding(key: "authorityDid", value: authorityDidValue)
             let spaceValue = try space.toCBORValue()
@@ -53,6 +59,7 @@ public struct BlueCatbirdChatRelaySpaceCredential {
         }
 
         private enum CodingKeys: String, CodingKey {
+            case actorDeviceId
             case authorityDid
             case space
             case delegationToken
@@ -123,9 +130,15 @@ public struct BlueCatbirdChatRelaySpaceCredential {
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
+        case accountSessionExpired = "AccountSessionExpired"
+        case cutoverRequired = "CutoverRequired"
+        case deviceNotRegistered = "DeviceNotRegistered"
+        case deviceRevoked = "DeviceRevoked"
         case invalidDelegationToken = "InvalidDelegationToken"
+        case invalidRequest = "InvalidRequest"
         case invalidTargetEndpoint = "InvalidTargetEndpoint"
         case notAuthorized = "NotAuthorized"
+        case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case upstreamError = "UpstreamError"
         public var description: String {
             return self.rawValue
@@ -140,7 +153,7 @@ public struct BlueCatbirdChatRelaySpaceCredential {
 
 extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - relaySpaceCredential
-    /// Stateless home-mls-ds relay (3A) exchanging a user's single-use PDS delegation token with a remote Space authority or remote Space host without exposing the client's IP address to third-party servers.
+    /// Stateless home-mls-ds relay (3A) exchanging an active registered device's single-use PDS delegation token with a remote Space authority or remote Space host without exposing the client's IP address to third-party servers.
     ///
     /// - Parameter input: The input parameters for the request
 
