@@ -24,7 +24,8 @@ object BlueCatbirdChatSendMessageDefs {
     @Serializable
     data class BlueCatbirdChatSendMessageOutput(
         @SerialName("entry")
-        val entry: BlueCatbirdChatDefsApplicationEntry    )
+        val entry: BlueCatbirdChatDefsApplicationEntry,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null    )
 
 sealed class BlueCatbirdChatSendMessageError(val name: String, val description: String?) {
         object BlobBindingConflict: BlueCatbirdChatSendMessageError("BlobBindingConflict", null)

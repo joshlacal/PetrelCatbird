@@ -1,0 +1,87 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.push.registerKey",
+  "description": "Registers a client's native APNs/FCM push token with Catbird's authenticated Push Gateway (nest, D2), binding a fresh 256-bit CSPRNG pushKey to (account_did, device_id, app_id, allowed_mls_service_did) resolved from the user's #atproto_mls DID document service.",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "deviceId",
+            "appId",
+            "platform",
+            "nativeToken"
+          ],
+          "properties": {
+            "deviceId": {
+              "type": "string",
+              "minLength": 36,
+              "maxLength": 36
+            },
+            "appId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "platform": {
+              "type": "string",
+              "enum": [
+                "apns",
+                "apnsSandbox",
+                "fcm",
+                "webpush"
+              ]
+            },
+            "nativeToken": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 4096
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "gatewayUrl",
+            "appId",
+            "pushKey"
+          ],
+          "properties": {
+            "gatewayUrl": {
+              "type": "string",
+              "format": "uri",
+              "maxLength": 512
+            },
+            "appId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "pushKey": {
+              "type": "string",
+              "minLength": 43,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidMlsServiceDid"
+        },
+        {
+          "name": "InvalidRequest"
+        },
+        {
+          "name": "NotAuthorized"
+        }
+      ]
+    }
+  }
+}

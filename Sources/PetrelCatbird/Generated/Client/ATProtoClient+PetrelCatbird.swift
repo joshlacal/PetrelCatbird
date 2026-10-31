@@ -63,6 +63,16 @@ public extension ATProtoClient.Blue {
 
         }
 
+        public var push: Push { Push(networkService: networkService) }
+
+        public struct Push: Sendable {
+            public let networkService: NetworkService
+            public init(networkService: NetworkService) {
+                self.networkService = networkService
+            }
+
+        }
+
     }
 
 }

@@ -1,0 +1,77 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.chat.registerPushGateway",
+  "description": "Registers an opaque Push Gateway binding (D2) for one authenticated MLS device on the user's home mls-ds. mls-ds never sees raw APNs/FCM tokens and never sends push wakes for remote federated users.",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "deviceId",
+            "gatewayUrl",
+            "appId",
+            "pushKey"
+          ],
+          "properties": {
+            "deviceId": {
+              "type": "ref",
+              "ref": "blue.catbird.chat.defs#deviceId"
+            },
+            "gatewayUrl": {
+              "type": "string",
+              "format": "uri",
+              "maxLength": 512,
+              "description": "HTTPS endpoint ending in /xrpc/blue.catbird.push.deliver (DNS-pinned SSRF-validated on port 443)."
+            },
+            "appId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "pushKey": {
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 256,
+              "description": "Opaque CSPRNG base64url push routing key issued by the Push Gateway."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "registeredAt"
+          ],
+          "properties": {
+            "registeredAt": {
+              "type": "ref",
+              "ref": "blue.catbird.chat.defs#canonicalDatetime"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "DeviceNotRegistered"
+        },
+        {
+          "name": "DeviceRevoked"
+        },
+        {
+          "name": "InvalidGatewayUrl"
+        },
+        {
+          "name": "InvalidRequest"
+        },
+        {
+          "name": "NotAuthorized"
+        }
+      ]
+    }
+  }
+}

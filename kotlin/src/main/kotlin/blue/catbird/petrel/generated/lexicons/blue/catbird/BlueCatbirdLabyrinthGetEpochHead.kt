@@ -25,7 +25,9 @@ object BlueCatbirdLabyrinthGetEpochHeadDefs {
     @Serializable
     data class BlueCatbirdLabyrinthGetEpochHeadOutput(
         @SerialName("epoch")
-        val epoch: BlueCatbirdLabyrinthDefsEpochPublic,// When mls-ds recorded it.        @SerialName("receivedAt")
+        val epoch: BlueCatbirdLabyrinthDefsEpochPublic,// [Gate 6] Contiguous verified hash-chained EpochPublic headers from floorSeq..=epoch.epochNumber proving directory consistency.        @SerialName("chain")
+        val chain: List<BlueCatbirdLabyrinthDefsEpochPublic>? = null,// Lowest epochNumber retained in the directory hash chain.        @SerialName("floorSeq")
+        val floorSeq: Int? = null,// When mls-ds recorded it.        @SerialName("receivedAt")
         val receivedAt: ATProtocolDate    )
 
 sealed class BlueCatbirdLabyrinthGetEpochHeadError(val name: String, val description: String?) {

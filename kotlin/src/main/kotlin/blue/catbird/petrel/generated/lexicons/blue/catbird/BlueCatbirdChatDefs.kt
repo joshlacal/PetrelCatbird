@@ -2818,6 +2818,9 @@ sealed interface BlueCatbirdChatDefsConversationEntry {
     data class DirectRequestAcceptanceEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestAcceptanceEntry) : BlueCatbirdChatDefsConversationEntry
 
     @Serializable
+    data class AccountDeletedEntry(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsAccountDeletedEntry) : BlueCatbirdChatDefsConversationEntry
+
+    @Serializable
     data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsConversationEntry
 }
 
@@ -2841,6 +2844,7 @@ object BlueCatbirdChatDefsConversationEntrySerializer : kotlinx.serialization.KS
     private val TYPE_LeaveCommitFulfillmentEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#leaveCommitFulfillmentEntry")
     private val TYPE_DirectRequestEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestEntry")
     private val TYPE_DirectRequestAcceptanceEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#directRequestAcceptanceEntry")
+    private val TYPE_AccountDeletedEntry = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#accountDeletedEntry")
 
     override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsConversationEntry) {
         val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
@@ -3069,6 +3073,20 @@ object BlueCatbirdChatDefsConversationEntrySerializer : kotlinx.serialization.KS
                 }
                 obj
             }
+            is BlueCatbirdChatDefsConversationEntry.AccountDeletedEntry -> {
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsAccountDeletedEntry.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_AccountDeletedEntry
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_AccountDeletedEntry)
+                }
+                obj
+            }
             is BlueCatbirdChatDefsConversationEntry.Unexpected -> value.value
             // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
             // subscription codegen) are runtime-only sentinels; JSON round-trip
@@ -3139,6 +3157,9 @@ object BlueCatbirdChatDefsConversationEntrySerializer : kotlinx.serialization.KS
             )
             "blue.catbird.chat.defs#directRequestAcceptanceEntry" -> BlueCatbirdChatDefsConversationEntry.DirectRequestAcceptanceEntry(
                 jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDirectRequestAcceptanceEntry.serializer(), element)
+            )
+            "blue.catbird.chat.defs#accountDeletedEntry" -> BlueCatbirdChatDefsConversationEntry.AccountDeletedEntry(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsAccountDeletedEntry.serializer(), element)
             )
             else -> BlueCatbirdChatDefsConversationEntry.Unexpected(element)
         }
@@ -5093,7 +5114,8 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val conversationId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("generation")
         val generation: Int,        @SerialName("messageId")
         val messageId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("prior")
-        val prior: BlueCatbirdChatDefsMlsAadPriorContext    ) {
+        val prior: BlueCatbirdChatDefsMlsAadPriorContext,/** [I13] SHA-256('catbird.labyrinth.archive.v1:' || canonicalPlaintextBytes || frameNonce) bound into live MLS AAD and echoed in sequencerReceipt. */        @SerialName("archiveCommitment")
+        val archiveCommitment: BlueCatbirdChatDefsArtifactHash? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsApplicationAad"
         }
@@ -6701,7 +6723,28 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     }
 
     /**
-     * conversationId must byte-equal signedRequest.body.prior.conversationId before append or fingerprinting. Clients strictly validate the signed request and verify its 64-byte Ed25519 signature over the exact CATBIRD-CHAT-MESSAGE\0 canonical signing transcript before decryption, attribution, display, or effects. The immutable outer-entry fingerprint is raw SHA-256 of UTF8(CATBIRD-CHAT-APPLICATION-ENTRY-FINGERPRINT\0) followed by canonical DAG-CBOR of exactly {entryId: UUID bytes16, conversationId: UUID bytes16, seq: safe integer, requestDigest: bytes32, signature: bytes64, receivedAt: canonical text}. requestDigest is raw SHA-256 of the exact send signing transcript, so it commits every signed actor, device, coordinate, message, artifact, and blob-binding field; signature and server row identity/time are committed separately. Raw JSON, generated DTO bytes, plaintext-only digests, and unsigned outer surrogates are forbidden. Application visibility is per concrete authenticated (userDid,deviceId) MLS leaf. The genesis creator device begins at creation seq; an ordinary Add begins that added device at its Welcome-producing transition; that exact device's Remove or reset closes its interval inclusively. Reset begins only the activator device's successor interval at the same reset seq. A sibling registered device, logical roster member, or zero-leaf device inherits no ciphertext. Re-addition opens a new interval and never backfills the gap.
+     * [I13] Sequencer receipt signed by {sequencerDid}#mls-receipt-1 binding live MLS applicationAad.archiveCommitment to Labyrinth history.
+     */
+    @Serializable
+    data class BlueCatbirdChatDefsSequencerReceipt(
+        @SerialName("conversationId")
+        val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("generation")
+        val generation: Int,        @SerialName("seq")
+        val seq: Int,        @SerialName("senderDid")
+        val senderDid: BlueCatbirdChatDefsBareDid,        @SerialName("senderDeviceId")
+        val senderDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("archiveCommitment")
+        val archiveCommitment: BlueCatbirdChatDefsArtifactHash,        @SerialName("issuedAtMs")
+        val issuedAtMs: Int,        @SerialName("sequencerDid")
+        val sequencerDid: BlueCatbirdChatDefsBareDid,        @SerialName("kid")
+        val kid: String,        @SerialName("signature")
+        val signature: Bytes    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsSequencerReceipt"
+        }
+    }
+
+    /**
+     * conversationId must byte-equal signedRequest.body.prior.conversationId before append or fingerprinting. When payloadPruned is true, signedRequest is absent while seq contiguity and entry metadata remain intact.
      */
     @Serializable
     data class BlueCatbirdChatDefsApplicationEntry(
@@ -6709,7 +6752,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
         val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedApplicationSend,        @SerialName("receivedAt")
+        val signedRequest: BlueCatbirdChatDefsSignedApplicationSend? = null,/** True once accepted_payload_bytes was pruned to NULL after all active non-dormant leaves acknowledged seq. */        @SerialName("payloadPruned")
+        val payloadPruned: Boolean? = null,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsApplicationEntry"
@@ -6887,6 +6932,24 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsLeaveCommitFulfillmentEntry"
+        }
+    }
+
+    /**
+     * [I13] Sequencer-recorded control entry indicating that deletedDid deleted their account and removed their writer repo from the conversation Space.
+     */
+    @Serializable
+    data class BlueCatbirdChatDefsAccountDeletedEntry(
+        @SerialName("entryId")
+        val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
+        val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
+        val seq: Int,        @SerialName("deletedDid")
+        val deletedDid: BlueCatbirdChatDefsBareDid,        @SerialName("sequencerDid")
+        val sequencerDid: BlueCatbirdChatDefsBareDid,        @SerialName("signature")
+        val signature: Bytes? = null,        @SerialName("receivedAt")
+        val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsAccountDeletedEntry"
         }
     }
 

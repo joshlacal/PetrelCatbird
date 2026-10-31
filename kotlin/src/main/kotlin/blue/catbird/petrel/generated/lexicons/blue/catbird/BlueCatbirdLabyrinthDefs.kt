@@ -25,8 +25,9 @@ object BlueCatbirdLabyrinthDefsDefs {
         val epochNumber: Int,/** Hawk auth public key (X25519, 32 bytes). */        @SerialName("authPubkey")
         val authPubkey: Bytes,/** Hawk encryption public key: X25519(32) || ML-KEM-768 ek(1184). */        @SerialName("encryptionPubkey")
         val encryptionPubkey: Bytes,/** XEdDSA mailbox signing public key (32 bytes). */        @SerialName("signingPubkey")
-        val signingPubkey: Bytes,/** Head of epoch N-1; absent for epoch 0. */        @SerialName("previousEpochHead")
-        val previousEpochHead: Bytes? = null,/** sha256 epoch head (SPEC §5.3). */        @SerialName("epochHead")
+        val signingPubkey: Bytes,/** [Gate 3] SHA-256 over canonical sorted active epoch member deviceKeyPubkeys bound into epochHead. */        @SerialName("membersHash")
+        val membersHash: Bytes,/** Head of epoch N-1; absent for epoch 0. */        @SerialName("previousEpochHead")
+        val previousEpochHead: Bytes? = null,/** sha256 epoch head (SPEC §5.3, Gate 3 membersHash bound). */        @SerialName("epochHead")
         val epochHead: Bytes,/** XEdDSA by this epoch's signing key over 'minos.unstructured_signature.epoch_self:' || head. */        @SerialName("selfSig")
         val selfSig: Bytes,/** XEdDSA by the previous epoch's signing key over 'minos.unstructured_signature.epoch_prev:' || head. */        @SerialName("prevSig")
         val prevSig: Bytes? = null,        @SerialName("attestation")
@@ -50,16 +51,40 @@ object BlueCatbirdLabyrinthDefsDefs {
     }
 
     /**
-     * One v1.1 sender-encrypted message (SPEC §7.2). A redacted item ([CB-38]) keeps messageId, timestamp, mekId and senderTransportPubkey, carries redaction, and has an empty signedEncMessage.
+     * [I13] Sequencer receipt signed by {sequencerDid}#mls-receipt-1 binding Labyrinth history items to live MLS applicationAad.archiveCommitment.
+     */
+    @Serializable
+    data class BlueCatbirdLabyrinthDefsSequencerReceipt(
+        @SerialName("conversationId")
+        val conversationId: String,        @SerialName("generation")
+        val generation: Int,        @SerialName("seq")
+        val seq: Int,        @SerialName("senderDid")
+        val senderDid: DID,        @SerialName("senderDeviceId")
+        val senderDeviceId: String,        @SerialName("archiveCommitment")
+        val archiveCommitment: Bytes,        @SerialName("issuedAtMs")
+        val issuedAtMs: Int,        @SerialName("sequencerDid")
+        val sequencerDid: DID,        @SerialName("kid")
+        val kid: String,        @SerialName("signature")
+        val signature: Bytes    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsSequencerReceipt"
+        }
+    }
+
+    /**
+     * One v1.1 sender-encrypted message (SPEC §7.2, I13). A redacted item ([CB-38]) keeps messageId, timestamp, mekId and senderTransportPubkey, carries redaction, and has an empty signedEncMessage.
      */
     @Serializable
     data class BlueCatbirdLabyrinthDefsSealedMessage(
 /** Chat message id. */        @SerialName("messageId")
-        val messageId: String,/** Milliseconds since Unix epoch. */        @SerialName("timestamp")
+        val messageId: String,/** Sequenced MLS entry seq from sequencerReceipt (I13). */        @SerialName("seq")
+        val seq: Int? = null,/** Milliseconds since Unix epoch. */        @SerialName("timestamp")
         val timestamp: Int,/** 12-byte MEK id. */        @SerialName("mekId")
         val mekId: Bytes,/** Sender chat device Ed25519 key. */        @SerialName("senderTransportPubkey")
         val senderTransportPubkey: Bytes,/** Ed25519 sig(64) || suite-tagged AEAD ciphertext of the padded frame; empty once redacted. */        @SerialName("signedEncMessage")
-        val signedEncMessage: Bytes,/** Present when the author unsent the message ([CB-38]). */        @SerialName("redaction")
+        val signedEncMessage: Bytes,/** 32-byte random nonce committing archiveCommitment = SHA-256('catbird.labyrinth.archive.v1:' || canonicalPlaintextBytes || frameNonce) (I13). */        @SerialName("frameNonce")
+        val frameNonce: Bytes? = null,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdLabyrinthDefsSequencerReceipt? = null,/** Present when the author unsent the message ([CB-38]). */        @SerialName("redaction")
         val redaction: BlueCatbirdLabyrinthDefsRedaction? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsSealedMessage"
@@ -73,11 +98,14 @@ object BlueCatbirdLabyrinthDefsDefs {
     data class BlueCatbirdLabyrinthDefsOwnerMessage(
 /** Conversation id. */        @SerialName("threadId")
         val threadId: String,/** Message id. */        @SerialName("messageId")
-        val messageId: String,/** ms since Unix epoch. */        @SerialName("timestamp")
+        val messageId: String,/** Sequenced MLS entry seq when archived from a live conversation. */        @SerialName("seq")
+        val seq: Int? = null,/** ms since Unix epoch. */        @SerialName("timestamp")
         val timestamp: Int,/** Epoch whose root key derived the message key. */        @SerialName("epochNumber")
         val epochNumber: Int,/** Cipher version. Writers use 5 ([CB-37]: binds messageId and timestamp; content kind byte for delete-for-me tombstones); readers also accept 0, 2, 3 and 4 (SPEC §7.1). */        @SerialName("version")
         val version: Int,/** Suite-tagged AEAD ciphertext of the padded frame. */        @SerialName("encrypted")
-        val encrypted: Bytes    ) {
+        val encrypted: Bytes,        @SerialName("frameNonce")
+        val frameNonce: Bytes? = null,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdLabyrinthDefsSequencerReceipt? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsOwnerMessage"
         }

@@ -25,6 +25,10 @@ public struct BlueCatbirdLabyrinthGetEpochHead {
 
         public let epoch: BlueCatbirdLabyrinthDefs.EpochPublic
 
+        public let chain: [BlueCatbirdLabyrinthDefs.EpochPublic]?
+
+        public let floorSeq: Int?
+
         public let receivedAt: ATProtocolDate
 
         // Standard public initializer
@@ -32,11 +36,19 @@ public struct BlueCatbirdLabyrinthGetEpochHead {
 
             epoch: BlueCatbirdLabyrinthDefs.EpochPublic,
 
+            chain: [BlueCatbirdLabyrinthDefs.EpochPublic]? = nil,
+
+            floorSeq: Int? = nil,
+
             receivedAt: ATProtocolDate
 
         ) {
 
             self.epoch = epoch
+
+            self.chain = chain
+
+            self.floorSeq = floorSeq
 
             self.receivedAt = receivedAt
 
@@ -48,6 +60,22 @@ public struct BlueCatbirdLabyrinthGetEpochHead {
 
             self.epoch = try container.decode(BlueCatbirdLabyrinthDefs.EpochPublic.self, forKey: .epoch)
 
+            do {
+                self.chain = try container.decodeIfPresent([BlueCatbirdLabyrinthDefs.EpochPublic].self, forKey: .chain)
+            } catch {
+                // Forward compatibility: a malformed optional field must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'chain' — degrading to nil: \(error)")
+                self.chain = nil
+            }
+
+            do {
+                self.floorSeq = try container.decodeIfPresent(Int.self, forKey: .floorSeq)
+            } catch {
+                // Forward compatibility: a malformed optional field must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'floorSeq' — degrading to nil: \(error)")
+                self.floorSeq = nil
+            }
+
             self.receivedAt = try container.decode(ATProtocolDate.self, forKey: .receivedAt)
 
         }
@@ -57,6 +85,12 @@ public struct BlueCatbirdLabyrinthGetEpochHead {
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(epoch, forKey: .epoch)
+
+            // Encode optional property even if it's an empty array
+            try container.encodeIfPresent(chain, forKey: .chain)
+
+            // Encode optional property even if it's an empty array
+            try container.encodeIfPresent(floorSeq, forKey: .floorSeq)
 
             try container.encode(receivedAt, forKey: .receivedAt)
 
@@ -69,6 +103,18 @@ public struct BlueCatbirdLabyrinthGetEpochHead {
             let epochValue = try epoch.toCBORValue()
             map = map.adding(key: "epoch", value: epochValue)
 
+            if let value = chain {
+                // Encode optional property even if it's an empty array for CBOR
+                let chainValue = try value.toCBORValue()
+                map = map.adding(key: "chain", value: chainValue)
+            }
+
+            if let value = floorSeq {
+                // Encode optional property even if it's an empty array for CBOR
+                let floorSeqValue = try value.toCBORValue()
+                map = map.adding(key: "floorSeq", value: floorSeqValue)
+            }
+
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
 
@@ -78,6 +124,8 @@ public struct BlueCatbirdLabyrinthGetEpochHead {
 
         private enum CodingKeys: String, CodingKey {
             case epoch
+            case chain
+            case floorSeq
             case receivedAt
         }
 

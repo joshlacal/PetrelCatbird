@@ -22,8 +22,8 @@ object BlueCatbirdLabyrinthDeviceDefs {
     @Serializable
     data class BlueCatbirdLabyrinthDevice(
 /** XEdDSA device key (X25519 form). */        @SerialName("deviceKeyPubkey")
-        val deviceKeyPubkey: Bytes,/** Labyrinth HPKE encryption key. */        @SerialName("epochStorageKeyPubkey")
-        val epochStorageKeyPubkey: Bytes,/** pk_sign(deviceKey, 0x30, epochStorageKeyPubkey). */        @SerialName("epochStorageKeySig")
+        val deviceKeyPubkey: Bytes,/** Hawk encryption public key: X25519(32) || ML-KEM-768 ek(1184) (1,216 bytes, I16). */        @SerialName("epochStorageKeyPubkey")
+        val epochStorageKeyPubkey: Bytes,/** pk_sign(deviceKey, 0x32, epochStorageKeyPubkey) (100% PQ domain tag 0x32, I16). */        @SerialName("epochStorageKeySig")
         val epochStorageKeySig: Bytes,/** Labyrinth HPKE auth key; absent for virtual devices. */        @SerialName("epochStorageAuthKeyPubkey")
         val epochStorageAuthKeyPubkey: Bytes? = null,/** pk_sign(deviceKey, 0x31, epochStorageAuthKeyPubkey). */        @SerialName("epochStorageAuthKeySig")
         val epochStorageAuthKeySig: Bytes? = null,/** True for a recovery (virtual) device, which has no epochStorageAuthKey. */        @SerialName("virtual")

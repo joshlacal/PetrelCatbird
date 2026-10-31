@@ -10,7 +10,6 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
     public let vdeviceId: Bytes
     public let encryptedDeviceKeyPriv: Bytes
     public let encryptedEpochStorageKeyPriv: Bytes
-    public let encryptedOrfClientState: Bytes
     public let encryptedMailboxRootSalt: Bytes
     public let encryptedEpochRootKey: Bytes
     public let encryptedEpochNumber: Bytes
@@ -23,11 +22,10 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
     public let createdAt: ATProtocolDate
     public let lastUsedAt: ATProtocolDate?
 
-    public init(vdeviceId: Bytes, encryptedDeviceKeyPriv: Bytes, encryptedEpochStorageKeyPriv: Bytes, encryptedOrfClientState: Bytes, encryptedMailboxRootSalt: Bytes, encryptedEpochRootKey: Bytes, encryptedEpochNumber: Bytes, deviceKeyPubkey: Bytes, epochStorageKeyPubkey: Bytes, epochStorageKeySig: Bytes, mechanism: String, passkeyWrappedCode: Bytes? = nil, passkeyCredentialId: Bytes? = nil, createdAt: ATProtocolDate, lastUsedAt: ATProtocolDate? = nil) {
+    public init(vdeviceId: Bytes, encryptedDeviceKeyPriv: Bytes, encryptedEpochStorageKeyPriv: Bytes, encryptedMailboxRootSalt: Bytes, encryptedEpochRootKey: Bytes, encryptedEpochNumber: Bytes, deviceKeyPubkey: Bytes, epochStorageKeyPubkey: Bytes, epochStorageKeySig: Bytes, mechanism: String, passkeyWrappedCode: Bytes? = nil, passkeyCredentialId: Bytes? = nil, createdAt: ATProtocolDate, lastUsedAt: ATProtocolDate? = nil) {
         self.vdeviceId = vdeviceId
         self.encryptedDeviceKeyPriv = encryptedDeviceKeyPriv
         self.encryptedEpochStorageKeyPriv = encryptedEpochStorageKeyPriv
-        self.encryptedOrfClientState = encryptedOrfClientState
         self.encryptedMailboxRootSalt = encryptedMailboxRootSalt
         self.encryptedEpochRootKey = encryptedEpochRootKey
         self.encryptedEpochNumber = encryptedEpochNumber
@@ -46,7 +44,6 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
         self.vdeviceId = try container.decode(Bytes.self, forKey: .vdeviceId)
         self.encryptedDeviceKeyPriv = try container.decode(Bytes.self, forKey: .encryptedDeviceKeyPriv)
         self.encryptedEpochStorageKeyPriv = try container.decode(Bytes.self, forKey: .encryptedEpochStorageKeyPriv)
-        self.encryptedOrfClientState = try container.decode(Bytes.self, forKey: .encryptedOrfClientState)
         self.encryptedMailboxRootSalt = try container.decode(Bytes.self, forKey: .encryptedMailboxRootSalt)
         self.encryptedEpochRootKey = try container.decode(Bytes.self, forKey: .encryptedEpochRootKey)
         self.encryptedEpochNumber = try container.decode(Bytes.self, forKey: .encryptedEpochNumber)
@@ -84,7 +81,6 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
         try container.encode(vdeviceId, forKey: .vdeviceId)
         try container.encode(encryptedDeviceKeyPriv, forKey: .encryptedDeviceKeyPriv)
         try container.encode(encryptedEpochStorageKeyPriv, forKey: .encryptedEpochStorageKeyPriv)
-        try container.encode(encryptedOrfClientState, forKey: .encryptedOrfClientState)
         try container.encode(encryptedMailboxRootSalt, forKey: .encryptedMailboxRootSalt)
         try container.encode(encryptedEpochRootKey, forKey: .encryptedEpochRootKey)
         try container.encode(encryptedEpochNumber, forKey: .encryptedEpochNumber)
@@ -111,9 +107,6 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
             return false
         }
         if encryptedEpochStorageKeyPriv != other.encryptedEpochStorageKeyPriv {
-            return false
-        }
-        if encryptedOrfClientState != other.encryptedOrfClientState {
             return false
         }
         if encryptedMailboxRootSalt != other.encryptedMailboxRootSalt {
@@ -156,7 +149,6 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
         hasher.combine(vdeviceId)
         hasher.combine(encryptedDeviceKeyPriv)
         hasher.combine(encryptedEpochStorageKeyPriv)
-        hasher.combine(encryptedOrfClientState)
         hasher.combine(encryptedMailboxRootSalt)
         hasher.combine(encryptedEpochRootKey)
         hasher.combine(encryptedEpochNumber)
@@ -191,8 +183,6 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
         map = map.adding(key: "encryptedDeviceKeyPriv", value: encryptedDeviceKeyPrivValue)
         let encryptedEpochStorageKeyPrivValue = try encryptedEpochStorageKeyPriv.toCBORValue()
         map = map.adding(key: "encryptedEpochStorageKeyPriv", value: encryptedEpochStorageKeyPrivValue)
-        let encryptedOrfClientStateValue = try encryptedOrfClientState.toCBORValue()
-        map = map.adding(key: "encryptedOrfClientState", value: encryptedOrfClientStateValue)
         let encryptedMailboxRootSaltValue = try encryptedMailboxRootSalt.toCBORValue()
         map = map.adding(key: "encryptedMailboxRootSalt", value: encryptedMailboxRootSaltValue)
         let encryptedEpochRootKeyValue = try encryptedEpochRootKey.toCBORValue()
@@ -229,7 +219,6 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
         case vdeviceId
         case encryptedDeviceKeyPriv
         case encryptedEpochStorageKeyPriv
-        case encryptedOrfClientState
         case encryptedMailboxRootSalt
         case encryptedEpochRootKey
         case encryptedEpochNumber

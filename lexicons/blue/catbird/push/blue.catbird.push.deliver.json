@@ -1,0 +1,111 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.push.deliver",
+  "description": "Delivers a structured, anti-phishing MLS push wake from a recipient's authorized home mls-ds to Catbird's Push Gateway (nest, D2, I12). Unknown or mismatched caller_ds_did pushKeys return uniform 202 Accepted; display strings in payload are strictly forbidden.",
+  "defs": {
+    "wakePayload": {
+      "type": "object",
+      "required": [
+        "wakeKind",
+        "conversationId",
+        "generation",
+        "seq",
+        "epoch"
+      ],
+      "properties": {
+        "wakeKind": {
+          "type": "string",
+          "enum": [
+            "applicationMessage",
+            "controlTransition",
+            "directRequest",
+            "welcome"
+          ]
+        },
+        "conversationId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "epoch": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "ciphertext": {
+          "type": "bytes",
+          "maxLength": 2200,
+          "description": "Optional inline MLS PrivateMessage ciphertext when <= 2,200 bytes (I12); omitted for larger frames so NSE fetches via getEntries."
+        }
+      }
+    },
+    "main": {
+      "type": "procedure",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "pushKey",
+            "appId",
+            "payload"
+          ],
+          "properties": {
+            "pushKey": {
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 256
+            },
+            "appId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "payload": {
+              "type": "ref",
+              "ref": "#wakePayload"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "accepted"
+          ],
+          "properties": {
+            "accepted": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidRequest"
+        },
+        {
+          "name": "NotAuthorized"
+        },
+        {
+          "name": "PushTokenGone"
+        },
+        {
+          "name": "RateLimited"
+        }
+      ]
+    }
+  }
+}

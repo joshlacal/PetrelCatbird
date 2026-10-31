@@ -41,14 +41,20 @@ public struct BlueCatbirdChatSendMessage {
 
         public let entry: BlueCatbirdChatDefs.ApplicationEntry
 
+        public let sequencerReceipt: BlueCatbirdChatDefs.SequencerReceipt?
+
         // Standard public initializer
         public init(
 
-            entry: BlueCatbirdChatDefs.ApplicationEntry
+            entry: BlueCatbirdChatDefs.ApplicationEntry,
+
+            sequencerReceipt: BlueCatbirdChatDefs.SequencerReceipt? = nil
 
         ) {
 
             self.entry = entry
+
+            self.sequencerReceipt = sequencerReceipt
 
         }
 
@@ -58,6 +64,14 @@ public struct BlueCatbirdChatSendMessage {
 
             self.entry = try container.decode(BlueCatbirdChatDefs.ApplicationEntry.self, forKey: .entry)
 
+            do {
+                self.sequencerReceipt = try container.decodeIfPresent(BlueCatbirdChatDefs.SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed optional field must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -65,6 +79,9 @@ public struct BlueCatbirdChatSendMessage {
             var container = encoder.container(keyedBy: CodingKeys.self)
 
             try container.encode(entry, forKey: .entry)
+
+            // Encode optional property even if it's an empty array
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
 
         }
 
@@ -75,12 +92,19 @@ public struct BlueCatbirdChatSendMessage {
             let entryValue = try entry.toCBORValue()
             map = map.adding(key: "entry", value: entryValue)
 
+            if let value = sequencerReceipt {
+                // Encode optional property even if it's an empty array for CBOR
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
+
             return map
 
         }
 
         private enum CodingKeys: String, CodingKey {
             case entry
+            case sequencerReceipt
         }
 
     }
