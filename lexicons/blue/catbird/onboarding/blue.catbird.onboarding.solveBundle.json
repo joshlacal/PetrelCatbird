@@ -1,0 +1,118 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.onboarding.solveBundle",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Solve a role-balanced, pace-calibrated, hostility-guarded starting lineup of recommended accounts, community feeds, and inspectable starter packs.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["selections"],
+          "properties": {
+            "selections": {
+              "type": "array",
+              "maxLength": 24,
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.onboarding.defs#communitySelection"
+              }
+            },
+            "swipes": {
+              "type": "array",
+              "maxLength": 16,
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.onboarding.defs#calibrationSwipeAnswer"
+              }
+            },
+            "controls": {
+              "type": "ref",
+              "ref": "blue.catbird.onboarding.defs#bundleControls"
+            },
+            "targetSize": {
+              "type": "integer",
+              "minimum": 8,
+              "maximum": 50,
+              "default": 24
+            },
+            "pinnedDids": {
+              "type": "array",
+              "maxLength": 30,
+              "items": { "type": "string", "format": "did" }
+            },
+            "excludedDids": {
+              "type": "array",
+              "maxLength": 100,
+              "items": { "type": "string", "format": "did" }
+            },
+            "seedFollowDids": {
+              "type": "array",
+              "maxLength": 100,
+              "items": { "type": "string", "format": "did" }
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "sessionId",
+            "catalogVersion",
+            "solveMs",
+            "summary",
+            "follows",
+            "feeds",
+            "starterPacks",
+            "harmoniousNeighbors"
+          ],
+          "properties": {
+            "sessionId": { "type": "string" },
+            "catalogVersion": { "type": "string" },
+            "solveMs": { "type": "integer", "minimum": 0 },
+            "summary": {
+              "type": "ref",
+              "ref": "blue.catbird.onboarding.defs#bundleSummary"
+            },
+            "follows": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.onboarding.defs#recommendedFollow"
+              }
+            },
+            "feeds": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.onboarding.defs#recommendedFeed"
+              }
+            },
+            "starterPacks": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.onboarding.defs#recommendedStarterPack"
+              }
+            },
+            "harmoniousNeighbors": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.intel.defs#communitySummary"
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        { "name": "AuthRequired" },
+        { "name": "InvalidRequest" },
+        { "name": "UpstreamUnavailable" }
+      ]
+    }
+  }
+}

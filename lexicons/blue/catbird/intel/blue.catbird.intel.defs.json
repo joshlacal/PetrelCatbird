@@ -1,0 +1,157 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.intel.defs",
+  "defs": {
+    "sceneGroup": {
+      "type": "object",
+      "description": "A human-curated macro scene grouping related subcultural communities.",
+      "required": [
+        "sceneId",
+        "sceneSlug",
+        "sceneTitle",
+        "macroCategory",
+        "symbolName",
+        "cardCount",
+        "totalEligibleAccounts",
+        "topCommunityIds"
+      ],
+      "properties": {
+        "sceneId": { "type": "integer", "minimum": 0 },
+        "sceneSlug": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "sceneTitle": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "macroCategory": {
+          "type": "string",
+          "knownValues": [
+            "arts_illustration",
+            "games_interactive",
+            "software_ai_tech",
+            "science_nature",
+            "music_audio",
+            "film_tv_anime",
+            "books_writing_comics",
+            "sports_motorsport",
+            "cities_craft_food",
+            "news_civics_history",
+            "queer_fandom_hangout",
+            "world_languages"
+          ]
+        },
+        "symbolName": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "cardCount": { "type": "integer", "minimum": 0 },
+        "totalEligibleAccounts": { "type": "integer", "minimum": 0 },
+        "topCommunityIds": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "communitySummary": {
+      "type": "object",
+      "description": "Summary card for an active community in the Catbird intelligence catalog. Contains only DIDs and AT-URI skeletons for viewer-aware client hydration.",
+      "required": [
+        "communityId",
+        "title",
+        "description",
+        "sceneId",
+        "sceneSlug",
+        "sceneTitle",
+        "macroCategory",
+        "symbolName",
+        "eligibleCount",
+        "postCoherenceBps",
+        "socialCoherenceBps",
+        "curatedListTags",
+        "neighborCommunityIds",
+        "samplePostUris",
+        "sampleAccountDids",
+        "feedGeneratorUris",
+        "starterPackUris"
+      ],
+      "properties": {
+        "communityId": { "type": "integer", "minimum": 0 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "description": { "type": "string", "minLength": 1, "maxLength": 600 },
+        "sceneId": { "type": "integer", "minimum": 0 },
+        "sceneSlug": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "sceneTitle": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "macroCategory": { "type": "string", "maxLength": 64 },
+        "symbolName": { "type": "string", "maxLength": 80 },
+        "eligibleCount": { "type": "integer", "minimum": 0 },
+        "postCoherenceBps": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "socialCoherenceBps": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "curatedListTags": {
+          "type": "array",
+          "items": { "type": "string", "maxLength": 80 }
+        },
+        "neighborCommunityIds": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0 }
+        },
+        "samplePostUris": {
+          "type": "array",
+          "items": { "type": "string", "format": "at-uri" }
+        },
+        "sampleAccountDids": {
+          "type": "array",
+          "items": { "type": "string", "format": "did" }
+        },
+        "feedGeneratorUris": {
+          "type": "array",
+          "items": { "type": "string", "format": "at-uri" }
+        },
+        "starterPackUris": {
+          "type": "array",
+          "items": { "type": "string", "format": "at-uri" }
+        }
+      }
+    },
+    "communityMemberRef": {
+      "type": "object",
+      "description": "Account membership and role metadata within a community. Profile bios and display names must be hydrated by the client.",
+      "required": [
+        "did",
+        "role",
+        "recommendedMode",
+        "whyPicked",
+        "rankScoreBps",
+        "repostShareBps",
+        "mediaShareBps",
+        "estimatedPostsPerWeek"
+      ],
+      "properties": {
+        "did": { "type": "string", "format": "did" },
+        "role": {
+          "type": "string",
+          "knownValues": [
+            "anchor_creator",
+            "visual_maker",
+            "conversationalist",
+            "scene_curator",
+            "project_or_studio"
+          ]
+        },
+        "recommendedMode": {
+          "type": "string",
+          "knownValues": ["follow_all", "originals_only", "topic_feed_only"]
+        },
+        "whyPicked": { "type": "string", "maxLength": 160 },
+        "rankScoreBps": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "repostShareBps": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "mediaShareBps": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "estimatedPostsPerWeek": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "samplePostUri": { "type": "string", "format": "at-uri" }
+      }
+    },
+    "postSkeletonItem": {
+      "type": "object",
+      "description": "Viewer-safe post AT-URI skeleton with community attribution.",
+      "required": ["post", "communityId", "communityTitle"],
+      "properties": {
+        "post": { "type": "string", "format": "at-uri" },
+        "communityId": { "type": "integer", "minimum": 0 },
+        "communityTitle": { "type": "string", "maxLength": 160 },
+        "authorRole": { "type": "string", "maxLength": 64 }
+      }
+    }
+  }
+}

@@ -43,6 +43,16 @@ public extension ATProtoClient.Blue {
 
         }
 
+        public var intel: Intel { Intel(networkService: networkService) }
+
+        public struct Intel: Sendable {
+            public let networkService: NetworkService
+            public init(networkService: NetworkService) {
+                self.networkService = networkService
+            }
+
+        }
+
         public var labyrinth: Labyrinth { Labyrinth(networkService: networkService) }
 
         public struct Labyrinth: Sendable {
@@ -56,6 +66,16 @@ public extension ATProtoClient.Blue {
         public var mlsDS: MlsDS { MlsDS(networkService: networkService) }
 
         public struct MlsDS: Sendable {
+            public let networkService: NetworkService
+            public init(networkService: NetworkService) {
+                self.networkService = networkService
+            }
+
+        }
+
+        public var onboarding: Onboarding { Onboarding(networkService: networkService) }
+
+        public struct Onboarding: Sendable {
             public let networkService: NetworkService
             public init(networkService: NetworkService) {
                 self.networkService = networkService

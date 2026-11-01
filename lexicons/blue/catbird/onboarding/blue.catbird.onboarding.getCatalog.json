@@ -1,0 +1,71 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.onboarding.getCatalog",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Fetch the onboarding scene catalog, featured diverse communities, and optional warm-start orbit communities seeded from accounts the user already follows.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "seedFollowDids": {
+            "type": "array",
+            "maxLength": 100,
+            "items": { "type": "string", "format": "did" }
+          },
+          "q": { "type": "string", "maxLength": 160 },
+          "macroCategory": { "type": "string", "maxLength": 64 },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "default": 80
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "catalogVersion",
+            "totalCommunities",
+            "scenes",
+            "featuredCommunities",
+            "warmStartCommunities"
+          ],
+          "properties": {
+            "catalogVersion": { "type": "string" },
+            "totalCommunities": { "type": "integer", "minimum": 0 },
+            "scenes": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.intel.defs#sceneGroup"
+              }
+            },
+            "featuredCommunities": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.intel.defs#communitySummary"
+              }
+            },
+            "warmStartCommunities": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.intel.defs#communitySummary"
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        { "name": "AuthRequired" },
+        { "name": "InvalidRequest" },
+        { "name": "UpstreamUnavailable" }
+      ]
+    }
+  }
+}

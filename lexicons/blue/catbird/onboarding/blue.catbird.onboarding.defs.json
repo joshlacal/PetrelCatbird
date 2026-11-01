@@ -1,0 +1,137 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.onboarding.defs",
+  "defs": {
+    "communitySelection": {
+      "type": "object",
+      "description": "A user-selected community card with 1x (picked) or 2x (heart-boosted) priority weight.",
+      "required": ["communityId", "weight"],
+      "properties": {
+        "communityId": { "type": "integer", "minimum": 0 },
+        "weight": { "type": "integer", "minimum": 1, "maximum": 2 }
+      }
+    },
+    "calibrationOption": {
+      "type": "object",
+      "required": ["communityId", "title", "subtitle", "sceneTitle", "samplePostUris"],
+      "properties": {
+        "communityId": { "type": "integer", "minimum": 0 },
+        "title": { "type": "string", "maxLength": 160 },
+        "subtitle": { "type": "string", "maxLength": 240 },
+        "sceneTitle": { "type": "string", "maxLength": 120 },
+        "samplePostUris": {
+          "type": "array",
+          "items": { "type": "string", "format": "at-uri" }
+        }
+      }
+    },
+    "calibrationSwipeCard": {
+      "type": "object",
+      "required": ["swipeId", "step", "kind", "prompt", "optionA", "optionB"],
+      "properties": {
+        "swipeId": { "type": "string", "maxLength": 80 },
+        "step": { "type": "integer", "minimum": 1 },
+        "kind": {
+          "type": "string",
+          "knownValues": ["collision_trap", "subscene_split", "taste_bridge"]
+        },
+        "prompt": { "type": "string", "maxLength": 240 },
+        "optionA": { "type": "ref", "ref": "#calibrationOption" },
+        "optionB": { "type": "ref", "ref": "#calibrationOption" }
+      }
+    },
+    "calibrationSwipeAnswer": {
+      "type": "object",
+      "required": ["swipeId", "communityA", "communityB", "choice"],
+      "properties": {
+        "swipeId": { "type": "string", "maxLength": 80 },
+        "communityA": { "type": "integer", "minimum": 0 },
+        "communityB": { "type": "integer", "minimum": 0 },
+        "choice": {
+          "type": "string",
+          "enum": ["a", "b", "both", "neither"]
+        }
+      }
+    },
+    "bundleControls": {
+      "type": "object",
+      "required": ["pace", "originalsOnlyForHeavyReposters"],
+      "properties": {
+        "pace": {
+          "type": "string",
+          "enum": ["calm", "balanced", "lively"]
+        },
+        "originalsOnlyForHeavyReposters": { "type": "boolean" }
+      }
+    },
+    "recommendedFollow": {
+      "type": "object",
+      "description": "A transparent account recommendation in the solved starting lineup. Client applies follow and hideReposts only upon explicit user confirmation.",
+      "required": [
+        "did",
+        "communityId",
+        "communityTitle",
+        "role",
+        "deliveryMode",
+        "hideReposts",
+        "whyPicked",
+        "estimatedPostsPerWeek"
+      ],
+      "properties": {
+        "did": { "type": "string", "format": "did" },
+        "communityId": { "type": "integer", "minimum": 0 },
+        "communityTitle": { "type": "string", "maxLength": 160 },
+        "role": { "type": "string", "maxLength": 64 },
+        "deliveryMode": {
+          "type": "string",
+          "knownValues": ["follow_all", "originals_only", "topic_feed_only"]
+        },
+        "hideReposts": { "type": "boolean" },
+        "whyPicked": { "type": "string", "maxLength": 160 },
+        "estimatedPostsPerWeek": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "samplePostUri": { "type": "string", "format": "at-uri" }
+      }
+    },
+    "recommendedFeed": {
+      "type": "object",
+      "required": ["uri", "communityId", "communityTitle"],
+      "properties": {
+        "uri": { "type": "string", "format": "at-uri" },
+        "communityId": { "type": "integer", "minimum": 0 },
+        "communityTitle": { "type": "string", "maxLength": 160 }
+      }
+    },
+    "recommendedStarterPack": {
+      "type": "object",
+      "required": ["uri", "communityId", "communityTitle"],
+      "properties": {
+        "uri": { "type": "string", "format": "at-uri" },
+        "communityId": { "type": "integer", "minimum": 0 },
+        "communityTitle": { "type": "string", "maxLength": 160 }
+      }
+    },
+    "bundleSummary": {
+      "type": "object",
+      "required": [
+        "totalFollows",
+        "anchorCount",
+        "makerCount",
+        "conversationalCount",
+        "curatorCount",
+        "originalsOnlyCount",
+        "estimatedDailyPosts",
+        "coveredCommunities"
+      ],
+      "properties": {
+        "totalFollows": { "type": "integer", "minimum": 0 },
+        "anchorCount": { "type": "integer", "minimum": 0 },
+        "makerCount": { "type": "integer", "minimum": 0 },
+        "conversationalCount": { "type": "integer", "minimum": 0 },
+        "curatorCount": { "type": "integer", "minimum": 0 },
+        "originalsOnlyCount": { "type": "integer", "minimum": 0 },
+        "estimatedDailyPosts": { "type": "integer", "minimum": 0 },
+        "coveredCommunities": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

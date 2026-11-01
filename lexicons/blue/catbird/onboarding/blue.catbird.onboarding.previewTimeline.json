@@ -1,0 +1,68 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.onboarding.previewTimeline",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Generate a viewer-safe post AT-URI skeleton preview of what the user's timeline will feel like before committing any follows.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["selections"],
+          "properties": {
+            "selections": {
+              "type": "array",
+              "maxLength": 24,
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.onboarding.defs#communitySelection"
+              }
+            },
+            "swipes": {
+              "type": "array",
+              "maxLength": 16,
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.onboarding.defs#calibrationSwipeAnswer"
+              }
+            },
+            "controls": {
+              "type": "ref",
+              "ref": "blue.catbird.onboarding.defs#bundleControls"
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 40,
+              "default": 20
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["catalogVersion", "items", "estimatedDailyPosts"],
+          "properties": {
+            "catalogVersion": { "type": "string" },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.intel.defs#postSkeletonItem"
+              }
+            },
+            "estimatedDailyPosts": { "type": "integer", "minimum": 0 }
+          }
+        }
+      },
+      "errors": [
+        { "name": "AuthRequired" },
+        { "name": "InvalidRequest" },
+        { "name": "UpstreamUnavailable" }
+      ]
+    }
+  }
+}
