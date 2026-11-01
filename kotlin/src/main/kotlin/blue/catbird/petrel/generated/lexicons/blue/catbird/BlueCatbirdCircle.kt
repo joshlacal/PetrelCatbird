@@ -14,16 +14,16 @@ import kotlinx.coroutines.flow.*
 
 object BlueCatbirdCircleDefs {
     const val TYPE_IDENTIFIER = "blue.catbird.circle"
+
+    data class SpaceDeclarationDescriptor(
+        val nsid: String,
+        val keyType: String,
+        val name: String,
+        val collections: List<String>,
+    )
+
+    val spaceDeclaration = SpaceDeclarationDescriptor(
+        nsid = "blue.catbird.circle", keyType = "tid",
+        name = "Catbird Circle", collections = listOf("blue.catbird.circle.metadata", "app.bsky.feed.post", "app.bsky.feed.like"),
+    )
 }
-
-data class SpaceDeclarationDescriptor(
-    val nsid: String,
-    val keyType: String,
-    val name: String,
-    val collections: List<String>,
-)
-
-val spaceDeclaration = SpaceDeclarationDescriptor(
-    nsid = "blue.catbird.circle", keyType = "tid",
-    name = "Catbird Circle", collections = listOf("blue.catbird.circle.metadata", "app.bsky.feed.post", "app.bsky.feed.like"),
-)

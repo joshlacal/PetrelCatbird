@@ -14,16 +14,16 @@ import kotlinx.coroutines.flow.*
 
 object BlueCatbirdLabyrinthConversationDefs {
     const val TYPE_IDENTIFIER = "blue.catbird.labyrinth.conversation"
+
+    data class SpaceDeclarationDescriptor(
+        val nsid: String,
+        val keyType: String,
+        val name: String,
+        val collections: List<String>,
+    )
+
+    val spaceDeclaration = SpaceDeclarationDescriptor(
+        nsid = "blue.catbird.labyrinth.conversation", keyType = "any",
+        name = "Catbird chat history", collections = listOf("blue.catbird.labyrinth.batch", "blue.catbird.labyrinth.mek", "blue.catbird.labyrinth.attachmentManifest"),
+    )
 }
-
-data class SpaceDeclarationDescriptor(
-    val nsid: String,
-    val keyType: String,
-    val name: String,
-    val collections: List<String>,
-)
-
-val spaceDeclaration = SpaceDeclarationDescriptor(
-    nsid = "blue.catbird.labyrinth.conversation", keyType = "any",
-    name = "Catbird chat history", collections = listOf("blue.catbird.labyrinth.batch", "blue.catbird.labyrinth.mek", "blue.catbird.labyrinth.attachmentManifest"),
-)

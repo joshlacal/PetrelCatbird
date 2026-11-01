@@ -14,16 +14,16 @@ import kotlinx.coroutines.flow.*
 
 object BlueCatbirdLabyrinthMailboxDefs {
     const val TYPE_IDENTIFIER = "blue.catbird.labyrinth.mailbox"
+
+    data class SpaceDeclarationDescriptor(
+        val nsid: String,
+        val keyType: String,
+        val name: String,
+        val collections: List<String>,
+    )
+
+    val spaceDeclaration = SpaceDeclarationDescriptor(
+        nsid = "blue.catbird.labyrinth.mailbox", keyType = "literal:self",
+        name = "Catbird message backup", collections = listOf("blue.catbird.labyrinth.device", "blue.catbird.labyrinth.virtualDevice", "blue.catbird.labyrinth.epoch", "blue.catbird.labyrinth.epochMember", "blue.catbird.labyrinth.otcSession", "blue.catbird.labyrinth.ownerBatch", "blue.catbird.labyrinth.attachmentManifest"),
+    )
 }
-
-data class SpaceDeclarationDescriptor(
-    val nsid: String,
-    val keyType: String,
-    val name: String,
-    val collections: List<String>,
-)
-
-val spaceDeclaration = SpaceDeclarationDescriptor(
-    nsid = "blue.catbird.labyrinth.mailbox", keyType = "literal:self",
-    name = "Catbird message backup", collections = listOf("blue.catbird.labyrinth.device", "blue.catbird.labyrinth.virtualDevice", "blue.catbird.labyrinth.epoch", "blue.catbird.labyrinth.epochMember", "blue.catbird.labyrinth.otcSession", "blue.catbird.labyrinth.ownerBatch", "blue.catbird.labyrinth.attachmentManifest"),
-)
