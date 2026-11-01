@@ -1,0 +1,63 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.intel.getCommunity",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Fetch full role-classified member DIDs, sample post AT-URI skeletons, and harmonious neighbor communities for one community.",
+      "parameters": {
+        "type": "params",
+        "required": ["communityId"],
+        "properties": {
+          "communityId": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "catalogVersion",
+            "community",
+            "members",
+            "samplePosts",
+            "neighborCommunities"
+          ],
+          "properties": {
+            "catalogVersion": { "type": "string" },
+            "community": {
+              "type": "ref",
+              "ref": "blue.catbird.intel.defs#communitySummary"
+            },
+            "members": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.intel.defs#communityMemberRef"
+              }
+            },
+            "samplePosts": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.intel.defs#postSkeletonItem"
+              }
+            },
+            "neighborCommunities": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.intel.defs#communitySummary"
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        { "name": "AuthRequired" },
+        { "name": "CommunityNotFound" },
+        { "name": "UpstreamUnavailable" }
+      ]
+    }
+  }
+}

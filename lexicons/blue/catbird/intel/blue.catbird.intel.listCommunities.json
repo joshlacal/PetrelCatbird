@@ -1,0 +1,60 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.intel.listCommunities",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List or hybrid-search communities and macro scenes in the Catbird intelligence catalog.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "q": {
+            "type": "string",
+            "maxLength": 160,
+            "description": "Optional hybrid concept, subcultural keyword, or topic search query."
+          },
+          "macroCategory": { "type": "string", "maxLength": 64 },
+          "sceneSlug": { "type": "string", "maxLength": 80 },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "default": 60
+          },
+          "cursor": { "type": "string", "maxLength": 64 }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["catalogVersion", "totalCount", "scenes", "communities"],
+          "properties": {
+            "catalogVersion": { "type": "string" },
+            "totalCount": { "type": "integer", "minimum": 0 },
+            "cursor": { "type": "string" },
+            "scenes": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.intel.defs#sceneGroup"
+              }
+            },
+            "communities": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.intel.defs#communitySummary"
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        { "name": "AuthRequired" },
+        { "name": "InvalidRequest" },
+        { "name": "UpstreamUnavailable" }
+      ]
+    }
+  }
+}
