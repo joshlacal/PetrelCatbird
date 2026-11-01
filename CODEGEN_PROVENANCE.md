@@ -13,8 +13,9 @@ The corresponding Petrel core uses the exact October 29 upstream Spaces alpha
 bytes against its recorded upstream archive. No overlay schema references a
 core definition that release changed, so regenerating this overlay against it
 reproduced the generated Swift and Kotlin byte for byte. This overlay's
-189 JSON files have aggregate SHA-256
-`a627cf74bcf876c954f79cbc4b3cab6618a1eed2401385655310575bf63e853f`.
+197 JSON files (including the 8 `blue.catbird.intel.*` and
+`blue.catbird.onboarding.*` Community Intelligence schemas) have aggregate
+SHA-256 `511a42dc42aa7f450032eeca1672d455d31a843d28059770bffd979fb460192d`.
 The aggregate hashes sorted lines of each file's SHA-256, two spaces, its path
 relative to `lexicons`, and LF. `Package.swift` pins a published Petrel revision
 so package resolution does not depend on the neighboring checkout.
@@ -40,7 +41,7 @@ implementations. Broader simplification/argument-rewriting rules in this pinned
 formatter take minutes on the complete private chat definition; the bounded
 pass finishes in seconds and is part of the reproducible projection.
 
-The full generation and formatter roundtrip reproduced all **381** generated
+The full generation and formatter roundtrip reproduced all **397** generated
 files with identical inventory and bytes. The shared Rust projection lives in
 `catbird-atproto`; its maintained generation wrapper handles named-byte codecs
 and raw relay output without editing generated declarations. Wire contract tests

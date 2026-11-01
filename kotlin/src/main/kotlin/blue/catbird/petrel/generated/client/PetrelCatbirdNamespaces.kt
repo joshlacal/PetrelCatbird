@@ -16,8 +16,10 @@ class BlueCatbirdNamespace(val client: ATProtoClient) {
     val circle: BlueCatbirdCircleNamespace get() = BlueCatbirdCircleNamespace(client)
     val bskychat: BlueCatbirdBskychatNamespace get() = BlueCatbirdBskychatNamespace(client)
     val chat: BlueCatbirdChatNamespace get() = BlueCatbirdChatNamespace(client)
+    val intel: BlueCatbirdIntelNamespace get() = BlueCatbirdIntelNamespace(client)
     val labyrinth: BlueCatbirdLabyrinthNamespace get() = BlueCatbirdLabyrinthNamespace(client)
     val mlsDS: BlueCatbirdMlsDSNamespace get() = BlueCatbirdMlsDSNamespace(client)
+    val onboarding: BlueCatbirdOnboardingNamespace get() = BlueCatbirdOnboardingNamespace(client)
 }
 
 class BlueCatbirdCircleNamespace(val client: ATProtoClient) {
@@ -29,10 +31,16 @@ class BlueCatbirdBskychatNamespace(val client: ATProtoClient) {
 class BlueCatbirdChatNamespace(val client: ATProtoClient) {
 }
 
+class BlueCatbirdIntelNamespace(val client: ATProtoClient) {
+}
+
 class BlueCatbirdLabyrinthNamespace(val client: ATProtoClient) {
 }
 
 class BlueCatbirdMlsDSNamespace(val client: ATProtoClient) {
+}
+
+class BlueCatbirdOnboardingNamespace(val client: ATProtoClient) {
 }
 
 class PlaceNamespace(val client: ATProtoClient) {
