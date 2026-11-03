@@ -7008,7 +7008,21 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     }
 
     /**
-     * [I13] Sequencer-recorded control entry indicating that deletedDid deleted their account and removed their writer repo from the conversation Space.
+     * [I13] The sequencer's attestation that it sequenced one exact accountDeletedEntry, signed with its dedicated receipt key and never its service-auth key. sequencerDid equals the entry's sequencerDid and keyId is exactly sequencerDid#mls-receipt-1, resolved from the sequencer's DID document. signature is low-S ES256 r||s over UTF8(catbird-mls-account-deletion-v1\0) followed by, for each of the entry's sequencerDid, conversationId, deletedDid, seq as decimal text, entryId and receivedAt (the deletion instant), its u32 big-endian UTF-8 byte length and its UTF-8 bytes. Clients verify it before hiding deletedDid's restored history.
+     */
+    @Serializable
+    data class BlueCatbirdChatDefsAccountDeletionAuthority(
+        @SerialName("sequencerDid")
+        val sequencerDid: BlueCatbirdChatDefsBareDid,        @SerialName("keyId")
+        val keyId: String,        @SerialName("signature")
+        val signature: Bytes    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsAccountDeletionAuthority"
+        }
+    }
+
+    /**
+     * [I13] Sequencer-recorded control entry indicating that deletedDid deleted their account and removed their writer repo from the conversation Space. sequencerAuthority is the sequencer's signed evidence of exactly this entry; every home stores and returns it verbatim.
      */
     @Serializable
     data class BlueCatbirdChatDefsAccountDeletedEntry(
@@ -7017,7 +7031,8 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
         val seq: Int,        @SerialName("deletedDid")
         val deletedDid: BlueCatbirdChatDefsBareDid,        @SerialName("sequencerDid")
-        val sequencerDid: BlueCatbirdChatDefsBareDid,        @SerialName("signature")
+        val sequencerDid: BlueCatbirdChatDefsBareDid,        @SerialName("sequencerAuthority")
+        val sequencerAuthority: BlueCatbirdChatDefsAccountDeletionAuthority,        @SerialName("signature")
         val signature: Bytes? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {

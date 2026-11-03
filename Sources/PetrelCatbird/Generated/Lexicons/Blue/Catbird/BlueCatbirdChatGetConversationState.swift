@@ -29,6 +29,8 @@ public struct BlueCatbirdChatGetConversationState {
 
         public let pendingLeaveRequests: [BlueCatbirdChatDefs.LeaveRequestView]
 
+        public let accountDeletions: [BlueCatbirdChatDefs.AccountDeletedEntry]
+
         public let pendingLeafRecoveryRequests: [BlueCatbirdChatDefs.LeafRecoveryView]?
 
         // Standard public initializer
@@ -40,6 +42,8 @@ public struct BlueCatbirdChatGetConversationState {
 
             pendingLeaveRequests: [BlueCatbirdChatDefs.LeaveRequestView],
 
+            accountDeletions: [BlueCatbirdChatDefs.AccountDeletedEntry],
+
             pendingLeafRecoveryRequests: [BlueCatbirdChatDefs.LeafRecoveryView]? = nil
 
         ) {
@@ -49,6 +53,8 @@ public struct BlueCatbirdChatGetConversationState {
             self.pendingResetRequests = pendingResetRequests
 
             self.pendingLeaveRequests = pendingLeaveRequests
+
+            self.accountDeletions = accountDeletions
 
             self.pendingLeafRecoveryRequests = pendingLeafRecoveryRequests
 
@@ -63,6 +69,8 @@ public struct BlueCatbirdChatGetConversationState {
             self.pendingResetRequests = try container.decode([BlueCatbirdChatDefs.ResetRequestView].self, forKey: .pendingResetRequests)
 
             self.pendingLeaveRequests = try container.decode([BlueCatbirdChatDefs.LeaveRequestView].self, forKey: .pendingLeaveRequests)
+
+            self.accountDeletions = try container.decode([BlueCatbirdChatDefs.AccountDeletedEntry].self, forKey: .accountDeletions)
 
             do {
                 self.pendingLeafRecoveryRequests = try container.decodeIfPresent([BlueCatbirdChatDefs.LeafRecoveryView].self, forKey: .pendingLeafRecoveryRequests)
@@ -84,6 +92,8 @@ public struct BlueCatbirdChatGetConversationState {
 
             try container.encode(pendingLeaveRequests, forKey: .pendingLeaveRequests)
 
+            try container.encode(accountDeletions, forKey: .accountDeletions)
+
             // Encode optional property even if it's an empty array
             try container.encodeIfPresent(pendingLeafRecoveryRequests, forKey: .pendingLeafRecoveryRequests)
 
@@ -102,6 +112,9 @@ public struct BlueCatbirdChatGetConversationState {
             let pendingLeaveRequestsValue = try pendingLeaveRequests.toCBORValue()
             map = map.adding(key: "pendingLeaveRequests", value: pendingLeaveRequestsValue)
 
+            let accountDeletionsValue = try accountDeletions.toCBORValue()
+            map = map.adding(key: "accountDeletions", value: accountDeletionsValue)
+
             if let value = pendingLeafRecoveryRequests {
                 // Encode optional property even if it's an empty array for CBOR
                 let pendingLeafRecoveryRequestsValue = try value.toCBORValue()
@@ -116,6 +129,7 @@ public struct BlueCatbirdChatGetConversationState {
             case state
             case pendingResetRequests
             case pendingLeaveRequests
+            case accountDeletions
             case pendingLeafRecoveryRequests
         }
 

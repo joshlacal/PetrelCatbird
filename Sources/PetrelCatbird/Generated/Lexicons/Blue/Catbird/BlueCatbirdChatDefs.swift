@@ -19840,6 +19840,94 @@ public struct BlueCatbirdChatDefs {
         }
     }
 
+    public struct AccountDeletionAuthority: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#accountDeletionAuthority"
+        public let sequencerDid: BareDid
+        public let keyId: String
+        public let signature: Bytes
+
+        public init(
+            sequencerDid: BareDid, keyId: String, signature: Bytes
+        ) {
+            self.sequencerDid = sequencerDid
+            self.keyId = keyId
+            self.signature = signature
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            do {
+                self.sequencerDid = try container.decode(BareDid.self, forKey: .sequencerDid)
+            } catch {
+                LogManager.logError("Decoding error for required property 'sequencerDid': \(error)")
+                throw error
+            }
+            do {
+                self.keyId = try container.decode(String.self, forKey: .keyId)
+            } catch {
+                LogManager.logError("Decoding error for required property 'keyId': \(error)")
+                throw error
+            }
+            do {
+                self.signature = try container.decode(Bytes.self, forKey: .signature)
+            } catch {
+                LogManager.logError("Decoding error for required property 'signature': \(error)")
+                throw error
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+            try container.encode(sequencerDid, forKey: .sequencerDid)
+            try container.encode(keyId, forKey: .keyId)
+            try container.encode(signature, forKey: .signature)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(sequencerDid)
+            hasher.combine(keyId)
+            hasher.combine(signature)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if sequencerDid != other.sequencerDid {
+                return false
+            }
+            if keyId != other.keyId {
+                return false
+            }
+            if signature != other.signature {
+                return false
+            }
+            return true
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            map = map.adding(key: "$type", value: Self.typeIdentifier)
+            let sequencerDidValue = try sequencerDid.toCBORValue()
+            map = map.adding(key: "sequencerDid", value: sequencerDidValue)
+            let keyIdValue = try keyId.toCBORValue()
+            map = map.adding(key: "keyId", value: keyIdValue)
+            let signatureValue = try signature.toCBORValue()
+            map = map.adding(key: "signature", value: signatureValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case typeIdentifier = "$type"
+            case sequencerDid
+            case keyId
+            case signature
+        }
+    }
+
     public struct AccountDeletedEntry: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.chat.defs#accountDeletedEntry"
         public let entryId: OperationId
@@ -19847,17 +19935,19 @@ public struct BlueCatbirdChatDefs {
         public let seq: Int
         public let deletedDid: BareDid
         public let sequencerDid: BareDid
+        public let sequencerAuthority: AccountDeletionAuthority
         public let signature: Bytes?
         public let receivedAt: CanonicalDatetime
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, deletedDid: BareDid, sequencerDid: BareDid, signature: Bytes? = nil, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, deletedDid: BareDid, sequencerDid: BareDid, sequencerAuthority: AccountDeletionAuthority, signature: Bytes? = nil, receivedAt: CanonicalDatetime
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.deletedDid = deletedDid
             self.sequencerDid = sequencerDid
+            self.sequencerAuthority = sequencerAuthority
             self.signature = signature
             self.receivedAt = receivedAt
         }
@@ -19895,6 +19985,12 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sequencerAuthority = try container.decode(AccountDeletionAuthority.self, forKey: .sequencerAuthority)
+            } catch {
+                LogManager.logError("Decoding error for required property 'sequencerAuthority': \(error)")
+                throw error
+            }
+            do {
                 self.signature = try container.decodeIfPresent(Bytes.self, forKey: .signature)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
@@ -19918,6 +20014,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(seq, forKey: .seq)
             try container.encode(deletedDid, forKey: .deletedDid)
             try container.encode(sequencerDid, forKey: .sequencerDid)
+            try container.encode(sequencerAuthority, forKey: .sequencerAuthority)
             try container.encodeIfPresent(signature, forKey: .signature)
             try container.encode(receivedAt, forKey: .receivedAt)
         }
@@ -19928,6 +20025,7 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(seq)
             hasher.combine(deletedDid)
             hasher.combine(sequencerDid)
+            hasher.combine(sequencerAuthority)
             if let value = signature {
                 hasher.combine(value)
             } else {
@@ -19951,6 +20049,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if sequencerDid != other.sequencerDid {
+                return false
+            }
+            if sequencerAuthority != other.sequencerAuthority {
                 return false
             }
             if signature != other.signature {
@@ -19979,6 +20080,8 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "deletedDid", value: deletedDidValue)
             let sequencerDidValue = try sequencerDid.toCBORValue()
             map = map.adding(key: "sequencerDid", value: sequencerDidValue)
+            let sequencerAuthorityValue = try sequencerAuthority.toCBORValue()
+            map = map.adding(key: "sequencerAuthority", value: sequencerAuthorityValue)
             if let value = signature {
                 let signatureValue = try value.toCBORValue()
                 map = map.adding(key: "signature", value: signatureValue)
@@ -19995,6 +20098,7 @@ public struct BlueCatbirdChatDefs {
             case seq
             case deletedDid
             case sequencerDid
+            case sequencerAuthority
             case signature
             case receivedAt
         }
