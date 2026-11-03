@@ -26454,18 +26454,20 @@ public struct BlueCatbirdChatDefs {
         public let entryId: OperationId
         public let conversationId: OperationId
         public let seq: Int
-        public let signedRequest: SignedDirectRequestPublication
+        public let signedRequest: SignedDirectRequestPublication?
+        public let payloadPruned: Bool?
         public let receivedAt: CanonicalDatetime
         public let sequencerReceipt: SequencerReceipt
         public let publicationReceipt: DirectRequestEntryPublicationReceiptUnion
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedDirectRequestPublication, receivedAt: CanonicalDatetime, sequencerReceipt: SequencerReceipt, publicationReceipt: DirectRequestEntryPublicationReceiptUnion
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedDirectRequestPublication? = nil, payloadPruned: Bool? = nil, receivedAt: CanonicalDatetime, sequencerReceipt: SequencerReceipt, publicationReceipt: DirectRequestEntryPublicationReceiptUnion
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
+            self.payloadPruned = payloadPruned
             self.receivedAt = receivedAt
             self.sequencerReceipt = sequencerReceipt
             self.publicationReceipt = publicationReceipt
@@ -26492,10 +26494,20 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
-                self.signedRequest = try container.decode(SignedDirectRequestPublication.self, forKey: .signedRequest)
+                self.signedRequest = try container.decodeIfPresent(SignedDirectRequestPublication.self, forKey: .signedRequest)
             } catch {
-                LogManager.logError("Decoding error for required property 'signedRequest': \(error)")
-                throw error
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'signedRequest' — degrading to nil: \(error)")
+                self.signedRequest = nil
+            }
+            do {
+                self.payloadPruned = try container.decodeIfPresent(Bool.self, forKey: .payloadPruned)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'payloadPruned' — degrading to nil: \(error)")
+                self.payloadPruned = nil
             }
             do {
                 self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
@@ -26523,7 +26535,8 @@ public struct BlueCatbirdChatDefs {
             try container.encode(entryId, forKey: .entryId)
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(seq, forKey: .seq)
-            try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(payloadPruned, forKey: .payloadPruned)
             try container.encode(receivedAt, forKey: .receivedAt)
             try container.encode(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encode(publicationReceipt, forKey: .publicationReceipt)
@@ -26533,7 +26546,16 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(entryId)
             hasher.combine(conversationId)
             hasher.combine(seq)
-            hasher.combine(signedRequest)
+            if let value = signedRequest {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = payloadPruned {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(receivedAt)
             hasher.combine(sequencerReceipt)
             hasher.combine(publicationReceipt)
@@ -26551,6 +26573,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if signedRequest != other.signedRequest {
+                return false
+            }
+            if payloadPruned != other.payloadPruned {
                 return false
             }
             if receivedAt != other.receivedAt {
@@ -26578,8 +26603,14 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "conversationId", value: conversationIdValue)
             let seqValue = try seq.toCBORValue()
             map = map.adding(key: "seq", value: seqValue)
-            let signedRequestValue = try signedRequest.toCBORValue()
-            map = map.adding(key: "signedRequest", value: signedRequestValue)
+            if let value = signedRequest {
+                let signedRequestValue = try value.toCBORValue()
+                map = map.adding(key: "signedRequest", value: signedRequestValue)
+            }
+            if let value = payloadPruned {
+                let payloadPrunedValue = try value.toCBORValue()
+                map = map.adding(key: "payloadPruned", value: payloadPrunedValue)
+            }
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
             let sequencerReceiptValue = try sequencerReceipt.toCBORValue()
@@ -26595,6 +26626,7 @@ public struct BlueCatbirdChatDefs {
             case conversationId
             case seq
             case signedRequest
+            case payloadPruned
             case receivedAt
             case sequencerReceipt
             case publicationReceipt

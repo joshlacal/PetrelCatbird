@@ -7974,7 +7974,6 @@
         "entryId",
         "conversationId",
         "seq",
-        "signedRequest",
         "receivedAt",
         "sequencerReceipt",
         "publicationReceipt"
@@ -7996,6 +7995,10 @@
         "signedRequest": {
           "type": "ref",
           "ref": "#signedDirectRequestPublication"
+        },
+        "payloadPruned": {
+          "type": "boolean",
+          "description": "True iff signedRequest is omitted because the opening ciphertext was pruned: every frozen-audience recipient device acknowledged it, its sender's account was deleted, the request expired, or it reached the 30-day retention ceiling; all other fields remain verbatim."
         },
         "receivedAt": {
           "type": "ref",

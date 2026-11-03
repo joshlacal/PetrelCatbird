@@ -7730,7 +7730,8 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
         val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedDirectRequestPublication,        @SerialName("receivedAt")
+        val signedRequest: BlueCatbirdChatDefsSignedDirectRequestPublication? = null,/** True iff signedRequest is omitted because the opening ciphertext was pruned: every frozen-audience recipient device acknowledged it, its sender's account was deleted, the request expired, or it reached the 30-day retention ceiling; all other fields remain verbatim. */        @SerialName("payloadPruned")
+        val payloadPruned: Boolean? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("sequencerReceipt")
         val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt,/** Authoritative signed published outcome, including its mandatory I13 proof, available before recipient Welcome import. */        @SerialName("publicationReceipt")
         val publicationReceipt: BlueCatbirdChatDefsDirectRequestEntryPublicationReceiptUnion    ) {
