@@ -23015,14 +23015,16 @@ public struct BlueCatbirdChatDefs {
         public let contextHash: Bytes
         public let coordinates: ConversationCoordinates
         public let messageId: OperationId
+        public let archiveCommitment: Bytes
 
         public init(
-            protocolVersion: String, contextHash: Bytes, coordinates: ConversationCoordinates, messageId: OperationId
+            protocolVersion: String, contextHash: Bytes, coordinates: ConversationCoordinates, messageId: OperationId, archiveCommitment: Bytes
         ) {
             self.protocolVersion = protocolVersion
             self.contextHash = contextHash
             self.coordinates = coordinates
             self.messageId = messageId
+            self.archiveCommitment = archiveCommitment
         }
 
         public init(from decoder: Decoder) throws {
@@ -23051,6 +23053,12 @@ public struct BlueCatbirdChatDefs {
                 LogManager.logError("Decoding error for required property 'messageId': \(error)")
                 throw error
             }
+            do {
+                self.archiveCommitment = try container.decode(Bytes.self, forKey: .archiveCommitment)
+            } catch {
+                LogManager.logError("Decoding error for required property 'archiveCommitment': \(error)")
+                throw error
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -23060,6 +23068,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(contextHash, forKey: .contextHash)
             try container.encode(coordinates, forKey: .coordinates)
             try container.encode(messageId, forKey: .messageId)
+            try container.encode(archiveCommitment, forKey: .archiveCommitment)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -23067,6 +23076,7 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(contextHash)
             hasher.combine(coordinates)
             hasher.combine(messageId)
+            hasher.combine(archiveCommitment)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
@@ -23081,6 +23091,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if messageId != other.messageId {
+                return false
+            }
+            if archiveCommitment != other.archiveCommitment {
                 return false
             }
             return true
@@ -23101,6 +23114,8 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "coordinates", value: coordinatesValue)
             let messageIdValue = try messageId.toCBORValue()
             map = map.adding(key: "messageId", value: messageIdValue)
+            let archiveCommitmentValue = try archiveCommitment.toCBORValue()
+            map = map.adding(key: "archiveCommitment", value: archiveCommitmentValue)
             return map
         }
 
@@ -23110,6 +23125,7 @@ public struct BlueCatbirdChatDefs {
             case contextHash
             case coordinates
             case messageId
+            case archiveCommitment
         }
     }
 
@@ -23679,9 +23695,10 @@ public struct BlueCatbirdChatDefs {
         public let idempotencyKey: OperationId
         public let signedAt: CanonicalDatetime
         public let preparationRequestDigest: Bytes
+        public let archiveCommitment: Bytes
 
         public init(
-            signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, requestId: OperationId, firstMessageId: OperationId, conversationId: OperationId, recipientDid: BareDid, origin: DirectRequestOrigin, profile: DirectRequestProfile, preparationDigest: Bytes, contextHash: Bytes, next: ConversationCoordinates, importUntil: CanonicalDatetime, artifacts: DirectRequestBootstrapArtifacts, idempotencyKey: OperationId, signedAt: CanonicalDatetime, preparationRequestDigest: Bytes
+            signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, requestId: OperationId, firstMessageId: OperationId, conversationId: OperationId, recipientDid: BareDid, origin: DirectRequestOrigin, profile: DirectRequestProfile, preparationDigest: Bytes, contextHash: Bytes, next: ConversationCoordinates, importUntil: CanonicalDatetime, artifacts: DirectRequestBootstrapArtifacts, idempotencyKey: OperationId, signedAt: CanonicalDatetime, preparationRequestDigest: Bytes, archiveCommitment: Bytes
         ) {
             self.signatureDomain = signatureDomain
             self.protocolVersion = protocolVersion
@@ -23703,6 +23720,7 @@ public struct BlueCatbirdChatDefs {
             self.idempotencyKey = idempotencyKey
             self.signedAt = signedAt
             self.preparationRequestDigest = preparationRequestDigest
+            self.archiveCommitment = archiveCommitment
         }
 
         public init(from decoder: Decoder) throws {
@@ -23827,6 +23845,12 @@ public struct BlueCatbirdChatDefs {
                 LogManager.logError("Decoding error for required property 'preparationRequestDigest': \(error)")
                 throw error
             }
+            do {
+                self.archiveCommitment = try container.decode(Bytes.self, forKey: .archiveCommitment)
+            } catch {
+                LogManager.logError("Decoding error for required property 'archiveCommitment': \(error)")
+                throw error
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -23852,6 +23876,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(idempotencyKey, forKey: .idempotencyKey)
             try container.encode(signedAt, forKey: .signedAt)
             try container.encode(preparationRequestDigest, forKey: .preparationRequestDigest)
+            try container.encode(archiveCommitment, forKey: .archiveCommitment)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -23875,6 +23900,7 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(idempotencyKey)
             hasher.combine(signedAt)
             hasher.combine(preparationRequestDigest)
+            hasher.combine(archiveCommitment)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
@@ -23939,6 +23965,9 @@ public struct BlueCatbirdChatDefs {
             if preparationRequestDigest != other.preparationRequestDigest {
                 return false
             }
+            if archiveCommitment != other.archiveCommitment {
+                return false
+            }
             return true
         }
 
@@ -23989,6 +24018,8 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "signedAt", value: signedAtValue)
             let preparationRequestDigestValue = try preparationRequestDigest.toCBORValue()
             map = map.adding(key: "preparationRequestDigest", value: preparationRequestDigestValue)
+            let archiveCommitmentValue = try archiveCommitment.toCBORValue()
+            map = map.adding(key: "archiveCommitment", value: archiveCommitmentValue)
             return map
         }
 
@@ -24014,6 +24045,7 @@ public struct BlueCatbirdChatDefs {
             case idempotencyKey
             case signedAt
             case preparationRequestDigest
+            case archiveCommitment
         }
     }
 
@@ -24823,9 +24855,10 @@ public struct BlueCatbirdChatDefs {
         public let actorKeyId: KeyId
         public let authGeneration: Int
         public let requestKind: String
+        public let sequencerReceipt: SequencerReceipt
 
         public init(
-            requestId: OperationId, requestDigest: Bytes, recordedAt: CanonicalDatetime, conversationId: OperationId, firstMessageId: OperationId, coordinates: ConversationCoordinates, preparationRequestDigest: Bytes, actorDid: BareDid, actorDeviceId: DeviceId, actorKeyId: KeyId, authGeneration: Int, requestKind: String
+            requestId: OperationId, requestDigest: Bytes, recordedAt: CanonicalDatetime, conversationId: OperationId, firstMessageId: OperationId, coordinates: ConversationCoordinates, preparationRequestDigest: Bytes, actorDid: BareDid, actorDeviceId: DeviceId, actorKeyId: KeyId, authGeneration: Int, requestKind: String, sequencerReceipt: SequencerReceipt
         ) {
             self.requestId = requestId
             self.requestDigest = requestDigest
@@ -24839,6 +24872,7 @@ public struct BlueCatbirdChatDefs {
             self.actorKeyId = actorKeyId
             self.authGeneration = authGeneration
             self.requestKind = requestKind
+            self.sequencerReceipt = sequencerReceipt
         }
 
         public init(from decoder: Decoder) throws {
@@ -24915,6 +24949,12 @@ public struct BlueCatbirdChatDefs {
                 LogManager.logError("Decoding error for required property 'requestKind': \(error)")
                 throw error
             }
+            do {
+                self.sequencerReceipt = try container.decode(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'sequencerReceipt': \(error)")
+                throw error
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -24932,6 +24972,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(actorKeyId, forKey: .actorKeyId)
             try container.encode(authGeneration, forKey: .authGeneration)
             try container.encode(requestKind, forKey: .requestKind)
+            try container.encode(sequencerReceipt, forKey: .sequencerReceipt)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -24947,6 +24988,7 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(actorKeyId)
             hasher.combine(authGeneration)
             hasher.combine(requestKind)
+            hasher.combine(sequencerReceipt)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
@@ -24987,6 +25029,9 @@ public struct BlueCatbirdChatDefs {
             if requestKind != other.requestKind {
                 return false
             }
+            if sequencerReceipt != other.sequencerReceipt {
+                return false
+            }
             return true
         }
 
@@ -25021,6 +25066,8 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "authGeneration", value: authGenerationValue)
             let requestKindValue = try requestKind.toCBORValue()
             map = map.adding(key: "requestKind", value: requestKindValue)
+            let sequencerReceiptValue = try sequencerReceipt.toCBORValue()
+            map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
             return map
         }
 
@@ -25038,6 +25085,7 @@ public struct BlueCatbirdChatDefs {
             case actorKeyId
             case authGeneration
             case requestKind
+            case sequencerReceipt
         }
     }
 
@@ -26304,15 +26352,19 @@ public struct BlueCatbirdChatDefs {
         public let seq: Int
         public let signedRequest: SignedDirectRequestPublication
         public let receivedAt: CanonicalDatetime
+        public let sequencerReceipt: SequencerReceipt
+        public let publicationReceipt: DirectRequestEntryPublicationReceiptUnion
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedDirectRequestPublication, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedDirectRequestPublication, receivedAt: CanonicalDatetime, sequencerReceipt: SequencerReceipt, publicationReceipt: DirectRequestEntryPublicationReceiptUnion
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
             self.receivedAt = receivedAt
+            self.sequencerReceipt = sequencerReceipt
+            self.publicationReceipt = publicationReceipt
         }
 
         public init(from decoder: Decoder) throws {
@@ -26347,6 +26399,18 @@ public struct BlueCatbirdChatDefs {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
                 throw error
             }
+            do {
+                self.sequencerReceipt = try container.decode(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'sequencerReceipt': \(error)")
+                throw error
+            }
+            do {
+                self.publicationReceipt = try container.decode(DirectRequestEntryPublicationReceiptUnion.self, forKey: .publicationReceipt)
+            } catch {
+                LogManager.logError("Decoding error for required property 'publicationReceipt': \(error)")
+                throw error
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -26357,6 +26421,8 @@ public struct BlueCatbirdChatDefs {
             try container.encode(seq, forKey: .seq)
             try container.encode(signedRequest, forKey: .signedRequest)
             try container.encode(receivedAt, forKey: .receivedAt)
+            try container.encode(sequencerReceipt, forKey: .sequencerReceipt)
+            try container.encode(publicationReceipt, forKey: .publicationReceipt)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -26365,6 +26431,8 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(seq)
             hasher.combine(signedRequest)
             hasher.combine(receivedAt)
+            hasher.combine(sequencerReceipt)
+            hasher.combine(publicationReceipt)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
@@ -26382,6 +26450,12 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if receivedAt != other.receivedAt {
+                return false
+            }
+            if sequencerReceipt != other.sequencerReceipt {
+                return false
+            }
+            if publicationReceipt != other.publicationReceipt {
                 return false
             }
             return true
@@ -26404,6 +26478,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "signedRequest", value: signedRequestValue)
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
+            let sequencerReceiptValue = try sequencerReceipt.toCBORValue()
+            map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            let publicationReceiptValue = try publicationReceipt.toCBORValue()
+            map = map.adding(key: "publicationReceipt", value: publicationReceiptValue)
             return map
         }
 
@@ -26414,6 +26492,8 @@ public struct BlueCatbirdChatDefs {
             case seq
             case signedRequest
             case receivedAt
+            case sequencerReceipt
+            case publicationReceipt
         }
     }
 
@@ -34904,6 +34984,100 @@ public struct BlueCatbirdChatDefs {
 
         public func toCBORValue() throws -> Any {
             return rawValue
+        }
+    }
+
+    public enum DirectRequestEntryPublicationReceiptUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
+        case blueCatbirdChatDefsSignedDirectRequestReceipt(BlueCatbirdChatDefs.SignedDirectRequestReceipt)
+        case unexpected(ATProtocolValueContainer)
+        public init(_ value: BlueCatbirdChatDefs.SignedDirectRequestReceipt) {
+            self = .blueCatbirdChatDefsSignedDirectRequestReceipt(value)
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let typeValue = try container.decode(String.self, forKey: .type)
+
+            switch typeValue {
+            case "blue.catbird.chat.defs#signedDirectRequestReceipt":
+                let value = try BlueCatbirdChatDefs.SignedDirectRequestReceipt(from: decoder)
+                self = .blueCatbirdChatDefsSignedDirectRequestReceipt(value)
+            default:
+                let unknownValue = try ATProtocolValueContainer(from: decoder)
+                self = .unexpected(unknownValue)
+            }
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .blueCatbirdChatDefsSignedDirectRequestReceipt(let value):
+                try container.encode("blue.catbird.chat.defs#signedDirectRequestReceipt", forKey: .type)
+                try value.encode(to: encoder)
+            case .unexpected(let container):
+                try container.encode(to: encoder)
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .blueCatbirdChatDefsSignedDirectRequestReceipt(let value):
+                hasher.combine("blue.catbird.chat.defs#signedDirectRequestReceipt")
+                hasher.combine(value)
+            case .unexpected(let container):
+                hasher.combine("unexpected")
+                hasher.combine(container)
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case type = "$type"
+        }
+
+        public static func == (lhs: DirectRequestEntryPublicationReceiptUnion, rhs: DirectRequestEntryPublicationReceiptUnion) -> Bool {
+            switch (lhs, rhs) {
+            case (.blueCatbirdChatDefsSignedDirectRequestReceipt(let lhsValue),
+                  .blueCatbirdChatDefsSignedDirectRequestReceipt(let rhsValue)):
+                return lhsValue == rhsValue
+            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
+                return lhsValue.isEqual(to: rhsValue)
+            default:
+                return false
+            }
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? DirectRequestEntryPublicationReceiptUnion else { return false }
+            return self == other
+        }
+
+        // DAGCBOR encoding with field ordering
+        public func toCBORValue() throws -> Any {
+            // Create an ordered map to maintain field order
+            var map = OrderedCBORMap()
+
+            switch self {
+            case .blueCatbirdChatDefsSignedDirectRequestReceipt(let value):
+                map = map.adding(key: "$type", value: "blue.catbird.chat.defs#signedDirectRequestReceipt")
+
+                let valueDict = try value.toCBORValue()
+
+                // If the value is already an OrderedCBORMap, merge its entries
+                if let orderedMap = valueDict as? OrderedCBORMap {
+                    for (key, value) in orderedMap.entries where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                } else if let dict = valueDict as? [String: Any] {
+                    // Otherwise add each key-value pair from the dictionary
+                    for (key, value) in dict where key != "$type" {
+                        map = map.adding(key: key, value: value)
+                    }
+                }
+                return map
+            case .unexpected(let container):
+                return try container.toCBORValue()
+            }
         }
     }
 
