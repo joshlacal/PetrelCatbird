@@ -12,10 +12,10 @@ public struct BlueCatbirdChatRelaySpaceCredential {
         public let authorityDid: DID
         public let space: SpaceRef
         public let delegationToken: String
-        public let cnfKey: String?
+        public let cnfKey: String
 
         /// Standard public initializer
-        public init(actorDeviceId: BlueCatbirdChatDefs.DeviceId, authorityDid: DID, space: SpaceRef, delegationToken: String, cnfKey: String? = nil) {
+        public init(actorDeviceId: BlueCatbirdChatDefs.DeviceId, authorityDid: DID, space: SpaceRef, delegationToken: String, cnfKey: String) {
             self.actorDeviceId = actorDeviceId
             self.authorityDid = authorityDid
             self.space = space
@@ -29,7 +29,7 @@ public struct BlueCatbirdChatRelaySpaceCredential {
             self.authorityDid = try container.decode(DID.self, forKey: .authorityDid)
             self.space = try container.decode(SpaceRef.self, forKey: .space)
             self.delegationToken = try container.decode(String.self, forKey: .delegationToken)
-            self.cnfKey = try container.decodeIfPresent(String.self, forKey: .cnfKey)
+            self.cnfKey = try container.decode(String.self, forKey: .cnfKey)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -38,7 +38,7 @@ public struct BlueCatbirdChatRelaySpaceCredential {
             try container.encode(authorityDid, forKey: .authorityDid)
             try container.encode(space, forKey: .space)
             try container.encode(delegationToken, forKey: .delegationToken)
-            try container.encodeIfPresent(cnfKey, forKey: .cnfKey)
+            try container.encode(cnfKey, forKey: .cnfKey)
         }
 
         public func toCBORValue() throws -> Any {
@@ -51,10 +51,8 @@ public struct BlueCatbirdChatRelaySpaceCredential {
             map = map.adding(key: "space", value: spaceValue)
             let delegationTokenValue = try delegationToken.toCBORValue()
             map = map.adding(key: "delegationToken", value: delegationTokenValue)
-            if let value = cnfKey {
-                let cnfKeyValue = try value.toCBORValue()
-                map = map.adding(key: "cnfKey", value: cnfKeyValue)
-            }
+            let cnfKeyValue = try cnfKey.toCBORValue()
+            map = map.adding(key: "cnfKey", value: cnfKeyValue)
             return map
         }
 
