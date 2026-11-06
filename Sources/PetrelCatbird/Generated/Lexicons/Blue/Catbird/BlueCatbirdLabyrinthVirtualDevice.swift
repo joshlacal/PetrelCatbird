@@ -7,10 +7,10 @@ import Petrel
 public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.virtualDevice"
+    public let formatVersion: Int
     public let vdeviceId: Bytes
     public let encryptedDeviceKeyPriv: Bytes
     public let encryptedEpochStorageKeyPriv: Bytes
-    public let encryptedMailboxRootSalt: Bytes
     public let encryptedEpochRootKey: Bytes
     public let encryptedEpochNumber: Bytes
     public let deviceKeyPubkey: Bytes
@@ -22,11 +22,11 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
     public let createdAt: ATProtocolDate
     public let lastUsedAt: ATProtocolDate?
 
-    public init(vdeviceId: Bytes, encryptedDeviceKeyPriv: Bytes, encryptedEpochStorageKeyPriv: Bytes, encryptedMailboxRootSalt: Bytes, encryptedEpochRootKey: Bytes, encryptedEpochNumber: Bytes, deviceKeyPubkey: Bytes, epochStorageKeyPubkey: Bytes, epochStorageKeySig: Bytes, mechanism: String, passkeyWrappedCode: Bytes? = nil, passkeyCredentialId: Bytes? = nil, createdAt: ATProtocolDate, lastUsedAt: ATProtocolDate? = nil) {
+    public init(formatVersion: Int, vdeviceId: Bytes, encryptedDeviceKeyPriv: Bytes, encryptedEpochStorageKeyPriv: Bytes, encryptedEpochRootKey: Bytes, encryptedEpochNumber: Bytes, deviceKeyPubkey: Bytes, epochStorageKeyPubkey: Bytes, epochStorageKeySig: Bytes, mechanism: String, passkeyWrappedCode: Bytes? = nil, passkeyCredentialId: Bytes? = nil, createdAt: ATProtocolDate, lastUsedAt: ATProtocolDate? = nil) {
+        self.formatVersion = formatVersion
         self.vdeviceId = vdeviceId
         self.encryptedDeviceKeyPriv = encryptedDeviceKeyPriv
         self.encryptedEpochStorageKeyPriv = encryptedEpochStorageKeyPriv
-        self.encryptedMailboxRootSalt = encryptedMailboxRootSalt
         self.encryptedEpochRootKey = encryptedEpochRootKey
         self.encryptedEpochNumber = encryptedEpochNumber
         self.deviceKeyPubkey = deviceKeyPubkey
@@ -41,10 +41,10 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.formatVersion = try container.decode(Int.self, forKey: .formatVersion)
         self.vdeviceId = try container.decode(Bytes.self, forKey: .vdeviceId)
         self.encryptedDeviceKeyPriv = try container.decode(Bytes.self, forKey: .encryptedDeviceKeyPriv)
         self.encryptedEpochStorageKeyPriv = try container.decode(Bytes.self, forKey: .encryptedEpochStorageKeyPriv)
-        self.encryptedMailboxRootSalt = try container.decode(Bytes.self, forKey: .encryptedMailboxRootSalt)
         self.encryptedEpochRootKey = try container.decode(Bytes.self, forKey: .encryptedEpochRootKey)
         self.encryptedEpochNumber = try container.decode(Bytes.self, forKey: .encryptedEpochNumber)
         self.deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
@@ -78,10 +78,10 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
+        try container.encode(formatVersion, forKey: .formatVersion)
         try container.encode(vdeviceId, forKey: .vdeviceId)
         try container.encode(encryptedDeviceKeyPriv, forKey: .encryptedDeviceKeyPriv)
         try container.encode(encryptedEpochStorageKeyPriv, forKey: .encryptedEpochStorageKeyPriv)
-        try container.encode(encryptedMailboxRootSalt, forKey: .encryptedMailboxRootSalt)
         try container.encode(encryptedEpochRootKey, forKey: .encryptedEpochRootKey)
         try container.encode(encryptedEpochNumber, forKey: .encryptedEpochNumber)
         try container.encode(deviceKeyPubkey, forKey: .deviceKeyPubkey)
@@ -100,6 +100,9 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
+        if formatVersion != other.formatVersion {
+            return false
+        }
         if vdeviceId != other.vdeviceId {
             return false
         }
@@ -107,9 +110,6 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
             return false
         }
         if encryptedEpochStorageKeyPriv != other.encryptedEpochStorageKeyPriv {
-            return false
-        }
-        if encryptedMailboxRootSalt != other.encryptedMailboxRootSalt {
             return false
         }
         if encryptedEpochRootKey != other.encryptedEpochRootKey {
@@ -146,10 +146,10 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
     }
 
     public func hash(into hasher: inout Hasher) {
+        hasher.combine(formatVersion)
         hasher.combine(vdeviceId)
         hasher.combine(encryptedDeviceKeyPriv)
         hasher.combine(encryptedEpochStorageKeyPriv)
-        hasher.combine(encryptedMailboxRootSalt)
         hasher.combine(encryptedEpochRootKey)
         hasher.combine(encryptedEpochNumber)
         hasher.combine(deviceKeyPubkey)
@@ -177,14 +177,14 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
+        let formatVersionValue = try formatVersion.toCBORValue()
+        map = map.adding(key: "formatVersion", value: formatVersionValue)
         let vdeviceIdValue = try vdeviceId.toCBORValue()
         map = map.adding(key: "vdeviceId", value: vdeviceIdValue)
         let encryptedDeviceKeyPrivValue = try encryptedDeviceKeyPriv.toCBORValue()
         map = map.adding(key: "encryptedDeviceKeyPriv", value: encryptedDeviceKeyPrivValue)
         let encryptedEpochStorageKeyPrivValue = try encryptedEpochStorageKeyPriv.toCBORValue()
         map = map.adding(key: "encryptedEpochStorageKeyPriv", value: encryptedEpochStorageKeyPrivValue)
-        let encryptedMailboxRootSaltValue = try encryptedMailboxRootSalt.toCBORValue()
-        map = map.adding(key: "encryptedMailboxRootSalt", value: encryptedMailboxRootSaltValue)
         let encryptedEpochRootKeyValue = try encryptedEpochRootKey.toCBORValue()
         map = map.adding(key: "encryptedEpochRootKey", value: encryptedEpochRootKeyValue)
         let encryptedEpochNumberValue = try encryptedEpochNumber.toCBORValue()
@@ -216,10 +216,10 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
 
     private enum CodingKeys: String, CodingKey {
         case typeIdentifier = "$type"
+        case formatVersion
         case vdeviceId
         case encryptedDeviceKeyPriv
         case encryptedEpochStorageKeyPriv
-        case encryptedMailboxRootSalt
         case encryptedEpochRootKey
         case encryptedEpochNumber
         case deviceKeyPubkey

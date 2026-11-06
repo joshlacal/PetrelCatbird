@@ -21,11 +21,11 @@ object BlueCatbirdLabyrinthVirtualDeviceDefs {
      */
     @Serializable
     data class BlueCatbirdLabyrinthVirtualDevice(
-/** First 16 bytes of the recovery-code KDF output; equals the rkey. */        @SerialName("vdeviceId")
+/** Clean-slate recovery bundle format. Version 2 removes mailboxRootSalt. */        @SerialName("formatVersion")
+        val formatVersion: Int,/** First 16 bytes of the recovery-code KDF output; equals the rkey. */        @SerialName("vdeviceId")
         val vdeviceId: Bytes,/** Sealed with AAD 'virtual_device:virtual_device_private_key'. */        @SerialName("encryptedDeviceKeyPriv")
         val encryptedDeviceKeyPriv: Bytes,/** Sealed HawkEncSecret (96 bytes) with AAD 'virtual_device:epoch_storage_private_key'. */        @SerialName("encryptedEpochStorageKeyPriv")
-        val encryptedEpochStorageKeyPriv: Bytes,/** Sealed with AAD 'virtual_device:mailbox_root_key'. */        @SerialName("encryptedMailboxRootSalt")
-        val encryptedMailboxRootSalt: Bytes,/** Sealed with AAD 'virtual_device:epoch_root_key'. */        @SerialName("encryptedEpochRootKey")
+        val encryptedEpochStorageKeyPriv: Bytes,/** Sealed with AAD 'virtual_device:epoch_root_key'. */        @SerialName("encryptedEpochRootKey")
         val encryptedEpochRootKey: Bytes,/** Sealed base64(decimal(epoch number)) with AAD 'virtual_device:epoch_anon_id'. */        @SerialName("encryptedEpochNumber")
         val encryptedEpochNumber: Bytes,/** The virtual device's deviceKeyPubkey. */        @SerialName("deviceKeyPubkey")
         val deviceKeyPubkey: Bytes,/** The virtual device's Hawk encryption public key: X25519(32) || ML-KEM-768 ek(1184) (1,216 bytes, I16). */        @SerialName("epochStorageKeyPubkey")
