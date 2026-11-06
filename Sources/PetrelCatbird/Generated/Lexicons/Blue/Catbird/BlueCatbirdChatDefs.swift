@@ -3496,9 +3496,10 @@ public struct BlueCatbirdChatDefs {
         public let messageId: Bytes
         public let prior: MlsAadPriorContext
         public let archiveCommitment: Bytes?
+        public let originalSenderAttestation: [String: ATProtocolValueContainer]?
 
         public init(
-            protocolVersion: DefsProtocolVersion, conversationId: Bytes, generation: Int, messageId: Bytes, prior: MlsAadPriorContext, archiveCommitment: Bytes? = nil
+            protocolVersion: DefsProtocolVersion, conversationId: Bytes, generation: Int, messageId: Bytes, prior: MlsAadPriorContext, archiveCommitment: Bytes? = nil, originalSenderAttestation: [String: ATProtocolValueContainer]? = nil
         ) {
             self.protocolVersion = protocolVersion
             self.conversationId = conversationId
@@ -3506,6 +3507,7 @@ public struct BlueCatbirdChatDefs {
             self.messageId = messageId
             self.prior = prior
             self.archiveCommitment = archiveCommitment
+            self.originalSenderAttestation = originalSenderAttestation
         }
 
         public init(from decoder: Decoder) throws {
@@ -3548,6 +3550,14 @@ public struct BlueCatbirdChatDefs {
                 LogManager.logWarning("Decoding error for optional property 'archiveCommitment' — degrading to nil: \(error)")
                 self.archiveCommitment = nil
             }
+            do {
+                self.originalSenderAttestation = try container.decodeIfPresent([String: ATProtocolValueContainer].self, forKey: .originalSenderAttestation)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'originalSenderAttestation' — degrading to nil: \(error)")
+                self.originalSenderAttestation = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -3559,6 +3569,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(messageId, forKey: .messageId)
             try container.encode(prior, forKey: .prior)
             try container.encodeIfPresent(archiveCommitment, forKey: .archiveCommitment)
+            try container.encodeIfPresent(originalSenderAttestation, forKey: .originalSenderAttestation)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -3568,6 +3579,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(messageId)
             hasher.combine(prior)
             if let value = archiveCommitment {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = originalSenderAttestation {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
@@ -3594,6 +3610,9 @@ public struct BlueCatbirdChatDefs {
             if archiveCommitment != other.archiveCommitment {
                 return false
             }
+            if originalSenderAttestation != other.originalSenderAttestation {
+                return false
+            }
             return true
         }
 
@@ -3618,6 +3637,10 @@ public struct BlueCatbirdChatDefs {
                 let archiveCommitmentValue = try value.toCBORValue()
                 map = map.adding(key: "archiveCommitment", value: archiveCommitmentValue)
             }
+            if let value = originalSenderAttestation {
+                let originalSenderAttestationValue = try value.toCBORValue()
+                map = map.adding(key: "originalSenderAttestation", value: originalSenderAttestationValue)
+            }
             return map
         }
 
@@ -3629,6 +3652,7 @@ public struct BlueCatbirdChatDefs {
             case messageId
             case prior
             case archiveCommitment
+            case originalSenderAttestation
         }
     }
 
@@ -23800,9 +23824,10 @@ public struct BlueCatbirdChatDefs {
         public let signedAt: CanonicalDatetime
         public let preparationRequestDigest: Bytes
         public let archiveCommitment: Bytes
+        public let originalSenderAttestation: [String: ATProtocolValueContainer]
 
         public init(
-            signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, requestId: OperationId, firstMessageId: OperationId, conversationId: OperationId, recipientDid: BareDid, origin: DirectRequestOrigin, profile: DirectRequestProfile, preparationDigest: Bytes, contextHash: Bytes, next: ConversationCoordinates, importUntil: CanonicalDatetime, artifacts: DirectRequestBootstrapArtifacts, idempotencyKey: OperationId, signedAt: CanonicalDatetime, preparationRequestDigest: Bytes, archiveCommitment: Bytes
+            signatureDomain: String, protocolVersion: String, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, requestId: OperationId, firstMessageId: OperationId, conversationId: OperationId, recipientDid: BareDid, origin: DirectRequestOrigin, profile: DirectRequestProfile, preparationDigest: Bytes, contextHash: Bytes, next: ConversationCoordinates, importUntil: CanonicalDatetime, artifacts: DirectRequestBootstrapArtifacts, idempotencyKey: OperationId, signedAt: CanonicalDatetime, preparationRequestDigest: Bytes, archiveCommitment: Bytes, originalSenderAttestation: [String: ATProtocolValueContainer]
         ) {
             self.signatureDomain = signatureDomain
             self.protocolVersion = protocolVersion
@@ -23825,6 +23850,7 @@ public struct BlueCatbirdChatDefs {
             self.signedAt = signedAt
             self.preparationRequestDigest = preparationRequestDigest
             self.archiveCommitment = archiveCommitment
+            self.originalSenderAttestation = originalSenderAttestation
         }
 
         public init(from decoder: Decoder) throws {
@@ -23955,6 +23981,12 @@ public struct BlueCatbirdChatDefs {
                 LogManager.logError("Decoding error for required property 'archiveCommitment': \(error)")
                 throw error
             }
+            do {
+                self.originalSenderAttestation = try container.decode([String: ATProtocolValueContainer].self, forKey: .originalSenderAttestation)
+            } catch {
+                LogManager.logError("Decoding error for required property 'originalSenderAttestation': \(error)")
+                throw error
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -23981,6 +24013,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(signedAt, forKey: .signedAt)
             try container.encode(preparationRequestDigest, forKey: .preparationRequestDigest)
             try container.encode(archiveCommitment, forKey: .archiveCommitment)
+            try container.encode(originalSenderAttestation, forKey: .originalSenderAttestation)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -24005,6 +24038,7 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(signedAt)
             hasher.combine(preparationRequestDigest)
             hasher.combine(archiveCommitment)
+            hasher.combine(originalSenderAttestation)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
@@ -24072,6 +24106,9 @@ public struct BlueCatbirdChatDefs {
             if archiveCommitment != other.archiveCommitment {
                 return false
             }
+            if originalSenderAttestation != other.originalSenderAttestation {
+                return false
+            }
             return true
         }
 
@@ -24124,6 +24161,8 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "preparationRequestDigest", value: preparationRequestDigestValue)
             let archiveCommitmentValue = try archiveCommitment.toCBORValue()
             map = map.adding(key: "archiveCommitment", value: archiveCommitmentValue)
+            let originalSenderAttestationValue = try originalSenderAttestation.toCBORValue()
+            map = map.adding(key: "originalSenderAttestation", value: originalSenderAttestationValue)
             return map
         }
 
@@ -24150,6 +24189,7 @@ public struct BlueCatbirdChatDefs {
             case signedAt
             case preparationRequestDigest
             case archiveCommitment
+            case originalSenderAttestation
         }
     }
 

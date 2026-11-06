@@ -5178,7 +5178,8 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val generation: Int,        @SerialName("messageId")
         val messageId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsMlsAadPriorContext,/** [I13] HMAC-SHA256(key = frameNonce, data = canonicalPayloadBytes) bound into live MLS AAD and echoed in sequencerReceipt. */        @SerialName("archiveCommitment")
-        val archiveCommitment: BlueCatbirdChatDefsArtifactHash? = null    ) {
+        val archiveCommitment: BlueCatbirdChatDefsArtifactHash? = null,        @SerialName("originalSenderAttestation")
+        val originalSenderAttestation: Map<String, JsonElement>? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsApplicationAad"
         }
@@ -7484,7 +7485,8 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("preparationRequestDigest")
         val preparationRequestDigest: BlueCatbirdChatDefsArtifactHash,/** Required I13 commitment, repeated in the initial private MLS application AAD. */        @SerialName("archiveCommitment")
-        val archiveCommitment: BlueCatbirdChatDefsArtifactHash    ) {
+        val archiveCommitment: BlueCatbirdChatDefsArtifactHash,        @SerialName("originalSenderAttestation")
+        val originalSenderAttestation: Map<String, JsonElement>    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestPublicationBody"
         }
