@@ -14,10 +14,18 @@ bytes against its recorded upstream archive. No overlay schema references a
 core definition that release changed, so regenerating this overlay against it
 reproduced the generated Swift and Kotlin byte for byte. This overlay's
 203 JSON files have aggregate SHA-256
-`0c2279e2df29fd8094608308ac4a4cca3637f9ebb0d20a223c81aeb697b6c978`.
+`0ee8827e7e119760cca7e34ad8b788ad572f2b02b8346da2ca1041c89c73e064`.
 The aggregate hashes sorted lines of each file's SHA-256, two spaces, its path
 relative to `lexicons`, and LF. `Package.swift` pins a published Petrel revision
 so package resolution does not depend on the neighboring checkout.
+
+The final Task 4 R3 projection was regenerated with Petrel
+`f381cb844d33d76ad7ca948698480d381712304b` (tree
+`6768ba98ed5076fe23141983a1f9b8011dbc7e85`). Petrel's 441-file lexicon
+corpus remains aggregate SHA-256
+`a5c5fbc0a9c38ceb74192fa0aea31d93f73e381b3ddb02e55d73fef7f94e975d`;
+the pinned generator and SwiftFormat 0.61.1 reproduced all generated Swift and
+Kotlin files byte for byte.
 
 ## Reproduce
 
