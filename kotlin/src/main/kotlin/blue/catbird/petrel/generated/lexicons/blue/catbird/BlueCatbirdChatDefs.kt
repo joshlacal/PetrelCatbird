@@ -5478,7 +5478,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     }
 
     /**
-     * messageId is the sole idempotency identity, unique within conversationId. Its canonical request digest is raw SHA-256 of the exact domain-prefixed canonical Ed25519 transcript and its 64-byte signature is stored separately. Exact completed replay requires both digest and signature byte-equal; either mismatch conflicts. Raw JSON or generated DTO bytes are never hashed. blobBindings contains zero or one exact applicationAttachmentBinding with purpose attachment; metadataAvatarBinding and generic uploadedBlobBinding are forbidden. A stale-coordinate attempt retires that messageId under the same digest/signature rule, so retry requires a newly encrypted frame and new messageId.
+     * messageId is the sole idempotency identity, unique within conversationId. Its canonical request digest is raw SHA-256 of the exact domain-prefixed canonical Ed25519 transcript and its 64-byte signature is stored separately. Exact completed replay requires both digest and signature byte-equal; either mismatch conflicts. Raw JSON or generated DTO bytes are never hashed. blobBindings contains zero or one exact applicationAttachmentBinding with purpose attachment; metadataAvatarBinding and generic uploadedBlobBinding are forbidden. A stale-coordinate attempt retires that messageId under the same digest/signature rule, so retry requires a newly encrypted frame and new messageId. sendCounter orders one device's sends: a StaleSend refusal retires neither the messageId nor that order, and the sender re-sends the same message as a newly encrypted frame with a new sendCounter under the same messageId; it never resubmits the refused bytes.
      */
     @Serializable
     data class BlueCatbirdChatDefsApplicationSendBody(
@@ -5488,7 +5488,8 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("prior")
+        val authGeneration: Int,/** Per-device send order within conversationId: strictly greater than every sendCounter this device has signed for the conversation, assigned in the same durable step that encrypts the frame and never reused. A sequencer resolving a messageId for the first time accepts it only if (prior.generation, prior.epoch, sendCounter) is lexicographically greater than this device's last accepted send in the conversation, so one device's sequenced order is its MLS generation order; otherwise it refuses StaleSend. An exact replay of an accepted send returns its stored outcome, never StaleSend. */        @SerialName("sendCounter")
+        val sendCounter: Int,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("aad")
         val aad: BlueCatbirdChatDefsApplicationAad,        @SerialName("applicationMessage")
         val applicationMessage: BlueCatbirdChatDefsPrivateApplicationMessage,        @SerialName("blobBindings")

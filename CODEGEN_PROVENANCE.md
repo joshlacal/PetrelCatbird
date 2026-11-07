@@ -14,18 +14,21 @@ bytes against its recorded upstream archive. No overlay schema references a
 core definition that release changed, so regenerating this overlay against it
 reproduced the generated Swift and Kotlin byte for byte. This overlay's
 203 JSON files have aggregate SHA-256
-`0ee8827e7e119760cca7e34ad8b788ad572f2b02b8346da2ca1041c89c73e064`.
-The aggregate hashes sorted lines of each file's SHA-256, two spaces, its path
-relative to `lexicons`, and LF. `Package.swift` pins a published Petrel revision
-so package resolution does not depend on the neighboring checkout.
+`c63561fc8365361d47c8ed9caba4b353885b737ccd3af8082fec2ca4f7d42c0e`.
+The aggregate hashes path-sorted lines of each file's SHA-256, two spaces, its
+path relative to `lexicons`, and LF. `Package.swift` pins a published Petrel
+revision so package resolution does not depend on the neighboring checkout.
 
-The final Task 4 R3 projection was regenerated with Petrel
+The seed 2323 projection (signed `applicationSendBody.sendCounter`, the
+`sendMessage` `StaleSend` error) was regenerated with Petrel
 `f381cb844d33d76ad7ca948698480d381712304b` (tree
 `6768ba98ed5076fe23141983a1f9b8011dbc7e85`). Petrel's 441-file lexicon
 corpus remains aggregate SHA-256
 `a5c5fbc0a9c38ceb74192fa0aea31d93f73e381b3ddb02e55d73fef7f94e975d`;
-the pinned generator and SwiftFormat 0.61.1 reproduced all generated Swift and
-Kotlin files byte for byte.
+`blue.catbird.chat.defs.json` is SHA-256
+`1c21d1b04555c800a0491e997b74e3185520b0634362e68a2a27e6b8babdb075`.
+Rerunning the pinned generator and SwiftFormat 0.61.1 reproduced all generated
+Swift and Kotlin files byte for byte.
 
 ## Reproduce
 

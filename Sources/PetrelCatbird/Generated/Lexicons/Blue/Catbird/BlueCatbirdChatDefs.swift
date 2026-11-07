@@ -6320,6 +6320,7 @@ public struct BlueCatbirdChatDefs {
         public let actorDeviceId: DeviceId
         public let keyId: KeyId
         public let authGeneration: Int
+        public let sendCounter: Int
         public let prior: ConversationCoordinates
         public let aad: ApplicationAad
         public let applicationMessage: PrivateApplicationMessage
@@ -6327,7 +6328,7 @@ public struct BlueCatbirdChatDefs {
         public let signedAt: CanonicalDatetime
 
         public init(
-            signatureDomain: String, messageId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, prior: ConversationCoordinates, aad: ApplicationAad, applicationMessage: PrivateApplicationMessage, blobBindings: [ApplicationAttachmentBinding], signedAt: CanonicalDatetime
+            signatureDomain: String, messageId: OperationId, actorDid: BareDid, actorDeviceId: DeviceId, keyId: KeyId, authGeneration: Int, sendCounter: Int, prior: ConversationCoordinates, aad: ApplicationAad, applicationMessage: PrivateApplicationMessage, blobBindings: [ApplicationAttachmentBinding], signedAt: CanonicalDatetime
         ) {
             self.signatureDomain = signatureDomain
             self.messageId = messageId
@@ -6335,6 +6336,7 @@ public struct BlueCatbirdChatDefs {
             self.actorDeviceId = actorDeviceId
             self.keyId = keyId
             self.authGeneration = authGeneration
+            self.sendCounter = sendCounter
             self.prior = prior
             self.aad = aad
             self.applicationMessage = applicationMessage
@@ -6381,6 +6383,12 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sendCounter = try container.decode(Int.self, forKey: .sendCounter)
+            } catch {
+                LogManager.logError("Decoding error for required property 'sendCounter': \(error)")
+                throw error
+            }
+            do {
                 self.prior = try container.decode(ConversationCoordinates.self, forKey: .prior)
             } catch {
                 LogManager.logError("Decoding error for required property 'prior': \(error)")
@@ -6421,6 +6429,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(actorDeviceId, forKey: .actorDeviceId)
             try container.encode(keyId, forKey: .keyId)
             try container.encode(authGeneration, forKey: .authGeneration)
+            try container.encode(sendCounter, forKey: .sendCounter)
             try container.encode(prior, forKey: .prior)
             try container.encode(aad, forKey: .aad)
             try container.encode(applicationMessage, forKey: .applicationMessage)
@@ -6435,6 +6444,7 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(actorDeviceId)
             hasher.combine(keyId)
             hasher.combine(authGeneration)
+            hasher.combine(sendCounter)
             hasher.combine(prior)
             hasher.combine(aad)
             hasher.combine(applicationMessage)
@@ -6460,6 +6470,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if authGeneration != other.authGeneration {
+                return false
+            }
+            if sendCounter != other.sendCounter {
                 return false
             }
             if prior != other.prior {
@@ -6499,6 +6512,8 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "keyId", value: keyIdValue)
             let authGenerationValue = try authGeneration.toCBORValue()
             map = map.adding(key: "authGeneration", value: authGenerationValue)
+            let sendCounterValue = try sendCounter.toCBORValue()
+            map = map.adding(key: "sendCounter", value: sendCounterValue)
             let priorValue = try prior.toCBORValue()
             map = map.adding(key: "prior", value: priorValue)
             let aadValue = try aad.toCBORValue()
@@ -6520,6 +6535,7 @@ public struct BlueCatbirdChatDefs {
             case actorDeviceId
             case keyId
             case authGeneration
+            case sendCounter
             case prior
             case aad
             case applicationMessage
