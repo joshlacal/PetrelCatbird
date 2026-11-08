@@ -14,21 +14,25 @@ bytes against its recorded upstream archive. No overlay schema references a
 core definition that release changed, so regenerating this overlay against it
 reproduced the generated Swift and Kotlin byte for byte. This overlay's
 203 JSON files have aggregate SHA-256
-`c63561fc8365361d47c8ed9caba4b353885b737ccd3af8082fec2ca4f7d42c0e`.
+`838a01b33cc249e42a19ecc028fe5a5d34abab56789d497bf95df7a4c73905bd`.
 The aggregate hashes path-sorted lines of each file's SHA-256, two spaces, its
 path relative to `lexicons`, and LF. `Package.swift` pins a published Petrel
 revision so package resolution does not depend on the neighboring checkout.
 
-The seed 2323 projection (signed `applicationSendBody.sendCounter`, the
-`sendMessage` `StaleSend` error) was regenerated with Petrel
-`f381cb844d33d76ad7ca948698480d381712304b` (tree
+The R4 leaf-recovery projection (optional `leafRecoveryView.signedRequest`, the
+requester device's exact signed `requestLeafRecovery`) was regenerated with
+Petrel `f381cb844d33d76ad7ca948698480d381712304b` (tree
 `6768ba98ed5076fe23141983a1f9b8011dbc7e85`). Petrel's 441-file lexicon
 corpus remains aggregate SHA-256
 `a5c5fbc0a9c38ceb74192fa0aea31d93f73e381b3ddb02e55d73fef7f94e975d`;
 `blue.catbird.chat.defs.json` is SHA-256
+`cf931d0fda7b68082f7f0ac9105dd62122692ee35afbf0ddf7eb2d134340f848`.
+The pinned generator and SwiftFormat 0.61.1 changed only
+`BlueCatbirdChatDefs.swift` and `BlueCatbirdChatDefs.kt` (the `signedRequest`
+field); every other generated Swift and Kotlin file is byte for byte unchanged.
+The previous seed 2323 projection (signed `applicationSendBody.sendCounter`)
+had `blue.catbird.chat.defs.json` SHA-256
 `1c21d1b04555c800a0491e997b74e3185520b0634362e68a2a27e6b8babdb075`.
-Rerunning the pinned generator and SwiftFormat 0.61.1 reproduced all generated
-Swift and Kotlin files byte for byte.
 
 ## Reproduce
 

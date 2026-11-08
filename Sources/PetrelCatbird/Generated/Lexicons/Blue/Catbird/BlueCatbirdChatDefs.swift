@@ -12500,9 +12500,10 @@ public struct BlueCatbirdChatDefs {
         public let status: DefsLeafRecoveryStatus
         public let requestedAt: CanonicalDatetime
         public let expiresAt: CanonicalDatetime
+        public let signedRequest: SignedLeafRecoveryRequest?
 
         public init(
-            recoveryRequestId: OperationId, conversationId: OperationId, requesterDid: BareDid, requesterDeviceId: DeviceId, recoveryKind: DefsLeafRecoveryKind, boundCoordinate: ConversationCoordinates, reservation: LeafRecoveryReservation, status: DefsLeafRecoveryStatus, requestedAt: CanonicalDatetime, expiresAt: CanonicalDatetime
+            recoveryRequestId: OperationId, conversationId: OperationId, requesterDid: BareDid, requesterDeviceId: DeviceId, recoveryKind: DefsLeafRecoveryKind, boundCoordinate: ConversationCoordinates, reservation: LeafRecoveryReservation, status: DefsLeafRecoveryStatus, requestedAt: CanonicalDatetime, expiresAt: CanonicalDatetime, signedRequest: SignedLeafRecoveryRequest? = nil
         ) {
             self.recoveryRequestId = recoveryRequestId
             self.conversationId = conversationId
@@ -12514,6 +12515,7 @@ public struct BlueCatbirdChatDefs {
             self.status = status
             self.requestedAt = requestedAt
             self.expiresAt = expiresAt
+            self.signedRequest = signedRequest
         }
 
         public init(from decoder: Decoder) throws {
@@ -12578,6 +12580,14 @@ public struct BlueCatbirdChatDefs {
                 LogManager.logError("Decoding error for required property 'expiresAt': \(error)")
                 throw error
             }
+            do {
+                self.signedRequest = try container.decodeIfPresent(SignedLeafRecoveryRequest.self, forKey: .signedRequest)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'signedRequest' — degrading to nil: \(error)")
+                self.signedRequest = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -12593,6 +12603,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(status, forKey: .status)
             try container.encode(requestedAt, forKey: .requestedAt)
             try container.encode(expiresAt, forKey: .expiresAt)
+            try container.encodeIfPresent(signedRequest, forKey: .signedRequest)
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -12606,6 +12617,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(status)
             hasher.combine(requestedAt)
             hasher.combine(expiresAt)
+            if let value = signedRequest {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
@@ -12640,6 +12656,9 @@ public struct BlueCatbirdChatDefs {
             if expiresAt != other.expiresAt {
                 return false
             }
+            if signedRequest != other.signedRequest {
+                return false
+            }
             return true
         }
 
@@ -12670,6 +12689,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "requestedAt", value: requestedAtValue)
             let expiresAtValue = try expiresAt.toCBORValue()
             map = map.adding(key: "expiresAt", value: expiresAtValue)
+            if let value = signedRequest {
+                let signedRequestValue = try value.toCBORValue()
+                map = map.adding(key: "signedRequest", value: signedRequestValue)
+            }
             return map
         }
 
@@ -12685,6 +12708,7 @@ public struct BlueCatbirdChatDefs {
             case status
             case requestedAt
             case expiresAt
+            case signedRequest
         }
     }
 

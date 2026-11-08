@@ -6179,7 +6179,8 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val reservation: BlueCatbirdChatDefsLeafRecoveryReservation,        @SerialName("status")
         val status: BlueCatbirdChatDefsDefsLeafRecoveryStatus,        @SerialName("requestedAt")
         val requestedAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("expiresAt")
-        val expiresAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
+        val expiresAt: BlueCatbirdChatDefsCanonicalDatetime,/** The requester device's exact signed requestLeafRecovery, present exactly when that request created this recovery. An acceptance-created recovery carries none; its participantAcceptanceEntry carries the signed acceptance. A fulfiller verifies it under the PDS-authorized key of exactly requesterDid#requesterDeviceId and binds every view and reservation field to it before any Commit. */        @SerialName("signedRequest")
+        val signedRequest: BlueCatbirdChatDefsSignedLeafRecoveryRequest? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsLeafRecoveryView"
         }
