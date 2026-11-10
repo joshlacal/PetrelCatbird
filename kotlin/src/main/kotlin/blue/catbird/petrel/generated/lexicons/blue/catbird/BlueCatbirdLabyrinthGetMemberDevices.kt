@@ -21,8 +21,8 @@ object BlueCatbirdLabyrinthGetMemberDevicesDefs {
 /** chat.device_keys key id. */        @SerialName("keyId")
         val keyId: String,/** Ed25519 key. */        @SerialName("signingPublicKey")
         val signingPublicKey: Bytes,/** Seq of the commit that added the leaf. */        @SerialName("joinedSeq")
-        val joinedSeq: Int,/** Seq of the commit that removed it. */        @SerialName("removedSeq")
-        val removedSeq: Int? = null    ) {
+        val joinedSeq: Long,/** Seq of the commit that removed it. */        @SerialName("removedSeq")
+        val removedSeq: Long? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthGetMemberDevicesMemberDevice"
         }

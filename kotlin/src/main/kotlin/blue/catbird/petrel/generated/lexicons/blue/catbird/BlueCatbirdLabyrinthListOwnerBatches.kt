@@ -31,8 +31,8 @@ object BlueCatbirdLabyrinthListOwnerBatchesDefs {
     data class BlueCatbirdLabyrinthListOwnerBatchesParameters(
 // Conversation id.        @SerialName("threadId")
         val threadId: String,// Window start (ms).        @SerialName("fromMs")
-        val fromMs: Int? = null,// Window end (ms), exclusive.        @SerialName("untilMs")
-        val untilMs: Int? = null,// Only records the server received at or after this instant (serverOrder.receivedAt).        @SerialName("since")
+        val fromMs: Long? = null,// Window end (ms), exclusive.        @SerialName("untilMs")
+        val untilMs: Long? = null,// Only records the server received at or after this instant (serverOrder.receivedAt).        @SerialName("since")
         val since: ATProtocolDate? = null,// Only records the server received before this instant (serverOrder.receivedAt), exclusive.        @SerialName("until")
         val until: ATProtocolDate? = null,// Newest first: descending server seq. The cursor then continues toward older records.        @SerialName("reverse")
         val reverse: Boolean? = null,// Opaque cursor from the previous page.        @SerialName("cursor")

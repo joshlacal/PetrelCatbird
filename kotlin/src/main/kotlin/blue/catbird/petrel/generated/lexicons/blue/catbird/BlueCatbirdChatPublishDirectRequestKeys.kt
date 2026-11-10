@@ -24,7 +24,7 @@ object BlueCatbirdChatPublishDirectRequestKeysDefs {
     @Serializable
     data class BlueCatbirdChatPublishDirectRequestKeysOutput(
         @SerialName("revision")
-        val revision: Int,        @SerialName("enabled")
+        val revision: Long,        @SerialName("enabled")
         val enabled: Boolean    )
 
 sealed class BlueCatbirdChatPublishDirectRequestKeysError(val name: String, val description: String?) {

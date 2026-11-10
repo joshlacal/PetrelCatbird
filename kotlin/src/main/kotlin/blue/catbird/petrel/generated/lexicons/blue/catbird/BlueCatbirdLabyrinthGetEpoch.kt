@@ -19,7 +19,7 @@ object BlueCatbirdLabyrinthGetEpochDefs {
 @Serializable
     data class BlueCatbirdLabyrinthGetEpochParameters(
 // Epoch number.        @SerialName("epochNumber")
-        val epochNumber: Int    )
+        val epochNumber: Long    )
 
     @Serializable
     data class BlueCatbirdLabyrinthGetEpochOutput(

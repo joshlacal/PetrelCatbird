@@ -32,9 +32,9 @@ enum class BlueCatbirdPushDeliverWakePayloadWakeKind {
         @SerialName("wakeKind")
         val wakeKind: BlueCatbirdPushDeliverWakePayloadWakeKind,        @SerialName("conversationId")
         val conversationId: String,        @SerialName("generation")
-        val generation: Int,        @SerialName("seq")
-        val seq: Int,        @SerialName("epoch")
-        val epoch: Int,/** Optional inline MLS PrivateMessage ciphertext when <= 2,200 bytes (I12); omitted for larger frames so NSE fetches via getEntries. */        @SerialName("ciphertext")
+        val generation: Long,        @SerialName("seq")
+        val seq: Long,        @SerialName("epoch")
+        val epoch: Long,/** Optional inline MLS PrivateMessage ciphertext when <= 2,200 bytes (I12); omitted for larger frames so NSE fetches via getEntries. */        @SerialName("ciphertext")
         val ciphertext: Bytes? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdPushDeliverWakePayload"

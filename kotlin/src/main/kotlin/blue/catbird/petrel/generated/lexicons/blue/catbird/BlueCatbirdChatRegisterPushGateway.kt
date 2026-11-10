@@ -21,7 +21,7 @@ object BlueCatbirdChatRegisterPushGatewayDefs {
         @SerialName("deviceId")
         val deviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,// HTTPS endpoint ending in /xrpc/blue.catbird.push.deliver (DNS-pinned SSRF-validated on port 443).        @SerialName("gatewayUrl")
+        val authGeneration: Long,// HTTPS endpoint ending in /xrpc/blue.catbird.push.deliver (DNS-pinned SSRF-validated on port 443).        @SerialName("gatewayUrl")
         val gatewayUrl: URI,        @SerialName("appId")
         val appId: String,// Opaque CSPRNG base64url push routing key issued by the Push Gateway (empty when enabled is false).        @SerialName("pushKey")
         val pushKey: String,        @SerialName("enabled")

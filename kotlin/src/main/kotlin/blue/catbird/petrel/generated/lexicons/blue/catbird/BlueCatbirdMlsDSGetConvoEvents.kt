@@ -32,7 +32,8 @@ object BlueCatbirdMlsDSGetConvoEventsDefs {
         val entryId: String? = null,        @SerialName("entryKind")
         val entryKind: String? = null,        @SerialName("acceptedPayloadSha256")
         val acceptedPayloadSha256: Bytes? = null,        @SerialName("signedRequest")
-        val signedRequest: Bytes? = null,        @SerialName("outerFingerprint")
+        val signedRequest: Bytes? = null,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: Bytes? = null,        @SerialName("outerFingerprint")
         val outerFingerprint: Bytes? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdMlsDSGetConvoEventsConvoEventEntry"

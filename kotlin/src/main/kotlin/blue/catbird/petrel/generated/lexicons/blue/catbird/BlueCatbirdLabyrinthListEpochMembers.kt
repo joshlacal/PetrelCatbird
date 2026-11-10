@@ -19,7 +19,7 @@ object BlueCatbirdLabyrinthListEpochMembersDefs {
 @Serializable
     data class BlueCatbirdLabyrinthListEpochMembersParameters(
 // Epoch number.        @SerialName("epochNumber")
-        val epochNumber: Int,// Opaque cursor from the previous page.        @SerialName("cursor")
+        val epochNumber: Long,// Opaque cursor from the previous page.        @SerialName("cursor")
         val cursor: String? = null,// Page size (at most 100).        @SerialName("limit")
         val limit: Int? = null    )
 

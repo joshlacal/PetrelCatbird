@@ -22,7 +22,7 @@ object BlueCatbirdLabyrinthEpochMemberDefs {
     @Serializable
     data class BlueCatbirdLabyrinthEpochMember(
 /** Sequence number of the epoch. */        @SerialName("epochNumber")
-        val epochNumber: Int,/** The member device's deviceKeyPubkey. */        @SerialName("deviceKeyPubkey")
+        val epochNumber: Long,/** The member device's deviceKeyPubkey. */        @SerialName("deviceKeyPubkey")
         val deviceKeyPubkey: Bytes,/** HMAC(epochDeviceMacKey, deviceKeyPubkey). */        @SerialName("deviceMac")
         val deviceMac: Bytes,/** hawk_encrypt_auth(epochStorageKey, openerAuth, distPsk, 'epoch__'||seq, entropy) (1,169 bytes, I16); present for devices that carried over when the epoch opened. */        @SerialName("encryptedEntropy")
         val encryptedEntropy: Bytes? = null,        @SerialName("createdAt")

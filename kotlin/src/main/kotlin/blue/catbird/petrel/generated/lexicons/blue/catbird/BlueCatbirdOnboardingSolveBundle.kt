@@ -32,7 +32,7 @@ object BlueCatbirdOnboardingSolveBundleDefs {
         @SerialName("sessionId")
         val sessionId: String,        @SerialName("catalogVersion")
         val catalogVersion: String,        @SerialName("solveMs")
-        val solveMs: Int,        @SerialName("summary")
+        val solveMs: Long,        @SerialName("summary")
         val summary: BlueCatbirdOnboardingDefsBundleSummary,        @SerialName("follows")
         val follows: List<BlueCatbirdOnboardingDefsRecommendedFollow>,        @SerialName("feeds")
         val feeds: List<BlueCatbirdOnboardingDefsRecommendedFeed>,        @SerialName("starterPacks")

@@ -19,6 +19,33 @@ The aggregate hashes path-sorted lines of each file's SHA-256, two spaces, its
 path relative to `lexicons`, and LF. `Package.swift` pins a published Petrel
 revision so package resolution does not depend on the neighboring checkout.
 
+## Task 5 receipt projection (2026-11-11)
+
+This projection removes the unsupported optional `sequencerReceipt` from
+`blue.catbird.chat.defs#accountDeletedEntry`, whose authenticated evidence remains
+the required `sequencerAuthority`, and adds the separately stored receipt bytes to
+`blue.catbird.mlsDS.getConvoEvents#convoEventEntry` for lossless reconciliation.
+The checked-in Kotlin output remains reproducible by applying Petrel generator change
+`887b522a18949dda322ef9c3f0119ab52b95c2eb` ("map 64-bit and millisecond
+timestamp integers to Kotlin Long") as file changes to the canonical Petrel
+working copy based on `f381cb844d33d76ad7ca948698480d381712304b`. The resulting
+`generator/kotlin_type_converter.py` is SHA-256
+`574296a73ede89d3fc3dc35db015101649f730361aeeb13da05386181119ec4c`;
+no other Petrel generator file changed.
+
+The canonical `blue.catbird.chat.defs.json` is SHA-256
+`b0fe4af17f657647a8e1ceedb7a34765a0c72d514420ce3b153d6ecd11d240ff`.
+The 203-file overlay aggregate is
+`57a924bfa5384e5a6d1440b87a8d61d5ebf501de5f01d7f195db5f1b6bd68e58`.
+The generated projections contain 205 Swift files (aggregate
+`df5a77cfc45e102b8a0a20f5e1c22dafc8641d9660a5bd28b3a9217dbfcbec9d`),
+204 Kotlin files (aggregate
+`a619737463e32a67323d7dcccce8374363612d733ea5f5a26d3b2d4b34f7ab03`),
+and 671 Rust files (aggregate
+`7951c1e02876f4f0ddb4e5309ef1262812d1fc2547be411e416299b0e08b5fca`).
+The Kotlin projection retains `Long` for every integer wider than 32 bits,
+millisecond field, and `authGeneration`.
+
 The R4 leaf-recovery projection (optional `leafRecoveryView.signedRequest`, the
 requester device's exact signed `requestLeafRecovery`) was regenerated with
 Petrel `f381cb844d33d76ad7ca948698480d381712304b` (tree
@@ -43,10 +70,18 @@ hash-locked Python 3.12 generator environment and SwiftFormat **0.61.1**:
 cd ../Petrel
 .build/release-generator-venv/bin/python run.py --manifest ../PetrelCatbird/manifests/petrel-catbird.json
 cd ../PetrelCatbird
-swiftformat Sources/PetrelCatbird/Generated
+MINT_PATH=../Petrel/.build/release-tools/mint-packages \
+MINT_LINK_PATH=../Petrel/.build/release-tools/mint-links \
+  ../Petrel/.build/release-tools/mint run --executable swiftformat \
+  nicklockwood/SwiftFormat@0.61.1 Sources/PetrelCatbird/Generated
 swift test --build-system native --scratch-path .build/native-spaces --no-parallel
 cd kotlin
 ./gradlew test --no-daemon -Pkotlin.incremental=false -Pkotlin.compiler.execution.strategy=in-process '-Dorg.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=1g'
+cd ../../mls-ds
+cargo build --locked --manifest-path Cargo.toml -p mls-codegen --bin gen-lexicons
+cd ../catbird-atproto
+python3 Scripts/regenerate.py generate --generator ../mls-ds/target/debug/gen-lexicons
+python3 Scripts/regenerate.py check --generator ../mls-ds/target/debug/gen-lexicons
 ```
 
 The checked-in `.swiftformat` selects indentation, linebreak, blank-line and

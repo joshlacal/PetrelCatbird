@@ -4747,10 +4747,10 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     data class BlueCatbirdChatDefsConversationCoordinates(
         @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("generation")
-        val generation: Int,        @SerialName("stateVersion")
-        val stateVersion: Int,        @SerialName("groupId")
+        val generation: Long,        @SerialName("stateVersion")
+        val stateVersion: Long,        @SerialName("groupId")
         val groupId: Bytes,        @SerialName("epoch")
-        val epoch: Int,        @SerialName("groupContextHash")
+        val epoch: Long,        @SerialName("groupContextHash")
         val groupContextHash: Bytes,        @SerialName("confirmationTag")
         val confirmationTag: Bytes,        @SerialName("lifecycle")
         val lifecycle: BlueCatbirdChatDefsDefsLifecycle    ) {
@@ -4763,10 +4763,10 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     data class BlueCatbirdChatDefsApplicationFrameContext(
         @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("generation")
-        val generation: Int,        @SerialName("stateVersion")
-        val stateVersion: Int,        @SerialName("groupId")
+        val generation: Long,        @SerialName("stateVersion")
+        val stateVersion: Long,        @SerialName("groupId")
         val groupId: Bytes,        @SerialName("epoch")
-        val epoch: Int,        @SerialName("groupContextHash")
+        val epoch: Long,        @SerialName("groupContextHash")
         val groupContextHash: Bytes,        @SerialName("confirmationTag")
         val confirmationTag: Bytes,        @SerialName("lifecycle")
         val lifecycle: String    ) {
@@ -4779,9 +4779,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     data class BlueCatbirdChatDefsMetadataCryptoContext(
         @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("generation")
-        val generation: Int,        @SerialName("groupId")
+        val generation: Long,        @SerialName("groupId")
         val groupId: Bytes,        @SerialName("epoch")
-        val epoch: Int,        @SerialName("groupContextHash")
+        val epoch: Long,        @SerialName("groupContextHash")
         val groupContextHash: Bytes,        @SerialName("confirmationTag")
         val confirmationTag: Bytes    ) {
         companion object {
@@ -4796,10 +4796,10 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     data class BlueCatbirdChatDefsMlsAadPriorContext(
         @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("generation")
-        val generation: Int,        @SerialName("stateVersion")
-        val stateVersion: Int,        @SerialName("groupId")
+        val generation: Long,        @SerialName("stateVersion")
+        val stateVersion: Long,        @SerialName("groupId")
         val groupId: Bytes,        @SerialName("epoch")
-        val epoch: Int,        @SerialName("groupContextHash")
+        val epoch: Long,        @SerialName("groupContextHash")
         val groupContextHash: Bytes,        @SerialName("confirmationTag")
         val confirmationTag: Bytes,        @SerialName("lifecycle")
         val lifecycle: String    ) {
@@ -4903,7 +4903,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val deviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("signaturePublicKey")
         val signaturePublicKey: Bytes,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("status")
+        val authGeneration: Long,        @SerialName("status")
         val status: BlueCatbirdChatDefsDefsDeviceStatus,        @SerialName("createdAt")
         val createdAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("updatedAt")
         val updatedAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("availablePackageCount")
@@ -4989,7 +4989,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     @Serializable
     data class BlueCatbirdChatDefsLabyrinthHead(
         @SerialName("epochNumber")
-        val epochNumber: Int,        @SerialName("epochHead")
+        val epochNumber: Long,        @SerialName("epochHead")
         val epochHead: Bytes,        @SerialName("attestationKeyId")
         val attestationKeyId: String    ) {
         companion object {
@@ -5137,7 +5137,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("welcomeId")
         val welcomeId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("transitionSeq")
-        val transitionSeq: Int,        @SerialName("coordinates")
+        val transitionSeq: Long,        @SerialName("coordinates")
         val coordinates: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("status")
         val status: BlueCatbirdChatDefsDefsWelcomeStatus,        @SerialName("opaqueWelcome")
         val opaqueWelcome: Bytes,        @SerialName("sha256")
@@ -5159,7 +5159,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("protocolVersion")
         val protocolVersion: BlueCatbirdChatDefsDefsProtocolVersion,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("generation")
-        val generation: Int,        @SerialName("transitionId")
+        val generation: Long,        @SerialName("transitionId")
         val transitionId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsMlsAadPriorContext    ) {
         companion object {
@@ -5175,7 +5175,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("protocolVersion")
         val protocolVersion: BlueCatbirdChatDefsDefsProtocolVersion,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("generation")
-        val generation: Int,        @SerialName("messageId")
+        val generation: Long,        @SerialName("messageId")
         val messageId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsMlsAadPriorContext,/** [I13] HMAC-SHA256(key = frameNonce, data = canonicalPayloadBytes) bound into live MLS AAD and echoed in sequencerReceipt. */        @SerialName("archiveCommitment")
         val archiveCommitment: BlueCatbirdChatDefsArtifactHash? = null,        @SerialName("originalSenderAttestation")
@@ -5238,7 +5238,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val requesterDid: BlueCatbirdChatDefsBareDid,        @SerialName("requesterDeviceId")
         val requesterDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("requesterKeyId")
         val requesterKeyId: BlueCatbirdChatDefsKeyId,        @SerialName("requesterAuthGeneration")
-        val requesterAuthGeneration: Int,        @SerialName("keyPackageRef")
+        val requesterAuthGeneration: Long,        @SerialName("keyPackageRef")
         val keyPackageRef: Bytes,        @SerialName("cipherSuite")
         val cipherSuite: BlueCatbirdChatDefsDefsCipherSuite,        @SerialName("purpose")
         val purpose: String,        @SerialName("status")
@@ -5312,10 +5312,10 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     @Serializable
     data class BlueCatbirdChatDefsBlobUsageView(
         @SerialName("usedBytes")
-        val usedBytes: Int,        @SerialName("reservedBytes")
-        val reservedBytes: Int,        @SerialName("quotaBytes")
+        val usedBytes: Long,        @SerialName("reservedBytes")
+        val reservedBytes: Long,        @SerialName("quotaBytes")
         val quotaBytes: Int,        @SerialName("blobCount")
-        val blobCount: Int,        @SerialName("liveUnboundCount")
+        val blobCount: Long,        @SerialName("liveUnboundCount")
         val liveUnboundCount: Int    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsBlobUsageView"
@@ -5354,7 +5354,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("signaturePublicKey")
+        val authGeneration: Long,        @SerialName("signaturePublicKey")
         val signaturePublicKey: Bytes,        @SerialName("keyPackages")
         val keyPackages: List<BlueCatbirdChatDefsKeyPackageArtifact>,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
@@ -5371,9 +5371,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("targetDeviceId")
+        val authGeneration: Long,        @SerialName("targetDeviceId")
         val targetDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("targetAuthGeneration")
-        val targetAuthGeneration: Int,        @SerialName("idempotencyKey")
+        val targetAuthGeneration: Long,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
@@ -5394,7 +5394,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("absence")
+        val authGeneration: Long,        @SerialName("absence")
         val absence: Boolean,        @SerialName("next")
         val next: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("manifest")
         val manifest: BlueCatbirdChatDefsCreationManifest,        @SerialName("genesisGroupInfo")
@@ -5418,7 +5418,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("prior")
+        val authGeneration: Long,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("next")
         val next: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("aad")
         val aad: BlueCatbirdChatDefsCommitAad,        @SerialName("manifest")
@@ -5443,7 +5443,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("prior")
+        val authGeneration: Long,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("next")
         val next: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("participantChanges")
         val participantChanges: List<BlueCatbirdChatDefsParticipantChange>,        @SerialName("idempotencyKey")
@@ -5466,7 +5466,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("prior")
+        val authGeneration: Long,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("next")
         val next: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("invitationProvenance")
         val invitationProvenance: BlueCatbirdChatDefsInvitationProvenance,        @SerialName("idempotencyKey")
@@ -5488,8 +5488,8 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,/** Per-device send order within conversationId: strictly greater than every sendCounter this device has signed for the conversation, assigned in the same durable step that encrypts the frame and never reused. A sequencer resolving a messageId for the first time accepts it only if (prior.generation, prior.epoch, sendCounter) is lexicographically greater than this device's last accepted send in the conversation, so one device's sequenced order is its MLS generation order; otherwise it refuses StaleSend. An exact replay of an accepted send returns its stored outcome, never StaleSend. */        @SerialName("sendCounter")
-        val sendCounter: Int,        @SerialName("prior")
+        val authGeneration: Long,/** Per-device send order within conversationId: strictly greater than every sendCounter this device has signed for the conversation, assigned in the same durable step that encrypts the frame and never reused. A sequencer resolving a messageId for the first time accepts it only if (prior.generation, prior.epoch, sendCounter) is lexicographically greater than this device's last accepted send in the conversation, so one device's sequenced order is its MLS generation order; otherwise it refuses StaleSend. An exact replay of an accepted send returns its stored outcome, never StaleSend. */        @SerialName("sendCounter")
+        val sendCounter: Long,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("aad")
         val aad: BlueCatbirdChatDefsApplicationAad,        @SerialName("applicationMessage")
         val applicationMessage: BlueCatbirdChatDefsPrivateApplicationMessage,        @SerialName("blobBindings")
@@ -5511,7 +5511,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     @Serializable
     data class BlueCatbirdChatDefsMessageTarget(
         @SerialName("targetSeq")
-        val targetSeq: Int,        @SerialName("targetMessageId")
+        val targetSeq: Long,        @SerialName("targetMessageId")
         val targetMessageId: BlueCatbirdChatDefsIdentifierBytes    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsMessageTarget"
@@ -5691,7 +5691,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     @Serializable
     data class BlueCatbirdChatDefsReadStateFrameBody(
         @SerialName("throughSeq")
-        val throughSeq: Int,        @SerialName("throughMessageId")
+        val throughSeq: Long,        @SerialName("throughMessageId")
         val throughMessageId: BlueCatbirdChatDefsIdentifierBytes    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsReadStateFrameBody"
@@ -5798,7 +5798,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val altText: String? = null,        @SerialName("blurhash")
         val blurhash: String? = null,        @SerialName("originTransitionId")
         val originTransitionId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("originalMetadataVersion")
-        val originalMetadataVersion: Int,        @SerialName("setterDid")
+        val originalMetadataVersion: Long,        @SerialName("setterDid")
         val setterDid: BlueCatbirdChatDefsBareDid? = null,        @SerialName("spaceBlobCid")
         val spaceBlobCid: String? = null    ) {
         companion object {
@@ -5815,7 +5815,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val protocol: String,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("originTransitionId")
         val originTransitionId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("originalMetadataVersion")
-        val originalMetadataVersion: Int,        @SerialName("blobId")
+        val originalMetadataVersion: Long,        @SerialName("blobId")
         val blobId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("purpose")
         val purpose: String,        @SerialName("mediaType")
         val mediaType: String,        @SerialName("plaintextSize")
@@ -5834,10 +5834,10 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val protocol: String,        @SerialName("version")
         val version: Int,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("generation")
-        val generation: Int,        @SerialName("epoch")
-        val epoch: Int,        @SerialName("groupContextHash")
+        val generation: Long,        @SerialName("epoch")
+        val epoch: Long,        @SerialName("groupContextHash")
         val groupContextHash: BlueCatbirdChatDefsArtifactHash,        @SerialName("metadataVersion")
-        val metadataVersion: Int    ) {
+        val metadataVersion: Long    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsMetadataExporterContext"
         }
@@ -5864,7 +5864,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val protocol: String,        @SerialName("version")
         val version: Int,        @SerialName("coordinate")
         val coordinate: BlueCatbirdChatDefsMetadataCryptoContext,        @SerialName("metadataVersion")
-        val metadataVersion: Int,        @SerialName("originTransitionId")
+        val metadataVersion: Long,        @SerialName("originTransitionId")
         val originTransitionId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("ciphertextSize")
         val ciphertextSize: Int,        @SerialName("avatarBinding")
         val avatarBinding: BlueCatbirdChatDefsMetadataAadAvatarBinding? = null    ) {
@@ -5883,9 +5883,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val authorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("authorKeyId")
         val authorKeyId: BlueCatbirdChatDefsKeyId,        @SerialName("signaturePublicKey")
         val signaturePublicKey: Bytes,        @SerialName("authGenerationAtOrigin")
-        val authGenerationAtOrigin: Int,        @SerialName("originTransitionId")
+        val authGenerationAtOrigin: Long,        @SerialName("originTransitionId")
         val originTransitionId: BlueCatbirdChatDefsOperationId,        @SerialName("originSeq")
-        val originSeq: Int,        @SerialName("roleAtOrigin")
+        val originSeq: Long,        @SerialName("roleAtOrigin")
         val roleAtOrigin: String,        @SerialName("deviceStatusAtOrigin")
         val deviceStatusAtOrigin: String    ) {
         companion object {
@@ -5899,7 +5899,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val protocol: String,        @SerialName("version")
         val version: Int,        @SerialName("originTransitionId")
         val originTransitionId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("metadataVersion")
-        val metadataVersion: Int,        @SerialName("authorDid")
+        val metadataVersion: Long,        @SerialName("authorDid")
         val authorDid: BlueCatbirdChatDefsBareDid,        @SerialName("authorDeviceId")
         val authorDeviceId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("authorKeyId")
         val authorKeyId: BlueCatbirdChatDefsKeyId,        @SerialName("title")
@@ -5932,7 +5932,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("coordinate")
         val coordinate: BlueCatbirdChatDefsMetadataCryptoContext,        @SerialName("originTransitionId")
         val originTransitionId: BlueCatbirdChatDefsOperationId,        @SerialName("metadataVersion")
-        val metadataVersion: Int,        @SerialName("nonce")
+        val metadataVersion: Long,        @SerialName("nonce")
         val nonce: Bytes,        @SerialName("ciphertext")
         val ciphertext: Bytes,        @SerialName("ciphertextSha256")
         val ciphertextSha256: BlueCatbirdChatDefsArtifactHash,        @SerialName("ciphertextSize")
@@ -5955,7 +5955,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("prior")
+        val authGeneration: Long,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("next")
         val next: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("metadataSnapshot")
         val metadataSnapshot: BlueCatbirdChatDefsMetadataSnapshot,        @SerialName("idempotencyKey")
@@ -5977,7 +5977,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("coordinates")
+        val authGeneration: Long,        @SerialName("coordinates")
         val coordinates: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("isTyping")
         val isTyping: Boolean,        @SerialName("signedAt")
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
@@ -6012,7 +6012,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("prior")
+        val authGeneration: Long,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("ciphertextSha256")
         val ciphertextSha256: BlueCatbirdChatDefsArtifactHash,        @SerialName("ciphertextSize")
         val ciphertextSize: Int,        @SerialName("mediaType")
@@ -6034,7 +6034,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("idempotencyKey")
+        val authGeneration: Long,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
@@ -6050,7 +6050,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("prior")
+        val authGeneration: Long,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("reason")
         val reason: BlueCatbirdChatDefsDefsResetReason,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
@@ -6073,7 +6073,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("prior")
+        val authGeneration: Long,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("retired")
         val retired: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("successor")
         val successor: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("manifest")
@@ -6115,7 +6115,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("prior")
+        val authGeneration: Long,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("recoveryKind")
         val recoveryKind: BlueCatbirdChatDefsDefsLeafRecoveryKind,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
@@ -6133,7 +6133,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("idempotencyKey")
+        val authGeneration: Long,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
@@ -6153,7 +6153,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("prior")
+        val authGeneration: Long,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("next")
         val next: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("aad")
         val aad: BlueCatbirdChatDefsCommitAad,        @SerialName("manifest")
@@ -6284,7 +6284,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("prior")
+        val authGeneration: Long,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("retired")
         val retired: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
@@ -6305,7 +6305,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("prior")
+        val authGeneration: Long,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
@@ -6325,7 +6325,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("prior")
+        val authGeneration: Long,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("next")
         val next: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
@@ -6347,7 +6347,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("idempotencyKey")
+        val authGeneration: Long,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
@@ -6367,7 +6367,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("prior")
+        val authGeneration: Long,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("next")
         val next: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("aad")
         val aad: BlueCatbirdChatDefsCommitAad,        @SerialName("manifest")
@@ -6446,12 +6446,12 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("signatureDomain")
         val signatureDomain: String,        @SerialName("welcomeId")
         val welcomeId: BlueCatbirdChatDefsOperationId,        @SerialName("transitionSeq")
-        val transitionSeq: Int,        @SerialName("coordinates")
+        val transitionSeq: Long,        @SerialName("coordinates")
         val coordinates: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("actorDid")
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("idempotencyKey")
+        val authGeneration: Long,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
@@ -6464,13 +6464,13 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("signatureDomain")
         val signatureDomain: String,        @SerialName("welcomeId")
         val welcomeId: BlueCatbirdChatDefsOperationId,        @SerialName("transitionSeq")
-        val transitionSeq: Int,        @SerialName("coordinates")
+        val transitionSeq: Long,        @SerialName("coordinates")
         val coordinates: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("reason")
         val reason: BlueCatbirdChatDefsDefsWelcomeRejectionReason,        @SerialName("actorDid")
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("idempotencyKey")
+        val authGeneration: Long,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
@@ -6730,9 +6730,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val participants: List<BlueCatbirdChatDefsParticipantView>,        @SerialName("leaves")
         val leaves: List<BlueCatbirdChatDefsDeviceLeafView>,        @SerialName("metadataSnapshot")
         val metadataSnapshot: BlueCatbirdChatDefsMetadataSnapshot,        @SerialName("snapshotSeq")
-        val snapshotSeq: Int,        @SerialName("sequencerDid")
+        val snapshotSeq: Long,        @SerialName("sequencerDid")
         val sequencerDid: BlueCatbirdChatDefsBareDid? = null,        @SerialName("sequencerTerm")
-        val sequencerTerm: Int? = null,        @SerialName("directRequest")
+        val sequencerTerm: Long? = null,        @SerialName("directRequest")
         val directRequest: BlueCatbirdChatDefsDirectRequestState? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsConversationState"
@@ -6759,7 +6759,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val membershipIntervalId: BlueCatbirdChatDefsOperationId,        @SerialName("userDid")
         val userDid: BlueCatbirdChatDefsBareDid,        @SerialName("deviceId")
         val deviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("terminalSeq")
-        val terminalSeq: Int,        @SerialName("removedAt")
+        val terminalSeq: Long,        @SerialName("removedAt")
         val removedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsConversationRemovalTombstone"
@@ -6777,7 +6777,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val retired: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("closedByDid")
         val closedByDid: BlueCatbirdChatDefsBareDid,        @SerialName("closedByDeviceId")
         val closedByDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("terminalSeq")
-        val terminalSeq: Int,        @SerialName("closedAt")
+        val terminalSeq: Long,        @SerialName("closedAt")
         val closedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsConversationCloseTombstone"
@@ -6801,15 +6801,15 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     data class BlueCatbirdChatDefsSequencerReceipt(
         @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("generation")
-        val generation: Int,        @SerialName("groupId")
+        val generation: Long,        @SerialName("groupId")
         val groupId: BlueCatbirdChatDefsArtifactHash,        @SerialName("epoch")
-        val epoch: Int,        @SerialName("entryId")
+        val epoch: Long,        @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("senderDid")
+        val seq: Long,        @SerialName("senderDid")
         val senderDid: BlueCatbirdChatDefsBareDid,        @SerialName("senderDeviceId")
         val senderDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("archiveCommitment")
         val archiveCommitment: BlueCatbirdChatDefsArtifactHash,        @SerialName("issuedAtMs")
-        val issuedAtMs: Int,        @SerialName("sequencerDid")
+        val issuedAtMs: Long,        @SerialName("sequencerDid")
         val sequencerDid: BlueCatbirdChatDefsBareDid,        @SerialName("kid")
         val kid: String,        @SerialName("signature")
         val signature: Bytes    ) {
@@ -6826,7 +6826,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
+        val seq: Long,        @SerialName("signedRequest")
         val signedRequest: BlueCatbirdChatDefsSignedApplicationSend? = null,/** True once accepted_payload_bytes was pruned to NULL after all active non-dormant leaves acknowledged seq. */        @SerialName("payloadPruned")
         val payloadPruned: Boolean? = null,        @SerialName("sequencerReceipt")
         val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
@@ -6841,8 +6841,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedCommitTransition,        @SerialName("receivedAt")
+        val seq: Long,        @SerialName("signedRequest")
+        val signedRequest: BlueCatbirdChatDefsSignedCommitTransition,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsCommitEntry"
@@ -6854,8 +6855,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedPolicyTransition,        @SerialName("receivedAt")
+        val seq: Long,        @SerialName("signedRequest")
+        val signedRequest: BlueCatbirdChatDefsSignedPolicyTransition,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsPolicyEntry"
@@ -6867,8 +6869,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedMetadataTransition,        @SerialName("receivedAt")
+        val seq: Long,        @SerialName("signedRequest")
+        val signedRequest: BlueCatbirdChatDefsSignedMetadataTransition,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsMetadataEntry"
@@ -6880,8 +6883,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedCreation,        @SerialName("receivedAt")
+        val seq: Long,        @SerialName("signedRequest")
+        val signedRequest: BlueCatbirdChatDefsSignedCreation,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsCreationEntry"
@@ -6896,9 +6900,10 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
+        val seq: Long,        @SerialName("signedRequest")
         val signedRequest: BlueCatbirdChatDefsSignedParticipantAcceptance,        @SerialName("recovery")
-        val recovery: BlueCatbirdChatDefsLeafRecoveryView,        @SerialName("receivedAt")
+        val recovery: BlueCatbirdChatDefsLeafRecoveryView,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsParticipantAcceptanceEntry"
@@ -6910,9 +6915,10 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
+        val seq: Long,        @SerialName("signedRequest")
         val signedRequest: BlueCatbirdChatDefsSignedConversationClose,        @SerialName("tombstone")
-        val tombstone: BlueCatbirdChatDefsConversationCloseTombstone,        @SerialName("receivedAt")
+        val tombstone: BlueCatbirdChatDefsConversationCloseTombstone,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsConversationCloseEntry"
@@ -6924,8 +6930,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedResetRequest,        @SerialName("receivedAt")
+        val seq: Long,        @SerialName("signedRequest")
+        val signedRequest: BlueCatbirdChatDefsSignedResetRequest,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsResetRequestEntry"
@@ -6937,8 +6944,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedResetActivation,        @SerialName("receivedAt")
+        val seq: Long,        @SerialName("signedRequest")
+        val signedRequest: BlueCatbirdChatDefsSignedResetActivation,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsResetActivationEntry"
@@ -6950,8 +6958,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedLeafRecoveryFulfillment,        @SerialName("receivedAt")
+        val seq: Long,        @SerialName("signedRequest")
+        val signedRequest: BlueCatbirdChatDefsSignedLeafRecoveryFulfillment,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsLeafRecoveryFulfillmentEntry"
@@ -6963,8 +6972,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedLeaveRequest,        @SerialName("receivedAt")
+        val seq: Long,        @SerialName("signedRequest")
+        val signedRequest: BlueCatbirdChatDefsSignedLeaveRequest,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsLeaveRequestEntry"
@@ -6976,8 +6986,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedZeroLeafLeave,        @SerialName("receivedAt")
+        val seq: Long,        @SerialName("signedRequest")
+        val signedRequest: BlueCatbirdChatDefsSignedZeroLeafLeave,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsZeroLeafLeaveEntry"
@@ -6989,8 +7000,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedLeaveCancellation,        @SerialName("receivedAt")
+        val seq: Long,        @SerialName("signedRequest")
+        val signedRequest: BlueCatbirdChatDefsSignedLeaveCancellation,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsLeaveCancellationEntry"
@@ -7002,8 +7014,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedLeaveCommitFulfillment,        @SerialName("receivedAt")
+        val seq: Long,        @SerialName("signedRequest")
+        val signedRequest: BlueCatbirdChatDefsSignedLeaveCommitFulfillment,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsLeaveCommitFulfillmentEntry"
@@ -7032,7 +7045,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("deletedDid")
+        val seq: Long,        @SerialName("deletedDid")
         val deletedDid: BlueCatbirdChatDefsBareDid,        @SerialName("sequencerDid")
         val sequencerDid: BlueCatbirdChatDefsBareDid,        @SerialName("sequencerAuthority")
         val sequencerAuthority: BlueCatbirdChatDefsAccountDeletionAuthority,        @SerialName("signature")
@@ -7057,7 +7070,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationKind")
         val conversationKind: BlueCatbirdChatDefsDefsConversationKind,        @SerialName("terminalSeq")
-        val terminalSeq: Int    ) {
+        val terminalSeq: Long    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsConversationClosedEvent"
         }
@@ -7067,7 +7080,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     data class BlueCatbirdChatDefsMessageAvailableEvent(
         @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int    ) {
+        val seq: Long    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsMessageAvailableEvent"
         }
@@ -7135,7 +7148,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val membershipIntervalId: BlueCatbirdChatDefsOperationId,        @SerialName("userDid")
         val userDid: BlueCatbirdChatDefsBareDid,        @SerialName("deviceId")
         val deviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("terminalSeq")
-        val terminalSeq: Int    ) {
+        val terminalSeq: Long    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsAccessEndedEvent"
         }
@@ -7203,9 +7216,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("grantId")
+        val authGeneration: Long,        @SerialName("grantId")
         val grantId: BlueCatbirdChatDefsOperationId,        @SerialName("grantRevision")
-        val grantRevision: Int,        @SerialName("purpose")
+        val grantRevision: Long,        @SerialName("purpose")
         val purpose: String,        @SerialName("profile")
         val profile: BlueCatbirdChatDefsDirectRequestProfile,        @SerialName("keyPackageRef")
         val keyPackageRef: BlueCatbirdChatDefsArtifactHash,        @SerialName("keyPackageSha256")
@@ -7246,8 +7259,8 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("revision")
-        val revision: Int,        @SerialName("enabled")
+        val authGeneration: Long,        @SerialName("revision")
+        val revision: Long,        @SerialName("enabled")
         val enabled: Boolean,        @SerialName("keys")
         val keys: List<BlueCatbirdChatDefsDirectRequestKey>,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
@@ -7275,7 +7288,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("requestId")
+        val authGeneration: Long,        @SerialName("requestId")
         val requestId: BlueCatbirdChatDefsOperationId,        @SerialName("firstMessageId")
         val firstMessageId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("recipientDid")
@@ -7305,7 +7318,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("keyPackage")
+        val authGeneration: Long,        @SerialName("keyPackage")
         val keyPackage: BlueCatbirdChatDefsKeyPackageArtifact,        @SerialName("grant")
         val grant: BlueCatbirdChatDefsSignedDirectRequestGrant    ) {
         companion object {
@@ -7319,7 +7332,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int    ) {
+        val authGeneration: Long    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestCreator"
         }
@@ -7414,7 +7427,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val preparationDigest: BlueCatbirdChatDefsArtifactHash,        @SerialName("contextHash")
         val contextHash: BlueCatbirdChatDefsArtifactHash,        @SerialName("grantId")
         val grantId: BlueCatbirdChatDefsOperationId,        @SerialName("grantRevision")
-        val grantRevision: Int,        @SerialName("keyPackageRef")
+        val grantRevision: Long,        @SerialName("keyPackageRef")
         val keyPackageRef: BlueCatbirdChatDefsArtifactHash,/** Request-specific whole-second timestamp rendered with canonical .000Z. Nonzero fractional seconds are rejected as InvalidBootstrap; they are never truncated. */        @SerialName("importUntil")
         val importUntil: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
@@ -7472,7 +7485,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("requestId")
+        val authGeneration: Long,        @SerialName("requestId")
         val requestId: BlueCatbirdChatDefsOperationId,        @SerialName("firstMessageId")
         val firstMessageId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("recipientDid")
@@ -7512,7 +7525,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("requestId")
+        val authGeneration: Long,        @SerialName("requestId")
         val requestId: BlueCatbirdChatDefsOperationId,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("recipientDid")
@@ -7541,7 +7554,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("requestId")
+        val authGeneration: Long,        @SerialName("requestId")
         val requestId: BlueCatbirdChatDefsOperationId,        @SerialName("transitionId")
         val transitionId: BlueCatbirdChatDefsOperationId,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("next")
@@ -7595,7 +7608,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("actorKeyId")
         val actorKeyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("requestKind")
+        val authGeneration: Long,        @SerialName("requestKind")
         val requestKind: String,        @SerialName("sequencerReceipt")
         val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt    ) {
         companion object {
@@ -7613,7 +7626,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("actorKeyId")
         val actorKeyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("requestKind")
+        val authGeneration: Long,        @SerialName("requestKind")
         val requestKind: String    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestCancelledReceipt"
@@ -7630,7 +7643,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("actorKeyId")
         val actorKeyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("requestKind")
+        val authGeneration: Long,        @SerialName("requestKind")
         val requestKind: String    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestExpiredReceipt"
@@ -7648,7 +7661,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("actorKeyId")
         val actorKeyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("requestKind")
+        val authGeneration: Long,        @SerialName("requestKind")
         val requestKind: BlueCatbirdChatDefsDirectRequestRejectedReceiptRequestKind    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestRejectedReceipt"
@@ -7667,7 +7680,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("actorKeyId")
         val actorKeyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("requestKind")
+        val authGeneration: Long,        @SerialName("requestKind")
         val requestKind: BlueCatbirdChatDefsDirectRequestExistingDirectReceiptRequestKind    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestExistingDirectReceipt"
@@ -7733,7 +7746,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
+        val seq: Long,        @SerialName("signedRequest")
         val signedRequest: BlueCatbirdChatDefsSignedDirectRequestPublication? = null,/** True iff signedRequest is omitted because the opening ciphertext was pruned: every frozen-audience recipient device acknowledged it, its sender's account was deleted, the request expired, or it reached the 30-day retention ceiling; all other fields remain verbatim. */        @SerialName("payloadPruned")
         val payloadPruned: Boolean? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("sequencerReceipt")
@@ -7749,8 +7762,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("signedRequest")
-        val signedRequest: BlueCatbirdChatDefsSignedDirectRequestAcceptance,        @SerialName("receivedAt")
+        val seq: Long,        @SerialName("signedRequest")
+        val signedRequest: BlueCatbirdChatDefsSignedDirectRequestAcceptance,        @SerialName("sequencerReceipt")
+        val sequencerReceipt: BlueCatbirdChatDefsSequencerReceipt? = null,        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDirectRequestAcceptanceEntry"
@@ -7762,7 +7776,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("welcomeId")
         val welcomeId: BlueCatbirdChatDefsOperationId,        @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("transitionSeq")
-        val transitionSeq: Int,        @SerialName("coordinates")
+        val transitionSeq: Long,        @SerialName("coordinates")
         val coordinates: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("status")
         val status: BlueCatbirdChatDefsDefsWelcomeStatus,        @SerialName("opaqueWelcome")
         val opaqueWelcome: Bytes,        @SerialName("sha256")
@@ -7861,7 +7875,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     data class BlueCatbirdChatDefsDirectRequestKeyPoolStats(
         @SerialName("enabled")
         val enabled: Boolean,        @SerialName("revision")
-        val revision: Int,        @SerialName("usableCount")
+        val revision: Long,        @SerialName("usableCount")
         val usableCount: Int,        @SerialName("reservedCount")
         val reservedCount: Int,        @SerialName("asOf")
         val asOf: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("usableUntil")
@@ -7883,11 +7897,11 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("registrationId")
+        val authGeneration: Long,        @SerialName("registrationId")
         val registrationId: BlueCatbirdChatDefsOperationId,        @SerialName("provider")
         val provider: BlueCatbirdChatDefsPushRegistrationBodyProvider,        @SerialName("appId")
         val appId: String,        @SerialName("tokenGeneration")
-        val tokenGeneration: Int,        @SerialName("tokenSha256")
+        val tokenGeneration: Long,        @SerialName("tokenSha256")
         val tokenSha256: Bytes,        @SerialName("enabled")
         val enabled: Boolean,        @SerialName("signedAt")
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {

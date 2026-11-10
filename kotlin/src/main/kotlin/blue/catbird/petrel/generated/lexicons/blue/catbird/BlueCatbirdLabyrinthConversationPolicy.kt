@@ -20,6 +20,6 @@ object BlueCatbirdLabyrinthConversationPolicyDefs {
 data class BlueCatbirdLabyrinthConversationPolicy(
 // Canonical lowercase hyphenated UUIDv4 conversation identifier.    @SerialName("conversationId")
     val conversationId: String,// Conversation generation counter.    @SerialName("generation")
-    val generation: Int,// DID of the sequencing mls-ds Space authority.    @SerialName("sequencerDid")
+    val generation: Long,// DID of the sequencing mls-ds Space authority.    @SerialName("sequencerDid")
     val sequencerDid: DID,// Whether the policy is also mirrored as a com.atproto.space.policy record.    @SerialName("publishPolicy")
     val publishPolicy: Boolean? = null)

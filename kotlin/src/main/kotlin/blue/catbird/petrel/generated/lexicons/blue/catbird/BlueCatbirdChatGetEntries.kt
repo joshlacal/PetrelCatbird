@@ -21,14 +21,14 @@ object BlueCatbirdChatGetEntriesDefs {
 // Canonical lowercase hyphenated RFC 4122-variant UUIDv4 device ID; strict runtime validation rejects every other spelling, version, or variant.        @SerialName("actorDeviceId")
         val actorDeviceId: String,// Canonical lowercase hyphenated RFC 4122-variant UUIDv4 conversation ID; strict runtime validation rejects every other spelling/version/variant.        @SerialName("conversationId")
         val conversationId: String,        @SerialName("afterSeq")
-        val afterSeq: Int,        @SerialName("limit")
+        val afterSeq: Long,        @SerialName("limit")
         val limit: Int    )
 
     @Serializable
     data class BlueCatbirdChatGetEntriesOutput(
         @SerialName("entries")
         val entries: List<BlueCatbirdChatDefsConversationEntry>,        @SerialName("nextAfterSeq")
-        val nextAfterSeq: Int,        @SerialName("hasMore")
+        val nextAfterSeq: Long,        @SerialName("hasMore")
         val hasMore: Boolean    )
 
 sealed class BlueCatbirdChatGetEntriesError(val name: String, val description: String?) {

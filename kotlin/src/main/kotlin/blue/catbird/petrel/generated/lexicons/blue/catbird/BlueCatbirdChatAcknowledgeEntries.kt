@@ -20,19 +20,19 @@ object BlueCatbirdChatAcknowledgeEntriesDefs {
     data class BlueCatbirdChatAcknowledgeEntriesInput(
         @SerialName("conversationId")
         val conversationId: BlueCatbirdChatDefsOperationId,        @SerialName("generation")
-        val generation: Int,        @SerialName("actorDeviceId")
+        val generation: Long,        @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
-        val authGeneration: Int,        @SerialName("upToSeq")
-        val upToSeq: Int,        @SerialName("signedAt")
+        val authGeneration: Long,        @SerialName("upToSeq")
+        val upToSeq: Long,        @SerialName("signedAt")
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("signature")
         val signature: Bytes    )
 
     @Serializable
     data class BlueCatbirdChatAcknowledgeEntriesOutput(
         @SerialName("acknowledgedSeq")
-        val acknowledgedSeq: Int,        @SerialName("prunedCount")
-        val prunedCount: Int    )
+        val acknowledgedSeq: Long,        @SerialName("prunedCount")
+        val prunedCount: Long    )
 
 sealed class BlueCatbirdChatAcknowledgeEntriesError(val name: String, val description: String?) {
         object AccountSessionExpired: BlueCatbirdChatAcknowledgeEntriesError("AccountSessionExpired", null)

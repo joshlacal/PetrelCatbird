@@ -21,10 +21,11 @@ public struct BlueCatbirdMlsDSGetConvoEvents {
         public let entryKind: String?
         public let acceptedPayloadSha256: Bytes?
         public let signedRequest: Bytes?
+        public let sequencerReceipt: Bytes?
         public let outerFingerprint: Bytes?
 
         public init(
-            seq: Int, epoch: Int, msgId: String, messageType: String, ciphertext: Bytes, paddedSize: Int, createdAt: ATProtocolDate, entryId: String? = nil, entryKind: String? = nil, acceptedPayloadSha256: Bytes? = nil, signedRequest: Bytes? = nil, outerFingerprint: Bytes? = nil
+            seq: Int, epoch: Int, msgId: String, messageType: String, ciphertext: Bytes, paddedSize: Int, createdAt: ATProtocolDate, entryId: String? = nil, entryKind: String? = nil, acceptedPayloadSha256: Bytes? = nil, signedRequest: Bytes? = nil, sequencerReceipt: Bytes? = nil, outerFingerprint: Bytes? = nil
         ) {
             self.seq = seq
             self.epoch = epoch
@@ -37,6 +38,7 @@ public struct BlueCatbirdMlsDSGetConvoEvents {
             self.entryKind = entryKind
             self.acceptedPayloadSha256 = acceptedPayloadSha256
             self.signedRequest = signedRequest
+            self.sequencerReceipt = sequencerReceipt
             self.outerFingerprint = outerFingerprint
         }
 
@@ -117,6 +119,14 @@ public struct BlueCatbirdMlsDSGetConvoEvents {
                 self.signedRequest = nil
             }
             do {
+                self.sequencerReceipt = try container.decodeIfPresent(Bytes.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+            do {
                 self.outerFingerprint = try container.decodeIfPresent(Bytes.self, forKey: .outerFingerprint)
             } catch {
                 // Forward compatibility: a malformed or unknown-shaped optional field
@@ -140,6 +150,7 @@ public struct BlueCatbirdMlsDSGetConvoEvents {
             try container.encodeIfPresent(entryKind, forKey: .entryKind)
             try container.encodeIfPresent(acceptedPayloadSha256, forKey: .acceptedPayloadSha256)
             try container.encodeIfPresent(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encodeIfPresent(outerFingerprint, forKey: .outerFingerprint)
         }
 
@@ -167,6 +178,11 @@ public struct BlueCatbirdMlsDSGetConvoEvents {
                 hasher.combine(nil as Int?)
             }
             if let value = signedRequest {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = sequencerReceipt {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
@@ -213,6 +229,9 @@ public struct BlueCatbirdMlsDSGetConvoEvents {
             if signedRequest != other.signedRequest {
                 return false
             }
+            if sequencerReceipt != other.sequencerReceipt {
+                return false
+            }
             if outerFingerprint != other.outerFingerprint {
                 return false
             }
@@ -256,6 +275,10 @@ public struct BlueCatbirdMlsDSGetConvoEvents {
                 let signedRequestValue = try value.toCBORValue()
                 map = map.adding(key: "signedRequest", value: signedRequestValue)
             }
+            if let value = sequencerReceipt {
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
             if let value = outerFingerprint {
                 let outerFingerprintValue = try value.toCBORValue()
                 map = map.adding(key: "outerFingerprint", value: outerFingerprintValue)
@@ -276,6 +299,7 @@ public struct BlueCatbirdMlsDSGetConvoEvents {
             case entryKind
             case acceptedPayloadSha256
             case signedRequest
+            case sequencerReceipt
             case outerFingerprint
         }
     }

@@ -22,7 +22,7 @@ object BlueCatbirdLabyrinthDefsDefs {
     @Serializable
     data class BlueCatbirdLabyrinthDefsEpochPublic(
 /** epochSequenceID, starting at 0. */        @SerialName("epochNumber")
-        val epochNumber: Int,/** Hawk auth public key (X25519, 32 bytes). */        @SerialName("authPubkey")
+        val epochNumber: Long,/** Hawk auth public key (X25519, 32 bytes). */        @SerialName("authPubkey")
         val authPubkey: Bytes,/** Hawk encryption public key: X25519(32) || ML-KEM-768 ek(1184). */        @SerialName("encryptionPubkey")
         val encryptionPubkey: Bytes,/** XEdDSA mailbox signing public key (32 bytes). */        @SerialName("signingPubkey")
         val signingPubkey: Bytes,/** [Gate 3] SHA-256 over canonical sorted active epoch member deviceKeyPubkeys bound into epochHead. */        @SerialName("membersHash")
@@ -57,15 +57,15 @@ object BlueCatbirdLabyrinthDefsDefs {
     data class BlueCatbirdLabyrinthDefsSequencerReceipt(
         @SerialName("conversationId")
         val conversationId: String,        @SerialName("generation")
-        val generation: Int,        @SerialName("groupId")
+        val generation: Long,        @SerialName("groupId")
         val groupId: Bytes,        @SerialName("epoch")
-        val epoch: Int,        @SerialName("entryId")
+        val epoch: Long,        @SerialName("entryId")
         val entryId: String,        @SerialName("seq")
-        val seq: Int,        @SerialName("senderDid")
+        val seq: Long,        @SerialName("senderDid")
         val senderDid: DID,        @SerialName("senderDeviceId")
         val senderDeviceId: String,        @SerialName("archiveCommitment")
         val archiveCommitment: Bytes,        @SerialName("issuedAtMs")
-        val issuedAtMs: Int,        @SerialName("sequencerDid")
+        val issuedAtMs: Long,        @SerialName("sequencerDid")
         val sequencerDid: DID,        @SerialName("kid")
         val kid: String,        @SerialName("signature")
         val signature: Bytes    ) {
@@ -81,7 +81,7 @@ object BlueCatbirdLabyrinthDefsDefs {
     data class BlueCatbirdLabyrinthDefsSealedMessage(
 /** Chat message id. */        @SerialName("messageId")
         val messageId: String,/** Sequenced MLS entry seq from sequencerReceipt (I13). */        @SerialName("seq")
-        val seq: Int? = null,/** Milliseconds since Unix epoch. */        @SerialName("timestamp")
+        val seq: Long? = null,/** Milliseconds since Unix epoch. */        @SerialName("timestamp")
         val timestamp: Int,/** 12-byte MEK id. */        @SerialName("mekId")
         val mekId: Bytes,/** Sender chat device Ed25519 key. */        @SerialName("senderTransportPubkey")
         val senderTransportPubkey: Bytes,/** Ed25519 sig(64) || suite-tagged AEAD ciphertext of the padded (frameNonce || canonicalPayloadBytes) frame; empty once redacted. */        @SerialName("signedEncMessage")
@@ -101,9 +101,9 @@ object BlueCatbirdLabyrinthDefsDefs {
 /** Conversation id. */        @SerialName("threadId")
         val threadId: String,/** Message id. */        @SerialName("messageId")
         val messageId: String,/** Sequenced MLS entry seq when archived from a live conversation. */        @SerialName("seq")
-        val seq: Int? = null,/** ms since Unix epoch. */        @SerialName("timestamp")
+        val seq: Long? = null,/** ms since Unix epoch. */        @SerialName("timestamp")
         val timestamp: Int,/** Epoch whose root key derived the message key. */        @SerialName("epochNumber")
-        val epochNumber: Int,/** Cipher version. Writers use 5 ([CB-37]: binds messageId and timestamp; content kind byte for delete-for-me tombstones); readers also accept 0, 2, 3 and 4 (SPEC §7.1). */        @SerialName("version")
+        val epochNumber: Long,/** Cipher version. Writers use 5 ([CB-37]: binds messageId and timestamp; content kind byte for delete-for-me tombstones); readers also accept 0, 2, 3 and 4 (SPEC §7.1). */        @SerialName("version")
         val version: Int,/** Suite-tagged AEAD ciphertext of the padded frame (carrying frameNonce inside ciphertext when sequencerReceipt is present). */        @SerialName("encrypted")
         val encrypted: Bytes,        @SerialName("sequencerReceipt")
         val sequencerReceipt: BlueCatbirdLabyrinthDefsSequencerReceipt? = null    ) {
@@ -129,8 +129,8 @@ object BlueCatbirdLabyrinthDefsDefs {
     @Serializable
     data class BlueCatbirdLabyrinthDefsServerOrder(
 /** Per-conversation (owner batches: per-mailbox) Labyrinth write counter. */        @SerialName("seq")
-        val seq: Int,/** The conversation's last chat entry seq at the write, linearized against MLS commits; absent outside a conversation. */        @SerialName("chatSeq")
-        val chatSeq: Int? = null,/** Receive time on the server clock. */        @SerialName("receivedAt")
+        val seq: Long,/** The conversation's last chat entry seq at the write, linearized against MLS commits; absent outside a conversation. */        @SerialName("chatSeq")
+        val chatSeq: Long? = null,/** Receive time on the server clock. */        @SerialName("receivedAt")
         val receivedAt: ATProtocolDate    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsServerOrder"

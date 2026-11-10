@@ -39,7 +39,7 @@ enum class BlueCatbirdMlsDSDefsDefsFederationEndpoint {
         val senderDsDid: BlueCatbirdChatDefsBareDid,        @SerialName("receiverDsDid")
         val receiverDsDid: BlueCatbirdChatDefsBareDid,        @SerialName("sequencerDid")
         val sequencerDid: BlueCatbirdChatDefsBareDid,        @SerialName("sequencerTerm")
-        val sequencerTerm: Int,/** The mailbox's canonical admission instant for this signed operation. The sequencer must use this exact value as the entry receivedAt so both nodes canonicalize identical entry bytes. */        @SerialName("receivedAt")
+        val sequencerTerm: Long,/** The mailbox's canonical admission instant for this signed operation. The sequencer must use this exact value as the entry receivedAt so both nodes canonicalize identical entry bytes. */        @SerialName("receivedAt")
         val receivedAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("payloadSha256")
         val payloadSha256: Bytes    ) {
         companion object {
@@ -51,7 +51,7 @@ enum class BlueCatbirdMlsDSDefsDefsFederationEndpoint {
     data class BlueCatbirdMlsDSDefsEntryLocatorV1(
         @SerialName("entryId")
         val entryId: BlueCatbirdChatDefsOperationId,        @SerialName("seq")
-        val seq: Int,        @SerialName("acceptedPayloadSha256")
+        val seq: Long,        @SerialName("acceptedPayloadSha256")
         val acceptedPayloadSha256: Bytes,        @SerialName("outerEntryFingerprint")
         val outerEntryFingerprint: Bytes    ) {
         companion object {
@@ -69,7 +69,7 @@ enum class BlueCatbirdMlsDSDefsDefsFederationEndpoint {
         val senderDsDid: BlueCatbirdChatDefsBareDid,        @SerialName("receiverDsDid")
         val receiverDsDid: BlueCatbirdChatDefsBareDid,        @SerialName("sequencerDid")
         val sequencerDid: BlueCatbirdChatDefsBareDid,        @SerialName("sequencerTerm")
-        val sequencerTerm: Int,        @SerialName("envelopeSha256")
+        val sequencerTerm: Long,        @SerialName("envelopeSha256")
         val envelopeSha256: Bytes,        @SerialName("resultSha256")
         val resultSha256: Bytes,        @SerialName("sourceLocator")
         val sourceLocator: BlueCatbirdMlsDSDefsEntryLocatorV1,        @SerialName("completedAt")

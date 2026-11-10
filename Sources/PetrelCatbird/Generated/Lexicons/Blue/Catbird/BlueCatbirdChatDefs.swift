@@ -18318,15 +18318,17 @@ public struct BlueCatbirdChatDefs {
         public let conversationId: OperationId
         public let seq: Int
         public let signedRequest: SignedCommitTransition
+        public let sequencerReceipt: SequencerReceipt?
         public let receivedAt: CanonicalDatetime
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedCommitTransition, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedCommitTransition, sequencerReceipt: SequencerReceipt? = nil, receivedAt: CanonicalDatetime
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
+            self.sequencerReceipt = sequencerReceipt
             self.receivedAt = receivedAt
         }
 
@@ -18357,6 +18359,14 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+            do {
                 self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
@@ -18371,6 +18381,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(seq, forKey: .seq)
             try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encode(receivedAt, forKey: .receivedAt)
         }
 
@@ -18379,6 +18390,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(conversationId)
             hasher.combine(seq)
             hasher.combine(signedRequest)
+            if let value = sequencerReceipt {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(receivedAt)
         }
 
@@ -18394,6 +18410,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if signedRequest != other.signedRequest {
+                return false
+            }
+            if sequencerReceipt != other.sequencerReceipt {
                 return false
             }
             if receivedAt != other.receivedAt {
@@ -18417,6 +18436,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "seq", value: seqValue)
             let signedRequestValue = try signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
+            if let value = sequencerReceipt {
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
             return map
@@ -18428,6 +18451,7 @@ public struct BlueCatbirdChatDefs {
             case conversationId
             case seq
             case signedRequest
+            case sequencerReceipt
             case receivedAt
         }
     }
@@ -18438,15 +18462,17 @@ public struct BlueCatbirdChatDefs {
         public let conversationId: OperationId
         public let seq: Int
         public let signedRequest: SignedPolicyTransition
+        public let sequencerReceipt: SequencerReceipt?
         public let receivedAt: CanonicalDatetime
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedPolicyTransition, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedPolicyTransition, sequencerReceipt: SequencerReceipt? = nil, receivedAt: CanonicalDatetime
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
+            self.sequencerReceipt = sequencerReceipt
             self.receivedAt = receivedAt
         }
 
@@ -18477,6 +18503,14 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+            do {
                 self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
@@ -18491,6 +18525,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(seq, forKey: .seq)
             try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encode(receivedAt, forKey: .receivedAt)
         }
 
@@ -18499,6 +18534,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(conversationId)
             hasher.combine(seq)
             hasher.combine(signedRequest)
+            if let value = sequencerReceipt {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(receivedAt)
         }
 
@@ -18514,6 +18554,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if signedRequest != other.signedRequest {
+                return false
+            }
+            if sequencerReceipt != other.sequencerReceipt {
                 return false
             }
             if receivedAt != other.receivedAt {
@@ -18537,6 +18580,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "seq", value: seqValue)
             let signedRequestValue = try signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
+            if let value = sequencerReceipt {
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
             return map
@@ -18548,6 +18595,7 @@ public struct BlueCatbirdChatDefs {
             case conversationId
             case seq
             case signedRequest
+            case sequencerReceipt
             case receivedAt
         }
     }
@@ -18558,15 +18606,17 @@ public struct BlueCatbirdChatDefs {
         public let conversationId: OperationId
         public let seq: Int
         public let signedRequest: SignedMetadataTransition
+        public let sequencerReceipt: SequencerReceipt?
         public let receivedAt: CanonicalDatetime
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedMetadataTransition, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedMetadataTransition, sequencerReceipt: SequencerReceipt? = nil, receivedAt: CanonicalDatetime
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
+            self.sequencerReceipt = sequencerReceipt
             self.receivedAt = receivedAt
         }
 
@@ -18597,6 +18647,14 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+            do {
                 self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
@@ -18611,6 +18669,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(seq, forKey: .seq)
             try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encode(receivedAt, forKey: .receivedAt)
         }
 
@@ -18619,6 +18678,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(conversationId)
             hasher.combine(seq)
             hasher.combine(signedRequest)
+            if let value = sequencerReceipt {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(receivedAt)
         }
 
@@ -18634,6 +18698,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if signedRequest != other.signedRequest {
+                return false
+            }
+            if sequencerReceipt != other.sequencerReceipt {
                 return false
             }
             if receivedAt != other.receivedAt {
@@ -18657,6 +18724,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "seq", value: seqValue)
             let signedRequestValue = try signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
+            if let value = sequencerReceipt {
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
             return map
@@ -18668,6 +18739,7 @@ public struct BlueCatbirdChatDefs {
             case conversationId
             case seq
             case signedRequest
+            case sequencerReceipt
             case receivedAt
         }
     }
@@ -18678,15 +18750,17 @@ public struct BlueCatbirdChatDefs {
         public let conversationId: OperationId
         public let seq: Int
         public let signedRequest: SignedCreation
+        public let sequencerReceipt: SequencerReceipt?
         public let receivedAt: CanonicalDatetime
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedCreation, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedCreation, sequencerReceipt: SequencerReceipt? = nil, receivedAt: CanonicalDatetime
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
+            self.sequencerReceipt = sequencerReceipt
             self.receivedAt = receivedAt
         }
 
@@ -18717,6 +18791,14 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+            do {
                 self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
@@ -18731,6 +18813,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(seq, forKey: .seq)
             try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encode(receivedAt, forKey: .receivedAt)
         }
 
@@ -18739,6 +18822,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(conversationId)
             hasher.combine(seq)
             hasher.combine(signedRequest)
+            if let value = sequencerReceipt {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(receivedAt)
         }
 
@@ -18754,6 +18842,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if signedRequest != other.signedRequest {
+                return false
+            }
+            if sequencerReceipt != other.sequencerReceipt {
                 return false
             }
             if receivedAt != other.receivedAt {
@@ -18777,6 +18868,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "seq", value: seqValue)
             let signedRequestValue = try signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
+            if let value = sequencerReceipt {
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
             return map
@@ -18788,6 +18883,7 @@ public struct BlueCatbirdChatDefs {
             case conversationId
             case seq
             case signedRequest
+            case sequencerReceipt
             case receivedAt
         }
     }
@@ -18799,16 +18895,18 @@ public struct BlueCatbirdChatDefs {
         public let seq: Int
         public let signedRequest: SignedParticipantAcceptance
         public let recovery: LeafRecoveryView
+        public let sequencerReceipt: SequencerReceipt?
         public let receivedAt: CanonicalDatetime
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedParticipantAcceptance, recovery: LeafRecoveryView, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedParticipantAcceptance, recovery: LeafRecoveryView, sequencerReceipt: SequencerReceipt? = nil, receivedAt: CanonicalDatetime
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
             self.recovery = recovery
+            self.sequencerReceipt = sequencerReceipt
             self.receivedAt = receivedAt
         }
 
@@ -18845,6 +18943,14 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+            do {
                 self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
@@ -18860,6 +18966,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(seq, forKey: .seq)
             try container.encode(signedRequest, forKey: .signedRequest)
             try container.encode(recovery, forKey: .recovery)
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encode(receivedAt, forKey: .receivedAt)
         }
 
@@ -18869,6 +18976,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(seq)
             hasher.combine(signedRequest)
             hasher.combine(recovery)
+            if let value = sequencerReceipt {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(receivedAt)
         }
 
@@ -18887,6 +18999,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if recovery != other.recovery {
+                return false
+            }
+            if sequencerReceipt != other.sequencerReceipt {
                 return false
             }
             if receivedAt != other.receivedAt {
@@ -18912,6 +19027,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "signedRequest", value: signedRequestValue)
             let recoveryValue = try recovery.toCBORValue()
             map = map.adding(key: "recovery", value: recoveryValue)
+            if let value = sequencerReceipt {
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
             return map
@@ -18924,6 +19043,7 @@ public struct BlueCatbirdChatDefs {
             case seq
             case signedRequest
             case recovery
+            case sequencerReceipt
             case receivedAt
         }
     }
@@ -18935,16 +19055,18 @@ public struct BlueCatbirdChatDefs {
         public let seq: Int
         public let signedRequest: SignedConversationClose
         public let tombstone: ConversationCloseTombstone
+        public let sequencerReceipt: SequencerReceipt?
         public let receivedAt: CanonicalDatetime
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedConversationClose, tombstone: ConversationCloseTombstone, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedConversationClose, tombstone: ConversationCloseTombstone, sequencerReceipt: SequencerReceipt? = nil, receivedAt: CanonicalDatetime
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
             self.tombstone = tombstone
+            self.sequencerReceipt = sequencerReceipt
             self.receivedAt = receivedAt
         }
 
@@ -18981,6 +19103,14 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+            do {
                 self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
@@ -18996,6 +19126,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(seq, forKey: .seq)
             try container.encode(signedRequest, forKey: .signedRequest)
             try container.encode(tombstone, forKey: .tombstone)
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encode(receivedAt, forKey: .receivedAt)
         }
 
@@ -19005,6 +19136,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(seq)
             hasher.combine(signedRequest)
             hasher.combine(tombstone)
+            if let value = sequencerReceipt {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(receivedAt)
         }
 
@@ -19023,6 +19159,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if tombstone != other.tombstone {
+                return false
+            }
+            if sequencerReceipt != other.sequencerReceipt {
                 return false
             }
             if receivedAt != other.receivedAt {
@@ -19048,6 +19187,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "signedRequest", value: signedRequestValue)
             let tombstoneValue = try tombstone.toCBORValue()
             map = map.adding(key: "tombstone", value: tombstoneValue)
+            if let value = sequencerReceipt {
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
             return map
@@ -19060,6 +19203,7 @@ public struct BlueCatbirdChatDefs {
             case seq
             case signedRequest
             case tombstone
+            case sequencerReceipt
             case receivedAt
         }
     }
@@ -19070,15 +19214,17 @@ public struct BlueCatbirdChatDefs {
         public let conversationId: OperationId
         public let seq: Int
         public let signedRequest: SignedResetRequest
+        public let sequencerReceipt: SequencerReceipt?
         public let receivedAt: CanonicalDatetime
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedResetRequest, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedResetRequest, sequencerReceipt: SequencerReceipt? = nil, receivedAt: CanonicalDatetime
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
+            self.sequencerReceipt = sequencerReceipt
             self.receivedAt = receivedAt
         }
 
@@ -19109,6 +19255,14 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+            do {
                 self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
@@ -19123,6 +19277,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(seq, forKey: .seq)
             try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encode(receivedAt, forKey: .receivedAt)
         }
 
@@ -19131,6 +19286,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(conversationId)
             hasher.combine(seq)
             hasher.combine(signedRequest)
+            if let value = sequencerReceipt {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(receivedAt)
         }
 
@@ -19146,6 +19306,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if signedRequest != other.signedRequest {
+                return false
+            }
+            if sequencerReceipt != other.sequencerReceipt {
                 return false
             }
             if receivedAt != other.receivedAt {
@@ -19169,6 +19332,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "seq", value: seqValue)
             let signedRequestValue = try signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
+            if let value = sequencerReceipt {
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
             return map
@@ -19180,6 +19347,7 @@ public struct BlueCatbirdChatDefs {
             case conversationId
             case seq
             case signedRequest
+            case sequencerReceipt
             case receivedAt
         }
     }
@@ -19190,15 +19358,17 @@ public struct BlueCatbirdChatDefs {
         public let conversationId: OperationId
         public let seq: Int
         public let signedRequest: SignedResetActivation
+        public let sequencerReceipt: SequencerReceipt?
         public let receivedAt: CanonicalDatetime
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedResetActivation, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedResetActivation, sequencerReceipt: SequencerReceipt? = nil, receivedAt: CanonicalDatetime
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
+            self.sequencerReceipt = sequencerReceipt
             self.receivedAt = receivedAt
         }
 
@@ -19229,6 +19399,14 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+            do {
                 self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
@@ -19243,6 +19421,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(seq, forKey: .seq)
             try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encode(receivedAt, forKey: .receivedAt)
         }
 
@@ -19251,6 +19430,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(conversationId)
             hasher.combine(seq)
             hasher.combine(signedRequest)
+            if let value = sequencerReceipt {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(receivedAt)
         }
 
@@ -19266,6 +19450,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if signedRequest != other.signedRequest {
+                return false
+            }
+            if sequencerReceipt != other.sequencerReceipt {
                 return false
             }
             if receivedAt != other.receivedAt {
@@ -19289,6 +19476,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "seq", value: seqValue)
             let signedRequestValue = try signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
+            if let value = sequencerReceipt {
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
             return map
@@ -19300,6 +19491,7 @@ public struct BlueCatbirdChatDefs {
             case conversationId
             case seq
             case signedRequest
+            case sequencerReceipt
             case receivedAt
         }
     }
@@ -19310,15 +19502,17 @@ public struct BlueCatbirdChatDefs {
         public let conversationId: OperationId
         public let seq: Int
         public let signedRequest: SignedLeafRecoveryFulfillment
+        public let sequencerReceipt: SequencerReceipt?
         public let receivedAt: CanonicalDatetime
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedLeafRecoveryFulfillment, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedLeafRecoveryFulfillment, sequencerReceipt: SequencerReceipt? = nil, receivedAt: CanonicalDatetime
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
+            self.sequencerReceipt = sequencerReceipt
             self.receivedAt = receivedAt
         }
 
@@ -19349,6 +19543,14 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+            do {
                 self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
@@ -19363,6 +19565,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(seq, forKey: .seq)
             try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encode(receivedAt, forKey: .receivedAt)
         }
 
@@ -19371,6 +19574,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(conversationId)
             hasher.combine(seq)
             hasher.combine(signedRequest)
+            if let value = sequencerReceipt {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(receivedAt)
         }
 
@@ -19386,6 +19594,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if signedRequest != other.signedRequest {
+                return false
+            }
+            if sequencerReceipt != other.sequencerReceipt {
                 return false
             }
             if receivedAt != other.receivedAt {
@@ -19409,6 +19620,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "seq", value: seqValue)
             let signedRequestValue = try signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
+            if let value = sequencerReceipt {
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
             return map
@@ -19420,6 +19635,7 @@ public struct BlueCatbirdChatDefs {
             case conversationId
             case seq
             case signedRequest
+            case sequencerReceipt
             case receivedAt
         }
     }
@@ -19430,15 +19646,17 @@ public struct BlueCatbirdChatDefs {
         public let conversationId: OperationId
         public let seq: Int
         public let signedRequest: SignedLeaveRequest
+        public let sequencerReceipt: SequencerReceipt?
         public let receivedAt: CanonicalDatetime
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedLeaveRequest, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedLeaveRequest, sequencerReceipt: SequencerReceipt? = nil, receivedAt: CanonicalDatetime
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
+            self.sequencerReceipt = sequencerReceipt
             self.receivedAt = receivedAt
         }
 
@@ -19469,6 +19687,14 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+            do {
                 self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
@@ -19483,6 +19709,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(seq, forKey: .seq)
             try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encode(receivedAt, forKey: .receivedAt)
         }
 
@@ -19491,6 +19718,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(conversationId)
             hasher.combine(seq)
             hasher.combine(signedRequest)
+            if let value = sequencerReceipt {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(receivedAt)
         }
 
@@ -19506,6 +19738,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if signedRequest != other.signedRequest {
+                return false
+            }
+            if sequencerReceipt != other.sequencerReceipt {
                 return false
             }
             if receivedAt != other.receivedAt {
@@ -19529,6 +19764,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "seq", value: seqValue)
             let signedRequestValue = try signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
+            if let value = sequencerReceipt {
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
             return map
@@ -19540,6 +19779,7 @@ public struct BlueCatbirdChatDefs {
             case conversationId
             case seq
             case signedRequest
+            case sequencerReceipt
             case receivedAt
         }
     }
@@ -19550,15 +19790,17 @@ public struct BlueCatbirdChatDefs {
         public let conversationId: OperationId
         public let seq: Int
         public let signedRequest: SignedZeroLeafLeave
+        public let sequencerReceipt: SequencerReceipt?
         public let receivedAt: CanonicalDatetime
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedZeroLeafLeave, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedZeroLeafLeave, sequencerReceipt: SequencerReceipt? = nil, receivedAt: CanonicalDatetime
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
+            self.sequencerReceipt = sequencerReceipt
             self.receivedAt = receivedAt
         }
 
@@ -19589,6 +19831,14 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+            do {
                 self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
@@ -19603,6 +19853,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(seq, forKey: .seq)
             try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encode(receivedAt, forKey: .receivedAt)
         }
 
@@ -19611,6 +19862,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(conversationId)
             hasher.combine(seq)
             hasher.combine(signedRequest)
+            if let value = sequencerReceipt {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(receivedAt)
         }
 
@@ -19626,6 +19882,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if signedRequest != other.signedRequest {
+                return false
+            }
+            if sequencerReceipt != other.sequencerReceipt {
                 return false
             }
             if receivedAt != other.receivedAt {
@@ -19649,6 +19908,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "seq", value: seqValue)
             let signedRequestValue = try signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
+            if let value = sequencerReceipt {
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
             return map
@@ -19660,6 +19923,7 @@ public struct BlueCatbirdChatDefs {
             case conversationId
             case seq
             case signedRequest
+            case sequencerReceipt
             case receivedAt
         }
     }
@@ -19670,15 +19934,17 @@ public struct BlueCatbirdChatDefs {
         public let conversationId: OperationId
         public let seq: Int
         public let signedRequest: SignedLeaveCancellation
+        public let sequencerReceipt: SequencerReceipt?
         public let receivedAt: CanonicalDatetime
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedLeaveCancellation, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedLeaveCancellation, sequencerReceipt: SequencerReceipt? = nil, receivedAt: CanonicalDatetime
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
+            self.sequencerReceipt = sequencerReceipt
             self.receivedAt = receivedAt
         }
 
@@ -19709,6 +19975,14 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+            do {
                 self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
@@ -19723,6 +19997,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(seq, forKey: .seq)
             try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encode(receivedAt, forKey: .receivedAt)
         }
 
@@ -19731,6 +20006,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(conversationId)
             hasher.combine(seq)
             hasher.combine(signedRequest)
+            if let value = sequencerReceipt {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(receivedAt)
         }
 
@@ -19746,6 +20026,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if signedRequest != other.signedRequest {
+                return false
+            }
+            if sequencerReceipt != other.sequencerReceipt {
                 return false
             }
             if receivedAt != other.receivedAt {
@@ -19769,6 +20052,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "seq", value: seqValue)
             let signedRequestValue = try signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
+            if let value = sequencerReceipt {
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
             return map
@@ -19780,6 +20067,7 @@ public struct BlueCatbirdChatDefs {
             case conversationId
             case seq
             case signedRequest
+            case sequencerReceipt
             case receivedAt
         }
     }
@@ -19790,15 +20078,17 @@ public struct BlueCatbirdChatDefs {
         public let conversationId: OperationId
         public let seq: Int
         public let signedRequest: SignedLeaveCommitFulfillment
+        public let sequencerReceipt: SequencerReceipt?
         public let receivedAt: CanonicalDatetime
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedLeaveCommitFulfillment, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedLeaveCommitFulfillment, sequencerReceipt: SequencerReceipt? = nil, receivedAt: CanonicalDatetime
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
+            self.sequencerReceipt = sequencerReceipt
             self.receivedAt = receivedAt
         }
 
@@ -19829,6 +20119,14 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+            do {
                 self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
@@ -19843,6 +20141,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(seq, forKey: .seq)
             try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encode(receivedAt, forKey: .receivedAt)
         }
 
@@ -19851,6 +20150,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(conversationId)
             hasher.combine(seq)
             hasher.combine(signedRequest)
+            if let value = sequencerReceipt {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(receivedAt)
         }
 
@@ -19866,6 +20170,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if signedRequest != other.signedRequest {
+                return false
+            }
+            if sequencerReceipt != other.sequencerReceipt {
                 return false
             }
             if receivedAt != other.receivedAt {
@@ -19889,6 +20196,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "seq", value: seqValue)
             let signedRequestValue = try signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
+            if let value = sequencerReceipt {
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
             return map
@@ -19900,6 +20211,7 @@ public struct BlueCatbirdChatDefs {
             case conversationId
             case seq
             case signedRequest
+            case sequencerReceipt
             case receivedAt
         }
     }
@@ -26719,15 +27031,17 @@ public struct BlueCatbirdChatDefs {
         public let conversationId: OperationId
         public let seq: Int
         public let signedRequest: SignedDirectRequestAcceptance
+        public let sequencerReceipt: SequencerReceipt?
         public let receivedAt: CanonicalDatetime
 
         public init(
-            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedDirectRequestAcceptance, receivedAt: CanonicalDatetime
+            entryId: OperationId, conversationId: OperationId, seq: Int, signedRequest: SignedDirectRequestAcceptance, sequencerReceipt: SequencerReceipt? = nil, receivedAt: CanonicalDatetime
         ) {
             self.entryId = entryId
             self.conversationId = conversationId
             self.seq = seq
             self.signedRequest = signedRequest
+            self.sequencerReceipt = sequencerReceipt
             self.receivedAt = receivedAt
         }
 
@@ -26758,6 +27072,14 @@ public struct BlueCatbirdChatDefs {
                 throw error
             }
             do {
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
+            } catch {
+                // Forward compatibility: a malformed or unknown-shaped optional field
+                // must not fail the whole response.
+                LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
+                self.sequencerReceipt = nil
+            }
+            do {
                 self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
             } catch {
                 LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
@@ -26772,6 +27094,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(conversationId, forKey: .conversationId)
             try container.encode(seq, forKey: .seq)
             try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
             try container.encode(receivedAt, forKey: .receivedAt)
         }
 
@@ -26780,6 +27103,11 @@ public struct BlueCatbirdChatDefs {
             hasher.combine(conversationId)
             hasher.combine(seq)
             hasher.combine(signedRequest)
+            if let value = sequencerReceipt {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(receivedAt)
         }
 
@@ -26795,6 +27123,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if signedRequest != other.signedRequest {
+                return false
+            }
+            if sequencerReceipt != other.sequencerReceipt {
                 return false
             }
             if receivedAt != other.receivedAt {
@@ -26818,6 +27149,10 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "seq", value: seqValue)
             let signedRequestValue = try signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
+            if let value = sequencerReceipt {
+                let sequencerReceiptValue = try value.toCBORValue()
+                map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
+            }
             let receivedAtValue = try receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
             return map
@@ -26829,6 +27164,7 @@ public struct BlueCatbirdChatDefs {
             case conversationId
             case seq
             case signedRequest
+            case sequencerReceipt
             case receivedAt
         }
     }

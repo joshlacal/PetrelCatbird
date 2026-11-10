@@ -26,7 +26,7 @@ object BlueCatbirdLabyrinthCreateEpochDefs {
     data class BlueCatbirdLabyrinthCreateEpochOutput(
 // Backend-assigned epochID.        @SerialName("epochId")
         val epochId: String,// The epoch's number.        @SerialName("epochNumber")
-        val epochNumber: Int    )
+        val epochNumber: Long    )
 
 sealed class BlueCatbirdLabyrinthCreateEpochError(val name: String, val description: String?) {
         object RecordAlreadyExists: BlueCatbirdLabyrinthCreateEpochError("RecordAlreadyExists", null)
