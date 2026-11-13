@@ -6,12 +6,14 @@ adding immutable conversation Space placement, authenticated history references,
 current membership lookup, and permanent generation deletion. Schemas are the
 source of truth; generated Swift and Kotlin are never patched by hand.
 
-The corresponding Petrel core uses the exact November 12 upstream Spaces alpha
-`d4def6e9f521896ed8222f576d54923d00b5fbeb` (published as
-`0.0.0-spaces-alpha-20261112204144`). Petrel generator commit
-`4cf789bafd4837f3ec3ab8e6fea545daeea9acd0` vendors all 39
+The corresponding Petrel core at head
+`fb3281346e5a26db68c638b16af7ed6656fe615a` (PR
+[`#73`](https://github.com/joshlacal/Petrel/pull/73)) uses the exact November 12
+upstream Spaces alpha `d4def6e9f521896ed8222f576d54923d00b5fbeb`
+(published as `0.0.0-spaces-alpha-20261112204144`). Its published generator
+revision `7d47f90684a73b9b420378f4925a686a6cb4cd17` vendors all 39
 `com.atproto.space`, `memberspace`, `managedspace` and `personalspace` schemas
-from that release. Its upstream archive has SHA-256
+from that release. The upstream archive has SHA-256
 `fd0b719f54227f93406770dd6e985147869853cb2a97320b6f072d999fb663d4`.
 No overlay schema references a core definition, and all overlay references
 resolve against that corpus. This overlay's 189 JSON files have aggregate
@@ -21,10 +23,10 @@ The 191 generated Swift files have aggregate SHA-256
 the 190 generated Kotlin files have
 `b9945318ae4be196f04298905d51ba695889c26d3b85a9b952447bdc270caf4b`.
 Each aggregate hashes sorted lines containing a file's SHA-256, two spaces,
-its path relative to the corresponding root, and LF. `Package.swift` keeps
-published Petrel revision `92b05b81966c07a2a7d3d96a68f9230dd7787c5d`;
-this generated projection requires APIs from the unpublished Petrel line, so
-local verification uses sibling `../Petrel` and the pin awaits that line's push.
+its path relative to the corresponding root, and LF. `Package.swift` pins
+Petrel revision `fb3281346e5a26db68c638b16af7ed6656fe615a` from PR #73,
+so the generated projection and Swift tests use the same Petrel 2.0-line
+runtime APIs.
 
 ## Reproduce
 

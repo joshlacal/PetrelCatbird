@@ -1,21 +1,12 @@
 {
-  "originHash" : "d5768ff6824f1daad47500d4748cc4f0290626ed2d034f0e5d294084acd14b9a",
+  "originHash" : "76439f228141a495ec3395af9a2f562b518571cc0d8651078f21380c9fe048e1",
   "pins" : [
     {
       "identity" : "petrel",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/joshlacal/Petrel.git",
       "state" : {
-        "revision" : "92b05b81966c07a2a7d3d96a68f9230dd7787c5d"
-      }
-    },
-    {
-      "identity" : "secp256k1.swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/GigaBitcoin/secp256k1.swift.git",
-      "state" : {
-        "revision" : "4c77c7384768acf1093d66ccaacf298d322b10b7",
-        "version" : "0.15.0"
+        "revision" : "fb3281346e5a26db68c638b16af7ed6656fe615a"
       }
     },
     {
@@ -32,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-async-dns-resolver",
       "state" : {
-        "revision" : "e145f21e97cc40ee744e1276b21426ed47ab9d88",
-        "version" : "0.7.1"
+        "revision" : "5320c7bb1caed6f37563c298ed913dccd219eba5",
+        "version" : "0.8.1"
       }
     },
     {
@@ -50,8 +41,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "3ffafb9722d5d918c614feb496c8789a3b59d222",
-        "version" : "1.15.0"
+        "revision" : "e3da04078777e6a1b72ce19981fbd6539b0847d8",
+        "version" : "1.17.0"
+      }
+    },
+    {
+      "identity" : "swift-secp256k1",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/21-DOT-DEV/swift-secp256k1.git",
+      "state" : {
+        "revision" : "ba04e9db3567bf345af7334b8e9be5727a73cc42",
+        "version" : "0.25.1"
       }
     },
     {
