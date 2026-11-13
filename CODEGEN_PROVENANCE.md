@@ -9,7 +9,7 @@ source of truth; generated Swift and Kotlin are never patched by hand.
 The corresponding Petrel core uses the exact November 12 upstream Spaces alpha
 `d4def6e9f521896ed8222f576d54923d00b5fbeb` (published as
 `0.0.0-spaces-alpha-20261112204144`). Petrel generator commit
-`bd3224debbc3a92d0be9bc88012e5502abbbb625` vendors all 39
+`4cf789bafd4837f3ec3ab8e6fea545daeea9acd0` vendors all 39
 `com.atproto.space`, `memberspace`, `managedspace` and `personalspace` schemas
 from that release. Its upstream archive has SHA-256
 `fd0b719f54227f93406770dd6e985147869853cb2a97320b6f072d999fb663d4`.
@@ -17,7 +17,7 @@ No overlay schema references a core definition, and all overlay references
 resolve against that corpus. This overlay's 189 JSON files have aggregate
 SHA-256 `3297a00b8a1ce0194a0e17f5375e1f4519d889079c79c1cc01712e37c90565fd`.
 The 191 generated Swift files have aggregate SHA-256
-`49560b6a53f70eaf943b315b04bc2711c6133b0a8b0e2aa79e9f17e8037308df`;
+`3853e92ea38fe56fb7587e180086f777c03a361afefb820a9ce0b14c93da1916`;
 the 190 generated Kotlin files have
 `b9945318ae4be196f04298905d51ba695889c26d3b85a9b952447bdc270caf4b`.
 Each aggregate hashes sorted lines containing a file's SHA-256, two spaces,

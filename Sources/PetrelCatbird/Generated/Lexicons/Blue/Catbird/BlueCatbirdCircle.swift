@@ -19,7 +19,7 @@ public struct BlueCatbirdCircle {
 
     public static let spaceDeclaration = SpaceDeclarationDescriptor(
         nsid: "blue.catbird.circle", keyType: "tid",
-        title: "Catbird Circle", titleLang: [],
+        title: "Catbird Circle", titleLang: [:],
         collections: ["blue.catbird.circle.metadata", "app.bsky.feed.post", "app.bsky.feed.like"]
     )
 

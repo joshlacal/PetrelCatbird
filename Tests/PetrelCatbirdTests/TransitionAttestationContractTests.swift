@@ -26,7 +26,7 @@ final class TransitionAttestationContractTests: XCTestCase {
         XCTAssertEqual(decoded.lifecycle, .value_active)
     }
 
-    func testSubmitTransitionOutputDecodesAndRoundTrips() throws {
+    func testSubmitTransitionOutputRejectsUnknownClosedEntry() throws {
         let json = """
         {
             "coordinates": {
@@ -47,15 +47,9 @@ final class TransitionAttestationContractTests: XCTestCase {
         }
         """.data(using: .utf8)!
 
-        let output = try JSONDecoder().decode(BlueCatbirdChatSubmitTransition.Output.self, from: json)
-        XCTAssertEqual(output.coordinates.epoch, 2)
-        XCTAssertEqual(output.coordinates.conversationId, "00000000-0000-4000-8000-000000000001")
-        XCTAssertEqual(output.welcomes.count, 0)
-
-        let reencoded = try JSONEncoder().encode(output)
-        let roundTrip = try JSONDecoder().decode(BlueCatbirdChatSubmitTransition.Output.self, from: reencoded)
-        XCTAssertEqual(roundTrip.coordinates.conversationId, output.coordinates.conversationId)
-        XCTAssertEqual(roundTrip.coordinates.epoch, output.coordinates.epoch)
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(BlueCatbirdChatSubmitTransition.Output.self, from: json)
+        )
     }
 
     func testStandardAppViewEnrollmentErrorsRemainAvailable() {
