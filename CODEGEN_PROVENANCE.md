@@ -52,3 +52,30 @@ The terminal-deletion contract also declares `SpaceDeleted` for `findMeks` and
 callers must not rebind or fall back to another placement. The overlay merges
 current main `3dc8b613abbab900f650f7e1a4e42884cc42b0e1` while retaining all 48
 main-only source changes plus the newer chat security definitions.
+
+## November 12 Spaces backport
+
+The application line uses the November 12 upstream Spaces schemas at
+`d4def6e9f521896ed8222f576d54923d00b5fbeb`. This overlay was regenerated with
+the old-line Petrel generator at
+`baa8cf10199c049e5137b5f1d8fa3cfbd4563f29`. That generator includes the
+previously merged Petrel #37 fix at `39f065e8`, so the projection also refreshes
+seven Kotlin binary-output endpoints to fetch and return their raw bytes instead
+of decoding them as JSON. Their public function signatures are unchanged.
+
+`blue.catbird.circle` is the overlay's only `type: "space"` declaration. Its
+`name` became the optional `title` plus an empty `title:lang` map in generated
+Swift and Kotlin. No overlay schema references a core definition renamed or
+removed by the November 12 release.
+
+Using the aggregate procedure above, the 189 lexicons hash to
+`25e72b4a21d40716938496bf8b349bf83f44a772baca732f827b4b2d146758ef`;
+the 191 generated Swift files hash to
+`5a80a7c9fa7a4b3ee8de638f5f5f927eeb93bd98d19b436c67e68291f7c16e2b`;
+and the 190 generated Kotlin files hash to
+`f8df651c646ab699b6212d252eea1dc7dddfc9cffb9118c92eff5df75d40b96f`.
+
+`Package.swift` keeps the published Petrel revision until the matching old-line
+backport is pushed. Local validation temporarily uses the supported sibling
+`.package(path: "../Petrel")` form; the published revision on `Package.swift:19`
+must be updated to the pushed backport revision before release.
