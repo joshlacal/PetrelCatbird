@@ -10,79 +10,70 @@ public struct PlaceStreamBroadcastDefs {
 
     public struct BroadcastOriginView: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.broadcast.defs#broadcastOriginView"
+
         public let uri: ATProtocolURI
-        public let cid: CID
+        public let cid: CIDString
         public let author: AppBskyActorDefs.ProfileViewBasic
         public let record: ATProtocolValueContainer
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            uri: ATProtocolURI, cid: CID, author: AppBskyActorDefs.ProfileViewBasic, record: ATProtocolValueContainer
+            uri: ATProtocolURI,
+            cid: CIDString,
+            author: AppBskyActorDefs.ProfileViewBasic,
+            record: ATProtocolValueContainer,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.uri = uri
             self.cid = cid
             self.author = author
             self.record = record
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
-            } catch {
-                LogManager.logError("Decoding error for required property 'uri': \(error)")
-                throw error
-            }
-            do {
-                self.cid = try container.decode(CID.self, forKey: .cid)
-            } catch {
-                LogManager.logError("Decoding error for required property 'cid': \(error)")
-                throw error
-            }
-            do {
-                self.author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .author)
-            } catch {
-                LogManager.logError("Decoding error for required property 'author': \(error)")
-                throw error
-            }
-            do {
-                self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
-            } catch {
-                LogManager.logError("Decoding error for required property 'record': \(error)")
-                throw error
-            }
+            self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+            self.cid = try container.decode(CIDString.self, forKey: .cid)
+            self.author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .author)
+            self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(uri, forKey: .uri)
-            try container.encode(cid, forKey: .cid)
-            try container.encode(author, forKey: .author)
-            try container.encode(record, forKey: .record)
+            try container.encode(self.uri, forKey: .uri)
+            try container.encode(self.cid, forKey: .cid)
+            try container.encode(self.author, forKey: .author)
+            try container.encode(self.record, forKey: .record)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(uri)
-            hasher.combine(cid)
-            hasher.combine(author)
-            hasher.combine(record)
+            hasher.combine(self.uri)
+            hasher.combine(self.cid)
+            hasher.combine(self.author)
+            hasher.combine(self.record)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if uri != other.uri {
+            if self.uri != other.uri {
                 return false
             }
-            if cid != other.cid {
+            if self.cid != other.cid {
                 return false
             }
-            if author != other.author {
+            if self.author != other.author {
                 return false
             }
-            if record != other.record {
+            if self.record != other.record {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -91,20 +82,20 @@ public struct PlaceStreamBroadcastDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let uriValue = try uri.toCBORValue()
+            let uriValue = try self.uri.toCBORValue()
             map = map.adding(key: "uri", value: uriValue)
-            let cidValue = try cid.toCBORValue()
+            let cidValue = try self.cid.toCBORValue()
             map = map.adding(key: "cid", value: cidValue)
-            let authorValue = try author.toCBORValue()
+            let authorValue = try self.author.toCBORValue()
             map = map.adding(key: "author", value: authorValue)
-            let recordValue = try record.toCBORValue()
+            let recordValue = try self.record.toCBORValue()
             map = map.adding(key: "record", value: recordValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "uri", "cid", "author", "record"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case uri
             case cid
             case author

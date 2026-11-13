@@ -4,20 +4,47 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.device
 
+/// A device enrolled in the mailbox (SPEC §4), physical or virtual. Personal mailbox space. rkey = hex(deviceKeyPubkey). Immutable except that revokedAt is set once on revocation.
 public struct BlueCatbirdLabyrinthDevice: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.device"
+
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "any")
+
+    /// XEdDSA device key (X25519 form).
     public let deviceKeyPubkey: Bytes
+    /// Labyrinth HPKE encryption key.
     public let epochStorageKeyPubkey: Bytes
+    /// pk_sign(deviceKey, 0x30, epochStorageKeyPubkey).
     public let epochStorageKeySig: Bytes
+    /// Labyrinth HPKE auth key; absent for virtual devices.
     public let epochStorageAuthKeyPubkey: Bytes?
+    /// pk_sign(deviceKey, 0x31, epochStorageAuthKeyPubkey).
     public let epochStorageAuthKeySig: Bytes?
+    /// True for a recovery (virtual) device, which has no epochStorageAuthKey.
     public let virtual: Bool
+    /// [CB-36] Ed25519(chat key, "catbird.labyrinth.device_binding:" || did || ":" || deviceKeyPubkey) by the chat device that enrolled this physical device. Absent for virtual devices; a physical device without a valid binding to a current chat device is dropped at the next rotation.
     public let chatBinding: BlueCatbirdLabyrinthDefs.TransportAttestation?
+    /// Set once when the device is revoked; the revoking device opens a new epoch that excludes it ([CB-11]).
     public let revokedAt: ATProtocolDate?
     public let createdAt: ATProtocolDate
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
 
-    public init(deviceKeyPubkey: Bytes, epochStorageKeyPubkey: Bytes, epochStorageKeySig: Bytes, epochStorageAuthKeyPubkey: Bytes? = nil, epochStorageAuthKeySig: Bytes? = nil, virtual: Bool, chatBinding: BlueCatbirdLabyrinthDefs.TransportAttestation? = nil, revokedAt: ATProtocolDate? = nil, createdAt: ATProtocolDate) {
+    public init(
+        deviceKeyPubkey: Bytes,
+        epochStorageKeyPubkey: Bytes,
+        epochStorageKeySig: Bytes,
+        epochStorageAuthKeyPubkey: Bytes? = nil,
+        epochStorageAuthKeySig: Bytes? = nil,
+        virtual: Bool,
+        chatBinding: BlueCatbirdLabyrinthDefs.TransportAttestation? = nil,
+        revokedAt: ATProtocolDate? = nil,
+        createdAt: ATProtocolDate,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.deviceKeyPubkey = deviceKeyPubkey
         self.epochStorageKeyPubkey = epochStorageKeyPubkey
         self.epochStorageKeySig = epochStorageKeySig
@@ -27,153 +54,199 @@ public struct BlueCatbirdLabyrinthDevice: ATProtocolCodable, ATProtocolValue {
         self.chatBinding = chatBinding
         self.revokedAt = revokedAt
         self.createdAt = createdAt
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         self.deviceKeyPubkey = try container.decode(Bytes.self, forKey: .deviceKeyPubkey)
         self.epochStorageKeyPubkey = try container.decode(Bytes.self, forKey: .epochStorageKeyPubkey)
         self.epochStorageKeySig = try container.decode(Bytes.self, forKey: .epochStorageKeySig)
         do {
-            self.epochStorageAuthKeyPubkey = try container.decodeIfPresent(Bytes.self, forKey: .epochStorageAuthKeyPubkey)
+            self.epochStorageAuthKeyPubkey = try container.decodeIfPresent(Bytes.self, forKey: .epochStorageAuthKeyPubkey, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'epochStorageAuthKeyPubkey' — degrading to nil: \(error)")
             self.epochStorageAuthKeyPubkey = nil
+            malformedFields.insert("epochStorageAuthKeyPubkey")
         }
         do {
-            self.epochStorageAuthKeySig = try container.decodeIfPresent(Bytes.self, forKey: .epochStorageAuthKeySig)
+            self.epochStorageAuthKeySig = try container.decodeIfPresent(Bytes.self, forKey: .epochStorageAuthKeySig, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'epochStorageAuthKeySig' — degrading to nil: \(error)")
             self.epochStorageAuthKeySig = nil
+            malformedFields.insert("epochStorageAuthKeySig")
         }
         self.virtual = try container.decode(Bool.self, forKey: .virtual)
         do {
-            self.chatBinding = try container.decodeIfPresent(BlueCatbirdLabyrinthDefs.TransportAttestation.self, forKey: .chatBinding)
+            self.chatBinding = try container.decodeIfPresent(BlueCatbirdLabyrinthDefs.TransportAttestation.self, forKey: .chatBinding, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'chatBinding' — degrading to nil: \(error)")
             self.chatBinding = nil
+            malformedFields.insert("chatBinding")
         }
         do {
-            self.revokedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .revokedAt)
+            self.revokedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .revokedAt, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'revokedAt' — degrading to nil: \(error)")
             self.revokedAt = nil
+            malformedFields.insert("revokedAt")
         }
         self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(deviceKeyPubkey, forKey: .deviceKeyPubkey)
-        try container.encode(epochStorageKeyPubkey, forKey: .epochStorageKeyPubkey)
-        try container.encode(epochStorageKeySig, forKey: .epochStorageKeySig)
-        try container.encodeIfPresent(epochStorageAuthKeyPubkey, forKey: .epochStorageAuthKeyPubkey)
-        try container.encodeIfPresent(epochStorageAuthKeySig, forKey: .epochStorageAuthKeySig)
-        try container.encode(virtual, forKey: .virtual)
-        try container.encodeIfPresent(chatBinding, forKey: .chatBinding)
-        try container.encodeIfPresent(revokedAt, forKey: .revokedAt)
-        try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(self.deviceKeyPubkey, forKey: .deviceKeyPubkey)
+        try container.encode(self.epochStorageKeyPubkey, forKey: .epochStorageKeyPubkey)
+        try container.encode(self.epochStorageKeySig, forKey: .epochStorageKeySig)
+        try container.encodeIfPresent(self.epochStorageAuthKeyPubkey, forKey: .epochStorageAuthKeyPubkey)
+        try container.encodeIfPresent(self.epochStorageAuthKeySig, forKey: .epochStorageAuthKeySig)
+        try container.encode(self.virtual, forKey: .virtual)
+        try container.encodeIfPresent(self.chatBinding, forKey: .chatBinding)
+        try container.encodeIfPresent(self.revokedAt, forKey: .revokedAt)
+        try container.encode(self.createdAt, forKey: .createdAt)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.deviceKeyPubkey)
+        hasher.combine(self.epochStorageKeyPubkey)
+        hasher.combine(self.epochStorageKeySig)
+        if let value = self.epochStorageAuthKeyPubkey {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        if let value = self.epochStorageAuthKeySig {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(self.virtual)
+        if let value = self.chatBinding {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        if let value = self.revokedAt {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(self.createdAt)
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.deviceKeyPubkey != other.deviceKeyPubkey {
+            return false
+        }
+        if self.epochStorageKeyPubkey != other.epochStorageKeyPubkey {
+            return false
+        }
+        if self.epochStorageKeySig != other.epochStorageKeySig {
+            return false
+        }
+        if self.epochStorageAuthKeyPubkey != other.epochStorageAuthKeyPubkey {
+            return false
+        }
+        if self.epochStorageAuthKeySig != other.epochStorageAuthKeySig {
+            return false
+        }
+        if self.virtual != other.virtual {
+            return false
+        }
+        if self.chatBinding != other.chatBinding {
+            return false
+        }
+        if self.revokedAt != other.revokedAt {
+            return false
+        }
+        if self.createdAt != other.createdAt {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if deviceKeyPubkey != other.deviceKeyPubkey {
-            return false
-        }
-        if epochStorageKeyPubkey != other.epochStorageKeyPubkey {
-            return false
-        }
-        if epochStorageKeySig != other.epochStorageKeySig {
-            return false
-        }
-        if epochStorageAuthKeyPubkey != other.epochStorageAuthKeyPubkey {
-            return false
-        }
-        if epochStorageAuthKeySig != other.epochStorageAuthKeySig {
-            return false
-        }
-        if virtual != other.virtual {
-            return false
-        }
-        if chatBinding != other.chatBinding {
-            return false
-        }
-        if revokedAt != other.revokedAt {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(deviceKeyPubkey)
-        hasher.combine(epochStorageKeyPubkey)
-        hasher.combine(epochStorageKeySig)
-        if let value = epochStorageAuthKeyPubkey {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        if let value = epochStorageAuthKeySig {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        hasher.combine(virtual)
-        if let value = chatBinding {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        if let value = revokedAt {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        hasher.combine(createdAt)
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let deviceKeyPubkeyValue = try deviceKeyPubkey.toCBORValue()
+        let deviceKeyPubkeyValue = try self.deviceKeyPubkey.toCBORValue()
         map = map.adding(key: "deviceKeyPubkey", value: deviceKeyPubkeyValue)
-        let epochStorageKeyPubkeyValue = try epochStorageKeyPubkey.toCBORValue()
+        let epochStorageKeyPubkeyValue = try self.epochStorageKeyPubkey.toCBORValue()
         map = map.adding(key: "epochStorageKeyPubkey", value: epochStorageKeyPubkeyValue)
-        let epochStorageKeySigValue = try epochStorageKeySig.toCBORValue()
+        let epochStorageKeySigValue = try self.epochStorageKeySig.toCBORValue()
         map = map.adding(key: "epochStorageKeySig", value: epochStorageKeySigValue)
-        if let value = epochStorageAuthKeyPubkey {
+        if let value = self.epochStorageAuthKeyPubkey {
             let epochStorageAuthKeyPubkeyValue = try value.toCBORValue()
             map = map.adding(key: "epochStorageAuthKeyPubkey", value: epochStorageAuthKeyPubkeyValue)
         }
-        if let value = epochStorageAuthKeySig {
+        if let value = self.epochStorageAuthKeySig {
             let epochStorageAuthKeySigValue = try value.toCBORValue()
             map = map.adding(key: "epochStorageAuthKeySig", value: epochStorageAuthKeySigValue)
         }
-        let virtualValue = try virtual.toCBORValue()
+        let virtualValue = try self.virtual.toCBORValue()
         map = map.adding(key: "virtual", value: virtualValue)
-        if let value = chatBinding {
+        if let value = self.chatBinding {
             let chatBindingValue = try value.toCBORValue()
             map = map.adding(key: "chatBinding", value: chatBindingValue)
         }
-        if let value = revokedAt {
+        if let value = self.revokedAt {
             let revokedAtValue = try value.toCBORValue()
             map = map.adding(key: "revokedAt", value: revokedAtValue)
         }
-        let createdAtValue = try createdAt.toCBORValue()
+        let createdAtValue = try self.createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "deviceKeyPubkey", "epochStorageKeyPubkey", "epochStorageKeySig", "epochStorageAuthKeyPubkey", "epochStorageAuthKeySig", "virtual", "chatBinding", "revokedAt", "createdAt"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "deviceKeyPubkey": return true
+        case "epochStorageKeyPubkey": return true
+        case "epochStorageKeySig": return true
+        case "epochStorageAuthKeyPubkey": return self.epochStorageAuthKeyPubkey != nil
+        case "epochStorageAuthKeySig": return self.epochStorageAuthKeySig != nil
+        case "virtual": return true
+        case "chatBinding": return self.chatBinding != nil
+        case "revokedAt": return self.revokedAt != nil
+        case "createdAt": return true
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

@@ -4,6 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.circle
 
+/// An author-owned private posting audience
 public struct BlueCatbirdCircle {
 
     public static let typeIdentifier = "blue.catbird.circle"
@@ -11,13 +12,15 @@ public struct BlueCatbirdCircle {
     public struct SpaceDeclarationDescriptor: Sendable, Equatable {
         public let nsid: String
         public let keyType: String
-        public let name: String
+        public let title: String?
+        public let titleLang: [String: String]
         public let collections: [String]
     }
 
     public static let spaceDeclaration = SpaceDeclarationDescriptor(
         nsid: "blue.catbird.circle", keyType: "tid",
-        name: "Catbird Circle", collections: ["blue.catbird.circle.metadata", "app.bsky.feed.post", "app.bsky.feed.like"]
+        title: "Catbird Circle", titleLang: [],
+        collections: ["blue.catbird.circle.metadata", "app.bsky.feed.post", "app.bsky.feed.like"]
     )
 
 }

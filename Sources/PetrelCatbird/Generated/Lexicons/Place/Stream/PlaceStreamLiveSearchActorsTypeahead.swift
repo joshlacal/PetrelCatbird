@@ -4,59 +4,61 @@ import Petrel
 
 // lexicon: 1, id: place.stream.live.searchActorsTypeahead
 
+/// Find actor suggestions for a prefix search term. Expected use is for auto-completion during text field entry.
 public struct PlaceStreamLiveSearchActorsTypeahead {
 
     public static let typeIdentifier = "place.stream.live.searchActorsTypeahead"
 
     public struct Actor: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.live.searchActorsTypeahead#actor"
+
+        /// The actor's DID
         public let did: DID
+        /// The actor's handle
         public let handle: Handle
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            did: DID, handle: Handle
+            did: DID,
+            handle: Handle,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.did = did
             self.handle = handle
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.did = try container.decode(DID.self, forKey: .did)
-            } catch {
-                LogManager.logError("Decoding error for required property 'did': \(error)")
-                throw error
-            }
-            do {
-                self.handle = try container.decode(Handle.self, forKey: .handle)
-            } catch {
-                LogManager.logError("Decoding error for required property 'handle': \(error)")
-                throw error
-            }
+            self.did = try container.decode(DID.self, forKey: .did)
+            self.handle = try container.decode(Handle.self, forKey: .handle)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(did, forKey: .did)
-            try container.encode(handle, forKey: .handle)
+            try container.encode(self.did, forKey: .did)
+            try container.encode(self.handle, forKey: .handle)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(did)
-            hasher.combine(handle)
+            hasher.combine(self.did)
+            hasher.combine(self.handle)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if did != other.did {
+            if self.did != other.did {
                 return false
             }
-            if handle != other.handle {
+            if self.handle != other.handle {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -65,16 +67,16 @@ public struct PlaceStreamLiveSearchActorsTypeahead {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let didValue = try did.toCBORValue()
+            let didValue = try self.did.toCBORValue()
             map = map.adding(key: "did", value: didValue)
-            let handleValue = try handle.toCBORValue()
+            let handleValue = try self.handle.toCBORValue()
             map = map.adding(key: "handle", value: handleValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "did", "handle"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case did
             case handle
         }
@@ -85,7 +87,7 @@ public struct PlaceStreamLiveSearchActorsTypeahead {
 
         public init(
             q: String? = nil,
-            limit: Int? = nil
+            limit: Int? = 10
         ) {
             self.q = q
             self.limit = limit
@@ -97,48 +99,32 @@ public struct PlaceStreamLiveSearchActorsTypeahead {
 
         public let actors: [Actor]
 
-        // Standard public initializer
         public init(
-
             actors: [Actor]
-
         ) {
-
             self.actors = actors
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.actors = try container.decode([Actor].self, forKey: .actors)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(actors, forKey: .actors)
-
+            try container.encode(self.actors, forKey: .actors)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let actorsValue = try actors.toCBORValue()
+            let actorsValue = try self.actors.toCBORValue()
             map = map.adding(key: "actors", value: actorsValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case actors
         }
-
     }
 
 }
@@ -148,9 +134,8 @@ extension ATProtoClient.Place.Stream.Live {
     /// Find actor suggestions for a prefix search term. Expected use is for auto-completion during text field entry.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoXRPCError` for a non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func searchActorsTypeahead(input: PlaceStreamLiveSearchActorsTypeahead.Parameters) async throws -> (responseCode: Int, data: PlaceStreamLiveSearchActorsTypeahead.Output?) {
         let endpoint = "place.stream.live.searchActorsTypeahead"
 
@@ -167,37 +152,27 @@ extension ATProtoClient.Place.Stream.Live {
         // Determine service DID for this endpoint
         let serviceDID = await networkService.getServiceDID(for: "place.stream.live.searchActorsTypeahead")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
-        let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
+        let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamLiveSearchActorsTypeahead.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.live.searchActorsTypeahead: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(PlaceStreamLiveSearchActorsTypeahead.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

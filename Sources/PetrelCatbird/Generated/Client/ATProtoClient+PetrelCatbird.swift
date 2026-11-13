@@ -13,16 +13,6 @@ public extension ATProtoClient.Blue {
             self.networkService = networkService
         }
 
-        public var circle: Circle { Circle(networkService: networkService) }
-
-        public struct Circle: Sendable {
-            public let networkService: NetworkService
-            public init(networkService: NetworkService) {
-                self.networkService = networkService
-            }
-
-        }
-
         public var bskychat: Bskychat { Bskychat(networkService: networkService) }
 
         public struct Bskychat: Sendable {
@@ -36,6 +26,16 @@ public extension ATProtoClient.Blue {
         public var chat: Chat { Chat(networkService: networkService) }
 
         public struct Chat: Sendable {
+            public let networkService: NetworkService
+            public init(networkService: NetworkService) {
+                self.networkService = networkService
+            }
+
+        }
+
+        public var circle: Circle { Circle(networkService: networkService) }
+
+        public struct Circle: Sendable {
             public let networkService: NetworkService
             public init(networkService: NetworkService) {
                 self.networkService = networkService
@@ -82,56 +82,6 @@ public extension ATProtoClient {
             public let networkService: NetworkService
             public init(networkService: NetworkService) {
                 self.networkService = networkService
-            }
-
-            public var defs: Defs { Defs(networkService: networkService) }
-
-            public struct Defs: Sendable {
-                public let networkService: NetworkService
-                public init(networkService: NetworkService) {
-                    self.networkService = networkService
-                }
-
-            }
-
-            public var key: Key { Key(networkService: networkService) }
-
-            public struct Key: Sendable {
-                public let networkService: NetworkService
-                public init(networkService: NetworkService) {
-                    self.networkService = networkService
-                }
-
-            }
-
-            public var livestream: Livestream { Livestream(networkService: networkService) }
-
-            public struct Livestream: Sendable {
-                public let networkService: NetworkService
-                public init(networkService: NetworkService) {
-                    self.networkService = networkService
-                }
-
-            }
-
-            public var segment: Segment { Segment(networkService: networkService) }
-
-            public struct Segment: Sendable {
-                public let networkService: NetworkService
-                public init(networkService: NetworkService) {
-                    self.networkService = networkService
-                }
-
-            }
-
-            public var video: Video { Video(networkService: networkService) }
-
-            public struct Video: Sendable {
-                public let networkService: NetworkService
-                public init(networkService: NetworkService) {
-                    self.networkService = networkService
-                }
-
             }
 
             public var badge: Badge { Badge(networkService: networkService) }

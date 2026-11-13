@@ -10,18 +10,33 @@ public struct PlaceStreamChatDefs {
 
     public struct MessageView: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.chat.defs#messageView"
+
         public let uri: ATProtocolURI
-        public let cid: CID
+        public let cid: CIDString
         public let author: AppBskyActorDefs.ProfileViewBasic
         public let record: ATProtocolValueContainer
         public let indexedAt: ATProtocolDate
         public let chatProfile: PlaceStreamChatProfile?
         public let replyTo: MessageViewReplyToUnion?
+        /// If true, this message has been deleted or labeled and should be cleared from the cache
         public let deleted: Bool?
+        /// Up to 3 badge tokens to display with the message. First badge is server-controlled, remaining badges are user-settable. Tokens are looked up in badges.json for display info.
         public let badges: [PlaceStreamBadgeDefs.BadgeView]?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            uri: ATProtocolURI, cid: CID, author: AppBskyActorDefs.ProfileViewBasic, record: ATProtocolValueContainer, indexedAt: ATProtocolDate, chatProfile: PlaceStreamChatProfile? = nil, replyTo: MessageViewReplyToUnion? = nil, deleted: Bool? = nil, badges: [PlaceStreamBadgeDefs.BadgeView]? = nil
+            uri: ATProtocolURI,
+            cid: CIDString,
+            author: AppBskyActorDefs.ProfileViewBasic,
+            record: ATProtocolValueContainer,
+            indexedAt: ATProtocolDate,
+            chatProfile: PlaceStreamChatProfile? = nil,
+            replyTo: MessageViewReplyToUnion? = nil,
+            deleted: Bool? = nil,
+            badges: [PlaceStreamBadgeDefs.BadgeView]? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.uri = uri
             self.cid = cid
@@ -32,146 +47,142 @@ public struct PlaceStreamChatDefs {
             self.replyTo = replyTo
             self.deleted = deleted
             self.badges = badges
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+            self.cid = try container.decode(CIDString.self, forKey: .cid)
+            self.author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .author)
+            self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+            self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
             do {
-                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                self.chatProfile = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: .chatProfile, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'uri': \(error)")
-                throw error
-            }
-            do {
-                self.cid = try container.decode(CID.self, forKey: .cid)
-            } catch {
-                LogManager.logError("Decoding error for required property 'cid': \(error)")
-                throw error
-            }
-            do {
-                self.author = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .author)
-            } catch {
-                LogManager.logError("Decoding error for required property 'author': \(error)")
-                throw error
-            }
-            do {
-                self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
-            } catch {
-                LogManager.logError("Decoding error for required property 'record': \(error)")
-                throw error
-            }
-            do {
-                self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
-            } catch {
-                LogManager.logError("Decoding error for required property 'indexedAt': \(error)")
-                throw error
-            }
-            do {
-                self.chatProfile = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: .chatProfile)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'chatProfile' — degrading to nil: \(error)")
                 self.chatProfile = nil
+                malformedFields.insert("chatProfile")
             }
             do {
-                self.replyTo = try container.decodeIfPresent(MessageViewReplyToUnion.self, forKey: .replyTo)
+                self.replyTo = try container.decodeIfPresent(MessageViewReplyToUnion.self, forKey: .replyTo, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'replyTo' — degrading to nil: \(error)")
                 self.replyTo = nil
+                malformedFields.insert("replyTo")
             }
             do {
-                self.deleted = try container.decodeIfPresent(Bool.self, forKey: .deleted)
+                self.deleted = try container.decodeIfPresent(Bool.self, forKey: .deleted, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'deleted' — degrading to nil: \(error)")
                 self.deleted = nil
+                malformedFields.insert("deleted")
             }
             do {
-                self.badges = try container.decodeIfPresent([PlaceStreamBadgeDefs.BadgeView].self, forKey: .badges)
+                self.badges = try container.decodeIfPresent([PlaceStreamBadgeDefs.BadgeView].self, forKey: .badges, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'badges' — degrading to nil: \(error)")
                 self.badges = nil
+                malformedFields.insert("badges")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(uri, forKey: .uri)
-            try container.encode(cid, forKey: .cid)
-            try container.encode(author, forKey: .author)
-            try container.encode(record, forKey: .record)
-            try container.encode(indexedAt, forKey: .indexedAt)
-            try container.encodeIfPresent(chatProfile, forKey: .chatProfile)
-            try container.encodeIfPresent(replyTo, forKey: .replyTo)
-            try container.encodeIfPresent(deleted, forKey: .deleted)
-            try container.encodeIfPresent(badges, forKey: .badges)
+            try container.encode(self.uri, forKey: .uri)
+            try container.encode(self.cid, forKey: .cid)
+            try container.encode(self.author, forKey: .author)
+            try container.encode(self.record, forKey: .record)
+            try container.encode(self.indexedAt, forKey: .indexedAt)
+            try container.encodeIfPresent(self.chatProfile, forKey: .chatProfile)
+            try container.encodeIfPresent(self.replyTo, forKey: .replyTo)
+            try container.encodeIfPresent(self.deleted, forKey: .deleted)
+            try container.encodeIfPresent(self.badges, forKey: .badges)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(uri)
-            hasher.combine(cid)
-            hasher.combine(author)
-            hasher.combine(record)
-            hasher.combine(indexedAt)
-            if let value = chatProfile {
+            hasher.combine(self.uri)
+            hasher.combine(self.cid)
+            hasher.combine(self.author)
+            hasher.combine(self.record)
+            hasher.combine(self.indexedAt)
+            if let value = self.chatProfile {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = replyTo {
+            if let value = self.replyTo {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = deleted {
+            if let value = self.deleted {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = badges {
+            if let value = self.badges {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if uri != other.uri {
+            if self.uri != other.uri {
                 return false
             }
-            if cid != other.cid {
+            if self.cid != other.cid {
                 return false
             }
-            if author != other.author {
+            if self.author != other.author {
                 return false
             }
-            if record != other.record {
+            if self.record != other.record {
                 return false
             }
-            if indexedAt != other.indexedAt {
+            if self.indexedAt != other.indexedAt {
                 return false
             }
-            if chatProfile != other.chatProfile {
+            if self.chatProfile != other.chatProfile {
                 return false
             }
-            if replyTo != other.replyTo {
+            if self.replyTo != other.replyTo {
                 return false
             }
-            if deleted != other.deleted {
+            if self.deleted != other.deleted {
                 return false
             }
-            if badges != other.badges {
+            if self.badges != other.badges {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -180,38 +191,55 @@ public struct PlaceStreamChatDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let uriValue = try uri.toCBORValue()
+            let uriValue = try self.uri.toCBORValue()
             map = map.adding(key: "uri", value: uriValue)
-            let cidValue = try cid.toCBORValue()
+            let cidValue = try self.cid.toCBORValue()
             map = map.adding(key: "cid", value: cidValue)
-            let authorValue = try author.toCBORValue()
+            let authorValue = try self.author.toCBORValue()
             map = map.adding(key: "author", value: authorValue)
-            let recordValue = try record.toCBORValue()
+            let recordValue = try self.record.toCBORValue()
             map = map.adding(key: "record", value: recordValue)
-            let indexedAtValue = try indexedAt.toCBORValue()
+            let indexedAtValue = try self.indexedAt.toCBORValue()
             map = map.adding(key: "indexedAt", value: indexedAtValue)
-            if let value = chatProfile {
+            if let value = self.chatProfile {
                 let chatProfileValue = try value.toCBORValue()
                 map = map.adding(key: "chatProfile", value: chatProfileValue)
             }
-            if let value = replyTo {
+            if let value = self.replyTo {
                 let replyToValue = try value.toCBORValue()
                 map = map.adding(key: "replyTo", value: replyToValue)
             }
-            if let value = deleted {
+            if let value = self.deleted {
                 let deletedValue = try value.toCBORValue()
                 map = map.adding(key: "deleted", value: deletedValue)
             }
-            if let value = badges {
+            if let value = self.badges {
                 let badgesValue = try value.toCBORValue()
                 map = map.adding(key: "badges", value: badgesValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "uri", "cid", "author", "record", "indexedAt", "chatProfile", "replyTo", "deleted", "badges"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "uri": return true
+            case "cid": return true
+            case "author": return true
+            case "record": return true
+            case "indexedAt": return true
+            case "chatProfile": return self.chatProfile != nil
+            case "replyTo": return self.replyTo != nil
+            case "deleted": return self.deleted != nil
+            case "badges": return self.badges != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case uri
             case cid
             case author
@@ -223,18 +251,28 @@ public struct PlaceStreamChatDefs {
             case badges
         }
     }
-
+    /// View of a pinned chat record with hydrated message data.
     public struct PinnedRecordView: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.chat.defs#pinnedRecordView"
+
         public let uri: ATProtocolURI
-        public let cid: CID
+        public let cid: CIDString
         public let record: PlaceStreamChatPinnedRecord
         public let indexedAt: ATProtocolDate
         public let pinnedBy: PlaceStreamChatProfile?
         public let message: MessageView?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            uri: ATProtocolURI, cid: CID, record: PlaceStreamChatPinnedRecord, indexedAt: ATProtocolDate, pinnedBy: PlaceStreamChatProfile? = nil, message: MessageView? = nil
+            uri: ATProtocolURI,
+            cid: CIDString,
+            record: PlaceStreamChatPinnedRecord,
+            indexedAt: ATProtocolDate,
+            pinnedBy: PlaceStreamChatProfile? = nil,
+            message: MessageView? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.uri = uri
             self.cid = cid
@@ -242,101 +280,94 @@ public struct PlaceStreamChatDefs {
             self.indexedAt = indexedAt
             self.pinnedBy = pinnedBy
             self.message = message
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+            self.cid = try container.decode(CIDString.self, forKey: .cid)
+            self.record = try container.decode(PlaceStreamChatPinnedRecord.self, forKey: .record)
+            self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
             do {
-                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                self.pinnedBy = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: .pinnedBy, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'uri': \(error)")
-                throw error
-            }
-            do {
-                self.cid = try container.decode(CID.self, forKey: .cid)
-            } catch {
-                LogManager.logError("Decoding error for required property 'cid': \(error)")
-                throw error
-            }
-            do {
-                self.record = try container.decode(PlaceStreamChatPinnedRecord.self, forKey: .record)
-            } catch {
-                LogManager.logError("Decoding error for required property 'record': \(error)")
-                throw error
-            }
-            do {
-                self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
-            } catch {
-                LogManager.logError("Decoding error for required property 'indexedAt': \(error)")
-                throw error
-            }
-            do {
-                self.pinnedBy = try container.decodeIfPresent(PlaceStreamChatProfile.self, forKey: .pinnedBy)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'pinnedBy' — degrading to nil: \(error)")
                 self.pinnedBy = nil
+                malformedFields.insert("pinnedBy")
             }
             do {
-                self.message = try container.decodeIfPresent(MessageView.self, forKey: .message)
+                self.message = try container.decodeIfPresent(MessageView.self, forKey: .message, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'message' — degrading to nil: \(error)")
                 self.message = nil
+                malformedFields.insert("message")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(uri, forKey: .uri)
-            try container.encode(cid, forKey: .cid)
-            try container.encode(record, forKey: .record)
-            try container.encode(indexedAt, forKey: .indexedAt)
-            try container.encodeIfPresent(pinnedBy, forKey: .pinnedBy)
-            try container.encodeIfPresent(message, forKey: .message)
+            try container.encode(self.uri, forKey: .uri)
+            try container.encode(self.cid, forKey: .cid)
+            try container.encode(self.record, forKey: .record)
+            try container.encode(self.indexedAt, forKey: .indexedAt)
+            try container.encodeIfPresent(self.pinnedBy, forKey: .pinnedBy)
+            try container.encodeIfPresent(self.message, forKey: .message)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(uri)
-            hasher.combine(cid)
-            hasher.combine(record)
-            hasher.combine(indexedAt)
-            if let value = pinnedBy {
+            hasher.combine(self.uri)
+            hasher.combine(self.cid)
+            hasher.combine(self.record)
+            hasher.combine(self.indexedAt)
+            if let value = self.pinnedBy {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = message {
+            if let value = self.message {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if uri != other.uri {
+            if self.uri != other.uri {
                 return false
             }
-            if cid != other.cid {
+            if self.cid != other.cid {
                 return false
             }
-            if record != other.record {
+            if self.record != other.record {
                 return false
             }
-            if indexedAt != other.indexedAt {
+            if self.indexedAt != other.indexedAt {
                 return false
             }
-            if pinnedBy != other.pinnedBy {
+            if self.pinnedBy != other.pinnedBy {
                 return false
             }
-            if message != other.message {
+            if self.message != other.message {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -345,28 +376,42 @@ public struct PlaceStreamChatDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let uriValue = try uri.toCBORValue()
+            let uriValue = try self.uri.toCBORValue()
             map = map.adding(key: "uri", value: uriValue)
-            let cidValue = try cid.toCBORValue()
+            let cidValue = try self.cid.toCBORValue()
             map = map.adding(key: "cid", value: cidValue)
-            let recordValue = try record.toCBORValue()
+            let recordValue = try self.record.toCBORValue()
             map = map.adding(key: "record", value: recordValue)
-            let indexedAtValue = try indexedAt.toCBORValue()
+            let indexedAtValue = try self.indexedAt.toCBORValue()
             map = map.adding(key: "indexedAt", value: indexedAtValue)
-            if let value = pinnedBy {
+            if let value = self.pinnedBy {
                 let pinnedByValue = try value.toCBORValue()
                 map = map.adding(key: "pinnedBy", value: pinnedByValue)
             }
-            if let value = message {
+            if let value = self.message {
                 let messageValue = try value.toCBORValue()
                 map = map.adding(key: "message", value: messageValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "uri", "cid", "record", "indexedAt", "pinnedBy", "message"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "uri": return true
+            case "cid": return true
+            case "record": return true
+            case "indexedAt": return true
+            case "pinnedBy": return self.pinnedBy != nil
+            case "message": return self.message != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case uri
             case cid
             case record
@@ -378,6 +423,8 @@ public struct PlaceStreamChatDefs {
 
     public indirect enum MessageViewReplyToUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
         case placeStreamChatDefsMessageView(PlaceStreamChatDefs.MessageView)
+        /// A value whose `$type` this union does not declare. Open unions accept and
+        /// re-encode such values unchanged.
         case unexpected(ATProtocolValueContainer)
         public init(_ value: PlaceStreamChatDefs.MessageView) {
             self = .placeStreamChatDefsMessageView(value)

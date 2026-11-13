@@ -4,39 +4,52 @@ import Petrel
 
 // lexicon: 1, id: place.stream.metadata.contentWarnings
 
+/// Content warnings for a stream.
 public struct PlaceStreamMetadataContentWarnings: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "place.stream.metadata.contentWarnings"
-    public let warnings: [String]?
 
-    public init(warnings: [String]? = nil) {
+    public let warnings: [String]?
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
+
+    public init(
+        warnings: [String]? = nil,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.warnings = warnings
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.warnings = try container.decodeIfPresent([String].self, forKey: .warnings)
+        let strict = decoder.isATProtoStrictDecoding
+        self.warnings = try container.decodeIfPresent([String].self, forKey: .warnings, rejectingNull: strict)
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(warnings, forKey: .warnings)
+        try container.encodeIfPresent(self.warnings, forKey: .warnings)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
     }
 
     public func hash(into hasher: inout Hasher) {
-        if let value = warnings {
+        if let value = self.warnings {
             hasher.combine(value)
         } else {
             hasher.combine(nil as Int?)
         }
+        hasher.combine(extraFields)
     }
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if warnings != other.warnings {
+        if self.warnings != other.warnings {
             return false
         }
-        return true
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -45,15 +58,47 @@ public struct PlaceStreamMetadataContentWarnings: ATProtocolCodable, ATProtocolV
 
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
-        if let value = warnings {
+        if let value = self.warnings {
             let warningsValue = try value.toCBORValue()
             map = map.adding(key: "warnings", value: warningsValue)
         }
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
     }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "warnings"]
 
     private enum CodingKeys: String, CodingKey {
         case warnings
     }
+
+    /// The content could be perceived as offensive due to the discussion or display of death.
+    public static let death = "place.stream.metadata.contentWarnings#death"
+
+    /// The content contains a portrayal of the use or abuse of mind altering substances.
+    public static let drugUse = "place.stream.metadata.contentWarnings#drugUse"
+
+    /// The content contains violent actions of a fantasy nature, involving human or non-human characters in situations easily distinguishable from real life.
+    public static let fantasyViolence = "place.stream.metadata.contentWarnings#fantasyViolence"
+
+    /// The content contains flashing lights that could be harmful to viewers with seizure disorders such as photosensitive epilepsy.
+    public static let flashingLights = "place.stream.metadata.contentWarnings#flashingLights"
+
+    /// The content could be perceived as offensive due to the language used.
+    public static let language = "place.stream.metadata.contentWarnings#language"
+
+    /// The content could be perceived as offensive due to nudity.
+    public static let nudity = "place.stream.metadata.contentWarnings#nudity"
+
+    /// The content contains information that can be used to identify a particular individual, such as a name, phone number, email address, physical address, or IP address.
+    public static let PII = "place.stream.metadata.contentWarnings#PII"
+
+    /// The content could be perceived as offensive due to the discussion or display of sexuality.
+    public static let sexuality = "place.stream.metadata.contentWarnings#sexuality"
+
+    /// The content could be perceived as distressing due to the discussion or display of suffering or triggering topics, including suicide, eating disorders or self harm.
+    public static let suffering = "place.stream.metadata.contentWarnings#suffering"
+
+    /// The content could be perceived as offensive due to the discussion or display of violence.
+    public static let violence = "place.stream.metadata.contentWarnings#violence"
 
 }

@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.getBlobUsage
 
+/// Return auth-derived aggregate opaque-blob usage and reserved quota for the verified bare DID; no caller-selected principal is accepted.
 public struct BlueCatbirdChatGetBlobUsage {
 
     public static let typeIdentifier = "blue.catbird.chat.getBlobUsage"
+
     public struct Parameters: Parametrizable {
         public let actorDeviceId: String
 
@@ -22,48 +24,32 @@ public struct BlueCatbirdChatGetBlobUsage {
 
         public let usage: BlueCatbirdChatDefs.BlobUsageView
 
-        // Standard public initializer
         public init(
-
             usage: BlueCatbirdChatDefs.BlobUsageView
-
         ) {
-
             self.usage = usage
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.usage = try container.decode(BlueCatbirdChatDefs.BlobUsageView.self, forKey: .usage)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(usage, forKey: .usage)
-
+            try container.encode(self.usage, forKey: .usage)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let usageValue = try usage.toCBORValue()
+            let usageValue = try self.usage.toCBORValue()
             map = map.adding(key: "usage", value: usageValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case usage
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -92,9 +78,8 @@ extension ATProtoClient.Blue.Catbird.Chat {
     /// Return auth-derived aggregate opaque-blob usage and reserved quota for the verified bare DID; no caller-selected principal is accepted.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdChatGetBlobUsage.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getBlobUsage(input: BlueCatbirdChatGetBlobUsage.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetBlobUsage.Output?) {
         let endpoint = "blue.catbird.chat.getBlobUsage"
 
@@ -114,42 +99,24 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatGetBlobUsage.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.getBlobUsage: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdChatGetBlobUsage.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdChatGetBlobUsage.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdChatGetBlobUsage.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

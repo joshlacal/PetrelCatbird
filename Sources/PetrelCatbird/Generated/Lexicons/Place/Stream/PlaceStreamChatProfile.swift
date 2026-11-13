@@ -4,60 +4,94 @@ import Petrel
 
 // lexicon: 1, id: place.stream.chat.profile
 
+/// Record containing customizations for a user's chat profile.
 public struct PlaceStreamChatProfile: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "place.stream.chat.profile"
-    public let color: Color?
 
-    public init(color: Color? = nil) {
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "literal:self")
+
+    public let color: Color?
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
+
+    public init(
+        color: Color? = nil,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.color = color
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         do {
-            self.color = try container.decodeIfPresent(Color.self, forKey: .color)
+            self.color = try container.decodeIfPresent(Color.self, forKey: .color, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'color' — degrading to nil: \(error)")
             self.color = nil
+            malformedFields.insert("color")
         }
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encodeIfPresent(color, forKey: .color)
+        try container.encodeIfPresent(self.color, forKey: .color)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        if let value = self.color {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.color != other.color {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if color != other.color {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        if let value = color {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        if let value = color {
+        if let value = self.color {
             let colorValue = try value.toCBORValue()
             map = map.adding(key: "color", value: colorValue)
         }
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "color"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "color": return self.color != nil
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -65,68 +99,64 @@ public struct PlaceStreamChatProfile: ATProtocolCodable, ATProtocolValue {
         case color
     }
 
+    /// Customizations for the color of a user's name in chat
     public struct Color: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.chat.profile#color"
+
         public let red: Int
         public let green: Int
         public let blue: Int
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            red: Int, green: Int, blue: Int
+            red: Int,
+            green: Int,
+            blue: Int,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.red = red
             self.green = green
             self.blue = blue
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.red = try container.decode(Int.self, forKey: .red)
-            } catch {
-                LogManager.logError("Decoding error for required property 'red': \(error)")
-                throw error
-            }
-            do {
-                self.green = try container.decode(Int.self, forKey: .green)
-            } catch {
-                LogManager.logError("Decoding error for required property 'green': \(error)")
-                throw error
-            }
-            do {
-                self.blue = try container.decode(Int.self, forKey: .blue)
-            } catch {
-                LogManager.logError("Decoding error for required property 'blue': \(error)")
-                throw error
-            }
+            self.red = try container.decode(Int.self, forKey: .red)
+            self.green = try container.decode(Int.self, forKey: .green)
+            self.blue = try container.decode(Int.self, forKey: .blue)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(red, forKey: .red)
-            try container.encode(green, forKey: .green)
-            try container.encode(blue, forKey: .blue)
+            try container.encode(self.red, forKey: .red)
+            try container.encode(self.green, forKey: .green)
+            try container.encode(self.blue, forKey: .blue)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(red)
-            hasher.combine(green)
-            hasher.combine(blue)
+            hasher.combine(self.red)
+            hasher.combine(self.green)
+            hasher.combine(self.blue)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if red != other.red {
+            if self.red != other.red {
                 return false
             }
-            if green != other.green {
+            if self.green != other.green {
                 return false
             }
-            if blue != other.blue {
+            if self.blue != other.blue {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -135,18 +165,18 @@ public struct PlaceStreamChatProfile: ATProtocolCodable, ATProtocolValue {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let redValue = try red.toCBORValue()
+            let redValue = try self.red.toCBORValue()
             map = map.adding(key: "red", value: redValue)
-            let greenValue = try green.toCBORValue()
+            let greenValue = try self.green.toCBORValue()
             map = map.adding(key: "green", value: greenValue)
-            let blueValue = try blue.toCBORValue()
+            let blueValue = try self.blue.toCBORValue()
             map = map.adding(key: "blue", value: blueValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "red", "green", "blue"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case red
             case green
             case blue

@@ -4,21 +4,38 @@ import Petrel
 
 // lexicon: 1, id: place.stream.branding.getBranding
 
+/// Get all branding configuration for the broadcaster.
 public struct PlaceStreamBrandingGetBranding {
 
     public static let typeIdentifier = "place.stream.branding.getBranding"
 
     public struct BrandingAsset: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.branding.getBranding#brandingAsset"
+
+        /// Asset key identifier
         public let key: String
+        /// MIME type of the asset
         public let mimeType: String
+        /// URL to fetch the asset blob (for images)
         public let url: String?
+        /// Inline data for text assets
         public let data: String?
+        /// Image width in pixels (optional, for images only)
         public let width: Int?
+        /// Image height in pixels (optional, for images only)
         public let height: Int?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            key: String, mimeType: String, url: String? = nil, data: String? = nil, width: Int? = nil, height: Int? = nil
+            key: String,
+            mimeType: String,
+            url: String? = nil,
+            data: String? = nil,
+            width: Int? = nil,
+            height: Int? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.key = key
             self.mimeType = mimeType
@@ -26,113 +43,124 @@ public struct PlaceStreamBrandingGetBranding {
             self.data = data
             self.width = width
             self.height = height
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.key = try container.decode(String.self, forKey: .key)
+            self.mimeType = try container.decode(String.self, forKey: .mimeType)
             do {
-                self.key = try container.decode(String.self, forKey: .key)
+                self.url = try container.decodeIfPresent(String.self, forKey: .url, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'key': \(error)")
-                throw error
-            }
-            do {
-                self.mimeType = try container.decode(String.self, forKey: .mimeType)
-            } catch {
-                LogManager.logError("Decoding error for required property 'mimeType': \(error)")
-                throw error
-            }
-            do {
-                self.url = try container.decodeIfPresent(String.self, forKey: .url)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'url' — degrading to nil: \(error)")
                 self.url = nil
+                malformedFields.insert("url")
             }
             do {
-                self.data = try container.decodeIfPresent(String.self, forKey: .data)
+                self.data = try container.decodeIfPresent(String.self, forKey: .data, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'data' — degrading to nil: \(error)")
                 self.data = nil
+                malformedFields.insert("data")
             }
             do {
-                self.width = try container.decodeIfPresent(Int.self, forKey: .width)
+                self.width = try container.decodeIfPresent(Int.self, forKey: .width, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'width' — degrading to nil: \(error)")
                 self.width = nil
+                malformedFields.insert("width")
             }
             do {
-                self.height = try container.decodeIfPresent(Int.self, forKey: .height)
+                self.height = try container.decodeIfPresent(Int.self, forKey: .height, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'height' — degrading to nil: \(error)")
                 self.height = nil
+                malformedFields.insert("height")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(key, forKey: .key)
-            try container.encode(mimeType, forKey: .mimeType)
-            try container.encodeIfPresent(url, forKey: .url)
-            try container.encodeIfPresent(data, forKey: .data)
-            try container.encodeIfPresent(width, forKey: .width)
-            try container.encodeIfPresent(height, forKey: .height)
+            try container.encode(self.key, forKey: .key)
+            try container.encode(self.mimeType, forKey: .mimeType)
+            try container.encodeIfPresent(self.url, forKey: .url)
+            try container.encodeIfPresent(self.data, forKey: .data)
+            try container.encodeIfPresent(self.width, forKey: .width)
+            try container.encodeIfPresent(self.height, forKey: .height)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(key)
-            hasher.combine(mimeType)
-            if let value = url {
+            hasher.combine(self.key)
+            hasher.combine(self.mimeType)
+            if let value = self.url {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = data {
+            if let value = self.data {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = width {
+            if let value = self.width {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = height {
+            if let value = self.height {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if key != other.key {
+            if self.key != other.key {
                 return false
             }
-            if mimeType != other.mimeType {
+            if self.mimeType != other.mimeType {
                 return false
             }
-            if url != other.url {
+            if self.url != other.url {
                 return false
             }
-            if data != other.data {
+            if self.data != other.data {
                 return false
             }
-            if width != other.width {
+            if self.width != other.width {
                 return false
             }
-            if height != other.height {
+            if self.height != other.height {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -141,32 +169,46 @@ public struct PlaceStreamBrandingGetBranding {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let keyValue = try key.toCBORValue()
+            let keyValue = try self.key.toCBORValue()
             map = map.adding(key: "key", value: keyValue)
-            let mimeTypeValue = try mimeType.toCBORValue()
+            let mimeTypeValue = try self.mimeType.toCBORValue()
             map = map.adding(key: "mimeType", value: mimeTypeValue)
-            if let value = url {
+            if let value = self.url {
                 let urlValue = try value.toCBORValue()
                 map = map.adding(key: "url", value: urlValue)
             }
-            if let value = data {
+            if let value = self.data {
                 let dataValue = try value.toCBORValue()
                 map = map.adding(key: "data", value: dataValue)
             }
-            if let value = width {
+            if let value = self.width {
                 let widthValue = try value.toCBORValue()
                 map = map.adding(key: "width", value: widthValue)
             }
-            if let value = height {
+            if let value = self.height {
                 let heightValue = try value.toCBORValue()
                 map = map.adding(key: "height", value: heightValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "key", "mimeType", "url", "data", "width", "height"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "key": return true
+            case "mimeType": return true
+            case "url": return self.url != nil
+            case "data": return self.data != nil
+            case "width": return self.width != nil
+            case "height": return self.height != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case key
             case mimeType
             case url
@@ -188,50 +230,35 @@ public struct PlaceStreamBrandingGetBranding {
 
     public struct Output: ATProtocolCodable {
 
+        /// List of available branding assets
         public let assets: [BrandingAsset]
 
-        // Standard public initializer
         public init(
-
             assets: [BrandingAsset]
-
         ) {
-
             self.assets = assets
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.assets = try container.decode([BrandingAsset].self, forKey: .assets)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(assets, forKey: .assets)
-
+            try container.encode(self.assets, forKey: .assets)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let assetsValue = try assets.toCBORValue()
+            let assetsValue = try self.assets.toCBORValue()
             map = map.adding(key: "assets", value: assetsValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case assets
         }
-
     }
 
 }
@@ -241,9 +268,8 @@ extension ATProtoClient.Place.Stream.Branding {
     /// Get all branding configuration for the broadcaster.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoXRPCError` for a non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getBranding(input: PlaceStreamBrandingGetBranding.Parameters) async throws -> (responseCode: Int, data: PlaceStreamBrandingGetBranding.Output?) {
         let endpoint = "place.stream.branding.getBranding"
 
@@ -260,37 +286,27 @@ extension ATProtoClient.Place.Stream.Branding {
         // Determine service DID for this endpoint
         let serviceDID = await networkService.getServiceDID(for: "place.stream.branding.getBranding")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
-        let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
+        let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamBrandingGetBranding.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.branding.getBranding: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(PlaceStreamBrandingGetBranding.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: place.stream.broadcast.getBroadcaster
 
+/// Get information about a Streamplace broadcaster.
 public struct PlaceStreamBroadcastGetBroadcaster {
 
     public static let typeIdentifier = "place.stream.broadcast.getBroadcaster"
+
     public struct Parameters: Parametrizable {
 
         public init(
@@ -17,90 +19,69 @@ public struct PlaceStreamBroadcastGetBroadcaster {
 
     public struct Output: ATProtocolCodable {
 
+        /// DID of the Streamplace broadcaster to which this server belongs
         public let broadcaster: DID
-
+        /// DID of this particular Streamplace server
         public let server: DID?
-
+        /// Array of DIDs authorized as admins
         public let admins: [DID]?
 
-        // Standard public initializer
         public init(
-
             broadcaster: DID,
-
             server: DID? = nil,
-
             admins: [DID]? = nil
-
         ) {
-
             self.broadcaster = broadcaster
-
             self.server = server
-
             self.admins = admins
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
+            let strict = decoder.isATProtoStrictDecoding
             self.broadcaster = try container.decode(DID.self, forKey: .broadcaster)
-
             do {
-                self.server = try container.decodeIfPresent(DID.self, forKey: .server)
+                self.server = try container.decodeIfPresent(DID.self, forKey: .server, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'server' — degrading to nil: \(error)")
                 self.server = nil
             }
-
             do {
-                self.admins = try container.decodeIfPresent([DID].self, forKey: .admins)
+                self.admins = try container.decodeIfPresent([DID].self, forKey: .admins, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'admins' — degrading to nil: \(error)")
                 self.admins = nil
             }
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(broadcaster, forKey: .broadcaster)
-
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(server, forKey: .server)
-
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(admins, forKey: .admins)
-
+            try container.encode(self.broadcaster, forKey: .broadcaster)
+            try container.encodeIfPresent(self.server, forKey: .server)
+            try container.encodeIfPresent(self.admins, forKey: .admins)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let broadcasterValue = try broadcaster.toCBORValue()
+            let broadcasterValue = try self.broadcaster.toCBORValue()
             map = map.adding(key: "broadcaster", value: broadcasterValue)
-
-            if let value = server {
-                // Encode optional property even if it's an empty array for CBOR
+            if let value = self.server {
                 let serverValue = try value.toCBORValue()
                 map = map.adding(key: "server", value: serverValue)
             }
-
-            if let value = admins {
-                // Encode optional property even if it's an empty array for CBOR
+            if let value = self.admins {
                 let adminsValue = try value.toCBORValue()
                 map = map.adding(key: "admins", value: adminsValue)
             }
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -108,7 +89,6 @@ public struct PlaceStreamBroadcastGetBroadcaster {
             case server
             case admins
         }
-
     }
 
 }
@@ -118,9 +98,8 @@ extension ATProtoClient.Place.Stream.Broadcast {
     /// Get information about a Streamplace broadcaster.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoXRPCError` for a non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getBroadcaster(input: PlaceStreamBroadcastGetBroadcaster.Parameters) async throws -> (responseCode: Int, data: PlaceStreamBroadcastGetBroadcaster.Output?) {
         let endpoint = "place.stream.broadcast.getBroadcaster"
 
@@ -137,37 +116,27 @@ extension ATProtoClient.Place.Stream.Broadcast {
         // Determine service DID for this endpoint
         let serviceDID = await networkService.getServiceDID(for: "place.stream.broadcast.getBroadcaster")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
-        let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
+        let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamBroadcastGetBroadcaster.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.broadcast.getBroadcaster: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(PlaceStreamBroadcastGetBroadcaster.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

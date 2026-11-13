@@ -4,23 +4,44 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.mek
 
+/// A Message Encryption Key distribution (SPEC §7.3), written by the sender into its own repo inside the conversation space ([CB-15], [CB-21]). rkey = hex(mekId). One record carries the MEK for every roster member.
 public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.mek"
+
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "any")
+
+    /// Conversation id.
     public let threadId: String
+    /// kdf(mek, MINOS_SALT, 'minos.kdf.mek.mek_id:recipient_roster_hash=' || hex(rosterHash), 12).
     public let mekId: Bytes
+    /// sha256('mek_recipient_list:' || sorted hex recipient epoch heads).
     public let rosterHash: Bytes
     public let sender: BlueCatbirdLabyrinthMekSenderUnion
+    /// One entry per roster member, the sender included ([CB-16]). At most 512 so the record stays under the 1 MB write cap.
     public let recipients: [BlueCatbirdLabyrinthDefs.MekRecipient]
     public let createdAt: ATProtocolDate
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
 
-    public init(threadId: String, mekId: Bytes, rosterHash: Bytes, sender: BlueCatbirdLabyrinthMekSenderUnion, recipients: [BlueCatbirdLabyrinthDefs.MekRecipient], createdAt: ATProtocolDate) {
+    public init(
+        threadId: String,
+        mekId: Bytes,
+        rosterHash: Bytes,
+        sender: BlueCatbirdLabyrinthMekSenderUnion,
+        recipients: [BlueCatbirdLabyrinthDefs.MekRecipient],
+        createdAt: ATProtocolDate,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.threadId = threadId
         self.mekId = mekId
         self.rosterHash = rosterHash
         self.sender = sender
         self.recipients = recipients
         self.createdAt = createdAt
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
@@ -31,72 +52,77 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
         self.sender = try container.decode(BlueCatbirdLabyrinthMekSenderUnion.self, forKey: .sender)
         self.recipients = try container.decode([BlueCatbirdLabyrinthDefs.MekRecipient].self, forKey: .recipients)
         self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(threadId, forKey: .threadId)
-        try container.encode(mekId, forKey: .mekId)
-        try container.encode(rosterHash, forKey: .rosterHash)
-        try container.encode(sender, forKey: .sender)
-        try container.encode(recipients, forKey: .recipients)
-        try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(self.threadId, forKey: .threadId)
+        try container.encode(self.mekId, forKey: .mekId)
+        try container.encode(self.rosterHash, forKey: .rosterHash)
+        try container.encode(self.sender, forKey: .sender)
+        try container.encode(self.recipients, forKey: .recipients)
+        try container.encode(self.createdAt, forKey: .createdAt)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.threadId)
+        hasher.combine(self.mekId)
+        hasher.combine(self.rosterHash)
+        hasher.combine(self.sender)
+        hasher.combine(self.recipients)
+        hasher.combine(self.createdAt)
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.threadId != other.threadId {
+            return false
+        }
+        if self.mekId != other.mekId {
+            return false
+        }
+        if self.rosterHash != other.rosterHash {
+            return false
+        }
+        if self.sender != other.sender {
+            return false
+        }
+        if self.recipients != other.recipients {
+            return false
+        }
+        if self.createdAt != other.createdAt {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if threadId != other.threadId {
-            return false
-        }
-        if mekId != other.mekId {
-            return false
-        }
-        if rosterHash != other.rosterHash {
-            return false
-        }
-        if sender != other.sender {
-            return false
-        }
-        if recipients != other.recipients {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(threadId)
-        hasher.combine(mekId)
-        hasher.combine(rosterHash)
-        hasher.combine(sender)
-        hasher.combine(recipients)
-        hasher.combine(createdAt)
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let threadIdValue = try threadId.toCBORValue()
+        let threadIdValue = try self.threadId.toCBORValue()
         map = map.adding(key: "threadId", value: threadIdValue)
-        let mekIdValue = try mekId.toCBORValue()
+        let mekIdValue = try self.mekId.toCBORValue()
         map = map.adding(key: "mekId", value: mekIdValue)
-        let rosterHashValue = try rosterHash.toCBORValue()
+        let rosterHashValue = try self.rosterHash.toCBORValue()
         map = map.adding(key: "rosterHash", value: rosterHashValue)
-        let senderValue = try sender.toCBORValue()
+        let senderValue = try self.sender.toCBORValue()
         map = map.adding(key: "sender", value: senderValue)
-        let recipientsValue = try recipients.toCBORValue()
+        let recipientsValue = try self.recipients.toCBORValue()
         map = map.adding(key: "recipients", value: recipientsValue)
-        let createdAtValue = try createdAt.toCBORValue()
+        let createdAtValue = try self.createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
     }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "threadId", "mekId", "rosterHash", "sender", "recipients", "createdAt"]
 
     private enum CodingKeys: String, CodingKey {
         case typeIdentifier = "$type"
@@ -108,68 +134,67 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
         case createdAt
     }
 
+    /// An enrolled sender, authenticated by its mailbox auth key.
     public struct LabyrinthSender: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.labyrinth.mek#labyrinthSender"
+
+        /// Sender account; must be the DID of the repo holding this record.
         public let did: DID
+        /// Head of the sender epoch whose auth key sealed the MEK.
         public let senderEpochHead: Bytes
+        /// The sender's epoch public data (head = senderEpochHead), so readers can authenticate MEKs from epochs the sender has since rotated past.
         public let senderEpoch: BlueCatbirdLabyrinthDefs.EpochPublic
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            did: DID, senderEpochHead: Bytes, senderEpoch: BlueCatbirdLabyrinthDefs.EpochPublic
+            did: DID,
+            senderEpochHead: Bytes,
+            senderEpoch: BlueCatbirdLabyrinthDefs.EpochPublic,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.did = did
             self.senderEpochHead = senderEpochHead
             self.senderEpoch = senderEpoch
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.did = try container.decode(DID.self, forKey: .did)
-            } catch {
-                LogManager.logError("Decoding error for required property 'did': \(error)")
-                throw error
-            }
-            do {
-                self.senderEpochHead = try container.decode(Bytes.self, forKey: .senderEpochHead)
-            } catch {
-                LogManager.logError("Decoding error for required property 'senderEpochHead': \(error)")
-                throw error
-            }
-            do {
-                self.senderEpoch = try container.decode(BlueCatbirdLabyrinthDefs.EpochPublic.self, forKey: .senderEpoch)
-            } catch {
-                LogManager.logError("Decoding error for required property 'senderEpoch': \(error)")
-                throw error
-            }
+            self.did = try container.decode(DID.self, forKey: .did)
+            self.senderEpochHead = try container.decode(Bytes.self, forKey: .senderEpochHead)
+            self.senderEpoch = try container.decode(BlueCatbirdLabyrinthDefs.EpochPublic.self, forKey: .senderEpoch)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(did, forKey: .did)
-            try container.encode(senderEpochHead, forKey: .senderEpochHead)
-            try container.encode(senderEpoch, forKey: .senderEpoch)
+            try container.encode(self.did, forKey: .did)
+            try container.encode(self.senderEpochHead, forKey: .senderEpochHead)
+            try container.encode(self.senderEpoch, forKey: .senderEpoch)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(did)
-            hasher.combine(senderEpochHead)
-            hasher.combine(senderEpoch)
+            hasher.combine(self.did)
+            hasher.combine(self.senderEpochHead)
+            hasher.combine(self.senderEpoch)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if did != other.did {
+            if self.did != other.did {
                 return false
             }
-            if senderEpochHead != other.senderEpochHead {
+            if self.senderEpochHead != other.senderEpochHead {
                 return false
             }
-            if senderEpoch != other.senderEpoch {
+            if self.senderEpoch != other.senderEpoch {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -178,86 +203,84 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let didValue = try did.toCBORValue()
+            let didValue = try self.did.toCBORValue()
             map = map.adding(key: "did", value: didValue)
-            let senderEpochHeadValue = try senderEpochHead.toCBORValue()
+            let senderEpochHeadValue = try self.senderEpochHead.toCBORValue()
             map = map.adding(key: "senderEpochHead", value: senderEpochHeadValue)
-            let senderEpochValue = try senderEpoch.toCBORValue()
+            let senderEpochValue = try self.senderEpoch.toCBORValue()
             map = map.adding(key: "senderEpoch", value: senderEpochValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "did", "senderEpochHead", "senderEpoch"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case did
             case senderEpochHead
             case senderEpoch
         }
     }
-
+    /// A sender that is not enrolled, authenticated by its chat transport key.
     public struct TransportSender: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.labyrinth.mek#transportSender"
+
+        /// Sender chat device Ed25519 key.
         public let transportPubkey: Bytes
+        /// Ephemeral Hawk auth key (X25519).
         public let ephemeralAuthPubkey: Bytes
+        /// Ed25519 over 'minos.structured_signature.mek_distribution.ephemeral_auth:k=<hex>;mek_id=<hex>'.
         public let sig: Bytes
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            transportPubkey: Bytes, ephemeralAuthPubkey: Bytes, sig: Bytes
+            transportPubkey: Bytes,
+            ephemeralAuthPubkey: Bytes,
+            sig: Bytes,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.transportPubkey = transportPubkey
             self.ephemeralAuthPubkey = ephemeralAuthPubkey
             self.sig = sig
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.transportPubkey = try container.decode(Bytes.self, forKey: .transportPubkey)
-            } catch {
-                LogManager.logError("Decoding error for required property 'transportPubkey': \(error)")
-                throw error
-            }
-            do {
-                self.ephemeralAuthPubkey = try container.decode(Bytes.self, forKey: .ephemeralAuthPubkey)
-            } catch {
-                LogManager.logError("Decoding error for required property 'ephemeralAuthPubkey': \(error)")
-                throw error
-            }
-            do {
-                self.sig = try container.decode(Bytes.self, forKey: .sig)
-            } catch {
-                LogManager.logError("Decoding error for required property 'sig': \(error)")
-                throw error
-            }
+            self.transportPubkey = try container.decode(Bytes.self, forKey: .transportPubkey)
+            self.ephemeralAuthPubkey = try container.decode(Bytes.self, forKey: .ephemeralAuthPubkey)
+            self.sig = try container.decode(Bytes.self, forKey: .sig)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(transportPubkey, forKey: .transportPubkey)
-            try container.encode(ephemeralAuthPubkey, forKey: .ephemeralAuthPubkey)
-            try container.encode(sig, forKey: .sig)
+            try container.encode(self.transportPubkey, forKey: .transportPubkey)
+            try container.encode(self.ephemeralAuthPubkey, forKey: .ephemeralAuthPubkey)
+            try container.encode(self.sig, forKey: .sig)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(transportPubkey)
-            hasher.combine(ephemeralAuthPubkey)
-            hasher.combine(sig)
+            hasher.combine(self.transportPubkey)
+            hasher.combine(self.ephemeralAuthPubkey)
+            hasher.combine(self.sig)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if transportPubkey != other.transportPubkey {
+            if self.transportPubkey != other.transportPubkey {
                 return false
             }
-            if ephemeralAuthPubkey != other.ephemeralAuthPubkey {
+            if self.ephemeralAuthPubkey != other.ephemeralAuthPubkey {
                 return false
             }
-            if sig != other.sig {
+            if self.sig != other.sig {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -266,18 +289,18 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let transportPubkeyValue = try transportPubkey.toCBORValue()
+            let transportPubkeyValue = try self.transportPubkey.toCBORValue()
             map = map.adding(key: "transportPubkey", value: transportPubkeyValue)
-            let ephemeralAuthPubkeyValue = try ephemeralAuthPubkey.toCBORValue()
+            let ephemeralAuthPubkeyValue = try self.ephemeralAuthPubkey.toCBORValue()
             map = map.adding(key: "ephemeralAuthPubkey", value: ephemeralAuthPubkeyValue)
-            let sigValue = try sig.toCBORValue()
+            let sigValue = try self.sig.toCBORValue()
             map = map.adding(key: "sig", value: sigValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "transportPubkey", "ephemeralAuthPubkey", "sig"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case transportPubkey
             case ephemeralAuthPubkey
             case sig
@@ -287,7 +310,6 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
     public enum BlueCatbirdLabyrinthMekSenderUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
         case blueCatbirdLabyrinthMekLabyrinthSender(BlueCatbirdLabyrinthMek.LabyrinthSender)
         case blueCatbirdLabyrinthMekTransportSender(BlueCatbirdLabyrinthMek.TransportSender)
-        case unexpected(ATProtocolValueContainer)
         public init(_ value: BlueCatbirdLabyrinthMek.LabyrinthSender) {
             self = .blueCatbirdLabyrinthMekLabyrinthSender(value)
         }
@@ -307,8 +329,11 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
                 let value = try BlueCatbirdLabyrinthMek.TransportSender(from: decoder)
                 self = .blueCatbirdLabyrinthMekTransportSender(value)
             default:
-                let unknownValue = try ATProtocolValueContainer(from: decoder)
-                self = .unexpected(unknownValue)
+                throw DecodingError.dataCorruptedError(
+                    forKey: .type,
+                    in: container,
+                    debugDescription: "'\(typeValue)' is not a member of this closed union"
+                )
             }
         }
 
@@ -322,8 +347,6 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
             case .blueCatbirdLabyrinthMekTransportSender(let value):
                 try container.encode("blue.catbird.labyrinth.mek#transportSender", forKey: .type)
                 try value.encode(to: encoder)
-            case .unexpected(let container):
-                try container.encode(to: encoder)
             }
         }
 
@@ -335,9 +358,6 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
             case .blueCatbirdLabyrinthMekTransportSender(let value):
                 hasher.combine("blue.catbird.labyrinth.mek#transportSender")
                 hasher.combine(value)
-            case .unexpected(let container):
-                hasher.combine("unexpected")
-                hasher.combine(container)
             }
         }
 
@@ -353,8 +373,6 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
             case (.blueCatbirdLabyrinthMekTransportSender(let lhsValue),
                   .blueCatbirdLabyrinthMekTransportSender(let rhsValue)):
                 return lhsValue == rhsValue
-            case (.unexpected(let lhsValue), .unexpected(let rhsValue)):
-                return lhsValue.isEqual(to: rhsValue)
             default:
                 return false
             }
@@ -405,8 +423,6 @@ public struct BlueCatbirdLabyrinthMek: ATProtocolCodable, ATProtocolValue {
                     }
                 }
                 return map
-            case .unexpected(let container):
-                return try container.toCBORValue()
             }
         }
     }

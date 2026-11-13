@@ -4,27 +4,52 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.mlsDS.getConvoEvents
 
+/// Paginated retrieval of conversation events for federation reconciliation. Fetch a page of conversation events (messages) after a given sequence number.
 public struct BlueCatbirdMlsDSGetConvoEvents {
 
     public static let typeIdentifier = "blue.catbird.mlsDS.getConvoEvents"
 
+    /// A single conversation event (message) with metadata.
     public struct ConvoEventEntry: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.mlsDS.getConvoEvents#convoEventEntry"
+
+        /// Sequence number
         public let seq: Int
+        /// MLS epoch
         public let epoch: Int
+        /// Message ID
         public let msgId: String
+        /// Message type (e.g., 'app')
         public let messageType: String
+        /// Encrypted message payload
         public let ciphertext: Bytes
+        /// Padded plaintext size
         public let paddedSize: Int
+        /// Creation timestamp
         public let createdAt: ATProtocolDate
         public let entryId: String?
         public let entryKind: String?
         public let acceptedPayloadSha256: Bytes?
         public let signedRequest: Bytes?
         public let outerFingerprint: Bytes?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            seq: Int, epoch: Int, msgId: String, messageType: String, ciphertext: Bytes, paddedSize: Int, createdAt: ATProtocolDate, entryId: String? = nil, entryKind: String? = nil, acceptedPayloadSha256: Bytes? = nil, signedRequest: Bytes? = nil, outerFingerprint: Bytes? = nil
+            seq: Int,
+            epoch: Int,
+            msgId: String,
+            messageType: String,
+            ciphertext: Bytes,
+            paddedSize: Int,
+            createdAt: ATProtocolDate,
+            entryId: String? = nil,
+            entryKind: String? = nil,
+            acceptedPayloadSha256: Bytes? = nil,
+            signedRequest: Bytes? = nil,
+            outerFingerprint: Bytes? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.seq = seq
             self.epoch = epoch
@@ -38,185 +63,175 @@ public struct BlueCatbirdMlsDSGetConvoEvents {
             self.acceptedPayloadSha256 = acceptedPayloadSha256
             self.signedRequest = signedRequest
             self.outerFingerprint = outerFingerprint
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.seq = try container.decode(Int.self, forKey: .seq)
+            self.epoch = try container.decode(Int.self, forKey: .epoch)
+            self.msgId = try container.decode(String.self, forKey: .msgId)
+            self.messageType = try container.decode(String.self, forKey: .messageType)
+            self.ciphertext = try container.decode(Bytes.self, forKey: .ciphertext)
+            self.paddedSize = try container.decode(Int.self, forKey: .paddedSize)
+            self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
             do {
-                self.seq = try container.decode(Int.self, forKey: .seq)
+                self.entryId = try container.decodeIfPresent(String.self, forKey: .entryId, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'seq': \(error)")
-                throw error
-            }
-            do {
-                self.epoch = try container.decode(Int.self, forKey: .epoch)
-            } catch {
-                LogManager.logError("Decoding error for required property 'epoch': \(error)")
-                throw error
-            }
-            do {
-                self.msgId = try container.decode(String.self, forKey: .msgId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'msgId': \(error)")
-                throw error
-            }
-            do {
-                self.messageType = try container.decode(String.self, forKey: .messageType)
-            } catch {
-                LogManager.logError("Decoding error for required property 'messageType': \(error)")
-                throw error
-            }
-            do {
-                self.ciphertext = try container.decode(Bytes.self, forKey: .ciphertext)
-            } catch {
-                LogManager.logError("Decoding error for required property 'ciphertext': \(error)")
-                throw error
-            }
-            do {
-                self.paddedSize = try container.decode(Int.self, forKey: .paddedSize)
-            } catch {
-                LogManager.logError("Decoding error for required property 'paddedSize': \(error)")
-                throw error
-            }
-            do {
-                self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
-            } catch {
-                LogManager.logError("Decoding error for required property 'createdAt': \(error)")
-                throw error
-            }
-            do {
-                self.entryId = try container.decodeIfPresent(String.self, forKey: .entryId)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'entryId' — degrading to nil: \(error)")
                 self.entryId = nil
+                malformedFields.insert("entryId")
             }
             do {
-                self.entryKind = try container.decodeIfPresent(String.self, forKey: .entryKind)
+                self.entryKind = try container.decodeIfPresent(String.self, forKey: .entryKind, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'entryKind' — degrading to nil: \(error)")
                 self.entryKind = nil
+                malformedFields.insert("entryKind")
             }
             do {
-                self.acceptedPayloadSha256 = try container.decodeIfPresent(Bytes.self, forKey: .acceptedPayloadSha256)
+                self.acceptedPayloadSha256 = try container.decodeIfPresent(Bytes.self, forKey: .acceptedPayloadSha256, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'acceptedPayloadSha256' — degrading to nil: \(error)")
                 self.acceptedPayloadSha256 = nil
+                malformedFields.insert("acceptedPayloadSha256")
             }
             do {
-                self.signedRequest = try container.decodeIfPresent(Bytes.self, forKey: .signedRequest)
+                self.signedRequest = try container.decodeIfPresent(Bytes.self, forKey: .signedRequest, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'signedRequest' — degrading to nil: \(error)")
                 self.signedRequest = nil
+                malformedFields.insert("signedRequest")
             }
             do {
-                self.outerFingerprint = try container.decodeIfPresent(Bytes.self, forKey: .outerFingerprint)
+                self.outerFingerprint = try container.decodeIfPresent(Bytes.self, forKey: .outerFingerprint, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'outerFingerprint' — degrading to nil: \(error)")
                 self.outerFingerprint = nil
+                malformedFields.insert("outerFingerprint")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(seq, forKey: .seq)
-            try container.encode(epoch, forKey: .epoch)
-            try container.encode(msgId, forKey: .msgId)
-            try container.encode(messageType, forKey: .messageType)
-            try container.encode(ciphertext, forKey: .ciphertext)
-            try container.encode(paddedSize, forKey: .paddedSize)
-            try container.encode(createdAt, forKey: .createdAt)
-            try container.encodeIfPresent(entryId, forKey: .entryId)
-            try container.encodeIfPresent(entryKind, forKey: .entryKind)
-            try container.encodeIfPresent(acceptedPayloadSha256, forKey: .acceptedPayloadSha256)
-            try container.encodeIfPresent(signedRequest, forKey: .signedRequest)
-            try container.encodeIfPresent(outerFingerprint, forKey: .outerFingerprint)
+            try container.encode(self.seq, forKey: .seq)
+            try container.encode(self.epoch, forKey: .epoch)
+            try container.encode(self.msgId, forKey: .msgId)
+            try container.encode(self.messageType, forKey: .messageType)
+            try container.encode(self.ciphertext, forKey: .ciphertext)
+            try container.encode(self.paddedSize, forKey: .paddedSize)
+            try container.encode(self.createdAt, forKey: .createdAt)
+            try container.encodeIfPresent(self.entryId, forKey: .entryId)
+            try container.encodeIfPresent(self.entryKind, forKey: .entryKind)
+            try container.encodeIfPresent(self.acceptedPayloadSha256, forKey: .acceptedPayloadSha256)
+            try container.encodeIfPresent(self.signedRequest, forKey: .signedRequest)
+            try container.encodeIfPresent(self.outerFingerprint, forKey: .outerFingerprint)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(seq)
-            hasher.combine(epoch)
-            hasher.combine(msgId)
-            hasher.combine(messageType)
-            hasher.combine(ciphertext)
-            hasher.combine(paddedSize)
-            hasher.combine(createdAt)
-            if let value = entryId {
+            hasher.combine(self.seq)
+            hasher.combine(self.epoch)
+            hasher.combine(self.msgId)
+            hasher.combine(self.messageType)
+            hasher.combine(self.ciphertext)
+            hasher.combine(self.paddedSize)
+            hasher.combine(self.createdAt)
+            if let value = self.entryId {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = entryKind {
+            if let value = self.entryKind {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = acceptedPayloadSha256 {
+            if let value = self.acceptedPayloadSha256 {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = signedRequest {
+            if let value = self.signedRequest {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = outerFingerprint {
+            if let value = self.outerFingerprint {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if seq != other.seq {
+            if self.seq != other.seq {
                 return false
             }
-            if epoch != other.epoch {
+            if self.epoch != other.epoch {
                 return false
             }
-            if msgId != other.msgId {
+            if self.msgId != other.msgId {
                 return false
             }
-            if messageType != other.messageType {
+            if self.messageType != other.messageType {
                 return false
             }
-            if ciphertext != other.ciphertext {
+            if self.ciphertext != other.ciphertext {
                 return false
             }
-            if paddedSize != other.paddedSize {
+            if self.paddedSize != other.paddedSize {
                 return false
             }
-            if createdAt != other.createdAt {
+            if self.createdAt != other.createdAt {
                 return false
             }
-            if entryId != other.entryId {
+            if self.entryId != other.entryId {
                 return false
             }
-            if entryKind != other.entryKind {
+            if self.entryKind != other.entryKind {
                 return false
             }
-            if acceptedPayloadSha256 != other.acceptedPayloadSha256 {
+            if self.acceptedPayloadSha256 != other.acceptedPayloadSha256 {
                 return false
             }
-            if signedRequest != other.signedRequest {
+            if self.signedRequest != other.signedRequest {
                 return false
             }
-            if outerFingerprint != other.outerFingerprint {
+            if self.outerFingerprint != other.outerFingerprint {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -225,46 +240,66 @@ public struct BlueCatbirdMlsDSGetConvoEvents {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let seqValue = try seq.toCBORValue()
+            let seqValue = try self.seq.toCBORValue()
             map = map.adding(key: "seq", value: seqValue)
-            let epochValue = try epoch.toCBORValue()
+            let epochValue = try self.epoch.toCBORValue()
             map = map.adding(key: "epoch", value: epochValue)
-            let msgIdValue = try msgId.toCBORValue()
+            let msgIdValue = try self.msgId.toCBORValue()
             map = map.adding(key: "msgId", value: msgIdValue)
-            let messageTypeValue = try messageType.toCBORValue()
+            let messageTypeValue = try self.messageType.toCBORValue()
             map = map.adding(key: "messageType", value: messageTypeValue)
-            let ciphertextValue = try ciphertext.toCBORValue()
+            let ciphertextValue = try self.ciphertext.toCBORValue()
             map = map.adding(key: "ciphertext", value: ciphertextValue)
-            let paddedSizeValue = try paddedSize.toCBORValue()
+            let paddedSizeValue = try self.paddedSize.toCBORValue()
             map = map.adding(key: "paddedSize", value: paddedSizeValue)
-            let createdAtValue = try createdAt.toCBORValue()
+            let createdAtValue = try self.createdAt.toCBORValue()
             map = map.adding(key: "createdAt", value: createdAtValue)
-            if let value = entryId {
+            if let value = self.entryId {
                 let entryIdValue = try value.toCBORValue()
                 map = map.adding(key: "entryId", value: entryIdValue)
             }
-            if let value = entryKind {
+            if let value = self.entryKind {
                 let entryKindValue = try value.toCBORValue()
                 map = map.adding(key: "entryKind", value: entryKindValue)
             }
-            if let value = acceptedPayloadSha256 {
+            if let value = self.acceptedPayloadSha256 {
                 let acceptedPayloadSha256Value = try value.toCBORValue()
                 map = map.adding(key: "acceptedPayloadSha256", value: acceptedPayloadSha256Value)
             }
-            if let value = signedRequest {
+            if let value = self.signedRequest {
                 let signedRequestValue = try value.toCBORValue()
                 map = map.adding(key: "signedRequest", value: signedRequestValue)
             }
-            if let value = outerFingerprint {
+            if let value = self.outerFingerprint {
                 let outerFingerprintValue = try value.toCBORValue()
                 map = map.adding(key: "outerFingerprint", value: outerFingerprintValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "seq", "epoch", "msgId", "messageType", "ciphertext", "paddedSize", "createdAt", "entryId", "entryKind", "acceptedPayloadSha256", "signedRequest", "outerFingerprint"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "seq": return true
+            case "epoch": return true
+            case "msgId": return true
+            case "messageType": return true
+            case "ciphertext": return true
+            case "paddedSize": return true
+            case "createdAt": return true
+            case "entryId": return self.entryId != nil
+            case "entryKind": return self.entryKind != nil
+            case "acceptedPayloadSha256": return self.acceptedPayloadSha256 != nil
+            case "signedRequest": return self.signedRequest != nil
+            case "outerFingerprint": return self.outerFingerprint != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case seq
             case epoch
             case msgId
@@ -287,7 +322,7 @@ public struct BlueCatbirdMlsDSGetConvoEvents {
         public init(
             convoId: String,
             afterSeq: Int? = nil,
-            limit: Int? = nil
+            limit: Int? = 200
         ) {
             self.convoId = convoId
             self.afterSeq = afterSeq
@@ -298,83 +333,54 @@ public struct BlueCatbirdMlsDSGetConvoEvents {
 
     public struct Output: ATProtocolCodable {
 
+        /// Conversation ID
         public let convoId: String
-
+        /// Lower bound sequence number (exclusive)
         public let fromSeqExclusive: Int
-
+        /// Upper bound sequence number (inclusive)
         public let toSeqInclusive: Int
-
+        /// Ordered list of conversation events
         public let events: [ConvoEventEntry]
 
-        // Standard public initializer
         public init(
-
             convoId: String,
-
             fromSeqExclusive: Int,
-
             toSeqInclusive: Int,
-
             events: [ConvoEventEntry]
-
         ) {
-
             self.convoId = convoId
-
             self.fromSeqExclusive = fromSeqExclusive
-
             self.toSeqInclusive = toSeqInclusive
-
             self.events = events
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.convoId = try container.decode(String.self, forKey: .convoId)
-
             self.fromSeqExclusive = try container.decode(Int.self, forKey: .fromSeqExclusive)
-
             self.toSeqInclusive = try container.decode(Int.self, forKey: .toSeqInclusive)
-
             self.events = try container.decode([ConvoEventEntry].self, forKey: .events)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(convoId, forKey: .convoId)
-
-            try container.encode(fromSeqExclusive, forKey: .fromSeqExclusive)
-
-            try container.encode(toSeqInclusive, forKey: .toSeqInclusive)
-
-            try container.encode(events, forKey: .events)
-
+            try container.encode(self.convoId, forKey: .convoId)
+            try container.encode(self.fromSeqExclusive, forKey: .fromSeqExclusive)
+            try container.encode(self.toSeqInclusive, forKey: .toSeqInclusive)
+            try container.encode(self.events, forKey: .events)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let convoIdValue = try convoId.toCBORValue()
+            let convoIdValue = try self.convoId.toCBORValue()
             map = map.adding(key: "convoId", value: convoIdValue)
-
-            let fromSeqExclusiveValue = try fromSeqExclusive.toCBORValue()
+            let fromSeqExclusiveValue = try self.fromSeqExclusive.toCBORValue()
             map = map.adding(key: "fromSeqExclusive", value: fromSeqExclusiveValue)
-
-            let toSeqInclusiveValue = try toSeqInclusive.toCBORValue()
+            let toSeqInclusiveValue = try self.toSeqInclusive.toCBORValue()
             map = map.adding(key: "toSeqInclusive", value: toSeqInclusiveValue)
-
-            let eventsValue = try events.toCBORValue()
+            let eventsValue = try self.events.toCBORValue()
             map = map.adding(key: "events", value: eventsValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -383,7 +389,6 @@ public struct BlueCatbirdMlsDSGetConvoEvents {
             case toSeqInclusive
             case events
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -405,9 +410,8 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
     /// Paginated retrieval of conversation events for federation reconciliation. Fetch a page of conversation events (messages) after a given sequence number.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdMlsDSGetConvoEvents.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getConvoEvents(input: BlueCatbirdMlsDSGetConvoEvents.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsDSGetConvoEvents.Output?) {
         let endpoint = "blue.catbird.mlsDS.getConvoEvents"
 
@@ -427,42 +431,24 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSGetConvoEvents.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.getConvoEvents: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdMlsDSGetConvoEvents.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdMlsDSGetConvoEvents.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdMlsDSGetConvoEvents.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

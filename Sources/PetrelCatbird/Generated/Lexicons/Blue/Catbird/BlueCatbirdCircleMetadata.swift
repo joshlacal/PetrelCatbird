@@ -4,112 +4,162 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.circle.metadata
 
+/// Circle metadata, authored by the Space authority into its own permissioned repo. The only Catbird-specific record type in a Circle; posts and likes are unmodified Bluesky records.
 public struct BlueCatbirdCircleMetadata: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "blue.catbird.circle.metadata"
+
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "literal:self")
+
+    /// Stable Circle identity, independent of the Space key. Survives migration to a different Space, which is the only identifier that does.
     public let circleId: TID
     public let name: String
     public let createdAt: ATProtocolDate
+    /// The Space this Circle's content was migrated from, if any.
     public let migratedFrom: SpaceRef?
+    /// The Space this Circle's content was migrated to, if any. Set when the Circle has moved and this Space is retained read-only.
     public let migratedTo: SpaceRef?
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
 
-    public init(circleId: TID, name: String, createdAt: ATProtocolDate, migratedFrom: SpaceRef? = nil, migratedTo: SpaceRef? = nil) {
+    public init(
+        circleId: TID,
+        name: String,
+        createdAt: ATProtocolDate,
+        migratedFrom: SpaceRef? = nil,
+        migratedTo: SpaceRef? = nil,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.circleId = circleId
         self.name = name
         self.createdAt = createdAt
         self.migratedFrom = migratedFrom
         self.migratedTo = migratedTo
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         self.circleId = try container.decode(TID.self, forKey: .circleId)
         self.name = try container.decode(String.self, forKey: .name)
         self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            self.migratedFrom = try container.decodeIfPresent(SpaceRef.self, forKey: .migratedFrom)
+            self.migratedFrom = try container.decodeIfPresent(SpaceRef.self, forKey: .migratedFrom, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'migratedFrom' — degrading to nil: \(error)")
             self.migratedFrom = nil
+            malformedFields.insert("migratedFrom")
         }
         do {
-            self.migratedTo = try container.decodeIfPresent(SpaceRef.self, forKey: .migratedTo)
+            self.migratedTo = try container.decodeIfPresent(SpaceRef.self, forKey: .migratedTo, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'migratedTo' — degrading to nil: \(error)")
             self.migratedTo = nil
+            malformedFields.insert("migratedTo")
         }
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(circleId, forKey: .circleId)
-        try container.encode(name, forKey: .name)
-        try container.encode(createdAt, forKey: .createdAt)
-        try container.encodeIfPresent(migratedFrom, forKey: .migratedFrom)
-        try container.encodeIfPresent(migratedTo, forKey: .migratedTo)
+        try container.encode(self.circleId, forKey: .circleId)
+        try container.encode(self.name, forKey: .name)
+        try container.encode(self.createdAt, forKey: .createdAt)
+        try container.encodeIfPresent(self.migratedFrom, forKey: .migratedFrom)
+        try container.encodeIfPresent(self.migratedTo, forKey: .migratedTo)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.circleId)
+        hasher.combine(self.name)
+        hasher.combine(self.createdAt)
+        if let value = self.migratedFrom {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        if let value = self.migratedTo {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.circleId != other.circleId {
+            return false
+        }
+        if self.name != other.name {
+            return false
+        }
+        if self.createdAt != other.createdAt {
+            return false
+        }
+        if self.migratedFrom != other.migratedFrom {
+            return false
+        }
+        if self.migratedTo != other.migratedTo {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if circleId != other.circleId {
-            return false
-        }
-        if name != other.name {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        if migratedFrom != other.migratedFrom {
-            return false
-        }
-        if migratedTo != other.migratedTo {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(circleId)
-        hasher.combine(name)
-        hasher.combine(createdAt)
-        if let value = migratedFrom {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        if let value = migratedTo {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let circleIdValue = try circleId.toCBORValue()
+        let circleIdValue = try self.circleId.toCBORValue()
         map = map.adding(key: "circleId", value: circleIdValue)
-        let nameValue = try name.toCBORValue()
+        let nameValue = try self.name.toCBORValue()
         map = map.adding(key: "name", value: nameValue)
-        let createdAtValue = try createdAt.toCBORValue()
+        let createdAtValue = try self.createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
-        if let value = migratedFrom {
+        if let value = self.migratedFrom {
             let migratedFromValue = try value.toCBORValue()
             map = map.adding(key: "migratedFrom", value: migratedFromValue)
         }
-        if let value = migratedTo {
+        if let value = self.migratedTo {
             let migratedToValue = try value.toCBORValue()
             map = map.adding(key: "migratedTo", value: migratedToValue)
         }
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "circleId", "name", "createdAt", "migratedFrom", "migratedTo"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "circleId": return true
+        case "name": return true
+        case "createdAt": return true
+        case "migratedFrom": return self.migratedFrom != nil
+        case "migratedTo": return self.migratedTo != nil
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

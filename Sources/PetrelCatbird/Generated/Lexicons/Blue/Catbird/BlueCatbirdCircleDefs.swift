@@ -10,15 +10,27 @@ public struct BlueCatbirdCircleDefs {
 
     public struct CircleSummary: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.circle.defs#circleSummary"
+
         public let uri: SpaceRef
+        /// Stable Circle identity, independent of the Space key, so a Circle remains recognizable across a Space migration.
         public let circleId: TID
         public let name: String
         public let owner: DID
+        /// Number of members on the owner's PDS member list. The member list itself is owner-only and is read from the owner's PDS, not from this service.
         public let memberCount: Int?
         public let muted: Bool?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            uri: SpaceRef, circleId: TID, name: String, owner: DID, memberCount: Int? = nil, muted: Bool? = nil
+            uri: SpaceRef,
+            circleId: TID,
+            name: String,
+            owner: DID,
+            memberCount: Int? = nil,
+            muted: Bool? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.uri = uri
             self.circleId = circleId
@@ -26,101 +38,94 @@ public struct BlueCatbirdCircleDefs {
             self.owner = owner
             self.memberCount = memberCount
             self.muted = muted
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.uri = try container.decode(SpaceRef.self, forKey: .uri)
+            self.circleId = try container.decode(TID.self, forKey: .circleId)
+            self.name = try container.decode(String.self, forKey: .name)
+            self.owner = try container.decode(DID.self, forKey: .owner)
             do {
-                self.uri = try container.decode(SpaceRef.self, forKey: .uri)
+                self.memberCount = try container.decodeIfPresent(Int.self, forKey: .memberCount, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'uri': \(error)")
-                throw error
-            }
-            do {
-                self.circleId = try container.decode(TID.self, forKey: .circleId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'circleId': \(error)")
-                throw error
-            }
-            do {
-                self.name = try container.decode(String.self, forKey: .name)
-            } catch {
-                LogManager.logError("Decoding error for required property 'name': \(error)")
-                throw error
-            }
-            do {
-                self.owner = try container.decode(DID.self, forKey: .owner)
-            } catch {
-                LogManager.logError("Decoding error for required property 'owner': \(error)")
-                throw error
-            }
-            do {
-                self.memberCount = try container.decodeIfPresent(Int.self, forKey: .memberCount)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'memberCount' — degrading to nil: \(error)")
                 self.memberCount = nil
+                malformedFields.insert("memberCount")
             }
             do {
-                self.muted = try container.decodeIfPresent(Bool.self, forKey: .muted)
+                self.muted = try container.decodeIfPresent(Bool.self, forKey: .muted, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'muted' — degrading to nil: \(error)")
                 self.muted = nil
+                malformedFields.insert("muted")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(uri, forKey: .uri)
-            try container.encode(circleId, forKey: .circleId)
-            try container.encode(name, forKey: .name)
-            try container.encode(owner, forKey: .owner)
-            try container.encodeIfPresent(memberCount, forKey: .memberCount)
-            try container.encodeIfPresent(muted, forKey: .muted)
+            try container.encode(self.uri, forKey: .uri)
+            try container.encode(self.circleId, forKey: .circleId)
+            try container.encode(self.name, forKey: .name)
+            try container.encode(self.owner, forKey: .owner)
+            try container.encodeIfPresent(self.memberCount, forKey: .memberCount)
+            try container.encodeIfPresent(self.muted, forKey: .muted)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(uri)
-            hasher.combine(circleId)
-            hasher.combine(name)
-            hasher.combine(owner)
-            if let value = memberCount {
+            hasher.combine(self.uri)
+            hasher.combine(self.circleId)
+            hasher.combine(self.name)
+            hasher.combine(self.owner)
+            if let value = self.memberCount {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = muted {
+            if let value = self.muted {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if uri != other.uri {
+            if self.uri != other.uri {
                 return false
             }
-            if circleId != other.circleId {
+            if self.circleId != other.circleId {
                 return false
             }
-            if name != other.name {
+            if self.name != other.name {
                 return false
             }
-            if owner != other.owner {
+            if self.owner != other.owner {
                 return false
             }
-            if memberCount != other.memberCount {
+            if self.memberCount != other.memberCount {
                 return false
             }
-            if muted != other.muted {
+            if self.muted != other.muted {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -129,28 +134,42 @@ public struct BlueCatbirdCircleDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let uriValue = try uri.toCBORValue()
+            let uriValue = try self.uri.toCBORValue()
             map = map.adding(key: "uri", value: uriValue)
-            let circleIdValue = try circleId.toCBORValue()
+            let circleIdValue = try self.circleId.toCBORValue()
             map = map.adding(key: "circleId", value: circleIdValue)
-            let nameValue = try name.toCBORValue()
+            let nameValue = try self.name.toCBORValue()
             map = map.adding(key: "name", value: nameValue)
-            let ownerValue = try owner.toCBORValue()
+            let ownerValue = try self.owner.toCBORValue()
             map = map.adding(key: "owner", value: ownerValue)
-            if let value = memberCount {
+            if let value = self.memberCount {
                 let memberCountValue = try value.toCBORValue()
                 map = map.adding(key: "memberCount", value: memberCountValue)
             }
-            if let value = muted {
+            if let value = self.muted {
                 let mutedValue = try value.toCBORValue()
                 map = map.adding(key: "muted", value: mutedValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "uri", "circleId", "name", "owner", "memberCount", "muted"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "uri": return true
+            case "circleId": return true
+            case "name": return true
+            case "owner": return true
+            case "memberCount": return self.memberCount != nil
+            case "muted": return self.muted != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case uri
             case circleId
             case name
@@ -159,56 +178,54 @@ public struct BlueCatbirdCircleDefs {
             case muted
         }
     }
-
     public struct FeedItem: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.circle.defs#feedItem"
+
         public let post: AppBskyFeedDefs.FeedViewPost
         public let circle: CircleSummary
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            post: AppBskyFeedDefs.FeedViewPost, circle: CircleSummary
+            post: AppBskyFeedDefs.FeedViewPost,
+            circle: CircleSummary,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.post = post
             self.circle = circle
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.post = try container.decode(AppBskyFeedDefs.FeedViewPost.self, forKey: .post)
-            } catch {
-                LogManager.logError("Decoding error for required property 'post': \(error)")
-                throw error
-            }
-            do {
-                self.circle = try container.decode(CircleSummary.self, forKey: .circle)
-            } catch {
-                LogManager.logError("Decoding error for required property 'circle': \(error)")
-                throw error
-            }
+            self.post = try container.decode(AppBskyFeedDefs.FeedViewPost.self, forKey: .post)
+            self.circle = try container.decode(CircleSummary.self, forKey: .circle)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(post, forKey: .post)
-            try container.encode(circle, forKey: .circle)
+            try container.encode(self.post, forKey: .post)
+            try container.encode(self.circle, forKey: .circle)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(post)
-            hasher.combine(circle)
+            hasher.combine(self.post)
+            hasher.combine(self.circle)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if post != other.post {
+            if self.post != other.post {
                 return false
             }
-            if circle != other.circle {
+            if self.circle != other.circle {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -217,32 +234,42 @@ public struct BlueCatbirdCircleDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let postValue = try post.toCBORValue()
+            let postValue = try self.post.toCBORValue()
             map = map.adding(key: "post", value: postValue)
-            let circleValue = try circle.toCBORValue()
+            let circleValue = try self.circle.toCBORValue()
             map = map.adding(key: "circle", value: circleValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "post", "circle"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case post
             case circle
         }
     }
-
     public struct Notification: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.circle.defs#notification"
+
+        /// Canonical lowercase hyphenated RFC 4122 UUID.
         public let id: String
         public let reason: NotificationReason
         public let actor: AppBskyActorDefs.ProfileViewBasic
         public let subject: ATProtocolURI?
         public let indexedAt: ATProtocolDate
         public let circle: CircleSummary
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            id: String, reason: NotificationReason, actor: AppBskyActorDefs.ProfileViewBasic, subject: ATProtocolURI? = nil, indexedAt: ATProtocolDate, circle: CircleSummary
+            id: String,
+            reason: NotificationReason,
+            actor: AppBskyActorDefs.ProfileViewBasic,
+            subject: ATProtocolURI? = nil,
+            indexedAt: ATProtocolDate,
+            circle: CircleSummary,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.id = id
             self.reason = reason
@@ -250,95 +277,79 @@ public struct BlueCatbirdCircleDefs {
             self.subject = subject
             self.indexedAt = indexedAt
             self.circle = circle
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.id = try container.decode(String.self, forKey: .id)
+            self.reason = try container.decode(NotificationReason.self, forKey: .reason)
+            self.actor = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .actor)
             do {
-                self.id = try container.decode(String.self, forKey: .id)
+                self.subject = try container.decodeIfPresent(ATProtocolURI.self, forKey: .subject, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'id': \(error)")
-                throw error
-            }
-            do {
-                self.reason = try container.decode(NotificationReason.self, forKey: .reason)
-            } catch {
-                LogManager.logError("Decoding error for required property 'reason': \(error)")
-                throw error
-            }
-            do {
-                self.actor = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .actor)
-            } catch {
-                LogManager.logError("Decoding error for required property 'actor': \(error)")
-                throw error
-            }
-            do {
-                self.subject = try container.decodeIfPresent(ATProtocolURI.self, forKey: .subject)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'subject' — degrading to nil: \(error)")
                 self.subject = nil
+                malformedFields.insert("subject")
             }
-            do {
-                self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
-            } catch {
-                LogManager.logError("Decoding error for required property 'indexedAt': \(error)")
-                throw error
-            }
-            do {
-                self.circle = try container.decode(CircleSummary.self, forKey: .circle)
-            } catch {
-                LogManager.logError("Decoding error for required property 'circle': \(error)")
-                throw error
-            }
+            self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
+            self.circle = try container.decode(CircleSummary.self, forKey: .circle)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(id, forKey: .id)
-            try container.encode(reason, forKey: .reason)
-            try container.encode(actor, forKey: .actor)
-            try container.encodeIfPresent(subject, forKey: .subject)
-            try container.encode(indexedAt, forKey: .indexedAt)
-            try container.encode(circle, forKey: .circle)
+            try container.encode(self.id, forKey: .id)
+            try container.encode(self.reason, forKey: .reason)
+            try container.encode(self.actor, forKey: .actor)
+            try container.encodeIfPresent(self.subject, forKey: .subject)
+            try container.encode(self.indexedAt, forKey: .indexedAt)
+            try container.encode(self.circle, forKey: .circle)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(id)
-            hasher.combine(reason)
-            hasher.combine(actor)
-            if let value = subject {
+            hasher.combine(self.id)
+            hasher.combine(self.reason)
+            hasher.combine(self.actor)
+            if let value = self.subject {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            hasher.combine(indexedAt)
-            hasher.combine(circle)
+            hasher.combine(self.indexedAt)
+            hasher.combine(self.circle)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if id != other.id {
+            if self.id != other.id {
                 return false
             }
-            if reason != other.reason {
+            if self.reason != other.reason {
                 return false
             }
-            if actor != other.actor {
+            if self.actor != other.actor {
                 return false
             }
-            if subject != other.subject {
+            if self.subject != other.subject {
                 return false
             }
-            if indexedAt != other.indexedAt {
+            if self.indexedAt != other.indexedAt {
                 return false
             }
-            if circle != other.circle {
+            if self.circle != other.circle {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -347,26 +358,40 @@ public struct BlueCatbirdCircleDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let idValue = try id.toCBORValue()
+            let idValue = try self.id.toCBORValue()
             map = map.adding(key: "id", value: idValue)
-            let reasonValue = try reason.toCBORValue()
+            let reasonValue = try self.reason.toCBORValue()
             map = map.adding(key: "reason", value: reasonValue)
-            let actorValue = try actor.toCBORValue()
+            let actorValue = try self.actor.toCBORValue()
             map = map.adding(key: "actor", value: actorValue)
-            if let value = subject {
+            if let value = self.subject {
                 let subjectValue = try value.toCBORValue()
                 map = map.adding(key: "subject", value: subjectValue)
             }
-            let indexedAtValue = try indexedAt.toCBORValue()
+            let indexedAtValue = try self.indexedAt.toCBORValue()
             map = map.adding(key: "indexedAt", value: indexedAtValue)
-            let circleValue = try circle.toCBORValue()
+            let circleValue = try self.circle.toCBORValue()
             map = map.adding(key: "circle", value: circleValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "id", "reason", "actor", "subject", "indexedAt", "circle"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "id": return true
+            case "reason": return true
+            case "actor": return true
+            case "subject": return self.subject != nil
+            case "indexedAt": return true
+            case "circle": return true
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case id
             case reason
             case actor

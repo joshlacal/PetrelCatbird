@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.circle.getFeed
 
+/// Get feed items from one Circle Space or unified Circles feed
 public struct BlueCatbirdCircleGetFeed {
 
     public static let typeIdentifier = "blue.catbird.circle.getFeed"
+
     public struct Parameters: Parametrizable {
         public let space: SpaceRef?
         public let limit: Int?
@@ -14,7 +16,7 @@ public struct BlueCatbirdCircleGetFeed {
 
         public init(
             space: SpaceRef? = nil,
-            limit: Int? = nil,
+            limit: Int? = 50,
             cursor: String? = nil
         ) {
             self.space = space
@@ -27,73 +29,53 @@ public struct BlueCatbirdCircleGetFeed {
     public struct Output: ATProtocolCodable {
 
         public let feed: [BlueCatbirdCircleDefs.FeedItem]
-
         public let cursor: String?
 
-        // Standard public initializer
         public init(
-
             feed: [BlueCatbirdCircleDefs.FeedItem],
-
             cursor: String? = nil
-
         ) {
-
             self.feed = feed
-
             self.cursor = cursor
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
+            let strict = decoder.isATProtoStrictDecoding
             self.feed = try container.decode([BlueCatbirdCircleDefs.FeedItem].self, forKey: .feed)
-
             do {
-                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
+                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
                 self.cursor = nil
             }
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(feed, forKey: .feed)
-
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(cursor, forKey: .cursor)
-
+            try container.encode(self.feed, forKey: .feed)
+            try container.encodeIfPresent(self.cursor, forKey: .cursor)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let feedValue = try feed.toCBORValue()
+            let feedValue = try self.feed.toCBORValue()
             map = map.adding(key: "feed", value: feedValue)
-
-            if let value = cursor {
-                // Encode optional property even if it's an empty array for CBOR
+            if let value = self.cursor {
                 let cursorValue = try value.toCBORValue()
                 map = map.adding(key: "cursor", value: cursorValue)
             }
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case feed
             case cursor
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -118,9 +100,8 @@ extension ATProtoClient.Blue.Catbird.Circle {
     /// Get feed items from one Circle Space or unified Circles feed
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdCircleGetFeed.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getFeed(input: BlueCatbirdCircleGetFeed.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdCircleGetFeed.Output?) {
         let endpoint = "blue.catbird.circle.getFeed"
 
@@ -140,42 +121,32 @@ extension ATProtoClient.Blue.Catbird.Circle {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdCircleGetFeed.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.circle.getFeed: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdCircleGetFeed.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdCircleGetFeed.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdCircleGetFeed.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }
+
+extension BlueCatbirdCircleGetFeed.Parameters: XRPCCursorPaginatedParameters {
+    public func withCursor(_ cursor: String?) -> Self {
+        Self(space: space, limit: limit, cursor: cursor)
+    }
+}
+
+extension BlueCatbirdCircleGetFeed.Output: XRPCCursorPaginatedOutput {}

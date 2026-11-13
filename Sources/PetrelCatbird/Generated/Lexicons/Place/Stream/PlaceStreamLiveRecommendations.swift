@@ -4,59 +4,79 @@ import Petrel
 
 // lexicon: 1, id: place.stream.live.recommendations
 
+/// A list of recommended streamers, in order of preference
 public struct PlaceStreamLiveRecommendations: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "place.stream.live.recommendations"
-    public let streamers: [DID]
-    public let createdAt: ATProtocolDate
 
-    public init(streamers: [DID], createdAt: ATProtocolDate) {
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "literal:self")
+
+    /// Ordered list of recommended streamer DIDs
+    public let streamers: [DID]
+    /// Client-declared timestamp when this list was created.
+    public let createdAt: ATProtocolDate
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
+
+    public init(
+        streamers: [DID],
+        createdAt: ATProtocolDate,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.streamers = streamers
         self.createdAt = createdAt
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.streamers = try container.decode([DID].self, forKey: .streamers)
         self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(streamers, forKey: .streamers)
-        try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(self.streamers, forKey: .streamers)
+        try container.encode(self.createdAt, forKey: .createdAt)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.streamers)
+        hasher.combine(self.createdAt)
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.streamers != other.streamers {
+            return false
+        }
+        if self.createdAt != other.createdAt {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if streamers != other.streamers {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(streamers)
-        hasher.combine(createdAt)
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let streamersValue = try streamers.toCBORValue()
+        let streamersValue = try self.streamers.toCBORValue()
         map = map.adding(key: "streamers", value: streamersValue)
-        let createdAtValue = try createdAt.toCBORValue()
+        let createdAtValue = try self.createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
     }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "streamers", "createdAt"]
 
     private enum CodingKeys: String, CodingKey {
         case typeIdentifier = "$type"
