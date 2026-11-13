@@ -4,15 +4,22 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.bskychat.updateMuteStatus
 
+/// Update the server-side mute status for a conversation. Used for push notification suppression.
 public struct BlueCatbirdBskychatUpdateMuteStatus {
 
     public static let typeIdentifier = "blue.catbird.bskychat.updateMuteStatus"
+
     public struct Input: ATProtocolCodable {
+
+        /// The conversation identifier
         public let convoId: String
+        /// Whether the conversation should be muted
         public let muted: Bool
 
-        /// Standard public initializer
-        public init(convoId: String, muted: Bool) {
+        public init(
+            convoId: String,
+            muted: Bool
+        ) {
             self.convoId = convoId
             self.muted = muted
         }
@@ -25,15 +32,15 @@ public struct BlueCatbirdBskychatUpdateMuteStatus {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(convoId, forKey: .convoId)
-            try container.encode(muted, forKey: .muted)
+            try container.encode(self.convoId, forKey: .convoId)
+            try container.encode(self.muted, forKey: .muted)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let convoIdValue = try convoId.toCBORValue()
+            let convoIdValue = try self.convoId.toCBORValue()
             map = map.adding(key: "convoId", value: convoIdValue)
-            let mutedValue = try muted.toCBORValue()
+            let mutedValue = try self.muted.toCBORValue()
             map = map.adding(key: "muted", value: mutedValue)
             return map
         }
@@ -48,48 +55,32 @@ public struct BlueCatbirdBskychatUpdateMuteStatus {
 
         public let success: Bool
 
-        // Standard public initializer
         public init(
-
             success: Bool
-
         ) {
-
             self.success = success
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.success = try container.decode(Bool.self, forKey: .success)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(success, forKey: .success)
-
+            try container.encode(self.success, forKey: .success)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let successValue = try success.toCBORValue()
+            let successValue = try self.success.toCBORValue()
             map = map.adding(key: "success", value: successValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case success
         }
-
     }
 
 }
@@ -98,11 +89,10 @@ extension ATProtoClient.Blue.Catbird.Bskychat {
     // MARK: - updateMuteStatus
     /// Update the server-side mute status for a conversation. Used for push notification suppression.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoXRPCError` for a non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func updateMuteStatus(
 
         input: BlueCatbirdBskychatUpdateMuteStatus.Input
@@ -131,39 +121,27 @@ extension ATProtoClient.Blue.Catbird.Bskychat {
         // Determine service DID for this endpoint
         let serviceDID = await networkService.getServiceDID(for: "blue.catbird.bskychat.updateMuteStatus")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
-        let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
+        let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdBskychatUpdateMuteStatus.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.bskychat.updateMuteStatus: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdBskychatUpdateMuteStatus.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

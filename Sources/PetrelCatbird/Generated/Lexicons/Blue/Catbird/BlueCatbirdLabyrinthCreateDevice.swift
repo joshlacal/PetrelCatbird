@@ -4,14 +4,19 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.createDevice
 
+/// Create a device record (create-if-absent). Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
 public struct BlueCatbirdLabyrinthCreateDevice {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.createDevice"
+
     public struct Input: ATProtocolCodable {
+
+        /// A blue.catbird.labyrinth.device record.
         public let record: ATProtocolValueContainer
 
-        /// Standard public initializer
-        public init(record: ATProtocolValueContainer) {
+        public init(
+            record: ATProtocolValueContainer
+        ) {
             self.record = record
         }
 
@@ -22,12 +27,12 @@ public struct BlueCatbirdLabyrinthCreateDevice {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(record, forKey: .record)
+            try container.encode(self.record, forKey: .record)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let recordValue = try record.toCBORValue()
+            let recordValue = try self.record.toCBORValue()
             map = map.adding(key: "record", value: recordValue)
             return map
         }
@@ -39,50 +44,35 @@ public struct BlueCatbirdLabyrinthCreateDevice {
 
     public struct Output: ATProtocolCodable {
 
+        /// hex(deviceKeyPubkey).
         public let rkey: String
 
-        // Standard public initializer
         public init(
-
             rkey: String
-
         ) {
-
             self.rkey = rkey
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.rkey = try container.decode(String.self, forKey: .rkey)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(rkey, forKey: .rkey)
-
+            try container.encode(self.rkey, forKey: .rkey)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let rkeyValue = try rkey.toCBORValue()
+            let rkeyValue = try self.rkey.toCBORValue()
             map = map.adding(key: "rkey", value: rkeyValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case rkey
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -103,11 +93,10 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - createDevice
     /// Create a device record (create-if-absent). Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdLabyrinthCreateDevice.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func createDevice(
 
         input: BlueCatbirdLabyrinthCreateDevice.Input
@@ -139,44 +128,24 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdLabyrinthCreateDevice.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdLabyrinthCreateDevice.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.createDevice: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdLabyrinthCreateDevice.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdLabyrinthCreateDevice.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

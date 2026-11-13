@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: place.stream.ingest.getIngestUrls
 
+/// Get ingest URLs for a Streamplace station.
 public struct PlaceStreamIngestGetIngestUrls {
 
     public static let typeIdentifier = "place.stream.ingest.getIngestUrls"
+
     public struct Parameters: Parametrizable {
 
         public init(
@@ -19,52 +21,38 @@ public struct PlaceStreamIngestGetIngestUrls {
 
         public let ingests: [OutputIngestsUnion]
 
-        // Standard public initializer
         public init(
-
             ingests: [OutputIngestsUnion]
-
         ) {
-
             self.ingests = ingests
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.ingests = try container.decode([OutputIngestsUnion].self, forKey: .ingests)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(ingests, forKey: .ingests)
-
+            try container.encode(self.ingests, forKey: .ingests)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let ingestsValue = try ingests.toCBORValue()
+            let ingestsValue = try self.ingests.toCBORValue()
             map = map.adding(key: "ingests", value: ingestsValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case ingests
         }
-
     }
 
     public enum OutputIngestsUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
         case placeStreamIngestDefsIngest(PlaceStreamIngestDefs.Ingest)
+        /// A value whose `$type` this union does not declare. Open unions accept and
+        /// re-encode such values unchanged.
         case unexpected(ATProtocolValueContainer)
         public init(_ value: PlaceStreamIngestDefs.Ingest) {
             self = .placeStreamIngestDefsIngest(value)
@@ -164,9 +152,8 @@ extension ATProtoClient.Place.Stream.Ingest {
     /// Get ingest URLs for a Streamplace station.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoXRPCError` for a non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getIngestUrls(input: PlaceStreamIngestGetIngestUrls.Parameters) async throws -> (responseCode: Int, data: PlaceStreamIngestGetIngestUrls.Output?) {
         let endpoint = "place.stream.ingest.getIngestUrls"
 
@@ -183,37 +170,27 @@ extension ATProtoClient.Place.Stream.Ingest {
         // Determine service DID for this endpoint
         let serviceDID = await networkService.getServiceDID(for: "place.stream.ingest.getIngestUrls")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
-        let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
+        let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamIngestGetIngestUrls.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.ingest.getIngestUrls: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(PlaceStreamIngestGetIngestUrls.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

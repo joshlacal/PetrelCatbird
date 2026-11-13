@@ -4,19 +4,34 @@ import Petrel
 
 // lexicon: 1, id: place.stream.branding.updateBlob
 
+/// Update or create a branding asset blob. Requires admin authorization.
 public struct PlaceStreamBrandingUpdateBlob {
 
     public static let typeIdentifier = "place.stream.branding.updateBlob"
+
     public struct Input: ATProtocolCodable {
+
+        /// Branding asset key (mainLogo, favicon, siteTitle, etc.)
         public let key: String
+        /// DID of the broadcaster. If not provided, uses the server's default broadcaster.
         public let broadcaster: DID?
+        /// Base64-encoded blob data
         public let data: String
+        /// MIME type of the blob (e.g., image/png, text/plain)
         public let mimeType: String
+        /// Image width in pixels (optional, for images only)
         public let width: Int?
+        /// Image height in pixels (optional, for images only)
         public let height: Int?
 
-        /// Standard public initializer
-        public init(key: String, broadcaster: DID? = nil, data: String, mimeType: String, width: Int? = nil, height: Int? = nil) {
+        public init(
+            key: String,
+            broadcaster: DID? = nil,
+            data: String,
+            mimeType: String,
+            width: Int? = nil,
+            height: Int? = nil
+        ) {
             self.key = key
             self.broadcaster = broadcaster
             self.data = data
@@ -27,41 +42,42 @@ public struct PlaceStreamBrandingUpdateBlob {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
             self.key = try container.decode(String.self, forKey: .key)
-            self.broadcaster = try container.decodeIfPresent(DID.self, forKey: .broadcaster)
+            self.broadcaster = try container.decodeIfPresent(DID.self, forKey: .broadcaster, rejectingNull: strict)
             self.data = try container.decode(String.self, forKey: .data)
             self.mimeType = try container.decode(String.self, forKey: .mimeType)
-            self.width = try container.decodeIfPresent(Int.self, forKey: .width)
-            self.height = try container.decodeIfPresent(Int.self, forKey: .height)
+            self.width = try container.decodeIfPresent(Int.self, forKey: .width, rejectingNull: strict)
+            self.height = try container.decodeIfPresent(Int.self, forKey: .height, rejectingNull: strict)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(key, forKey: .key)
-            try container.encodeIfPresent(broadcaster, forKey: .broadcaster)
-            try container.encode(data, forKey: .data)
-            try container.encode(mimeType, forKey: .mimeType)
-            try container.encodeIfPresent(width, forKey: .width)
-            try container.encodeIfPresent(height, forKey: .height)
+            try container.encode(self.key, forKey: .key)
+            try container.encodeIfPresent(self.broadcaster, forKey: .broadcaster)
+            try container.encode(self.data, forKey: .data)
+            try container.encode(self.mimeType, forKey: .mimeType)
+            try container.encodeIfPresent(self.width, forKey: .width)
+            try container.encodeIfPresent(self.height, forKey: .height)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let keyValue = try key.toCBORValue()
+            let keyValue = try self.key.toCBORValue()
             map = map.adding(key: "key", value: keyValue)
-            if let value = broadcaster {
+            if let value = self.broadcaster {
                 let broadcasterValue = try value.toCBORValue()
                 map = map.adding(key: "broadcaster", value: broadcasterValue)
             }
-            let dataValue = try data.toCBORValue()
+            let dataValue = try self.data.toCBORValue()
             map = map.adding(key: "data", value: dataValue)
-            let mimeTypeValue = try mimeType.toCBORValue()
+            let mimeTypeValue = try self.mimeType.toCBORValue()
             map = map.adding(key: "mimeType", value: mimeTypeValue)
-            if let value = width {
+            if let value = self.width {
                 let widthValue = try value.toCBORValue()
                 map = map.adding(key: "width", value: widthValue)
             }
-            if let value = height {
+            if let value = self.height {
                 let heightValue = try value.toCBORValue()
                 map = map.adding(key: "height", value: heightValue)
             }
@@ -82,48 +98,32 @@ public struct PlaceStreamBrandingUpdateBlob {
 
         public let success: Bool
 
-        // Standard public initializer
         public init(
-
             success: Bool
-
         ) {
-
             self.success = success
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.success = try container.decode(Bool.self, forKey: .success)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(success, forKey: .success)
-
+            try container.encode(self.success, forKey: .success)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let successValue = try success.toCBORValue()
+            let successValue = try self.success.toCBORValue()
             map = map.adding(key: "success", value: successValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case success
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -146,11 +146,10 @@ extension ATProtoClient.Place.Stream.Branding {
     // MARK: - updateBlob
     /// Update or create a branding asset blob. Requires admin authorization.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<PlaceStreamBrandingUpdateBlob.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func updateBlob(
 
         input: PlaceStreamBrandingUpdateBlob.Input
@@ -182,44 +181,24 @@ extension ATProtoClient.Place.Stream.Branding {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: PlaceStreamBrandingUpdateBlob.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamBrandingUpdateBlob.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.branding.updateBlob: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: PlaceStreamBrandingUpdateBlob.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(PlaceStreamBrandingUpdateBlob.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

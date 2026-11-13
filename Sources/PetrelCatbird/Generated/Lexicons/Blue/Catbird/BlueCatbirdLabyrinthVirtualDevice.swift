@@ -4,26 +4,65 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.virtualDevice
 
+/// A recovery bundle (SPEC §6.2). rkey = hex(vdeviceId). Every encrypted* field is AEAD-sealed under vdeviceDecryptionKey with the paper's AAD strings. Immutable except lastUsedAt (server-stamped); deletable by the owner (remove a recovery method, [CB-39]).
 public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.virtualDevice"
+
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "any")
+
+    /// First 16 bytes of the recovery-code KDF output; equals the rkey.
     public let vdeviceId: Bytes
+    /// Sealed with AAD 'virtual_device:virtual_device_private_key'.
     public let encryptedDeviceKeyPriv: Bytes
+    /// Sealed with AAD 'virtual_device:epoch_storage_private_key'.
     public let encryptedEpochStorageKeyPriv: Bytes
+    /// Sealed with AAD 'virtual_device:ocmf_client_state'.
     public let encryptedOrfClientState: Bytes
+    /// Sealed with AAD 'virtual_device:mailbox_root_key'.
     public let encryptedMailboxRootSalt: Bytes
+    /// Sealed with AAD 'virtual_device:epoch_root_key'.
     public let encryptedEpochRootKey: Bytes
+    /// Sealed base64(decimal(epoch number)) with AAD 'virtual_device:epoch_anon_id'.
     public let encryptedEpochNumber: Bytes
+    /// The virtual device's deviceKeyPubkey.
     public let deviceKeyPubkey: Bytes
+    /// The virtual device's epochStorageKeyPubkey.
     public let epochStorageKeyPubkey: Bytes
+    /// pk_sign(deviceKey, 0x30, epochStorageKeyPubkey).
     public let epochStorageKeySig: Bytes
+    /// Recovery mechanism this bundle backs.
     public let mechanism: String
+    /// [CB-13] Recovery code sealed under a WebAuthn PRF-derived key. Present iff passkeyCredentialId is.
     public let passkeyWrappedCode: Bytes?
+    /// WebAuthn credential id for the PRF wrap.
     public let passkeyCredentialId: Bytes?
     public let createdAt: ATProtocolDate
+    /// [CB-39] Last successful restore or keep-alive, stamped by the server from its own clock (clients never write it). Keychain and passkey bundles expire 180 days after max(createdAt, lastUsedAt).
     public let lastUsedAt: ATProtocolDate?
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
 
-    public init(vdeviceId: Bytes, encryptedDeviceKeyPriv: Bytes, encryptedEpochStorageKeyPriv: Bytes, encryptedOrfClientState: Bytes, encryptedMailboxRootSalt: Bytes, encryptedEpochRootKey: Bytes, encryptedEpochNumber: Bytes, deviceKeyPubkey: Bytes, epochStorageKeyPubkey: Bytes, epochStorageKeySig: Bytes, mechanism: String, passkeyWrappedCode: Bytes? = nil, passkeyCredentialId: Bytes? = nil, createdAt: ATProtocolDate, lastUsedAt: ATProtocolDate? = nil) {
+    public init(
+        vdeviceId: Bytes,
+        encryptedDeviceKeyPriv: Bytes,
+        encryptedEpochStorageKeyPriv: Bytes,
+        encryptedOrfClientState: Bytes,
+        encryptedMailboxRootSalt: Bytes,
+        encryptedEpochRootKey: Bytes,
+        encryptedEpochNumber: Bytes,
+        deviceKeyPubkey: Bytes,
+        epochStorageKeyPubkey: Bytes,
+        epochStorageKeySig: Bytes,
+        mechanism: String,
+        passkeyWrappedCode: Bytes? = nil,
+        passkeyCredentialId: Bytes? = nil,
+        createdAt: ATProtocolDate,
+        lastUsedAt: ATProtocolDate? = nil,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.vdeviceId = vdeviceId
         self.encryptedDeviceKeyPriv = encryptedDeviceKeyPriv
         self.encryptedEpochStorageKeyPriv = encryptedEpochStorageKeyPriv
@@ -39,10 +78,13 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
         self.passkeyCredentialId = passkeyCredentialId
         self.createdAt = createdAt
         self.lastUsedAt = lastUsedAt
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         self.vdeviceId = try container.decode(Bytes.self, forKey: .vdeviceId)
         self.encryptedDeviceKeyPriv = try container.decode(Bytes.self, forKey: .encryptedDeviceKeyPriv)
         self.encryptedEpochStorageKeyPriv = try container.decode(Bytes.self, forKey: .encryptedEpochStorageKeyPriv)
@@ -55,173 +97,217 @@ public struct BlueCatbirdLabyrinthVirtualDevice: ATProtocolCodable, ATProtocolVa
         self.epochStorageKeySig = try container.decode(Bytes.self, forKey: .epochStorageKeySig)
         self.mechanism = try container.decode(String.self, forKey: .mechanism)
         do {
-            self.passkeyWrappedCode = try container.decodeIfPresent(Bytes.self, forKey: .passkeyWrappedCode)
+            self.passkeyWrappedCode = try container.decodeIfPresent(Bytes.self, forKey: .passkeyWrappedCode, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'passkeyWrappedCode' — degrading to nil: \(error)")
             self.passkeyWrappedCode = nil
+            malformedFields.insert("passkeyWrappedCode")
         }
         do {
-            self.passkeyCredentialId = try container.decodeIfPresent(Bytes.self, forKey: .passkeyCredentialId)
+            self.passkeyCredentialId = try container.decodeIfPresent(Bytes.self, forKey: .passkeyCredentialId, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'passkeyCredentialId' — degrading to nil: \(error)")
             self.passkeyCredentialId = nil
+            malformedFields.insert("passkeyCredentialId")
         }
         self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            self.lastUsedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastUsedAt)
+            self.lastUsedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastUsedAt, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'lastUsedAt' — degrading to nil: \(error)")
             self.lastUsedAt = nil
+            malformedFields.insert("lastUsedAt")
         }
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(vdeviceId, forKey: .vdeviceId)
-        try container.encode(encryptedDeviceKeyPriv, forKey: .encryptedDeviceKeyPriv)
-        try container.encode(encryptedEpochStorageKeyPriv, forKey: .encryptedEpochStorageKeyPriv)
-        try container.encode(encryptedOrfClientState, forKey: .encryptedOrfClientState)
-        try container.encode(encryptedMailboxRootSalt, forKey: .encryptedMailboxRootSalt)
-        try container.encode(encryptedEpochRootKey, forKey: .encryptedEpochRootKey)
-        try container.encode(encryptedEpochNumber, forKey: .encryptedEpochNumber)
-        try container.encode(deviceKeyPubkey, forKey: .deviceKeyPubkey)
-        try container.encode(epochStorageKeyPubkey, forKey: .epochStorageKeyPubkey)
-        try container.encode(epochStorageKeySig, forKey: .epochStorageKeySig)
-        try container.encode(mechanism, forKey: .mechanism)
-        try container.encodeIfPresent(passkeyWrappedCode, forKey: .passkeyWrappedCode)
-        try container.encodeIfPresent(passkeyCredentialId, forKey: .passkeyCredentialId)
-        try container.encode(createdAt, forKey: .createdAt)
-        try container.encodeIfPresent(lastUsedAt, forKey: .lastUsedAt)
+        try container.encode(self.vdeviceId, forKey: .vdeviceId)
+        try container.encode(self.encryptedDeviceKeyPriv, forKey: .encryptedDeviceKeyPriv)
+        try container.encode(self.encryptedEpochStorageKeyPriv, forKey: .encryptedEpochStorageKeyPriv)
+        try container.encode(self.encryptedOrfClientState, forKey: .encryptedOrfClientState)
+        try container.encode(self.encryptedMailboxRootSalt, forKey: .encryptedMailboxRootSalt)
+        try container.encode(self.encryptedEpochRootKey, forKey: .encryptedEpochRootKey)
+        try container.encode(self.encryptedEpochNumber, forKey: .encryptedEpochNumber)
+        try container.encode(self.deviceKeyPubkey, forKey: .deviceKeyPubkey)
+        try container.encode(self.epochStorageKeyPubkey, forKey: .epochStorageKeyPubkey)
+        try container.encode(self.epochStorageKeySig, forKey: .epochStorageKeySig)
+        try container.encode(self.mechanism, forKey: .mechanism)
+        try container.encodeIfPresent(self.passkeyWrappedCode, forKey: .passkeyWrappedCode)
+        try container.encodeIfPresent(self.passkeyCredentialId, forKey: .passkeyCredentialId)
+        try container.encode(self.createdAt, forKey: .createdAt)
+        try container.encodeIfPresent(self.lastUsedAt, forKey: .lastUsedAt)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.vdeviceId)
+        hasher.combine(self.encryptedDeviceKeyPriv)
+        hasher.combine(self.encryptedEpochStorageKeyPriv)
+        hasher.combine(self.encryptedOrfClientState)
+        hasher.combine(self.encryptedMailboxRootSalt)
+        hasher.combine(self.encryptedEpochRootKey)
+        hasher.combine(self.encryptedEpochNumber)
+        hasher.combine(self.deviceKeyPubkey)
+        hasher.combine(self.epochStorageKeyPubkey)
+        hasher.combine(self.epochStorageKeySig)
+        hasher.combine(self.mechanism)
+        if let value = self.passkeyWrappedCode {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        if let value = self.passkeyCredentialId {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(self.createdAt)
+        if let value = self.lastUsedAt {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.vdeviceId != other.vdeviceId {
+            return false
+        }
+        if self.encryptedDeviceKeyPriv != other.encryptedDeviceKeyPriv {
+            return false
+        }
+        if self.encryptedEpochStorageKeyPriv != other.encryptedEpochStorageKeyPriv {
+            return false
+        }
+        if self.encryptedOrfClientState != other.encryptedOrfClientState {
+            return false
+        }
+        if self.encryptedMailboxRootSalt != other.encryptedMailboxRootSalt {
+            return false
+        }
+        if self.encryptedEpochRootKey != other.encryptedEpochRootKey {
+            return false
+        }
+        if self.encryptedEpochNumber != other.encryptedEpochNumber {
+            return false
+        }
+        if self.deviceKeyPubkey != other.deviceKeyPubkey {
+            return false
+        }
+        if self.epochStorageKeyPubkey != other.epochStorageKeyPubkey {
+            return false
+        }
+        if self.epochStorageKeySig != other.epochStorageKeySig {
+            return false
+        }
+        if self.mechanism != other.mechanism {
+            return false
+        }
+        if self.passkeyWrappedCode != other.passkeyWrappedCode {
+            return false
+        }
+        if self.passkeyCredentialId != other.passkeyCredentialId {
+            return false
+        }
+        if self.createdAt != other.createdAt {
+            return false
+        }
+        if self.lastUsedAt != other.lastUsedAt {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if vdeviceId != other.vdeviceId {
-            return false
-        }
-        if encryptedDeviceKeyPriv != other.encryptedDeviceKeyPriv {
-            return false
-        }
-        if encryptedEpochStorageKeyPriv != other.encryptedEpochStorageKeyPriv {
-            return false
-        }
-        if encryptedOrfClientState != other.encryptedOrfClientState {
-            return false
-        }
-        if encryptedMailboxRootSalt != other.encryptedMailboxRootSalt {
-            return false
-        }
-        if encryptedEpochRootKey != other.encryptedEpochRootKey {
-            return false
-        }
-        if encryptedEpochNumber != other.encryptedEpochNumber {
-            return false
-        }
-        if deviceKeyPubkey != other.deviceKeyPubkey {
-            return false
-        }
-        if epochStorageKeyPubkey != other.epochStorageKeyPubkey {
-            return false
-        }
-        if epochStorageKeySig != other.epochStorageKeySig {
-            return false
-        }
-        if mechanism != other.mechanism {
-            return false
-        }
-        if passkeyWrappedCode != other.passkeyWrappedCode {
-            return false
-        }
-        if passkeyCredentialId != other.passkeyCredentialId {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        if lastUsedAt != other.lastUsedAt {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(vdeviceId)
-        hasher.combine(encryptedDeviceKeyPriv)
-        hasher.combine(encryptedEpochStorageKeyPriv)
-        hasher.combine(encryptedOrfClientState)
-        hasher.combine(encryptedMailboxRootSalt)
-        hasher.combine(encryptedEpochRootKey)
-        hasher.combine(encryptedEpochNumber)
-        hasher.combine(deviceKeyPubkey)
-        hasher.combine(epochStorageKeyPubkey)
-        hasher.combine(epochStorageKeySig)
-        hasher.combine(mechanism)
-        if let value = passkeyWrappedCode {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        if let value = passkeyCredentialId {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        hasher.combine(createdAt)
-        if let value = lastUsedAt {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let vdeviceIdValue = try vdeviceId.toCBORValue()
+        let vdeviceIdValue = try self.vdeviceId.toCBORValue()
         map = map.adding(key: "vdeviceId", value: vdeviceIdValue)
-        let encryptedDeviceKeyPrivValue = try encryptedDeviceKeyPriv.toCBORValue()
+        let encryptedDeviceKeyPrivValue = try self.encryptedDeviceKeyPriv.toCBORValue()
         map = map.adding(key: "encryptedDeviceKeyPriv", value: encryptedDeviceKeyPrivValue)
-        let encryptedEpochStorageKeyPrivValue = try encryptedEpochStorageKeyPriv.toCBORValue()
+        let encryptedEpochStorageKeyPrivValue = try self.encryptedEpochStorageKeyPriv.toCBORValue()
         map = map.adding(key: "encryptedEpochStorageKeyPriv", value: encryptedEpochStorageKeyPrivValue)
-        let encryptedOrfClientStateValue = try encryptedOrfClientState.toCBORValue()
+        let encryptedOrfClientStateValue = try self.encryptedOrfClientState.toCBORValue()
         map = map.adding(key: "encryptedOrfClientState", value: encryptedOrfClientStateValue)
-        let encryptedMailboxRootSaltValue = try encryptedMailboxRootSalt.toCBORValue()
+        let encryptedMailboxRootSaltValue = try self.encryptedMailboxRootSalt.toCBORValue()
         map = map.adding(key: "encryptedMailboxRootSalt", value: encryptedMailboxRootSaltValue)
-        let encryptedEpochRootKeyValue = try encryptedEpochRootKey.toCBORValue()
+        let encryptedEpochRootKeyValue = try self.encryptedEpochRootKey.toCBORValue()
         map = map.adding(key: "encryptedEpochRootKey", value: encryptedEpochRootKeyValue)
-        let encryptedEpochNumberValue = try encryptedEpochNumber.toCBORValue()
+        let encryptedEpochNumberValue = try self.encryptedEpochNumber.toCBORValue()
         map = map.adding(key: "encryptedEpochNumber", value: encryptedEpochNumberValue)
-        let deviceKeyPubkeyValue = try deviceKeyPubkey.toCBORValue()
+        let deviceKeyPubkeyValue = try self.deviceKeyPubkey.toCBORValue()
         map = map.adding(key: "deviceKeyPubkey", value: deviceKeyPubkeyValue)
-        let epochStorageKeyPubkeyValue = try epochStorageKeyPubkey.toCBORValue()
+        let epochStorageKeyPubkeyValue = try self.epochStorageKeyPubkey.toCBORValue()
         map = map.adding(key: "epochStorageKeyPubkey", value: epochStorageKeyPubkeyValue)
-        let epochStorageKeySigValue = try epochStorageKeySig.toCBORValue()
+        let epochStorageKeySigValue = try self.epochStorageKeySig.toCBORValue()
         map = map.adding(key: "epochStorageKeySig", value: epochStorageKeySigValue)
-        let mechanismValue = try mechanism.toCBORValue()
+        let mechanismValue = try self.mechanism.toCBORValue()
         map = map.adding(key: "mechanism", value: mechanismValue)
-        if let value = passkeyWrappedCode {
+        if let value = self.passkeyWrappedCode {
             let passkeyWrappedCodeValue = try value.toCBORValue()
             map = map.adding(key: "passkeyWrappedCode", value: passkeyWrappedCodeValue)
         }
-        if let value = passkeyCredentialId {
+        if let value = self.passkeyCredentialId {
             let passkeyCredentialIdValue = try value.toCBORValue()
             map = map.adding(key: "passkeyCredentialId", value: passkeyCredentialIdValue)
         }
-        let createdAtValue = try createdAt.toCBORValue()
+        let createdAtValue = try self.createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
-        if let value = lastUsedAt {
+        if let value = self.lastUsedAt {
             let lastUsedAtValue = try value.toCBORValue()
             map = map.adding(key: "lastUsedAt", value: lastUsedAtValue)
         }
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "vdeviceId", "encryptedDeviceKeyPriv", "encryptedEpochStorageKeyPriv", "encryptedOrfClientState", "encryptedMailboxRootSalt", "encryptedEpochRootKey", "encryptedEpochNumber", "deviceKeyPubkey", "epochStorageKeyPubkey", "epochStorageKeySig", "mechanism", "passkeyWrappedCode", "passkeyCredentialId", "createdAt", "lastUsedAt"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "vdeviceId": return true
+        case "encryptedDeviceKeyPriv": return true
+        case "encryptedEpochStorageKeyPriv": return true
+        case "encryptedOrfClientState": return true
+        case "encryptedMailboxRootSalt": return true
+        case "encryptedEpochRootKey": return true
+        case "encryptedEpochNumber": return true
+        case "deviceKeyPubkey": return true
+        case "epochStorageKeyPubkey": return true
+        case "epochStorageKeySig": return true
+        case "mechanism": return true
+        case "passkeyWrappedCode": return self.passkeyWrappedCode != nil
+        case "passkeyCredentialId": return self.passkeyCredentialId != nil
+        case "createdAt": return true
+        case "lastUsedAt": return self.lastUsedAt != nil
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

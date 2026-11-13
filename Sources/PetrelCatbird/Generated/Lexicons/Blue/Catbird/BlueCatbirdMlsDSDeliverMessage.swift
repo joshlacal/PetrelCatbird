@@ -4,18 +4,28 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.mlsDS.deliverMessage
 
+/// Accept an inbound MLS application message from a remote sequencer DS for a local recipient. Deliver a federated MLS application message to a local recipient on the destination DS.
 public struct BlueCatbirdMlsDSDeliverMessage {
 
     public static let typeIdentifier = "blue.catbird.mlsDS.deliverMessage"
+
     public struct Input: ATProtocolCodable {
+
         public let header: BlueCatbirdMlsDSDefs.EnvelopeHeaderV1
+        /// Canonical DAG-CBOR bytes of the exact applicationEntry
         public let entryBytes: Bytes
+        /// Exact JSON bytes of the signed message request
         public let signedRequestBytes: Bytes
         public let recipientDid: BlueCatbirdChatDefs.BareDid
         public let entryLocator: BlueCatbirdMlsDSDefs.EntryLocatorV1
 
-        /// Standard public initializer
-        public init(header: BlueCatbirdMlsDSDefs.EnvelopeHeaderV1, entryBytes: Bytes, signedRequestBytes: Bytes, recipientDid: BlueCatbirdChatDefs.BareDid, entryLocator: BlueCatbirdMlsDSDefs.EntryLocatorV1) {
+        public init(
+            header: BlueCatbirdMlsDSDefs.EnvelopeHeaderV1,
+            entryBytes: Bytes,
+            signedRequestBytes: Bytes,
+            recipientDid: BlueCatbirdChatDefs.BareDid,
+            entryLocator: BlueCatbirdMlsDSDefs.EntryLocatorV1
+        ) {
             self.header = header
             self.entryBytes = entryBytes
             self.signedRequestBytes = signedRequestBytes
@@ -34,24 +44,24 @@ public struct BlueCatbirdMlsDSDeliverMessage {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(header, forKey: .header)
-            try container.encode(entryBytes, forKey: .entryBytes)
-            try container.encode(signedRequestBytes, forKey: .signedRequestBytes)
-            try container.encode(recipientDid, forKey: .recipientDid)
-            try container.encode(entryLocator, forKey: .entryLocator)
+            try container.encode(self.header, forKey: .header)
+            try container.encode(self.entryBytes, forKey: .entryBytes)
+            try container.encode(self.signedRequestBytes, forKey: .signedRequestBytes)
+            try container.encode(self.recipientDid, forKey: .recipientDid)
+            try container.encode(self.entryLocator, forKey: .entryLocator)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let headerValue = try header.toCBORValue()
+            let headerValue = try self.header.toCBORValue()
             map = map.adding(key: "header", value: headerValue)
-            let entryBytesValue = try entryBytes.toCBORValue()
+            let entryBytesValue = try self.entryBytes.toCBORValue()
             map = map.adding(key: "entryBytes", value: entryBytesValue)
-            let signedRequestBytesValue = try signedRequestBytes.toCBORValue()
+            let signedRequestBytesValue = try self.signedRequestBytes.toCBORValue()
             map = map.adding(key: "signedRequestBytes", value: signedRequestBytesValue)
-            let recipientDidValue = try recipientDid.toCBORValue()
+            let recipientDidValue = try self.recipientDid.toCBORValue()
             map = map.adding(key: "recipientDid", value: recipientDidValue)
-            let entryLocatorValue = try entryLocator.toCBORValue()
+            let entryLocatorValue = try self.entryLocator.toCBORValue()
             map = map.adding(key: "entryLocator", value: entryLocatorValue)
             return map
         }
@@ -67,64 +77,43 @@ public struct BlueCatbirdMlsDSDeliverMessage {
 
     public struct Output: ATProtocolCodable {
 
+        /// Whether the message was delivered and persisted
         public let accepted: Bool
-
         public let receipt: BlueCatbirdMlsDSDefs.FederationReceiptV1
 
-        // Standard public initializer
         public init(
-
             accepted: Bool,
-
             receipt: BlueCatbirdMlsDSDefs.FederationReceiptV1
-
         ) {
-
             self.accepted = accepted
-
             self.receipt = receipt
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.accepted = try container.decode(Bool.self, forKey: .accepted)
-
             self.receipt = try container.decode(BlueCatbirdMlsDSDefs.FederationReceiptV1.self, forKey: .receipt)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(accepted, forKey: .accepted)
-
-            try container.encode(receipt, forKey: .receipt)
-
+            try container.encode(self.accepted, forKey: .accepted)
+            try container.encode(self.receipt, forKey: .receipt)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let acceptedValue = try accepted.toCBORValue()
+            let acceptedValue = try self.accepted.toCBORValue()
             map = map.adding(key: "accepted", value: acceptedValue)
-
-            let receiptValue = try receipt.toCBORValue()
+            let receiptValue = try self.receipt.toCBORValue()
             map = map.adding(key: "receipt", value: receiptValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case accepted
             case receipt
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -150,11 +139,10 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
     // MARK: - deliverMessage
     /// Accept an inbound MLS application message from a remote sequencer DS for a local recipient. Deliver a federated MLS application message to a local recipient on the destination DS.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdMlsDSDeliverMessage.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func deliverMessage(
 
         input: BlueCatbirdMlsDSDeliverMessage.Input
@@ -186,44 +174,24 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdMlsDSDeliverMessage.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSDeliverMessage.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.deliverMessage: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdMlsDSDeliverMessage.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdMlsDSDeliverMessage.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

@@ -4,15 +4,21 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.createEpoch
 
+/// Atomically create an epoch and its initial members, and record its head in the epoch-head directory. The head must recompute, its selfSig (XEdDSA by signingPubkey) must verify, it must be attested by the calling chat device's own key, and a later epoch's prevSig must verify under the previous epoch's signingPubkey. The epoch number is the race guard between devices ([CB-9]). Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
 public struct BlueCatbirdLabyrinthCreateEpoch {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.createEpoch"
+
     public struct Input: ATProtocolCodable {
+
+        /// A blue.catbird.labyrinth.epoch record.
         public let epoch: ATProtocolValueContainer
         public let members: [ATProtocolValueContainer]
 
-        /// Standard public initializer
-        public init(epoch: ATProtocolValueContainer, members: [ATProtocolValueContainer]) {
+        public init(
+            epoch: ATProtocolValueContainer,
+            members: [ATProtocolValueContainer]
+        ) {
             self.epoch = epoch
             self.members = members
         }
@@ -25,15 +31,15 @@ public struct BlueCatbirdLabyrinthCreateEpoch {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(epoch, forKey: .epoch)
-            try container.encode(members, forKey: .members)
+            try container.encode(self.epoch, forKey: .epoch)
+            try container.encode(self.members, forKey: .members)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let epochValue = try epoch.toCBORValue()
+            let epochValue = try self.epoch.toCBORValue()
             map = map.adding(key: "epoch", value: epochValue)
-            let membersValue = try members.toCBORValue()
+            let membersValue = try self.members.toCBORValue()
             map = map.adding(key: "members", value: membersValue)
             return map
         }
@@ -46,64 +52,44 @@ public struct BlueCatbirdLabyrinthCreateEpoch {
 
     public struct Output: ATProtocolCodable {
 
+        /// Backend-assigned epochID.
         public let epochId: String
-
+        /// The epoch's number.
         public let epochNumber: Int
 
-        // Standard public initializer
         public init(
-
             epochId: String,
-
             epochNumber: Int
-
         ) {
-
             self.epochId = epochId
-
             self.epochNumber = epochNumber
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.epochId = try container.decode(String.self, forKey: .epochId)
-
             self.epochNumber = try container.decode(Int.self, forKey: .epochNumber)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(epochId, forKey: .epochId)
-
-            try container.encode(epochNumber, forKey: .epochNumber)
-
+            try container.encode(self.epochId, forKey: .epochId)
+            try container.encode(self.epochNumber, forKey: .epochNumber)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let epochIdValue = try epochId.toCBORValue()
+            let epochIdValue = try self.epochId.toCBORValue()
             map = map.adding(key: "epochId", value: epochIdValue)
-
-            let epochNumberValue = try epochNumber.toCBORValue()
+            let epochNumberValue = try self.epochNumber.toCBORValue()
             map = map.adding(key: "epochNumber", value: epochNumberValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case epochId
             case epochNumber
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -128,11 +114,10 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - createEpoch
     /// Atomically create an epoch and its initial members, and record its head in the epoch-head directory. The head must recompute, its selfSig (XEdDSA by signingPubkey) must verify, it must be attested by the calling chat device's own key, and a later epoch's prevSig must verify under the previous epoch's signingPubkey. The epoch number is the race guard between devices ([CB-9]). Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdLabyrinthCreateEpoch.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func createEpoch(
 
         input: BlueCatbirdLabyrinthCreateEpoch.Input
@@ -164,44 +149,24 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdLabyrinthCreateEpoch.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdLabyrinthCreateEpoch.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.createEpoch: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdLabyrinthCreateEpoch.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdLabyrinthCreateEpoch.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

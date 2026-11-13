@@ -10,92 +10,79 @@ public struct PlaceStreamDefs {
 
     public struct BlockView: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.defs#blockView"
+
         public let uri: ATProtocolURI
-        public let cid: CID
+        public let cid: CIDString
         public let blocker: AppBskyActorDefs.ProfileViewBasic
         public let record: AppBskyGraphBlock
         public let indexedAt: ATProtocolDate
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            uri: ATProtocolURI, cid: CID, blocker: AppBskyActorDefs.ProfileViewBasic, record: AppBskyGraphBlock, indexedAt: ATProtocolDate
+            uri: ATProtocolURI,
+            cid: CIDString,
+            blocker: AppBskyActorDefs.ProfileViewBasic,
+            record: AppBskyGraphBlock,
+            indexedAt: ATProtocolDate,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.uri = uri
             self.cid = cid
             self.blocker = blocker
             self.record = record
             self.indexedAt = indexedAt
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
-            } catch {
-                LogManager.logError("Decoding error for required property 'uri': \(error)")
-                throw error
-            }
-            do {
-                self.cid = try container.decode(CID.self, forKey: .cid)
-            } catch {
-                LogManager.logError("Decoding error for required property 'cid': \(error)")
-                throw error
-            }
-            do {
-                self.blocker = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .blocker)
-            } catch {
-                LogManager.logError("Decoding error for required property 'blocker': \(error)")
-                throw error
-            }
-            do {
-                self.record = try container.decode(AppBskyGraphBlock.self, forKey: .record)
-            } catch {
-                LogManager.logError("Decoding error for required property 'record': \(error)")
-                throw error
-            }
-            do {
-                self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
-            } catch {
-                LogManager.logError("Decoding error for required property 'indexedAt': \(error)")
-                throw error
-            }
+            self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+            self.cid = try container.decode(CIDString.self, forKey: .cid)
+            self.blocker = try container.decode(AppBskyActorDefs.ProfileViewBasic.self, forKey: .blocker)
+            self.record = try container.decode(AppBskyGraphBlock.self, forKey: .record)
+            self.indexedAt = try container.decode(ATProtocolDate.self, forKey: .indexedAt)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(uri, forKey: .uri)
-            try container.encode(cid, forKey: .cid)
-            try container.encode(blocker, forKey: .blocker)
-            try container.encode(record, forKey: .record)
-            try container.encode(indexedAt, forKey: .indexedAt)
+            try container.encode(self.uri, forKey: .uri)
+            try container.encode(self.cid, forKey: .cid)
+            try container.encode(self.blocker, forKey: .blocker)
+            try container.encode(self.record, forKey: .record)
+            try container.encode(self.indexedAt, forKey: .indexedAt)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(uri)
-            hasher.combine(cid)
-            hasher.combine(blocker)
-            hasher.combine(record)
-            hasher.combine(indexedAt)
+            hasher.combine(self.uri)
+            hasher.combine(self.cid)
+            hasher.combine(self.blocker)
+            hasher.combine(self.record)
+            hasher.combine(self.indexedAt)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if uri != other.uri {
+            if self.uri != other.uri {
                 return false
             }
-            if cid != other.cid {
+            if self.cid != other.cid {
                 return false
             }
-            if blocker != other.blocker {
+            if self.blocker != other.blocker {
                 return false
             }
-            if record != other.record {
+            if self.record != other.record {
                 return false
             }
-            if indexedAt != other.indexedAt {
+            if self.indexedAt != other.indexedAt {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -104,22 +91,22 @@ public struct PlaceStreamDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let uriValue = try uri.toCBORValue()
+            let uriValue = try self.uri.toCBORValue()
             map = map.adding(key: "uri", value: uriValue)
-            let cidValue = try cid.toCBORValue()
+            let cidValue = try self.cid.toCBORValue()
             map = map.adding(key: "cid", value: cidValue)
-            let blockerValue = try blocker.toCBORValue()
+            let blockerValue = try self.blocker.toCBORValue()
             map = map.adding(key: "blocker", value: blockerValue)
-            let recordValue = try record.toCBORValue()
+            let recordValue = try self.record.toCBORValue()
             map = map.adding(key: "record", value: recordValue)
-            let indexedAtValue = try indexedAt.toCBORValue()
+            let indexedAtValue = try self.indexedAt.toCBORValue()
             map = map.adding(key: "indexedAt", value: indexedAtValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "uri", "cid", "blocker", "record", "indexedAt"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case uri
             case cid
             case blocker
@@ -127,43 +114,45 @@ public struct PlaceStreamDefs {
             case indexedAt
         }
     }
-
     public struct Renditions: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.defs#renditions"
+
         public let renditions: [Rendition]
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            renditions: [Rendition]
+            renditions: [Rendition],
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.renditions = renditions
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.renditions = try container.decode([Rendition].self, forKey: .renditions)
-            } catch {
-                LogManager.logError("Decoding error for required property 'renditions': \(error)")
-                throw error
-            }
+            self.renditions = try container.decode([Rendition].self, forKey: .renditions)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(renditions, forKey: .renditions)
+            try container.encode(self.renditions, forKey: .renditions)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(renditions)
+            hasher.combine(self.renditions)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if renditions != other.renditions {
+            if self.renditions != other.renditions {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -172,54 +161,56 @@ public struct PlaceStreamDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let renditionsValue = try renditions.toCBORValue()
+            let renditionsValue = try self.renditions.toCBORValue()
             map = map.adding(key: "renditions", value: renditionsValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "renditions"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case renditions
         }
     }
-
     public struct Rendition: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.defs#rendition"
+
         public let name: String
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            name: String
+            name: String,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.name = name
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.name = try container.decode(String.self, forKey: .name)
-            } catch {
-                LogManager.logError("Decoding error for required property 'name': \(error)")
-                throw error
-            }
+            self.name = try container.decode(String.self, forKey: .name)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(name, forKey: .name)
+            try container.encode(self.name, forKey: .name)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(name)
+            hasher.combine(self.name)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if name != other.name {
+            if self.name != other.name {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -228,14 +219,14 @@ public struct PlaceStreamDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let nameValue = try name.toCBORValue()
+            let nameValue = try self.name.toCBORValue()
             map = map.adding(key: "name", value: nameValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "name"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case name
         }
     }

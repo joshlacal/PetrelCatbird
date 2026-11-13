@@ -4,112 +4,162 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.epoch
 
+/// One mailbox epoch (SPEC §5). rkey = epochNumber zero-padded to 12 digits; creating an existing rkey fails with RecordAlreadyExists, which is the race guard between devices ([CB-9]). Immutable once written.
 public struct BlueCatbirdLabyrinthEpoch: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.epoch"
+
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "any")
+
     public let `public`: BlueCatbirdLabyrinthDefs.EpochPublic
+    /// encrypt(epochDataStorageKey, 'epoch_data_metadata', decimal(prev seq)). Absent for epoch 0.
     public let encryptedPreviousEpochNumber: Bytes?
+    /// encrypt(epochDataStorageKey, 'epoch_data_metadata', prev root). Absent for epoch 0.
     public let encryptedPreviousEpochRootKey: Bytes?
+    /// deviceKeyPubkey of the device that opened the epoch (its epochStorageAuthKey authenticates the entropy).
     public let openedBy: Bytes
     public let createdAt: ATProtocolDate
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
 
-    public init(`public`: BlueCatbirdLabyrinthDefs.EpochPublic, encryptedPreviousEpochNumber: Bytes? = nil, encryptedPreviousEpochRootKey: Bytes? = nil, openedBy: Bytes, createdAt: ATProtocolDate) {
+    public init(
+        `public`: BlueCatbirdLabyrinthDefs.EpochPublic,
+        encryptedPreviousEpochNumber: Bytes? = nil,
+        encryptedPreviousEpochRootKey: Bytes? = nil,
+        openedBy: Bytes,
+        createdAt: ATProtocolDate,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.`public` = `public`
         self.encryptedPreviousEpochNumber = encryptedPreviousEpochNumber
         self.encryptedPreviousEpochRootKey = encryptedPreviousEpochRootKey
         self.openedBy = openedBy
         self.createdAt = createdAt
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         self.`public` = try container.decode(BlueCatbirdLabyrinthDefs.EpochPublic.self, forKey: .`public`)
         do {
-            self.encryptedPreviousEpochNumber = try container.decodeIfPresent(Bytes.self, forKey: .encryptedPreviousEpochNumber)
+            self.encryptedPreviousEpochNumber = try container.decodeIfPresent(Bytes.self, forKey: .encryptedPreviousEpochNumber, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'encryptedPreviousEpochNumber' — degrading to nil: \(error)")
             self.encryptedPreviousEpochNumber = nil
+            malformedFields.insert("encryptedPreviousEpochNumber")
         }
         do {
-            self.encryptedPreviousEpochRootKey = try container.decodeIfPresent(Bytes.self, forKey: .encryptedPreviousEpochRootKey)
+            self.encryptedPreviousEpochRootKey = try container.decodeIfPresent(Bytes.self, forKey: .encryptedPreviousEpochRootKey, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'encryptedPreviousEpochRootKey' — degrading to nil: \(error)")
             self.encryptedPreviousEpochRootKey = nil
+            malformedFields.insert("encryptedPreviousEpochRootKey")
         }
         self.openedBy = try container.decode(Bytes.self, forKey: .openedBy)
         self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(`public`, forKey: .`public`)
-        try container.encodeIfPresent(encryptedPreviousEpochNumber, forKey: .encryptedPreviousEpochNumber)
-        try container.encodeIfPresent(encryptedPreviousEpochRootKey, forKey: .encryptedPreviousEpochRootKey)
-        try container.encode(openedBy, forKey: .openedBy)
-        try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(self.`public`, forKey: .`public`)
+        try container.encodeIfPresent(self.encryptedPreviousEpochNumber, forKey: .encryptedPreviousEpochNumber)
+        try container.encodeIfPresent(self.encryptedPreviousEpochRootKey, forKey: .encryptedPreviousEpochRootKey)
+        try container.encode(self.openedBy, forKey: .openedBy)
+        try container.encode(self.createdAt, forKey: .createdAt)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.`public`)
+        if let value = self.encryptedPreviousEpochNumber {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        if let value = self.encryptedPreviousEpochRootKey {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(self.openedBy)
+        hasher.combine(self.createdAt)
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.`public` != other.`public` {
+            return false
+        }
+        if self.encryptedPreviousEpochNumber != other.encryptedPreviousEpochNumber {
+            return false
+        }
+        if self.encryptedPreviousEpochRootKey != other.encryptedPreviousEpochRootKey {
+            return false
+        }
+        if self.openedBy != other.openedBy {
+            return false
+        }
+        if self.createdAt != other.createdAt {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if `public` != other.`public` {
-            return false
-        }
-        if encryptedPreviousEpochNumber != other.encryptedPreviousEpochNumber {
-            return false
-        }
-        if encryptedPreviousEpochRootKey != other.encryptedPreviousEpochRootKey {
-            return false
-        }
-        if openedBy != other.openedBy {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(`public`)
-        if let value = encryptedPreviousEpochNumber {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        if let value = encryptedPreviousEpochRootKey {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        hasher.combine(openedBy)
-        hasher.combine(createdAt)
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let publicValue = try `public`.toCBORValue()
+        let publicValue = try self.`public`.toCBORValue()
         map = map.adding(key: "public", value: publicValue)
-        if let value = encryptedPreviousEpochNumber {
+        if let value = self.encryptedPreviousEpochNumber {
             let encryptedPreviousEpochNumberValue = try value.toCBORValue()
             map = map.adding(key: "encryptedPreviousEpochNumber", value: encryptedPreviousEpochNumberValue)
         }
-        if let value = encryptedPreviousEpochRootKey {
+        if let value = self.encryptedPreviousEpochRootKey {
             let encryptedPreviousEpochRootKeyValue = try value.toCBORValue()
             map = map.adding(key: "encryptedPreviousEpochRootKey", value: encryptedPreviousEpochRootKeyValue)
         }
-        let openedByValue = try openedBy.toCBORValue()
+        let openedByValue = try self.openedBy.toCBORValue()
         map = map.adding(key: "openedBy", value: openedByValue)
-        let createdAtValue = try createdAt.toCBORValue()
+        let createdAtValue = try self.createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "public", "encryptedPreviousEpochNumber", "encryptedPreviousEpochRootKey", "openedBy", "createdAt"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "public": return true
+        case "encryptedPreviousEpochNumber": return self.encryptedPreviousEpochNumber != nil
+        case "encryptedPreviousEpochRootKey": return self.encryptedPreviousEpochRootKey != nil
+        case "openedBy": return true
+        case "createdAt": return true
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

@@ -4,16 +4,25 @@ import Petrel
 
 // lexicon: 1, id: place.stream.moderation.createBlock
 
+/// Create a block (ban) on behalf of a streamer. Requires 'ban' permission. Creates an app.bsky.graph.block record in the streamer's repository.
 public struct PlaceStreamModerationCreateBlock {
 
     public static let typeIdentifier = "place.stream.moderation.createBlock"
+
     public struct Input: ATProtocolCodable {
+
+        /// The DID of the streamer whose chat this block applies to.
         public let streamer: DID
+        /// The DID of the user being blocked from chat.
         public let subject: DID
+        /// Optional reason for the block.
         public let reason: String?
 
-        /// Standard public initializer
-        public init(streamer: DID, subject: DID, reason: String? = nil) {
+        public init(
+            streamer: DID,
+            subject: DID,
+            reason: String? = nil
+        ) {
             self.streamer = streamer
             self.subject = subject
             self.reason = reason
@@ -21,25 +30,26 @@ public struct PlaceStreamModerationCreateBlock {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
             self.streamer = try container.decode(DID.self, forKey: .streamer)
             self.subject = try container.decode(DID.self, forKey: .subject)
-            self.reason = try container.decodeIfPresent(String.self, forKey: .reason)
+            self.reason = try container.decodeIfPresent(String.self, forKey: .reason, rejectingNull: strict)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(streamer, forKey: .streamer)
-            try container.encode(subject, forKey: .subject)
-            try container.encodeIfPresent(reason, forKey: .reason)
+            try container.encode(self.streamer, forKey: .streamer)
+            try container.encode(self.subject, forKey: .subject)
+            try container.encodeIfPresent(self.reason, forKey: .reason)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let streamerValue = try streamer.toCBORValue()
+            let streamerValue = try self.streamer.toCBORValue()
             map = map.adding(key: "streamer", value: streamerValue)
-            let subjectValue = try subject.toCBORValue()
+            let subjectValue = try self.subject.toCBORValue()
             map = map.adding(key: "subject", value: subjectValue)
-            if let value = reason {
+            if let value = self.reason {
                 let reasonValue = try value.toCBORValue()
                 map = map.adding(key: "reason", value: reasonValue)
             }
@@ -55,64 +65,44 @@ public struct PlaceStreamModerationCreateBlock {
 
     public struct Output: ATProtocolCodable {
 
+        /// The AT-URI of the created block record.
         public let uri: ATProtocolURI
+        /// The CID of the created block record.
+        public let cid: CIDString
 
-        public let cid: CID
-
-        // Standard public initializer
         public init(
-
             uri: ATProtocolURI,
-
-            cid: CID
-
+            cid: CIDString
         ) {
-
             self.uri = uri
-
             self.cid = cid
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
-
-            self.cid = try container.decode(CID.self, forKey: .cid)
-
+            self.cid = try container.decode(CIDString.self, forKey: .cid)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(uri, forKey: .uri)
-
-            try container.encode(cid, forKey: .cid)
-
+            try container.encode(self.uri, forKey: .uri)
+            try container.encode(self.cid, forKey: .cid)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let uriValue = try uri.toCBORValue()
+            let uriValue = try self.uri.toCBORValue()
             map = map.adding(key: "uri", value: uriValue)
-
-            let cidValue = try cid.toCBORValue()
+            let cidValue = try self.cid.toCBORValue()
             map = map.adding(key: "cid", value: cidValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case uri
             case cid
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -137,11 +127,10 @@ extension ATProtoClient.Place.Stream.Moderation {
     // MARK: - createBlock
     /// Create a block (ban) on behalf of a streamer. Requires 'ban' permission. Creates an app.bsky.graph.block record in the streamer's repository.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<PlaceStreamModerationCreateBlock.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func createBlock(
 
         input: PlaceStreamModerationCreateBlock.Input
@@ -173,44 +162,24 @@ extension ATProtoClient.Place.Stream.Moderation {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: PlaceStreamModerationCreateBlock.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamModerationCreateBlock.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.moderation.createBlock: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: PlaceStreamModerationCreateBlock.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(PlaceStreamModerationCreateBlock.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

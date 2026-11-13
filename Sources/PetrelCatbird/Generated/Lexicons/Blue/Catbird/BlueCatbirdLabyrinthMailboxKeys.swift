@@ -4,80 +4,119 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.mailboxKeys
 
+/// Published in the account's PUBLIC repo so any sender can address MEKs to the account's latest Labyrinth epoch ([CB-19]). Works on every PDS, with or without Spaces. rkey `self` holds the latest epoch and is overwritten on rotation; rkey = epochNumber zero-padded to 12 digits holds an immutable copy of every published epoch, so senders can verify the prev_sig chain from a pinned head ([CB-29]).
 public struct BlueCatbirdLabyrinthMailboxKeys: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.mailboxKeys"
+
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "any")
+
     public let current: BlueCatbirdLabyrinthDefs.EpochPublic
+    /// Where the mailbox lives.
     public let backend: String?
     public let updatedAt: ATProtocolDate
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
 
-    public init(current: BlueCatbirdLabyrinthDefs.EpochPublic, backend: String? = nil, updatedAt: ATProtocolDate) {
+    public init(
+        current: BlueCatbirdLabyrinthDefs.EpochPublic,
+        backend: String? = nil,
+        updatedAt: ATProtocolDate,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.current = current
         self.backend = backend
         self.updatedAt = updatedAt
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         self.current = try container.decode(BlueCatbirdLabyrinthDefs.EpochPublic.self, forKey: .current)
         do {
-            self.backend = try container.decodeIfPresent(String.self, forKey: .backend)
+            self.backend = try container.decodeIfPresent(String.self, forKey: .backend, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'backend' — degrading to nil: \(error)")
             self.backend = nil
+            malformedFields.insert("backend")
         }
         self.updatedAt = try container.decode(ATProtocolDate.self, forKey: .updatedAt)
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(current, forKey: .current)
-        try container.encodeIfPresent(backend, forKey: .backend)
-        try container.encode(updatedAt, forKey: .updatedAt)
+        try container.encode(self.current, forKey: .current)
+        try container.encodeIfPresent(self.backend, forKey: .backend)
+        try container.encode(self.updatedAt, forKey: .updatedAt)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.current)
+        if let value = self.backend {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(self.updatedAt)
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.current != other.current {
+            return false
+        }
+        if self.backend != other.backend {
+            return false
+        }
+        if self.updatedAt != other.updatedAt {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if current != other.current {
-            return false
-        }
-        if backend != other.backend {
-            return false
-        }
-        if updatedAt != other.updatedAt {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(current)
-        if let value = backend {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        hasher.combine(updatedAt)
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let currentValue = try current.toCBORValue()
+        let currentValue = try self.current.toCBORValue()
         map = map.adding(key: "current", value: currentValue)
-        if let value = backend {
+        if let value = self.backend {
             let backendValue = try value.toCBORValue()
             map = map.adding(key: "backend", value: backendValue)
         }
-        let updatedAtValue = try updatedAt.toCBORValue()
+        let updatedAtValue = try self.updatedAt.toCBORValue()
         map = map.adding(key: "updatedAt", value: updatedAtValue)
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "current", "backend", "updatedAt"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "current": return true
+        case "backend": return self.backend != nil
+        case "updatedAt": return true
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

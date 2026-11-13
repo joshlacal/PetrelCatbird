@@ -4,46 +4,51 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.listThreads
 
+/// Lookup by thread: every conversation in which the caller wrote a MEK or is a MEK recipient, including conversations it has left ([CB-22]), ascending by conversation id. The caller's home DS merges its own conversations with those of every remote sequencer of a conversation the caller takes or took part in (labyrinthRelay listThreads); the remote sequencers are asked in parallel with a per-sequencer deadline and response cap, and a sequencer that cannot answer is named in incomplete instead of failing the call (its conversations are then missing from this page). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
 public struct BlueCatbirdLabyrinthListThreads {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.listThreads"
 
     public struct ThreadView: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.labyrinth.listThreads#threadView"
+
+        /// Thread id.
         public let threadId: String
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            threadId: String
+            threadId: String,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.threadId = threadId
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.threadId = try container.decode(String.self, forKey: .threadId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'threadId': \(error)")
-                throw error
-            }
+            self.threadId = try container.decode(String.self, forKey: .threadId)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(threadId, forKey: .threadId)
+            try container.encode(self.threadId, forKey: .threadId)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(threadId)
+            hasher.combine(self.threadId)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if threadId != other.threadId {
+            if self.threadId != other.threadId {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -52,14 +57,14 @@ public struct BlueCatbirdLabyrinthListThreads {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let threadIdValue = try threadId.toCBORValue()
+            let threadIdValue = try self.threadId.toCBORValue()
             map = map.adding(key: "threadId", value: threadIdValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "threadId"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case threadId
         }
     }
@@ -80,89 +85,67 @@ public struct BlueCatbirdLabyrinthListThreads {
     public struct Output: ATProtocolCodable {
 
         public let items: [ThreadView]
-
+        /// Opaque cursor from the previous page.
         public let cursor: String?
-
+        /// Remote sequencer DSes whose conversations could not be listed this time; absent when the page is complete. Retry later for a complete list.
         public let incomplete: [DID]?
 
-        // Standard public initializer
         public init(
-
             items: [ThreadView],
-
             cursor: String? = nil,
-
             incomplete: [DID]? = nil
-
         ) {
-
             self.items = items
-
             self.cursor = cursor
-
             self.incomplete = incomplete
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
+            let strict = decoder.isATProtoStrictDecoding
             self.items = try container.decode([ThreadView].self, forKey: .items)
-
             do {
-                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
+                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
                 self.cursor = nil
             }
-
             do {
-                self.incomplete = try container.decodeIfPresent([DID].self, forKey: .incomplete)
+                self.incomplete = try container.decodeIfPresent([DID].self, forKey: .incomplete, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'incomplete' — degrading to nil: \(error)")
                 self.incomplete = nil
             }
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(items, forKey: .items)
-
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(cursor, forKey: .cursor)
-
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(incomplete, forKey: .incomplete)
-
+            try container.encode(self.items, forKey: .items)
+            try container.encodeIfPresent(self.cursor, forKey: .cursor)
+            try container.encodeIfPresent(self.incomplete, forKey: .incomplete)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let itemsValue = try items.toCBORValue()
+            let itemsValue = try self.items.toCBORValue()
             map = map.adding(key: "items", value: itemsValue)
-
-            if let value = cursor {
-                // Encode optional property even if it's an empty array for CBOR
+            if let value = self.cursor {
                 let cursorValue = try value.toCBORValue()
                 map = map.adding(key: "cursor", value: cursorValue)
             }
-
-            if let value = incomplete {
-                // Encode optional property even if it's an empty array for CBOR
+            if let value = self.incomplete {
                 let incompleteValue = try value.toCBORValue()
                 map = map.adding(key: "incomplete", value: incompleteValue)
             }
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -170,7 +153,6 @@ public struct BlueCatbirdLabyrinthListThreads {
             case cursor
             case incomplete
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -191,9 +173,8 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
     /// Lookup by thread: every conversation in which the caller wrote a MEK or is a MEK recipient, including conversations it has left ([CB-22]), ascending by conversation id. The caller's home DS merges its own conversations with those of every remote sequencer of a conversation the caller takes or took part in (labyrinthRelay listThreads); the remote sequencers are asked in parallel with a per-sequencer deadline and response cap, and a sequencer that cannot answer is named in incomplete instead of failing the call (its conversations are then missing from this page). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdLabyrinthListThreads.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func listThreads(input: BlueCatbirdLabyrinthListThreads.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthListThreads.Output?) {
         let endpoint = "blue.catbird.labyrinth.listThreads"
 
@@ -213,42 +194,32 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdLabyrinthListThreads.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.listThreads: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdLabyrinthListThreads.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdLabyrinthListThreads.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdLabyrinthListThreads.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }
+
+extension BlueCatbirdLabyrinthListThreads.Parameters: XRPCCursorPaginatedParameters {
+    public func withCursor(_ cursor: String?) -> Self {
+        Self(cursor: cursor, limit: limit)
+    }
+}
+
+extension BlueCatbirdLabyrinthListThreads.Output: XRPCCursorPaginatedOutput {}

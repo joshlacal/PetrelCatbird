@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.getBlob
 
+/// Download immutable opaque ciphertext under purpose-specific authorization. An attachment is readable only when its binding seq lies inside the caller's exact application interval; pre-join history and re-add gaps are denied even if the caller is currently a participant. A metadata avatar is readable by any current logical participant from the current metadata snapshot, including a title-only snapshot that reuses an older avatar binding. A completed unbound upload is visible only to its verified owner.
 public struct BlueCatbirdChatGetBlob {
 
     public static let typeIdentifier = "blue.catbird.chat.getBlob"
+
     public struct Parameters: Parametrizable {
         public let actorDeviceId: String
         public let blobId: String
@@ -22,51 +24,29 @@ public struct BlueCatbirdChatGetBlob {
     }
 
     public struct Output: ATProtocolCodable {
-
         public let data: Data
 
-        // Standard public initializer
-        public init(
-
-            data: Data
-
-        ) {
-
+        public init(data: Data) {
             self.data = data
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.data = try container.decode(Data.self, forKey: .data)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
             try container.encode(data, forKey: .data)
-
         }
 
         public func toCBORValue() throws -> Any {
-
-            var map = OrderedCBORMap()
-
-            let dataValue = try data.toCBORValue()
-            map = map.adding(key: "data", value: dataValue)
-
-            return map
-
+            return data
         }
 
         private enum CodingKeys: String, CodingKey {
             case data
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -96,9 +76,8 @@ extension ATProtoClient.Blue.Catbird.Chat {
     /// Download immutable opaque ciphertext under purpose-specific authorization. An attachment is readable only when its binding seq lies inside the caller's exact application interval; pre-join history and re-add gaps are denied even if the caller is currently a participant. A metadata avatar is readable by any current logical participant from the current metadata snapshot, including a title-only snapshot that reuses an older avatar binding. A completed unbound upload is visible only to its verified owner.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdChatGetBlob.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getBlob(input: BlueCatbirdChatGetBlob.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetBlob.Output?) {
         let endpoint = "blue.catbird.chat.getBlob"
 
@@ -118,34 +97,19 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/octet-stream", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/octet-stream") {
-                throw NetworkError.invalidContentType(expected: "application/octet-stream", actual: contentType)
-            }
-
-            let decodedData = BlueCatbirdChatGetBlob.Output(data: responseData)
-            return (responseCode, decodedData)
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdChatGetBlob.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdChatGetBlob.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/octet-stream", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/octet-stream") {
+            throw NetworkError.invalidContentType(expected: "application/octet-stream", actual: contentType)
+        }
+
+        return (responseCode, BlueCatbirdChatGetBlob.Output(data: responseData))
+
     }
 }

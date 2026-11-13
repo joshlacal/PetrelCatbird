@@ -4,22 +4,42 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.labyrinthRelay
 
+/// Server-to-server only (design Y3). A device's home DS uses this to forward a Labyrinth thread operation for a conversation that the receiving DS sequences. Authentication is standard DS service auth: iss is the home DS, aud is the sequencer, lxm is this NSID, under the federation peer policy. The receiver requires three things: the requesting DS is the actor's home DS in the conversation's participant rows, the actor's chat device is current in its replicated device table, for writes, the device's labyrinthWriteBody signature over the forwarded payload re-verifies, and for reads the device's signed read claim (readHeader/readSignature) re-verifies. The output and errors are exactly those of the relayed endpoint.
 public struct BlueCatbirdLabyrinthLabyrinthRelay {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.labyrinthRelay"
+
     public struct Input: ATProtocolCodable {
+
+        /// The relayed operation. messageLive (query threadId, messageId, author) answers {live, redacted}: whether author's sender item for the message is stored unredacted and readable by the actor, and whether any of them was redacted; it gates attachment access and is authorized by the device's signed getAttachmentBlob read. purgeAuthor redacts every item the actor authored in conversations the receiver sequences, received before the signed write body's signedAt + 5 minutes; it is the remote part of deleteAccountData, delivered from the home DS's durable outbox, and the receiver accepts that signed body for 30 days under a key of the device that was current at signedAt. invalidateMessages (sequencer to member home DS, DS-originated, no actorDeviceId; payload {threadId, messageIds}) announces that actorDid's messages were redacted so the receiver drops references to that author's attachments and refuses new ones; the receiver requires the requesting DS to be the conversation's sequencer. listThreads carries no threadId: the receiver lists only conversations it sequences in which the requesting DS is the actor's home DS.
         public let op: String
         public let actorDid: DID
+        /// The actor's chat device (canonical UUIDv4). Required for every op except invalidateMessages.
         public let actorDeviceId: String?
+        /// Reads: the original query string.
         public let query: String?
+        /// Writes: the exact request body the device signed.
         public let payload: Bytes?
+        /// Writes: the catbird-labyrinth-write header value.
         public let writeBody: String?
+        /// Writes: the catbird-labyrinth-write-signature header value.
         public let writeSignature: String?
+        /// Reads: the device's catbird-labyrinth-read header value, re-verified by the receiver.
         public let readHeader: String?
+        /// Reads: the device's catbird-labyrinth-read-signature header value.
         public let readSignature: String?
 
-        /// Standard public initializer
-        public init(op: String, actorDid: DID, actorDeviceId: String? = nil, query: String? = nil, payload: Bytes? = nil, writeBody: String? = nil, writeSignature: String? = nil, readHeader: String? = nil, readSignature: String? = nil) {
+        public init(
+            op: String,
+            actorDid: DID,
+            actorDeviceId: String? = nil,
+            query: String? = nil,
+            payload: Bytes? = nil,
+            writeBody: String? = nil,
+            writeSignature: String? = nil,
+            readHeader: String? = nil,
+            readSignature: String? = nil
+        ) {
             self.op = op
             self.actorDid = actorDid
             self.actorDeviceId = actorDeviceId
@@ -33,61 +53,62 @@ public struct BlueCatbirdLabyrinthLabyrinthRelay {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
             self.op = try container.decode(String.self, forKey: .op)
             self.actorDid = try container.decode(DID.self, forKey: .actorDid)
-            self.actorDeviceId = try container.decodeIfPresent(String.self, forKey: .actorDeviceId)
-            self.query = try container.decodeIfPresent(String.self, forKey: .query)
-            self.payload = try container.decodeIfPresent(Bytes.self, forKey: .payload)
-            self.writeBody = try container.decodeIfPresent(String.self, forKey: .writeBody)
-            self.writeSignature = try container.decodeIfPresent(String.self, forKey: .writeSignature)
-            self.readHeader = try container.decodeIfPresent(String.self, forKey: .readHeader)
-            self.readSignature = try container.decodeIfPresent(String.self, forKey: .readSignature)
+            self.actorDeviceId = try container.decodeIfPresent(String.self, forKey: .actorDeviceId, rejectingNull: strict)
+            self.query = try container.decodeIfPresent(String.self, forKey: .query, rejectingNull: strict)
+            self.payload = try container.decodeIfPresent(Bytes.self, forKey: .payload, rejectingNull: strict)
+            self.writeBody = try container.decodeIfPresent(String.self, forKey: .writeBody, rejectingNull: strict)
+            self.writeSignature = try container.decodeIfPresent(String.self, forKey: .writeSignature, rejectingNull: strict)
+            self.readHeader = try container.decodeIfPresent(String.self, forKey: .readHeader, rejectingNull: strict)
+            self.readSignature = try container.decodeIfPresent(String.self, forKey: .readSignature, rejectingNull: strict)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(op, forKey: .op)
-            try container.encode(actorDid, forKey: .actorDid)
-            try container.encodeIfPresent(actorDeviceId, forKey: .actorDeviceId)
-            try container.encodeIfPresent(query, forKey: .query)
-            try container.encodeIfPresent(payload, forKey: .payload)
-            try container.encodeIfPresent(writeBody, forKey: .writeBody)
-            try container.encodeIfPresent(writeSignature, forKey: .writeSignature)
-            try container.encodeIfPresent(readHeader, forKey: .readHeader)
-            try container.encodeIfPresent(readSignature, forKey: .readSignature)
+            try container.encode(self.op, forKey: .op)
+            try container.encode(self.actorDid, forKey: .actorDid)
+            try container.encodeIfPresent(self.actorDeviceId, forKey: .actorDeviceId)
+            try container.encodeIfPresent(self.query, forKey: .query)
+            try container.encodeIfPresent(self.payload, forKey: .payload)
+            try container.encodeIfPresent(self.writeBody, forKey: .writeBody)
+            try container.encodeIfPresent(self.writeSignature, forKey: .writeSignature)
+            try container.encodeIfPresent(self.readHeader, forKey: .readHeader)
+            try container.encodeIfPresent(self.readSignature, forKey: .readSignature)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let opValue = try op.toCBORValue()
+            let opValue = try self.op.toCBORValue()
             map = map.adding(key: "op", value: opValue)
-            let actorDidValue = try actorDid.toCBORValue()
+            let actorDidValue = try self.actorDid.toCBORValue()
             map = map.adding(key: "actorDid", value: actorDidValue)
-            if let value = actorDeviceId {
+            if let value = self.actorDeviceId {
                 let actorDeviceIdValue = try value.toCBORValue()
                 map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
             }
-            if let value = query {
+            if let value = self.query {
                 let queryValue = try value.toCBORValue()
                 map = map.adding(key: "query", value: queryValue)
             }
-            if let value = payload {
+            if let value = self.payload {
                 let payloadValue = try value.toCBORValue()
                 map = map.adding(key: "payload", value: payloadValue)
             }
-            if let value = writeBody {
+            if let value = self.writeBody {
                 let writeBodyValue = try value.toCBORValue()
                 map = map.adding(key: "writeBody", value: writeBodyValue)
             }
-            if let value = writeSignature {
+            if let value = self.writeSignature {
                 let writeSignatureValue = try value.toCBORValue()
                 map = map.adding(key: "writeSignature", value: writeSignatureValue)
             }
-            if let value = readHeader {
+            if let value = self.readHeader {
                 let readHeaderValue = try value.toCBORValue()
                 map = map.adding(key: "readHeader", value: readHeaderValue)
             }
-            if let value = readSignature {
+            if let value = self.readSignature {
                 let readSignatureValue = try value.toCBORValue()
                 map = map.adding(key: "readSignature", value: readSignatureValue)
             }
@@ -109,36 +130,25 @@ public struct BlueCatbirdLabyrinthLabyrinthRelay {
 
     public struct Output: ATProtocolCodable {
 
-        // Empty output - no properties (response is {})
-
-        // Standard public initializer
         public init(
-
         ) {
-
         }
 
         public init(from decoder: Decoder) throws {
-
-            // Empty output - just validate it's an object by trying to get any container
-            _ = try decoder.singleValueContainer()
-
+            _ = try decoder.container(keyedBy: CodingKeys.self)
         }
 
         public func encode(to encoder: Encoder) throws {
-
-            // Empty output - encode empty object
-            _ = encoder.singleValueContainer()
-
+            _ = encoder.container(keyedBy: CodingKeys.self)
         }
 
         public func toCBORValue() throws -> Any {
-
-            // Empty output - return empty CBOR map
-            return OrderedCBORMap()
-
+            let map = OrderedCBORMap()
+            return map
         }
 
+        private enum CodingKeys: CodingKey {
+        }
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -160,11 +170,10 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - labyrinthRelay
     /// Server-to-server only (design Y3). A device's home DS uses this to forward a Labyrinth thread operation for a conversation that the receiving DS sequences. Authentication is standard DS service auth: iss is the home DS, aud is the sequencer, lxm is this NSID, under the federation peer policy. The receiver requires three things: the requesting DS is the actor's home DS in the conversation's participant rows, the actor's chat device is current in its replicated device table, for writes, the device's labyrinthWriteBody signature over the forwarded payload re-verifies, and for reads the device's signed read claim (readHeader/readSignature) re-verifies. The output and errors are exactly those of the relayed endpoint.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdLabyrinthLabyrinthRelay.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func labyrinthRelay(
 
         input: BlueCatbirdLabyrinthLabyrinthRelay.Input
@@ -196,44 +205,24 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdLabyrinthLabyrinthRelay.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdLabyrinthLabyrinthRelay.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.labyrinthRelay: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdLabyrinthLabyrinthRelay.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdLabyrinthLabyrinthRelay.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

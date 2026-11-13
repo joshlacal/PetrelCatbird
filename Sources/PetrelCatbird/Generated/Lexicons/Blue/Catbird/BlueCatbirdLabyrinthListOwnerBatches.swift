@@ -4,72 +4,70 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.listOwnerBatches
 
+/// Owner batches of one thread holding a message in [fromMs, untilMs) by sender timestamp and received in [since, until) by the server clock, in mailbox seq order (oldest first; newest first when reverse). Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
 public struct BlueCatbirdLabyrinthListOwnerBatches {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.listOwnerBatches"
 
     public struct OwnerBatchView: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.labyrinth.listOwnerBatches#ownerBatchView"
+
+        /// TID.
         public let rkey: String
+        /// A blue.catbird.labyrinth.ownerBatch record.
         public let record: ATProtocolValueContainer
         public let order: BlueCatbirdLabyrinthDefs.ServerOrder
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            rkey: String, record: ATProtocolValueContainer, order: BlueCatbirdLabyrinthDefs.ServerOrder
+            rkey: String,
+            record: ATProtocolValueContainer,
+            order: BlueCatbirdLabyrinthDefs.ServerOrder,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.rkey = rkey
             self.record = record
             self.order = order
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.rkey = try container.decode(String.self, forKey: .rkey)
-            } catch {
-                LogManager.logError("Decoding error for required property 'rkey': \(error)")
-                throw error
-            }
-            do {
-                self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
-            } catch {
-                LogManager.logError("Decoding error for required property 'record': \(error)")
-                throw error
-            }
-            do {
-                self.order = try container.decode(BlueCatbirdLabyrinthDefs.ServerOrder.self, forKey: .order)
-            } catch {
-                LogManager.logError("Decoding error for required property 'order': \(error)")
-                throw error
-            }
+            self.rkey = try container.decode(String.self, forKey: .rkey)
+            self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
+            self.order = try container.decode(BlueCatbirdLabyrinthDefs.ServerOrder.self, forKey: .order)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(rkey, forKey: .rkey)
-            try container.encode(record, forKey: .record)
-            try container.encode(order, forKey: .order)
+            try container.encode(self.rkey, forKey: .rkey)
+            try container.encode(self.record, forKey: .record)
+            try container.encode(self.order, forKey: .order)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(rkey)
-            hasher.combine(record)
-            hasher.combine(order)
+            hasher.combine(self.rkey)
+            hasher.combine(self.record)
+            hasher.combine(self.order)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if rkey != other.rkey {
+            if self.rkey != other.rkey {
                 return false
             }
-            if record != other.record {
+            if self.record != other.record {
                 return false
             }
-            if order != other.order {
+            if self.order != other.order {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -78,18 +76,18 @@ public struct BlueCatbirdLabyrinthListOwnerBatches {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let rkeyValue = try rkey.toCBORValue()
+            let rkeyValue = try self.rkey.toCBORValue()
             map = map.adding(key: "rkey", value: rkeyValue)
-            let recordValue = try record.toCBORValue()
+            let recordValue = try self.record.toCBORValue()
             map = map.adding(key: "record", value: recordValue)
-            let orderValue = try order.toCBORValue()
+            let orderValue = try self.order.toCBORValue()
             map = map.adding(key: "order", value: orderValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "rkey", "record", "order"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case rkey
             case record
             case order
@@ -111,7 +109,7 @@ public struct BlueCatbirdLabyrinthListOwnerBatches {
             untilMs: Int? = nil,
             since: ATProtocolDate? = nil,
             until: ATProtocolDate? = nil,
-            reverse: Bool? = nil,
+            reverse: Bool? = false,
             cursor: String? = nil,
             limit: Int? = nil
         ) {
@@ -130,73 +128,54 @@ public struct BlueCatbirdLabyrinthListOwnerBatches {
     public struct Output: ATProtocolCodable {
 
         public let items: [OwnerBatchView]
-
+        /// Opaque cursor from the previous page.
         public let cursor: String?
 
-        // Standard public initializer
         public init(
-
             items: [OwnerBatchView],
-
             cursor: String? = nil
-
         ) {
-
             self.items = items
-
             self.cursor = cursor
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
+            let strict = decoder.isATProtoStrictDecoding
             self.items = try container.decode([OwnerBatchView].self, forKey: .items)
-
             do {
-                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
+                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
                 self.cursor = nil
             }
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(items, forKey: .items)
-
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(cursor, forKey: .cursor)
-
+            try container.encode(self.items, forKey: .items)
+            try container.encodeIfPresent(self.cursor, forKey: .cursor)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let itemsValue = try items.toCBORValue()
+            let itemsValue = try self.items.toCBORValue()
             map = map.adding(key: "items", value: itemsValue)
-
-            if let value = cursor {
-                // Encode optional property even if it's an empty array for CBOR
+            if let value = self.cursor {
                 let cursorValue = try value.toCBORValue()
                 map = map.adding(key: "cursor", value: cursorValue)
             }
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case items
             case cursor
         }
-
     }
 
 }
@@ -206,9 +185,8 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
     /// Owner batches of one thread holding a message in [fromMs, untilMs) by sender timestamp and received in [since, until) by the server clock, in mailbox seq order (oldest first; newest first when reverse). Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoXRPCError` for a non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func listOwnerBatches(input: BlueCatbirdLabyrinthListOwnerBatches.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthListOwnerBatches.Output?) {
         let endpoint = "blue.catbird.labyrinth.listOwnerBatches"
 
@@ -225,37 +203,35 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         // Determine service DID for this endpoint
         let serviceDID = await networkService.getServiceDID(for: "blue.catbird.labyrinth.listOwnerBatches")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
-        let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
+        let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdLabyrinthListOwnerBatches.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.listOwnerBatches: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdLabyrinthListOwnerBatches.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }
+
+extension BlueCatbirdLabyrinthListOwnerBatches.Parameters: XRPCCursorPaginatedParameters {
+    public func withCursor(_ cursor: String?) -> Self {
+        Self(threadId: threadId, fromMs: fromMs, untilMs: untilMs, since: since, until: until, reverse: reverse, cursor: cursor, limit: limit)
+    }
+}
+
+extension BlueCatbirdLabyrinthListOwnerBatches.Output: XRPCCursorPaginatedOutput {}

@@ -4,90 +4,134 @@ import Petrel
 
 // lexicon: 1, id: place.stream.moderation.permission
 
+/// Record granting moderation permissions to a user for this streamer's content.
 public struct PlaceStreamModerationPermission: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "place.stream.moderation.permission"
-    public let moderator: DID
-    public let permissions: [PlaceStreamModerationPermissionPermissions]
-    public let createdAt: ATProtocolDate
-    public let expirationTime: ATProtocolDate?
 
-    public init(moderator: DID, permissions: [PlaceStreamModerationPermissionPermissions], createdAt: ATProtocolDate, expirationTime: ATProtocolDate? = nil) {
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "tid")
+
+    /// The DID of the user granted moderator permissions.
+    public let moderator: DID
+    /// Array of permissions granted to this moderator. 'ban' covers blocks/bans (with optional expiration), 'hide' covers message gates, 'livestream.manage' allows updating livestream metadata.
+    public let permissions: [PlaceStreamModerationPermissionPermissions]
+    /// Client-declared timestamp when this moderator was added.
+    public let createdAt: ATProtocolDate
+    /// Optional expiration time for this delegation. If set, the delegation is invalid after this time.
+    public let expirationTime: ATProtocolDate?
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
+
+    public init(
+        moderator: DID,
+        permissions: [PlaceStreamModerationPermissionPermissions],
+        createdAt: ATProtocolDate,
+        expirationTime: ATProtocolDate? = nil,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.moderator = moderator
         self.permissions = permissions
         self.createdAt = createdAt
         self.expirationTime = expirationTime
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         self.moderator = try container.decode(DID.self, forKey: .moderator)
         self.permissions = try container.decode([PlaceStreamModerationPermissionPermissions].self, forKey: .permissions)
         self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            self.expirationTime = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expirationTime)
+            self.expirationTime = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expirationTime, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'expirationTime' — degrading to nil: \(error)")
             self.expirationTime = nil
+            malformedFields.insert("expirationTime")
         }
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(moderator, forKey: .moderator)
-        try container.encode(permissions, forKey: .permissions)
-        try container.encode(createdAt, forKey: .createdAt)
-        try container.encodeIfPresent(expirationTime, forKey: .expirationTime)
+        try container.encode(self.moderator, forKey: .moderator)
+        try container.encode(self.permissions, forKey: .permissions)
+        try container.encode(self.createdAt, forKey: .createdAt)
+        try container.encodeIfPresent(self.expirationTime, forKey: .expirationTime)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.moderator)
+        hasher.combine(self.permissions)
+        hasher.combine(self.createdAt)
+        if let value = self.expirationTime {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.moderator != other.moderator {
+            return false
+        }
+        if self.permissions != other.permissions {
+            return false
+        }
+        if self.createdAt != other.createdAt {
+            return false
+        }
+        if self.expirationTime != other.expirationTime {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if moderator != other.moderator {
-            return false
-        }
-        if permissions != other.permissions {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        if expirationTime != other.expirationTime {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(moderator)
-        hasher.combine(permissions)
-        hasher.combine(createdAt)
-        if let value = expirationTime {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let moderatorValue = try moderator.toCBORValue()
+        let moderatorValue = try self.moderator.toCBORValue()
         map = map.adding(key: "moderator", value: moderatorValue)
-        let permissionsValue = try permissions.toCBORValue()
+        let permissionsValue = try self.permissions.toCBORValue()
         map = map.adding(key: "permissions", value: permissionsValue)
-        let createdAtValue = try createdAt.toCBORValue()
+        let createdAtValue = try self.createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
-        if let value = expirationTime {
+        if let value = self.expirationTime {
             let expirationTimeValue = try value.toCBORValue()
             map = map.adding(key: "expirationTime", value: expirationTimeValue)
         }
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "moderator", "permissions", "createdAt", "expirationTime"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "moderator": return true
+        case "permissions": return true
+        case "createdAt": return true
+        case "expirationTime": return self.expirationTime != nil
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

@@ -4,59 +4,61 @@ import Petrel
 
 // lexicon: 1, id: place.stream.live.getRecommendations
 
+/// Get the list of streamers recommended by a user
 public struct PlaceStreamLiveGetRecommendations {
 
     public static let typeIdentifier = "place.stream.live.getRecommendations"
 
     public struct LivestreamRecommendation: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.live.getRecommendations#livestreamRecommendation"
+
+        /// The DID of the recommended streamer
         public let did: DID
+        /// Source of the recommendation
         public let source: LivestreamRecommendationSource
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            did: DID, source: LivestreamRecommendationSource
+            did: DID,
+            source: LivestreamRecommendationSource,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.did = did
             self.source = source
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.did = try container.decode(DID.self, forKey: .did)
-            } catch {
-                LogManager.logError("Decoding error for required property 'did': \(error)")
-                throw error
-            }
-            do {
-                self.source = try container.decode(LivestreamRecommendationSource.self, forKey: .source)
-            } catch {
-                LogManager.logError("Decoding error for required property 'source': \(error)")
-                throw error
-            }
+            self.did = try container.decode(DID.self, forKey: .did)
+            self.source = try container.decode(LivestreamRecommendationSource.self, forKey: .source)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(did, forKey: .did)
-            try container.encode(source, forKey: .source)
+            try container.encode(self.did, forKey: .did)
+            try container.encode(self.source, forKey: .source)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(did)
-            hasher.combine(source)
+            hasher.combine(self.did)
+            hasher.combine(self.source)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if did != other.did {
+            if self.did != other.did {
                 return false
             }
-            if source != other.source {
+            if self.source != other.source {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -65,16 +67,16 @@ public struct PlaceStreamLiveGetRecommendations {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let didValue = try did.toCBORValue()
+            let didValue = try self.did.toCBORValue()
             map = map.adding(key: "did", value: didValue)
-            let sourceValue = try source.toCBORValue()
+            let sourceValue = try self.source.toCBORValue()
             map = map.adding(key: "source", value: sourceValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "did", "source"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case did
             case source
         }
@@ -92,78 +94,62 @@ public struct PlaceStreamLiveGetRecommendations {
 
     public struct Output: ATProtocolCodable {
 
+        /// Ordered list of recommendations
         public let recommendations: [OutputRecommendationsUnion]
-
+        /// The user DID this recommendation is for
         public let userDID: DID?
 
-        // Standard public initializer
         public init(
-
             recommendations: [OutputRecommendationsUnion],
-
             userDID: DID? = nil
-
         ) {
-
             self.recommendations = recommendations
-
             self.userDID = userDID
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
+            let strict = decoder.isATProtoStrictDecoding
             self.recommendations = try container.decode([OutputRecommendationsUnion].self, forKey: .recommendations)
-
             do {
-                self.userDID = try container.decodeIfPresent(DID.self, forKey: .userDID)
+                self.userDID = try container.decodeIfPresent(DID.self, forKey: .userDID, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'userDID' — degrading to nil: \(error)")
                 self.userDID = nil
             }
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(recommendations, forKey: .recommendations)
-
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(userDID, forKey: .userDID)
-
+            try container.encode(self.recommendations, forKey: .recommendations)
+            try container.encodeIfPresent(self.userDID, forKey: .userDID)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let recommendationsValue = try recommendations.toCBORValue()
+            let recommendationsValue = try self.recommendations.toCBORValue()
             map = map.adding(key: "recommendations", value: recommendationsValue)
-
-            if let value = userDID {
-                // Encode optional property even if it's an empty array for CBOR
+            if let value = self.userDID {
                 let userDIDValue = try value.toCBORValue()
                 map = map.adding(key: "userDID", value: userDIDValue)
             }
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case recommendations
             case userDID
         }
-
     }
 
     public enum OutputRecommendationsUnion: Codable, ATProtocolCodable, ATProtocolValue, Sendable, Equatable {
         case placeStreamLiveGetRecommendationsLivestreamRecommendation(PlaceStreamLiveGetRecommendations.LivestreamRecommendation)
+        /// A value whose `$type` this union does not declare. Open unions accept and
+        /// re-encode such values unchanged.
         case unexpected(ATProtocolValueContainer)
         public init(_ value: PlaceStreamLiveGetRecommendations.LivestreamRecommendation) {
             self = .placeStreamLiveGetRecommendationsLivestreamRecommendation(value)
@@ -278,9 +264,8 @@ extension ATProtoClient.Place.Stream.Live {
     /// Get the list of streamers recommended by a user
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoXRPCError` for a non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getRecommendations(input: PlaceStreamLiveGetRecommendations.Parameters) async throws -> (responseCode: Int, data: PlaceStreamLiveGetRecommendations.Output?) {
         let endpoint = "place.stream.live.getRecommendations"
 
@@ -297,37 +282,27 @@ extension ATProtoClient.Place.Stream.Live {
         // Determine service DID for this endpoint
         let serviceDID = await networkService.getServiceDID(for: "place.stream.live.getRecommendations")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
-        let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
+        let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamLiveGetRecommendations.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.live.getRecommendations: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(PlaceStreamLiveGetRecommendations.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

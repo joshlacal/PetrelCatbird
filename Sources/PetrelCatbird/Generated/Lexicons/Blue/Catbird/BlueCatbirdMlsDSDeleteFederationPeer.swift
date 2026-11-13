@@ -4,14 +4,19 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.mlsDS.deleteFederationPeer
 
+/// Delete a federation peer policy (admin only). Remove a federation peer policy record. Requires federation admin privileges.
 public struct BlueCatbirdMlsDSDeleteFederationPeer {
 
     public static let typeIdentifier = "blue.catbird.mlsDS.deleteFederationPeer"
+
     public struct Input: ATProtocolCodable {
+
+        /// DID of the peer delivery service to remove
         public let dsDid: String
 
-        /// Standard public initializer
-        public init(dsDid: String) {
+        public init(
+            dsDid: String
+        ) {
             self.dsDid = dsDid
         }
 
@@ -22,12 +27,12 @@ public struct BlueCatbirdMlsDSDeleteFederationPeer {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(dsDid, forKey: .dsDid)
+            try container.encode(self.dsDid, forKey: .dsDid)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let dsDidValue = try dsDid.toCBORValue()
+            let dsDidValue = try self.dsDid.toCBORValue()
             map = map.adding(key: "dsDid", value: dsDidValue)
             return map
         }
@@ -39,64 +44,44 @@ public struct BlueCatbirdMlsDSDeleteFederationPeer {
 
     public struct Output: ATProtocolCodable {
 
+        /// Whether the peer was deleted
         public let deleted: Bool
-
+        /// DID that was deleted
         public let dsDid: String
 
-        // Standard public initializer
         public init(
-
             deleted: Bool,
-
             dsDid: String
-
         ) {
-
             self.deleted = deleted
-
             self.dsDid = dsDid
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.deleted = try container.decode(Bool.self, forKey: .deleted)
-
             self.dsDid = try container.decode(String.self, forKey: .dsDid)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(deleted, forKey: .deleted)
-
-            try container.encode(dsDid, forKey: .dsDid)
-
+            try container.encode(self.deleted, forKey: .deleted)
+            try container.encode(self.dsDid, forKey: .dsDid)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let deletedValue = try deleted.toCBORValue()
+            let deletedValue = try self.deleted.toCBORValue()
             map = map.adding(key: "deleted", value: deletedValue)
-
-            let dsDidValue = try dsDid.toCBORValue()
+            let dsDidValue = try self.dsDid.toCBORValue()
             map = map.adding(key: "dsDid", value: dsDidValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case deleted
             case dsDid
         }
-
     }
 
 }
@@ -105,11 +90,10 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
     // MARK: - deleteFederationPeer
     /// Delete a federation peer policy (admin only). Remove a federation peer policy record. Requires federation admin privileges.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoXRPCError` for a non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func deleteFederationPeer(
 
         input: BlueCatbirdMlsDSDeleteFederationPeer.Input
@@ -138,39 +122,27 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
         // Determine service DID for this endpoint
         let serviceDID = await networkService.getServiceDID(for: "blue.catbird.mlsDS.deleteFederationPeer")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
-        let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
+        let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSDeleteFederationPeer.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.deleteFederationPeer: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdMlsDSDeleteFederationPeer.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

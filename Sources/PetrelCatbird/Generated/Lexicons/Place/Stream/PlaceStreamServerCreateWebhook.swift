@@ -4,22 +4,43 @@ import Petrel
 
 // lexicon: 1, id: place.stream.server.createWebhook
 
+/// Create a new webhook for receiving Streamplace events.
 public struct PlaceStreamServerCreateWebhook {
 
     public static let typeIdentifier = "place.stream.server.createWebhook"
+
     public struct Input: ATProtocolCodable {
+
+        /// The webhook URL where events will be sent.
         public let url: URI
+        /// The types of events this webhook should receive.
         public let events: [InputEvents]
+        /// Whether this webhook should be active upon creation.
         public let active: Bool?
+        /// Text to prepend to webhook messages.
         public let prefix: String?
+        /// Text to append to webhook messages.
         public let suffix: String?
+        /// Text replacement rules for webhook messages.
         public let rewrite: [PlaceStreamServerDefs.RewriteRule]?
+        /// A user-friendly name for this webhook.
         public let name: String?
+        /// A description of what this webhook is used for.
         public let description: String?
+        /// Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
         public let muteWords: [String]?
 
-        /// Standard public initializer
-        public init(url: URI, events: [InputEvents], active: Bool? = nil, prefix: String? = nil, suffix: String? = nil, rewrite: [PlaceStreamServerDefs.RewriteRule]? = nil, name: String? = nil, description: String? = nil, muteWords: [String]? = nil) {
+        public init(
+            url: URI,
+            events: [InputEvents],
+            active: Bool? = nil,
+            prefix: String? = nil,
+            suffix: String? = nil,
+            rewrite: [PlaceStreamServerDefs.RewriteRule]? = nil,
+            name: String? = nil,
+            description: String? = nil,
+            muteWords: [String]? = nil
+        ) {
             self.url = url
             self.events = events
             self.active = active
@@ -33,61 +54,62 @@ public struct PlaceStreamServerCreateWebhook {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
             self.url = try container.decode(URI.self, forKey: .url)
             self.events = try container.decode([InputEvents].self, forKey: .events)
-            self.active = try container.decodeIfPresent(Bool.self, forKey: .active)
-            self.prefix = try container.decodeIfPresent(String.self, forKey: .prefix)
-            self.suffix = try container.decodeIfPresent(String.self, forKey: .suffix)
-            self.rewrite = try container.decodeIfPresent([PlaceStreamServerDefs.RewriteRule].self, forKey: .rewrite)
-            self.name = try container.decodeIfPresent(String.self, forKey: .name)
-            self.description = try container.decodeIfPresent(String.self, forKey: .description)
-            self.muteWords = try container.decodeIfPresent([String].self, forKey: .muteWords)
+            self.active = try container.decodeIfPresent(Bool.self, forKey: .active, rejectingNull: strict)
+            self.prefix = try container.decodeIfPresent(String.self, forKey: .prefix, rejectingNull: strict)
+            self.suffix = try container.decodeIfPresent(String.self, forKey: .suffix, rejectingNull: strict)
+            self.rewrite = try container.decodeIfPresent([PlaceStreamServerDefs.RewriteRule].self, forKey: .rewrite, rejectingNull: strict)
+            self.name = try container.decodeIfPresent(String.self, forKey: .name, rejectingNull: strict)
+            self.description = try container.decodeIfPresent(String.self, forKey: .description, rejectingNull: strict)
+            self.muteWords = try container.decodeIfPresent([String].self, forKey: .muteWords, rejectingNull: strict)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(url, forKey: .url)
-            try container.encode(events, forKey: .events)
-            try container.encodeIfPresent(active, forKey: .active)
-            try container.encodeIfPresent(prefix, forKey: .prefix)
-            try container.encodeIfPresent(suffix, forKey: .suffix)
-            try container.encodeIfPresent(rewrite, forKey: .rewrite)
-            try container.encodeIfPresent(name, forKey: .name)
-            try container.encodeIfPresent(description, forKey: .description)
-            try container.encodeIfPresent(muteWords, forKey: .muteWords)
+            try container.encode(self.url, forKey: .url)
+            try container.encode(self.events, forKey: .events)
+            try container.encodeIfPresent(self.active, forKey: .active)
+            try container.encodeIfPresent(self.prefix, forKey: .prefix)
+            try container.encodeIfPresent(self.suffix, forKey: .suffix)
+            try container.encodeIfPresent(self.rewrite, forKey: .rewrite)
+            try container.encodeIfPresent(self.name, forKey: .name)
+            try container.encodeIfPresent(self.description, forKey: .description)
+            try container.encodeIfPresent(self.muteWords, forKey: .muteWords)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let urlValue = try url.toCBORValue()
+            let urlValue = try self.url.toCBORValue()
             map = map.adding(key: "url", value: urlValue)
-            let eventsValue = try events.toCBORValue()
+            let eventsValue = try self.events.toCBORValue()
             map = map.adding(key: "events", value: eventsValue)
-            if let value = active {
+            if let value = self.active {
                 let activeValue = try value.toCBORValue()
                 map = map.adding(key: "active", value: activeValue)
             }
-            if let value = prefix {
+            if let value = self.prefix {
                 let prefixValue = try value.toCBORValue()
                 map = map.adding(key: "prefix", value: prefixValue)
             }
-            if let value = suffix {
+            if let value = self.suffix {
                 let suffixValue = try value.toCBORValue()
                 map = map.adding(key: "suffix", value: suffixValue)
             }
-            if let value = rewrite {
+            if let value = self.rewrite {
                 let rewriteValue = try value.toCBORValue()
                 map = map.adding(key: "rewrite", value: rewriteValue)
             }
-            if let value = name {
+            if let value = self.name {
                 let nameValue = try value.toCBORValue()
                 map = map.adding(key: "name", value: nameValue)
             }
-            if let value = description {
+            if let value = self.description {
                 let descriptionValue = try value.toCBORValue()
                 map = map.adding(key: "description", value: descriptionValue)
             }
-            if let value = muteWords {
+            if let value = self.muteWords {
                 let muteWordsValue = try value.toCBORValue()
                 map = map.adding(key: "muteWords", value: muteWordsValue)
             }
@@ -111,48 +133,32 @@ public struct PlaceStreamServerCreateWebhook {
 
         public let webhook: PlaceStreamServerDefs.Webhook
 
-        // Standard public initializer
         public init(
-
             webhook: PlaceStreamServerDefs.Webhook
-
         ) {
-
             self.webhook = webhook
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.webhook = try container.decode(PlaceStreamServerDefs.Webhook.self, forKey: .webhook)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(webhook, forKey: .webhook)
-
+            try container.encode(self.webhook, forKey: .webhook)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let webhookValue = try webhook.toCBORValue()
+            let webhookValue = try self.webhook.toCBORValue()
             map = map.adding(key: "webhook", value: webhookValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case webhook
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -193,11 +199,10 @@ extension ATProtoClient.Place.Stream.Server {
     // MARK: - createWebhook
     /// Create a new webhook for receiving Streamplace events.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<PlaceStreamServerCreateWebhook.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func createWebhook(
 
         input: PlaceStreamServerCreateWebhook.Input
@@ -229,44 +234,24 @@ extension ATProtoClient.Place.Stream.Server {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: PlaceStreamServerCreateWebhook.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamServerCreateWebhook.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.server.createWebhook: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: PlaceStreamServerCreateWebhook.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(PlaceStreamServerCreateWebhook.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

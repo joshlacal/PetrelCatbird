@@ -4,15 +4,22 @@ import Petrel
 
 // lexicon: 1, id: place.stream.moderation.createGate
 
+/// Create a gate (hide message) on behalf of a streamer. Requires 'hide' permission. Creates a place.stream.chat.gate record in the streamer's repository.
 public struct PlaceStreamModerationCreateGate {
 
     public static let typeIdentifier = "place.stream.moderation.createGate"
+
     public struct Input: ATProtocolCodable {
+
+        /// The DID of the streamer.
         public let streamer: DID
+        /// The AT-URI of the chat message to hide.
         public let messageUri: ATProtocolURI
 
-        /// Standard public initializer
-        public init(streamer: DID, messageUri: ATProtocolURI) {
+        public init(
+            streamer: DID,
+            messageUri: ATProtocolURI
+        ) {
             self.streamer = streamer
             self.messageUri = messageUri
         }
@@ -25,15 +32,15 @@ public struct PlaceStreamModerationCreateGate {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(streamer, forKey: .streamer)
-            try container.encode(messageUri, forKey: .messageUri)
+            try container.encode(self.streamer, forKey: .streamer)
+            try container.encode(self.messageUri, forKey: .messageUri)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let streamerValue = try streamer.toCBORValue()
+            let streamerValue = try self.streamer.toCBORValue()
             map = map.adding(key: "streamer", value: streamerValue)
-            let messageUriValue = try messageUri.toCBORValue()
+            let messageUriValue = try self.messageUri.toCBORValue()
             map = map.adding(key: "messageUri", value: messageUriValue)
             return map
         }
@@ -46,64 +53,44 @@ public struct PlaceStreamModerationCreateGate {
 
     public struct Output: ATProtocolCodable {
 
+        /// The AT-URI of the created gate record.
         public let uri: ATProtocolURI
+        /// The CID of the created gate record.
+        public let cid: CIDString
 
-        public let cid: CID
-
-        // Standard public initializer
         public init(
-
             uri: ATProtocolURI,
-
-            cid: CID
-
+            cid: CIDString
         ) {
-
             self.uri = uri
-
             self.cid = cid
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
-
-            self.cid = try container.decode(CID.self, forKey: .cid)
-
+            self.cid = try container.decode(CIDString.self, forKey: .cid)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(uri, forKey: .uri)
-
-            try container.encode(cid, forKey: .cid)
-
+            try container.encode(self.uri, forKey: .uri)
+            try container.encode(self.cid, forKey: .cid)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let uriValue = try uri.toCBORValue()
+            let uriValue = try self.uri.toCBORValue()
             map = map.adding(key: "uri", value: uriValue)
-
-            let cidValue = try cid.toCBORValue()
+            let cidValue = try self.cid.toCBORValue()
             map = map.adding(key: "cid", value: cidValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case uri
             case cid
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -128,11 +115,10 @@ extension ATProtoClient.Place.Stream.Moderation {
     // MARK: - createGate
     /// Create a gate (hide message) on behalf of a streamer. Requires 'hide' permission. Creates a place.stream.chat.gate record in the streamer's repository.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<PlaceStreamModerationCreateGate.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func createGate(
 
         input: PlaceStreamModerationCreateGate.Input
@@ -164,44 +150,24 @@ extension ATProtoClient.Place.Stream.Moderation {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: PlaceStreamModerationCreateGate.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamModerationCreateGate.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.moderation.createGate: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: PlaceStreamModerationCreateGate.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(PlaceStreamModerationCreateGate.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

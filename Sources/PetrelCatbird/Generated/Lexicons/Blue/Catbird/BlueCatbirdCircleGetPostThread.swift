@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.circle.getPostThread
 
+/// Get a thread of posts within a Circle Space
 public struct BlueCatbirdCircleGetPostThread {
 
     public static let typeIdentifier = "blue.catbird.circle.getPostThread"
+
     public struct Parameters: Parametrizable {
         public let uri: ATProtocolURI
         public let space: SpaceRef
@@ -16,8 +18,8 @@ public struct BlueCatbirdCircleGetPostThread {
         public init(
             uri: ATProtocolURI,
             space: SpaceRef,
-            depth: Int? = nil,
-            parentHeight: Int? = nil
+            depth: Int? = 6,
+            parentHeight: Int? = 80
         ) {
             self.uri = uri
             self.space = space
@@ -30,63 +32,41 @@ public struct BlueCatbirdCircleGetPostThread {
     public struct Output: ATProtocolCodable {
 
         public let thread: AppBskyFeedDefs.ThreadViewPost
-
         public let circle: BlueCatbirdCircleDefs.CircleSummary
 
-        // Standard public initializer
         public init(
-
             thread: AppBskyFeedDefs.ThreadViewPost,
-
             circle: BlueCatbirdCircleDefs.CircleSummary
-
         ) {
-
             self.thread = thread
-
             self.circle = circle
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.thread = try container.decode(AppBskyFeedDefs.ThreadViewPost.self, forKey: .thread)
-
             self.circle = try container.decode(BlueCatbirdCircleDefs.CircleSummary.self, forKey: .circle)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(thread, forKey: .thread)
-
-            try container.encode(circle, forKey: .circle)
-
+            try container.encode(self.thread, forKey: .thread)
+            try container.encode(self.circle, forKey: .circle)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let threadValue = try thread.toCBORValue()
+            let threadValue = try self.thread.toCBORValue()
             map = map.adding(key: "thread", value: threadValue)
-
-            let circleValue = try circle.toCBORValue()
+            let circleValue = try self.circle.toCBORValue()
             map = map.adding(key: "circle", value: circleValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case thread
             case circle
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -111,9 +91,8 @@ extension ATProtoClient.Blue.Catbird.Circle {
     /// Get a thread of posts within a Circle Space
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdCircleGetPostThread.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getPostThread(input: BlueCatbirdCircleGetPostThread.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdCircleGetPostThread.Output?) {
         let endpoint = "blue.catbird.circle.getPostThread"
 
@@ -133,42 +112,24 @@ extension ATProtoClient.Blue.Catbird.Circle {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdCircleGetPostThread.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.circle.getPostThread: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdCircleGetPostThread.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdCircleGetPostThread.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdCircleGetPostThread.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

@@ -4,90 +4,134 @@ import Petrel
 
 // lexicon: 1, id: place.stream.live.viewerCount
 
+/// Current viewer count for a livestream on a particular server. Record keys are streamer_did::server_did by convention.
 public struct PlaceStreamLiveViewerCount: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "place.stream.live.viewerCount"
-    public let streamer: DID
-    public let server: DID
-    public let count: Int
-    public let updatedAt: ATProtocolDate?
 
-    public init(streamer: DID, server: DID, count: Int, updatedAt: ATProtocolDate? = nil) {
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "any")
+
+    /// The DID of the streamer to teleport to.
+    public let streamer: DID
+    /// The DID of the server to get the view count for.
+    public let server: DID
+    /// The current view count for the livestream.
+    public let count: Int
+    /// The time the view count was last updated.
+    public let updatedAt: ATProtocolDate?
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
+
+    public init(
+        streamer: DID,
+        server: DID,
+        count: Int,
+        updatedAt: ATProtocolDate? = nil,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.streamer = streamer
         self.server = server
         self.count = count
         self.updatedAt = updatedAt
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         self.streamer = try container.decode(DID.self, forKey: .streamer)
         self.server = try container.decode(DID.self, forKey: .server)
         self.count = try container.decode(Int.self, forKey: .count)
         do {
-            self.updatedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .updatedAt)
+            self.updatedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .updatedAt, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'updatedAt' — degrading to nil: \(error)")
             self.updatedAt = nil
+            malformedFields.insert("updatedAt")
         }
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(streamer, forKey: .streamer)
-        try container.encode(server, forKey: .server)
-        try container.encode(count, forKey: .count)
-        try container.encodeIfPresent(updatedAt, forKey: .updatedAt)
+        try container.encode(self.streamer, forKey: .streamer)
+        try container.encode(self.server, forKey: .server)
+        try container.encode(self.count, forKey: .count)
+        try container.encodeIfPresent(self.updatedAt, forKey: .updatedAt)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.streamer)
+        hasher.combine(self.server)
+        hasher.combine(self.count)
+        if let value = self.updatedAt {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.streamer != other.streamer {
+            return false
+        }
+        if self.server != other.server {
+            return false
+        }
+        if self.count != other.count {
+            return false
+        }
+        if self.updatedAt != other.updatedAt {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if streamer != other.streamer {
-            return false
-        }
-        if server != other.server {
-            return false
-        }
-        if count != other.count {
-            return false
-        }
-        if updatedAt != other.updatedAt {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(streamer)
-        hasher.combine(server)
-        hasher.combine(count)
-        if let value = updatedAt {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let streamerValue = try streamer.toCBORValue()
+        let streamerValue = try self.streamer.toCBORValue()
         map = map.adding(key: "streamer", value: streamerValue)
-        let serverValue = try server.toCBORValue()
+        let serverValue = try self.server.toCBORValue()
         map = map.adding(key: "server", value: serverValue)
-        let countValue = try count.toCBORValue()
+        let countValue = try self.count.toCBORValue()
         map = map.adding(key: "count", value: countValue)
-        if let value = updatedAt {
+        if let value = self.updatedAt {
             let updatedAtValue = try value.toCBORValue()
             map = map.adding(key: "updatedAt", value: updatedAtValue)
         }
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "streamer", "server", "count", "updatedAt"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "streamer": return true
+        case "server": return true
+        case "count": return true
+        case "updatedAt": return self.updatedAt != nil
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

@@ -4,16 +4,24 @@ import Petrel
 
 // lexicon: 1, id: place.stream.live.startLivestream
 
+/// Create a new place.stream.livestream record, automatically populating a thumbnail and creating a Bluesky post and whatnot. You can do this manually by creating a record but this method can work better for mobile livestreaming and such.
 public struct PlaceStreamLiveStartLivestream {
 
     public static let typeIdentifier = "place.stream.live.startLivestream"
+
     public struct Input: ATProtocolCodable {
+
         public let livestream: PlaceStreamLivestream
+        /// The DID of the streamer.
         public let streamer: DID
+        /// Whether to create a Bluesky post announcing the livestream.
         public let createBlueskyPost: Bool?
 
-        /// Standard public initializer
-        public init(livestream: PlaceStreamLivestream, streamer: DID, createBlueskyPost: Bool? = nil) {
+        public init(
+            livestream: PlaceStreamLivestream,
+            streamer: DID,
+            createBlueskyPost: Bool? = nil
+        ) {
             self.livestream = livestream
             self.streamer = streamer
             self.createBlueskyPost = createBlueskyPost
@@ -21,25 +29,26 @@ public struct PlaceStreamLiveStartLivestream {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
             self.livestream = try container.decode(PlaceStreamLivestream.self, forKey: .livestream)
             self.streamer = try container.decode(DID.self, forKey: .streamer)
-            self.createBlueskyPost = try container.decodeIfPresent(Bool.self, forKey: .createBlueskyPost)
+            self.createBlueskyPost = try container.decodeIfPresent(Bool.self, forKey: .createBlueskyPost, rejectingNull: strict)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(livestream, forKey: .livestream)
-            try container.encode(streamer, forKey: .streamer)
-            try container.encodeIfPresent(createBlueskyPost, forKey: .createBlueskyPost)
+            try container.encode(self.livestream, forKey: .livestream)
+            try container.encode(self.streamer, forKey: .streamer)
+            try container.encodeIfPresent(self.createBlueskyPost, forKey: .createBlueskyPost)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let livestreamValue = try livestream.toCBORValue()
+            let livestreamValue = try self.livestream.toCBORValue()
             map = map.adding(key: "livestream", value: livestreamValue)
-            let streamerValue = try streamer.toCBORValue()
+            let streamerValue = try self.streamer.toCBORValue()
             map = map.adding(key: "streamer", value: streamerValue)
-            if let value = createBlueskyPost {
+            if let value = self.createBlueskyPost {
                 let createBlueskyPostValue = try value.toCBORValue()
                 map = map.adding(key: "createBlueskyPost", value: createBlueskyPostValue)
             }
@@ -55,64 +64,44 @@ public struct PlaceStreamLiveStartLivestream {
 
     public struct Output: ATProtocolCodable {
 
+        /// The URI of the livestream record.
         public let uri: URI
+        /// The CID of the livestream record.
+        public let cid: CIDString
 
-        public let cid: CID
-
-        // Standard public initializer
         public init(
-
             uri: URI,
-
-            cid: CID
-
+            cid: CIDString
         ) {
-
             self.uri = uri
-
             self.cid = cid
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.uri = try container.decode(URI.self, forKey: .uri)
-
-            self.cid = try container.decode(CID.self, forKey: .cid)
-
+            self.cid = try container.decode(CIDString.self, forKey: .cid)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(uri, forKey: .uri)
-
-            try container.encode(cid, forKey: .cid)
-
+            try container.encode(self.uri, forKey: .uri)
+            try container.encode(self.cid, forKey: .cid)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let uriValue = try uri.toCBORValue()
+            let uriValue = try self.uri.toCBORValue()
             map = map.adding(key: "uri", value: uriValue)
-
-            let cidValue = try cid.toCBORValue()
+            let cidValue = try self.cid.toCBORValue()
             map = map.adding(key: "cid", value: cidValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case uri
             case cid
         }
-
     }
 
 }
@@ -121,11 +110,10 @@ extension ATProtoClient.Place.Stream.Live {
     // MARK: - startLivestream
     /// Create a new place.stream.livestream record, automatically populating a thumbnail and creating a Bluesky post and whatnot. You can do this manually by creating a record but this method can work better for mobile livestreaming and such.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoXRPCError` for a non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func startLivestream(
 
         input: PlaceStreamLiveStartLivestream.Input
@@ -154,39 +142,27 @@ extension ATProtoClient.Place.Stream.Live {
         // Determine service DID for this endpoint
         let serviceDID = await networkService.getServiceDID(for: "place.stream.live.startLivestream")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
-        let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
+        let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamLiveStartLivestream.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.live.startLivestream: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(PlaceStreamLiveStartLivestream.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

@@ -4,14 +4,18 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.sendMessage
 
+/// Stores one signed MLS PrivateMessage Application wrapper from a current leaf after exact coordinate/AAD validation. A complete at-most-60-second relationship projection between the actor DID and every current active participant DID is required; any actor-involving direct/list block denies and incomplete or stale policy fails closed. Direct additionally requires both exact participants active and each represented by at least one current MLS leaf, rejecting pre-consent and acceptance/recovery/reset gaps; group traffic may continue for remaining leaves. An application attachment binding, if present, is exactly applicationAttachmentBinding with purpose attachment; it must be completed-unbound and owned by this exact signer, and metadataAvatarBinding or generic uploadedBlobBinding rejects. The service remains blind to plaintext. (conversationId,messageId) is unique, and a stale attempt terminally retires that ID. The returned applicationEntry carries the exact signedRequest rather than duplicated unsigned actor, device, coordinate, message, artifact, or blob fields; entry conversationId must equal signedRequest.body.prior.conversationId. Clients verify the canonical CATBIRD-CHAT-MESSAGE\0 Ed25519 transcript before decrypting or attributing. Its immutable fingerprint is SHA-256 of UTF8(CATBIRD-CHAT-APPLICATION-ENTRY-FINGERPRINT\0) followed by canonical DAG-CBOR of exact entryId bytes16, conversationId bytes16, seq, requestDigest bytes32, signature bytes64, and receivedAt canonical text; plaintext-only or unsigned substitutes are forbidden.
 public struct BlueCatbirdChatSendMessage {
 
     public static let typeIdentifier = "blue.catbird.chat.sendMessage"
+
     public struct Input: ATProtocolCodable {
+
         public let signedRequest: BlueCatbirdChatDefs.SignedApplicationSend
 
-        /// Standard public initializer
-        public init(signedRequest: BlueCatbirdChatDefs.SignedApplicationSend) {
+        public init(
+            signedRequest: BlueCatbirdChatDefs.SignedApplicationSend
+        ) {
             self.signedRequest = signedRequest
         }
 
@@ -22,12 +26,12 @@ public struct BlueCatbirdChatSendMessage {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encode(self.signedRequest, forKey: .signedRequest)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let signedRequestValue = try signedRequest.toCBORValue()
+            let signedRequestValue = try self.signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
             return map
         }
@@ -41,48 +45,32 @@ public struct BlueCatbirdChatSendMessage {
 
         public let entry: BlueCatbirdChatDefs.ApplicationEntry
 
-        // Standard public initializer
         public init(
-
             entry: BlueCatbirdChatDefs.ApplicationEntry
-
         ) {
-
             self.entry = entry
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.entry = try container.decode(BlueCatbirdChatDefs.ApplicationEntry.self, forKey: .entry)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(entry, forKey: .entry)
-
+            try container.encode(self.entry, forKey: .entry)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let entryValue = try entry.toCBORValue()
+            let entryValue = try self.entry.toCBORValue()
             map = map.adding(key: "entry", value: entryValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case entry
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -124,11 +112,10 @@ extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - sendMessage
     /// Stores one signed MLS PrivateMessage Application wrapper from a current leaf after exact coordinate/AAD validation. A complete at-most-60-second relationship projection between the actor DID and every current active participant DID is required; any actor-involving direct/list block denies and incomplete or stale policy fails closed. Direct additionally requires both exact participants active and each represented by at least one current MLS leaf, rejecting pre-consent and acceptance/recovery/reset gaps; group traffic may continue for remaining leaves. An application attachment binding, if present, is exactly applicationAttachmentBinding with purpose attachment; it must be completed-unbound and owned by this exact signer, and metadataAvatarBinding or generic uploadedBlobBinding rejects. The service remains blind to plaintext. (conversationId,messageId) is unique, and a stale attempt terminally retires that ID. The returned applicationEntry carries the exact signedRequest rather than duplicated unsigned actor, device, coordinate, message, artifact, or blob fields; entry conversationId must equal signedRequest.body.prior.conversationId. Clients verify the canonical CATBIRD-CHAT-MESSAGE\0 Ed25519 transcript before decrypting or attributing. Its immutable fingerprint is SHA-256 of UTF8(CATBIRD-CHAT-APPLICATION-ENTRY-FINGERPRINT\0) followed by canonical DAG-CBOR of exact entryId bytes16, conversationId bytes16, seq, requestDigest bytes32, signature bytes64, and receivedAt canonical text; plaintext-only or unsigned substitutes are forbidden.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdChatSendMessage.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func sendMessage(
 
         input: BlueCatbirdChatSendMessage.Input
@@ -160,44 +147,24 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdChatSendMessage.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatSendMessage.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.sendMessage: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdChatSendMessage.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdChatSendMessage.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

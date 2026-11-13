@@ -43,11 +43,14 @@ parameters: PlaceStreamLiveGetProfileCardParameters): ATProtoResponse<PlaceStrea
     // array-valued query params rely on (e.g. `?actors=a&actors=b`).
     val queryItems = parameters.toQueryItems()
 
-    return client.networkService.performRequest(
+    // Raw (non-JSON) body: fetch the bytes, then wrap them. The output wrapper
+    // is not JSON-decodable from a binary body.
+    val raw = client.networkService.performRequest<ByteArray>(
         method = "GET",
         endpoint = endpoint,
         queryItems = queryItems,
         headers = mapOf("Accept" to "*/*"),
         body = null
     )
+    return ATProtoResponse(raw.responseCode, raw.data?.let { PlaceStreamLiveGetProfileCardOutput(it) }, raw.errorBody)
 }

@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.getAttachmentRef
 
+/// Whether an attachment reference exists at this blinded index (decision J4: the server keeps no readable conversation, message or blob linkage to return). ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
 public struct BlueCatbirdLabyrinthGetAttachmentRef {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.getAttachmentRef"
+
     public struct Parameters: Parametrizable {
         public let deviceKeyPubkey: String
         public let blindedIndex: String
@@ -25,48 +27,32 @@ public struct BlueCatbirdLabyrinthGetAttachmentRef {
 
         public let createdAt: ATProtocolDate
 
-        // Standard public initializer
         public init(
-
             createdAt: ATProtocolDate
-
         ) {
-
             self.createdAt = createdAt
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(createdAt, forKey: .createdAt)
-
+            try container.encode(self.createdAt, forKey: .createdAt)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let createdAtValue = try createdAt.toCBORValue()
+            let createdAtValue = try self.createdAt.toCBORValue()
             map = map.adding(key: "createdAt", value: createdAtValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case createdAt
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -88,9 +74,8 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
     /// Whether an attachment reference exists at this blinded index (decision J4: the server keeps no readable conversation, message or blob linkage to return). ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdLabyrinthGetAttachmentRef.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getAttachmentRef(input: BlueCatbirdLabyrinthGetAttachmentRef.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetAttachmentRef.Output?) {
         let endpoint = "blue.catbird.labyrinth.getAttachmentRef"
 
@@ -110,42 +95,24 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdLabyrinthGetAttachmentRef.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.getAttachmentRef: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdLabyrinthGetAttachmentRef.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdLabyrinthGetAttachmentRef.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdLabyrinthGetAttachmentRef.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

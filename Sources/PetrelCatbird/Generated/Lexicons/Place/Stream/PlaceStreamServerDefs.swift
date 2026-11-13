@@ -8,25 +8,58 @@ public struct PlaceStreamServerDefs {
 
     public static let typeIdentifier = "place.stream.server.defs"
 
+    /// A webhook configuration for receiving Streamplace events.
     public struct Webhook: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.server.defs#webhook"
+
+        /// Unique identifier for this webhook.
         public let id: String
+        /// The webhook URL where events will be sent.
         public let url: URI
+        /// The types of events this webhook should receive.
         public let events: [WebhookEvents]
+        /// Whether this webhook is currently active.
         public let active: Bool
+        /// Text to prepend to webhook messages.
         public let prefix: String?
+        /// Text to append to webhook messages.
         public let suffix: String?
+        /// Text replacement rules for webhook messages.
         public let rewrite: [RewriteRule]?
+        /// When this webhook was created.
         public let createdAt: ATProtocolDate
+        /// When this webhook was last updated.
         public let updatedAt: ATProtocolDate?
+        /// A user-friendly name for this webhook.
         public let name: String?
+        /// A description of what this webhook is used for.
         public let description: String?
+        /// When this webhook was last triggered.
         public let lastTriggered: ATProtocolDate?
+        /// Number of consecutive errors for this webhook.
         public let errorCount: Int?
+        /// Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
         public let muteWords: [String]?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            id: String, url: URI, events: [WebhookEvents], active: Bool, prefix: String? = nil, suffix: String? = nil, rewrite: [RewriteRule]? = nil, createdAt: ATProtocolDate, updatedAt: ATProtocolDate? = nil, name: String? = nil, description: String? = nil, lastTriggered: ATProtocolDate? = nil, errorCount: Int? = nil, muteWords: [String]? = nil
+            id: String,
+            url: URI,
+            events: [WebhookEvents],
+            active: Bool,
+            prefix: String? = nil,
+            suffix: String? = nil,
+            rewrite: [RewriteRule]? = nil,
+            createdAt: ATProtocolDate,
+            updatedAt: ATProtocolDate? = nil,
+            name: String? = nil,
+            description: String? = nil,
+            lastTriggered: ATProtocolDate? = nil,
+            errorCount: Int? = nil,
+            muteWords: [String]? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.id = id
             self.url = url
@@ -42,231 +75,247 @@ public struct PlaceStreamServerDefs {
             self.lastTriggered = lastTriggered
             self.errorCount = errorCount
             self.muteWords = muteWords
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.id = try container.decode(String.self, forKey: .id)
+            self.url = try container.decode(URI.self, forKey: .url)
+            self.events = try container.decode([WebhookEvents].self, forKey: .events)
+            self.active = try container.decode(Bool.self, forKey: .active)
             do {
-                self.id = try container.decode(String.self, forKey: .id)
+                self.prefix = try container.decodeIfPresent(String.self, forKey: .prefix, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'id': \(error)")
-                throw error
-            }
-            do {
-                self.url = try container.decode(URI.self, forKey: .url)
-            } catch {
-                LogManager.logError("Decoding error for required property 'url': \(error)")
-                throw error
-            }
-            do {
-                self.events = try container.decode([WebhookEvents].self, forKey: .events)
-            } catch {
-                LogManager.logError("Decoding error for required property 'events': \(error)")
-                throw error
-            }
-            do {
-                self.active = try container.decode(Bool.self, forKey: .active)
-            } catch {
-                LogManager.logError("Decoding error for required property 'active': \(error)")
-                throw error
-            }
-            do {
-                self.prefix = try container.decodeIfPresent(String.self, forKey: .prefix)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'prefix' — degrading to nil: \(error)")
                 self.prefix = nil
+                malformedFields.insert("prefix")
             }
             do {
-                self.suffix = try container.decodeIfPresent(String.self, forKey: .suffix)
+                self.suffix = try container.decodeIfPresent(String.self, forKey: .suffix, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'suffix' — degrading to nil: \(error)")
                 self.suffix = nil
+                malformedFields.insert("suffix")
             }
             do {
-                self.rewrite = try container.decodeIfPresent([RewriteRule].self, forKey: .rewrite)
+                self.rewrite = try container.decodeIfPresent([RewriteRule].self, forKey: .rewrite, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'rewrite' — degrading to nil: \(error)")
                 self.rewrite = nil
+                malformedFields.insert("rewrite")
             }
+            self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
             do {
-                self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+                self.updatedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .updatedAt, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'createdAt': \(error)")
-                throw error
-            }
-            do {
-                self.updatedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .updatedAt)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'updatedAt' — degrading to nil: \(error)")
                 self.updatedAt = nil
+                malformedFields.insert("updatedAt")
             }
             do {
-                self.name = try container.decodeIfPresent(String.self, forKey: .name)
+                self.name = try container.decodeIfPresent(String.self, forKey: .name, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'name' — degrading to nil: \(error)")
                 self.name = nil
+                malformedFields.insert("name")
             }
             do {
-                self.description = try container.decodeIfPresent(String.self, forKey: .description)
+                self.description = try container.decodeIfPresent(String.self, forKey: .description, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'description' — degrading to nil: \(error)")
                 self.description = nil
+                malformedFields.insert("description")
             }
             do {
-                self.lastTriggered = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastTriggered)
+                self.lastTriggered = try container.decodeIfPresent(ATProtocolDate.self, forKey: .lastTriggered, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'lastTriggered' — degrading to nil: \(error)")
                 self.lastTriggered = nil
+                malformedFields.insert("lastTriggered")
             }
             do {
-                self.errorCount = try container.decodeIfPresent(Int.self, forKey: .errorCount)
+                self.errorCount = try container.decodeIfPresent(Int.self, forKey: .errorCount, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'errorCount' — degrading to nil: \(error)")
                 self.errorCount = nil
+                malformedFields.insert("errorCount")
             }
             do {
-                self.muteWords = try container.decodeIfPresent([String].self, forKey: .muteWords)
+                self.muteWords = try container.decodeIfPresent([String].self, forKey: .muteWords, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'muteWords' — degrading to nil: \(error)")
                 self.muteWords = nil
+                malformedFields.insert("muteWords")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(id, forKey: .id)
-            try container.encode(url, forKey: .url)
-            try container.encode(events, forKey: .events)
-            try container.encode(active, forKey: .active)
-            try container.encodeIfPresent(prefix, forKey: .prefix)
-            try container.encodeIfPresent(suffix, forKey: .suffix)
-            try container.encodeIfPresent(rewrite, forKey: .rewrite)
-            try container.encode(createdAt, forKey: .createdAt)
-            try container.encodeIfPresent(updatedAt, forKey: .updatedAt)
-            try container.encodeIfPresent(name, forKey: .name)
-            try container.encodeIfPresent(description, forKey: .description)
-            try container.encodeIfPresent(lastTriggered, forKey: .lastTriggered)
-            try container.encodeIfPresent(errorCount, forKey: .errorCount)
-            try container.encodeIfPresent(muteWords, forKey: .muteWords)
+            try container.encode(self.id, forKey: .id)
+            try container.encode(self.url, forKey: .url)
+            try container.encode(self.events, forKey: .events)
+            try container.encode(self.active, forKey: .active)
+            try container.encodeIfPresent(self.prefix, forKey: .prefix)
+            try container.encodeIfPresent(self.suffix, forKey: .suffix)
+            try container.encodeIfPresent(self.rewrite, forKey: .rewrite)
+            try container.encode(self.createdAt, forKey: .createdAt)
+            try container.encodeIfPresent(self.updatedAt, forKey: .updatedAt)
+            try container.encodeIfPresent(self.name, forKey: .name)
+            try container.encodeIfPresent(self.description, forKey: .description)
+            try container.encodeIfPresent(self.lastTriggered, forKey: .lastTriggered)
+            try container.encodeIfPresent(self.errorCount, forKey: .errorCount)
+            try container.encodeIfPresent(self.muteWords, forKey: .muteWords)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(id)
-            hasher.combine(url)
-            hasher.combine(events)
-            hasher.combine(active)
-            if let value = prefix {
+            hasher.combine(self.id)
+            hasher.combine(self.url)
+            hasher.combine(self.events)
+            hasher.combine(self.active)
+            if let value = self.prefix {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = suffix {
+            if let value = self.suffix {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = rewrite {
+            if let value = self.rewrite {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            hasher.combine(createdAt)
-            if let value = updatedAt {
+            hasher.combine(self.createdAt)
+            if let value = self.updatedAt {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = name {
+            if let value = self.name {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = description {
+            if let value = self.description {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = lastTriggered {
+            if let value = self.lastTriggered {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = errorCount {
+            if let value = self.errorCount {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = muteWords {
+            if let value = self.muteWords {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if id != other.id {
+            if self.id != other.id {
                 return false
             }
-            if url != other.url {
+            if self.url != other.url {
                 return false
             }
-            if events != other.events {
+            if self.events != other.events {
                 return false
             }
-            if active != other.active {
+            if self.active != other.active {
                 return false
             }
-            if prefix != other.prefix {
+            if self.prefix != other.prefix {
                 return false
             }
-            if suffix != other.suffix {
+            if self.suffix != other.suffix {
                 return false
             }
-            if rewrite != other.rewrite {
+            if self.rewrite != other.rewrite {
                 return false
             }
-            if createdAt != other.createdAt {
+            if self.createdAt != other.createdAt {
                 return false
             }
-            if updatedAt != other.updatedAt {
+            if self.updatedAt != other.updatedAt {
                 return false
             }
-            if name != other.name {
+            if self.name != other.name {
                 return false
             }
-            if description != other.description {
+            if self.description != other.description {
                 return false
             }
-            if lastTriggered != other.lastTriggered {
+            if self.lastTriggered != other.lastTriggered {
                 return false
             }
-            if errorCount != other.errorCount {
+            if self.errorCount != other.errorCount {
                 return false
             }
-            if muteWords != other.muteWords {
+            if self.muteWords != other.muteWords {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -275,58 +324,80 @@ public struct PlaceStreamServerDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let idValue = try id.toCBORValue()
+            let idValue = try self.id.toCBORValue()
             map = map.adding(key: "id", value: idValue)
-            let urlValue = try url.toCBORValue()
+            let urlValue = try self.url.toCBORValue()
             map = map.adding(key: "url", value: urlValue)
-            let eventsValue = try events.toCBORValue()
+            let eventsValue = try self.events.toCBORValue()
             map = map.adding(key: "events", value: eventsValue)
-            let activeValue = try active.toCBORValue()
+            let activeValue = try self.active.toCBORValue()
             map = map.adding(key: "active", value: activeValue)
-            if let value = prefix {
+            if let value = self.prefix {
                 let prefixValue = try value.toCBORValue()
                 map = map.adding(key: "prefix", value: prefixValue)
             }
-            if let value = suffix {
+            if let value = self.suffix {
                 let suffixValue = try value.toCBORValue()
                 map = map.adding(key: "suffix", value: suffixValue)
             }
-            if let value = rewrite {
+            if let value = self.rewrite {
                 let rewriteValue = try value.toCBORValue()
                 map = map.adding(key: "rewrite", value: rewriteValue)
             }
-            let createdAtValue = try createdAt.toCBORValue()
+            let createdAtValue = try self.createdAt.toCBORValue()
             map = map.adding(key: "createdAt", value: createdAtValue)
-            if let value = updatedAt {
+            if let value = self.updatedAt {
                 let updatedAtValue = try value.toCBORValue()
                 map = map.adding(key: "updatedAt", value: updatedAtValue)
             }
-            if let value = name {
+            if let value = self.name {
                 let nameValue = try value.toCBORValue()
                 map = map.adding(key: "name", value: nameValue)
             }
-            if let value = description {
+            if let value = self.description {
                 let descriptionValue = try value.toCBORValue()
                 map = map.adding(key: "description", value: descriptionValue)
             }
-            if let value = lastTriggered {
+            if let value = self.lastTriggered {
                 let lastTriggeredValue = try value.toCBORValue()
                 map = map.adding(key: "lastTriggered", value: lastTriggeredValue)
             }
-            if let value = errorCount {
+            if let value = self.errorCount {
                 let errorCountValue = try value.toCBORValue()
                 map = map.adding(key: "errorCount", value: errorCountValue)
             }
-            if let value = muteWords {
+            if let value = self.muteWords {
                 let muteWordsValue = try value.toCBORValue()
                 map = map.adding(key: "muteWords", value: muteWordsValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "id", "url", "events", "active", "prefix", "suffix", "rewrite", "createdAt", "updatedAt", "name", "description", "lastTriggered", "errorCount", "muteWords"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "id": return true
+            case "url": return true
+            case "events": return true
+            case "active": return true
+            case "prefix": return self.prefix != nil
+            case "suffix": return self.suffix != nil
+            case "rewrite": return self.rewrite != nil
+            case "createdAt": return true
+            case "updatedAt": return self.updatedAt != nil
+            case "name": return self.name != nil
+            case "description": return self.description != nil
+            case "lastTriggered": return self.lastTriggered != nil
+            case "errorCount": return self.errorCount != nil
+            case "muteWords": return self.muteWords != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case id
             case url
             case events
@@ -343,56 +414,56 @@ public struct PlaceStreamServerDefs {
             case muteWords
         }
     }
-
     public struct RewriteRule: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.server.defs#rewriteRule"
+
+        /// Text to search for and replace.
         public let from: String
+        /// Text to replace with.
         public let to: String
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            from: String, to: String
+            from: String,
+            to: String,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.from = from
             self.to = to
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.from = try container.decode(String.self, forKey: .from)
-            } catch {
-                LogManager.logError("Decoding error for required property 'from': \(error)")
-                throw error
-            }
-            do {
-                self.to = try container.decode(String.self, forKey: .to)
-            } catch {
-                LogManager.logError("Decoding error for required property 'to': \(error)")
-                throw error
-            }
+            self.from = try container.decode(String.self, forKey: .from)
+            self.to = try container.decode(String.self, forKey: .to)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(from, forKey: .from)
-            try container.encode(to, forKey: .to)
+            try container.encode(self.from, forKey: .from)
+            try container.encode(self.to, forKey: .to)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(from)
-            hasher.combine(to)
+            hasher.combine(self.from)
+            hasher.combine(self.to)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if from != other.from {
+            if self.from != other.from {
                 return false
             }
-            if to != other.to {
+            if self.to != other.to {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -401,16 +472,16 @@ public struct PlaceStreamServerDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let fromValue = try from.toCBORValue()
+            let fromValue = try self.from.toCBORValue()
             map = map.adding(key: "from", value: fromValue)
-            let toValue = try to.toCBORValue()
+            let toValue = try self.to.toCBORValue()
             map = map.adding(key: "to", value: toValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "from", "to"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case from
             case to
         }

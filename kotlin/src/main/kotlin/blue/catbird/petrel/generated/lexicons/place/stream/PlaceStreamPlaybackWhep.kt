@@ -54,7 +54,9 @@ input: PlaceStreamPlaybackWhepInput,
     // array-valued query params rely on (e.g. `?actors=a&actors=b`).
     val queryItems = params.toQueryItems()
 
-    return client.networkService.performRequest(
+    // Raw (non-JSON) body: fetch the bytes, then wrap them. The output wrapper
+    // is not JSON-decodable from a binary body.
+    val raw = client.networkService.performRequest<ByteArray>(
         method = "POST",
         endpoint = endpoint,
         queryItems = queryItems,
@@ -64,4 +66,5 @@ input: PlaceStreamPlaybackWhepInput,
         ),
         body = body
     )
+    return ATProtoResponse(raw.responseCode, raw.data?.let { PlaceStreamPlaybackWhepOutput(it) }, raw.errorBody)
 }

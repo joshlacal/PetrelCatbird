@@ -4,14 +4,18 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.requestLeave
 
+/// Group-only self-leave. A pending or active zero-leaf participant signs immediate stateVersion-plus-one self-removal. An active participant with leaves signs durable 24-hour consent for a different-DID current leaf to remove every requester leaf and the participant by Commit. Neither path can remove the last active admin. Relationship blocks or policy unavailability never deny self-exit. Direct participants use closeConversation instead.
 public struct BlueCatbirdChatRequestLeave {
 
     public static let typeIdentifier = "blue.catbird.chat.requestLeave"
+
     public struct Input: ATProtocolCodable {
+
         public let signedRequest: BlueCatbirdChatDefs.SignedLeaveOperation
 
-        /// Standard public initializer
-        public init(signedRequest: BlueCatbirdChatDefs.SignedLeaveOperation) {
+        public init(
+            signedRequest: BlueCatbirdChatDefs.SignedLeaveOperation
+        ) {
             self.signedRequest = signedRequest
         }
 
@@ -22,12 +26,12 @@ public struct BlueCatbirdChatRequestLeave {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encode(self.signedRequest, forKey: .signedRequest)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let signedRequestValue = try signedRequest.toCBORValue()
+            let signedRequestValue = try self.signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
             return map
         }
@@ -41,48 +45,32 @@ public struct BlueCatbirdChatRequestLeave {
 
         public let result: BlueCatbirdChatDefs.LeaveOperationResult
 
-        // Standard public initializer
         public init(
-
             result: BlueCatbirdChatDefs.LeaveOperationResult
-
         ) {
-
             self.result = result
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.result = try container.decode(BlueCatbirdChatDefs.LeaveOperationResult.self, forKey: .result)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(result, forKey: .result)
-
+            try container.encode(self.result, forKey: .result)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let resultValue = try result.toCBORValue()
+            let resultValue = try self.result.toCBORValue()
             map = map.adding(key: "result", value: resultValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case result
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -120,11 +108,10 @@ extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - requestLeave
     /// Group-only self-leave. A pending or active zero-leaf participant signs immediate stateVersion-plus-one self-removal. An active participant with leaves signs durable 24-hour consent for a different-DID current leaf to remove every requester leaf and the participant by Commit. Neither path can remove the last active admin. Relationship blocks or policy unavailability never deny self-exit. Direct participants use closeConversation instead.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdChatRequestLeave.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func requestLeave(
 
         input: BlueCatbirdChatRequestLeave.Input
@@ -156,44 +143,24 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdChatRequestLeave.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatRequestLeave.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.requestLeave: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdChatRequestLeave.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdChatRequestLeave.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }
