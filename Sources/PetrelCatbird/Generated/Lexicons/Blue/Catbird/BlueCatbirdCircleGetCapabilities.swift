@@ -4,6 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.circle.getCapabilities
 
+/// Get capability metadata for Catbird Circles support
 public struct BlueCatbirdCircleGetCapabilities {
 
     public static let typeIdentifier = "blue.catbird.circle.getCapabilities"
@@ -11,77 +12,70 @@ public struct BlueCatbirdCircleGetCapabilities {
     public struct Output: ATProtocolCodable {
 
         public let enabled: Bool
-
         public let protocolRevision: String
-
         public let supportsImages: Bool
+        /// Whether this service accepts and serves encrypted Circle posts.
+        public let supportsEncryptedPosts: Bool?
 
-        // Standard public initializer
         public init(
-
             enabled: Bool,
-
             protocolRevision: String,
-
-            supportsImages: Bool
-
+            supportsImages: Bool,
+            supportsEncryptedPosts: Bool? = nil
         ) {
-
             self.enabled = enabled
-
             self.protocolRevision = protocolRevision
-
             self.supportsImages = supportsImages
-
+            self.supportsEncryptedPosts = supportsEncryptedPosts
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
+            let strict = decoder.isATProtoStrictDecoding
             self.enabled = try container.decode(Bool.self, forKey: .enabled)
-
             self.protocolRevision = try container.decode(String.self, forKey: .protocolRevision)
-
             self.supportsImages = try container.decode(Bool.self, forKey: .supportsImages)
-
+            do {
+                self.supportsEncryptedPosts = try container.decodeIfPresent(Bool.self, forKey: .supportsEncryptedPosts, rejectingNull: strict)
+            } catch {
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
+                LogManager.logWarning("Decoding error for optional property 'supportsEncryptedPosts' — degrading to nil: \(error)")
+                self.supportsEncryptedPosts = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(enabled, forKey: .enabled)
-
-            try container.encode(protocolRevision, forKey: .protocolRevision)
-
-            try container.encode(supportsImages, forKey: .supportsImages)
-
+            try container.encode(self.enabled, forKey: .enabled)
+            try container.encode(self.protocolRevision, forKey: .protocolRevision)
+            try container.encode(self.supportsImages, forKey: .supportsImages)
+            try container.encodeIfPresent(self.supportsEncryptedPosts, forKey: .supportsEncryptedPosts)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let enabledValue = try enabled.toCBORValue()
+            let enabledValue = try self.enabled.toCBORValue()
             map = map.adding(key: "enabled", value: enabledValue)
-
-            let protocolRevisionValue = try protocolRevision.toCBORValue()
+            let protocolRevisionValue = try self.protocolRevision.toCBORValue()
             map = map.adding(key: "protocolRevision", value: protocolRevisionValue)
-
-            let supportsImagesValue = try supportsImages.toCBORValue()
+            let supportsImagesValue = try self.supportsImages.toCBORValue()
             map = map.adding(key: "supportsImages", value: supportsImagesValue)
-
+            if let value = self.supportsEncryptedPosts {
+                let supportsEncryptedPostsValue = try value.toCBORValue()
+                map = map.adding(key: "supportsEncryptedPosts", value: supportsEncryptedPostsValue)
+            }
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case enabled
             case protocolRevision
             case supportsImages
+            case supportsEncryptedPosts
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -105,8 +99,8 @@ extension ATProtoClient.Blue.Catbird.Circle {
     // MARK: - getCapabilities
     /// Get capability metadata for Catbird Circles support
     ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdCircleGetCapabilities.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getCapabilities() async throws -> (responseCode: Int, data: BlueCatbirdCircleGetCapabilities.Output?) {
         let endpoint = "blue.catbird.circle.getCapabilities"
 
@@ -126,42 +120,24 @@ extension ATProtoClient.Blue.Catbird.Circle {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdCircleGetCapabilities.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.circle.getCapabilities: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdCircleGetCapabilities.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdCircleGetCapabilities.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdCircleGetCapabilities.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

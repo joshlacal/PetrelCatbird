@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.circle.post",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An encrypted Circle post. The post body is ciphertext under the named Circle key version; only the reply reference and attachment blobs are visible to the service.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["circleId", "keyVersion", "createdAt", "ciphertext", "sig", "authorEpochHead"],
+        "properties": {
+          "circleId": {
+            "type": "string",
+            "format": "tid",
+            "description": "Stable Circle identity this post belongs to."
+          },
+          "keyVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "The Circle content-key version the ciphertext was encrypted under."
+          },
+          "createdAt": { "type": "string", "format": "datetime" },
+          "ciphertext": {
+            "type": "bytes",
+            "maxLength": 65536,
+            "description": "AEAD ciphertext of the post body."
+          },
+          "sig": {
+            "type": "bytes",
+            "minLength": 64,
+            "maxLength": 64,
+            "description": "Author signature over the ciphertext and its binding fields, verifiable by members."
+          },
+          "authorEpochHead": {
+            "type": "bytes",
+            "minLength": 32,
+            "maxLength": 32,
+            "description": "Head of the author epoch whose key produced the signature."
+          },
+          "reply": { "type": "ref", "ref": "app.bsky.feed.post#replyRef" },
+          "attachments": {
+            "type": "array",
+            "maxLength": 4,
+            "items": { "type": "blob", "accept": ["*/*"], "maxSize": 20000000 },
+            "description": "Encrypted attachment blobs. Per-blob keys travel inside the ciphertext."
+          }
+        }
+      }
+    }
+  }
+}

@@ -15,7 +15,11 @@
             "maximum": 100,
             "default": 50
           },
-          "cursor": { "type": "string" }
+          "cursor": { "type": "string" },
+          "includeEncrypted": {
+            "type": "boolean",
+            "description": "When absent or false the server omits encrypted posts (and encrypted thread nodes). Clients that understand blue.catbird.circle.post envelopes send true."
+          }
         }
       },
       "output": {

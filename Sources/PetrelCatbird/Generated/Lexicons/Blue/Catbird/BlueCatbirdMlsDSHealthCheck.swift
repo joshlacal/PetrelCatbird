@@ -4,89 +4,61 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.mlsDS.healthCheck
 
+/// Simple health/status endpoint for DS-to-DS discovery. Return the health status and federation capabilities of this delivery service. No authentication required.
 public struct BlueCatbirdMlsDSHealthCheck {
 
     public static let typeIdentifier = "blue.catbird.mlsDS.healthCheck"
 
     public struct Output: ATProtocolCodable {
 
+        /// Service DID of this delivery service
         public let did: String
-
+        /// Server version
         public let version: String
-
+        /// Server uptime in seconds
         public let uptime: Int
-
+        /// List of supported federation capabilities
         public let federationCapabilities: [String]
 
-        // Standard public initializer
         public init(
-
             did: String,
-
             version: String,
-
             uptime: Int,
-
             federationCapabilities: [String]
-
         ) {
-
             self.did = did
-
             self.version = version
-
             self.uptime = uptime
-
             self.federationCapabilities = federationCapabilities
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.did = try container.decode(String.self, forKey: .did)
-
             self.version = try container.decode(String.self, forKey: .version)
-
             self.uptime = try container.decode(Int.self, forKey: .uptime)
-
             self.federationCapabilities = try container.decode([String].self, forKey: .federationCapabilities)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(did, forKey: .did)
-
-            try container.encode(version, forKey: .version)
-
-            try container.encode(uptime, forKey: .uptime)
-
-            try container.encode(federationCapabilities, forKey: .federationCapabilities)
-
+            try container.encode(self.did, forKey: .did)
+            try container.encode(self.version, forKey: .version)
+            try container.encode(self.uptime, forKey: .uptime)
+            try container.encode(self.federationCapabilities, forKey: .federationCapabilities)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let didValue = try did.toCBORValue()
+            let didValue = try self.did.toCBORValue()
             map = map.adding(key: "did", value: didValue)
-
-            let versionValue = try version.toCBORValue()
+            let versionValue = try self.version.toCBORValue()
             map = map.adding(key: "version", value: versionValue)
-
-            let uptimeValue = try uptime.toCBORValue()
+            let uptimeValue = try self.uptime.toCBORValue()
             map = map.adding(key: "uptime", value: uptimeValue)
-
-            let federationCapabilitiesValue = try federationCapabilities.toCBORValue()
+            let federationCapabilitiesValue = try self.federationCapabilities.toCBORValue()
             map = map.adding(key: "federationCapabilities", value: federationCapabilitiesValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -95,7 +67,6 @@ public struct BlueCatbirdMlsDSHealthCheck {
             case uptime
             case federationCapabilities
         }
-
     }
 
 }
@@ -104,8 +75,8 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
     // MARK: - healthCheck
     /// Simple health/status endpoint for DS-to-DS discovery. Return the health status and federation capabilities of this delivery service. No authentication required.
     ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoXRPCError` for a non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func healthCheck() async throws -> (responseCode: Int, data: BlueCatbirdMlsDSHealthCheck.Output?) {
         let endpoint = "blue.catbird.mlsDS.healthCheck"
 
@@ -122,37 +93,27 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
         // Determine service DID for this endpoint
         let serviceDID = await networkService.getServiceDID(for: "blue.catbird.mlsDS.healthCheck")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
-        let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
+        let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSHealthCheck.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.healthCheck: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdMlsDSHealthCheck.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.getMailboxKeysRecord
 
+/// Reads one public mailboxKeys record through the authenticated caller's home mls-ds. The server resolves the target DID's PDS, fixes the collection to blue.catbird.labyrinth.mailboxKeys, and never forwards caller credentials or arbitrary URLs. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, RelayUnavailable.
 public struct BlueCatbirdLabyrinthGetMailboxKeysRecord {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.getMailboxKeysRecord"
+
     public struct Parameters: Parametrizable {
         public let did: DID
         public let rkey: RecordKey
@@ -24,69 +26,42 @@ public struct BlueCatbirdLabyrinthGetMailboxKeysRecord {
     public struct Output: ATProtocolCodable {
 
         public let uri: ATProtocolURI
-
-        public let cid: CID
-
+        public let cid: CIDString
         public let value: BlueCatbirdLabyrinthMailboxKeys
 
-        // Standard public initializer
         public init(
-
             uri: ATProtocolURI,
-
-            cid: CID,
-
+            cid: CIDString,
             value: BlueCatbirdLabyrinthMailboxKeys
-
         ) {
-
             self.uri = uri
-
             self.cid = cid
-
             self.value = value
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
-
-            self.cid = try container.decode(CID.self, forKey: .cid)
-
+            self.cid = try container.decode(CIDString.self, forKey: .cid)
             self.value = try container.decode(BlueCatbirdLabyrinthMailboxKeys.self, forKey: .value)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(uri, forKey: .uri)
-
-            try container.encode(cid, forKey: .cid)
-
-            try container.encode(value, forKey: .value)
-
+            try container.encode(self.uri, forKey: .uri)
+            try container.encode(self.cid, forKey: .cid)
+            try container.encode(self.value, forKey: .value)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let uriValue = try uri.toCBORValue()
+            let uriValue = try self.uri.toCBORValue()
             map = map.adding(key: "uri", value: uriValue)
-
-            let cidValue = try cid.toCBORValue()
+            let cidValue = try self.cid.toCBORValue()
             map = map.adding(key: "cid", value: cidValue)
-
-            let valueValue = try value.toCBORValue()
+            let valueValue = try self.value.toCBORValue()
             map = map.adding(key: "value", value: valueValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -94,7 +69,6 @@ public struct BlueCatbirdLabyrinthGetMailboxKeysRecord {
             case cid
             case value
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -117,9 +91,8 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
     /// Reads one public mailboxKeys record through the authenticated caller's home mls-ds. The server resolves the target DID's PDS, fixes the collection to blue.catbird.labyrinth.mailboxKeys, and never forwards caller credentials or arbitrary URLs. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, RelayUnavailable.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdLabyrinthGetMailboxKeysRecord.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getMailboxKeysRecord(input: BlueCatbirdLabyrinthGetMailboxKeysRecord.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetMailboxKeysRecord.Output?) {
         let endpoint = "blue.catbird.labyrinth.getMailboxKeysRecord"
 
@@ -139,42 +112,24 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdLabyrinthGetMailboxKeysRecord.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.getMailboxKeysRecord: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdLabyrinthGetMailboxKeysRecord.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdLabyrinthGetMailboxKeysRecord.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdLabyrinthGetMailboxKeysRecord.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

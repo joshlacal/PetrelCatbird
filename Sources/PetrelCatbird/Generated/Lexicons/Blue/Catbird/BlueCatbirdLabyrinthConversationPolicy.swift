@@ -4,63 +4,83 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.conversationPolicy
 
+/// Space policy governing a conversation Space hosted by the sequencing mls-ds authority. Active MLS conversation participants receive short-lived read credentials; active, left, and removed writers appear in listRepos until they delete their Space records.
 public struct BlueCatbirdLabyrinthConversationPolicy: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.conversationPolicy"
-    public let conversationId: String
-    public let generation: Int
-    public let sequencerDid: DID
-    public let publishPolicy: Bool?
 
-    public init(conversationId: String, generation: Int, sequencerDid: DID, publishPolicy: Bool? = nil) {
+    /// Canonical lowercase hyphenated UUIDv4 conversation identifier.
+    public let conversationId: String
+    /// Conversation generation counter.
+    public let generation: Int
+    /// DID of the sequencing mls-ds Space authority.
+    public let sequencerDid: DID
+    /// Whether the policy is also mirrored as a com.atproto.space.policy record.
+    public let publishPolicy: Bool?
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
+
+    public init(
+        conversationId: String,
+        generation: Int,
+        sequencerDid: DID,
+        publishPolicy: Bool? = nil,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.conversationId = conversationId
         self.generation = generation
         self.sequencerDid = sequencerDid
         self.publishPolicy = publishPolicy
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
         self.conversationId = try container.decode(String.self, forKey: .conversationId)
         self.generation = try container.decode(Int.self, forKey: .generation)
         self.sequencerDid = try container.decode(DID.self, forKey: .sequencerDid)
-        self.publishPolicy = try container.decodeIfPresent(Bool.self, forKey: .publishPolicy)
+        self.publishPolicy = try container.decodeIfPresent(Bool.self, forKey: .publishPolicy, rejectingNull: strict)
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(conversationId, forKey: .conversationId)
-        try container.encode(generation, forKey: .generation)
-        try container.encode(sequencerDid, forKey: .sequencerDid)
-        try container.encodeIfPresent(publishPolicy, forKey: .publishPolicy)
+        try container.encode(self.conversationId, forKey: .conversationId)
+        try container.encode(self.generation, forKey: .generation)
+        try container.encode(self.sequencerDid, forKey: .sequencerDid)
+        try container.encodeIfPresent(self.publishPolicy, forKey: .publishPolicy)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(conversationId)
-        hasher.combine(generation)
-        hasher.combine(sequencerDid)
-        if let value = publishPolicy {
+        hasher.combine(self.conversationId)
+        hasher.combine(self.generation)
+        hasher.combine(self.sequencerDid)
+        if let value = self.publishPolicy {
             hasher.combine(value)
         } else {
             hasher.combine(nil as Int?)
         }
+        hasher.combine(extraFields)
     }
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if conversationId != other.conversationId {
+        if self.conversationId != other.conversationId {
             return false
         }
-        if generation != other.generation {
+        if self.generation != other.generation {
             return false
         }
-        if sequencerDid != other.sequencerDid {
+        if self.sequencerDid != other.sequencerDid {
             return false
         }
-        if publishPolicy != other.publishPolicy {
+        if self.publishPolicy != other.publishPolicy {
             return false
         }
-        return true
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -69,18 +89,20 @@ public struct BlueCatbirdLabyrinthConversationPolicy: ATProtocolCodable, ATProto
 
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
-        let conversationIdValue = try conversationId.toCBORValue()
+        let conversationIdValue = try self.conversationId.toCBORValue()
         map = map.adding(key: "conversationId", value: conversationIdValue)
-        let generationValue = try generation.toCBORValue()
+        let generationValue = try self.generation.toCBORValue()
         map = map.adding(key: "generation", value: generationValue)
-        let sequencerDidValue = try sequencerDid.toCBORValue()
+        let sequencerDidValue = try self.sequencerDid.toCBORValue()
         map = map.adding(key: "sequencerDid", value: sequencerDidValue)
-        if let value = publishPolicy {
+        if let value = self.publishPolicy {
             let publishPolicyValue = try value.toCBORValue()
             map = map.adding(key: "publishPolicy", value: publishPolicyValue)
         }
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
     }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "conversationId", "generation", "sequencerDid", "publishPolicy"]
 
     private enum CodingKeys: String, CodingKey {
         case conversationId

@@ -1,0 +1,18 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.circle.encrypted",
+  "defs": {
+    "main": {
+      "type": "space",
+      "key": "tid",
+      "title": "Catbird Encrypted Circle",
+      "description": "An author-owned private posting audience whose posts are end-to-end encrypted. The Space holds only ciphertext and wrapped keys; the AppView never sees plaintext.",
+      "collections": [
+        "blue.catbird.circle.metadata",
+        "blue.catbird.circle.key",
+        "blue.catbird.circle.post",
+        "app.bsky.feed.like"
+      ]
+    }
+  }
+}

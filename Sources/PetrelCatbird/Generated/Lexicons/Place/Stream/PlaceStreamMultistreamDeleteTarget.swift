@@ -4,14 +4,19 @@ import Petrel
 
 // lexicon: 1, id: place.stream.multistream.deleteTarget
 
+/// Delete a target for rebroadcasting a Streamplace stream.
 public struct PlaceStreamMultistreamDeleteTarget {
 
     public static let typeIdentifier = "place.stream.multistream.deleteTarget"
+
     public struct Input: ATProtocolCodable {
+
+        /// The Record Key of the target to delete.
         public let rkey: RecordKey
 
-        /// Standard public initializer
-        public init(rkey: RecordKey) {
+        public init(
+            rkey: RecordKey
+        ) {
             self.rkey = rkey
         }
 
@@ -22,12 +27,12 @@ public struct PlaceStreamMultistreamDeleteTarget {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(rkey, forKey: .rkey)
+            try container.encode(self.rkey, forKey: .rkey)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let rkeyValue = try rkey.toCBORValue()
+            let rkeyValue = try self.rkey.toCBORValue()
             map = map.adding(key: "rkey", value: rkeyValue)
             return map
         }
@@ -39,36 +44,25 @@ public struct PlaceStreamMultistreamDeleteTarget {
 
     public struct Output: ATProtocolCodable {
 
-        // Empty output - no properties (response is {})
-
-        // Standard public initializer
         public init(
-
         ) {
-
         }
 
         public init(from decoder: Decoder) throws {
-
-            // Empty output - just validate it's an object by trying to get any container
-            _ = try decoder.singleValueContainer()
-
+            _ = try decoder.container(keyedBy: CodingKeys.self)
         }
 
         public func encode(to encoder: Encoder) throws {
-
-            // Empty output - encode empty object
-            _ = encoder.singleValueContainer()
-
+            _ = encoder.container(keyedBy: CodingKeys.self)
         }
 
         public func toCBORValue() throws -> Any {
-
-            // Empty output - return empty CBOR map
-            return OrderedCBORMap()
-
+            let map = OrderedCBORMap()
+            return map
         }
 
+        private enum CodingKeys: CodingKey {
+        }
     }
 
 }
@@ -77,11 +71,10 @@ extension ATProtoClient.Place.Stream.Multistream {
     // MARK: - deleteTarget
     /// Delete a target for rebroadcasting a Streamplace stream.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoXRPCError` for a non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func deleteTarget(
 
         input: PlaceStreamMultistreamDeleteTarget.Input
@@ -110,39 +103,27 @@ extension ATProtoClient.Place.Stream.Multistream {
         // Determine service DID for this endpoint
         let serviceDID = await networkService.getServiceDID(for: "place.stream.multistream.deleteTarget")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
-        let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
+        let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamMultistreamDeleteTarget.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.multistream.deleteTarget: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(PlaceStreamMultistreamDeleteTarget.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

@@ -3,7 +3,9 @@ package blue.catbird.petrel
 import blue.catbird.petrel.generated.BlueCatbirdCircleActivateCircleOutput
 import blue.catbird.petrel.generated.BlueCatbirdCircleDefsCircleSummary
 import blue.catbird.petrel.generated.BlueCatbirdCircleMetadata
+import blue.catbird.petrel.generated.BlueCatbirdCirclePost
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -60,5 +62,26 @@ class CircleLexiconTest {
         assertEquals("Family", output.circle.name)
         assertEquals(circleId, output.circle.circleId)
         assertEquals(2, output.circle.memberCount)
+    }
+
+    /**
+     * An encrypted Circle post carries its payload as `$bytes` fields. Decoding then
+     * re-encoding must reproduce the same JSON, or signatures over it would not verify.
+     */
+    @Test
+    fun encryptedPostRecordRoundTrips() {
+        val sig = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+Pw=="
+        val head = "ICEiIyQlJicoKSorLC0uLzAxMjM0NTY3ODk6Ozw9Pj8="
+        val data = """{"circleId":"$circleId","keyVersion":2,"createdAt":"2026-11-07T00:00:00Z","ciphertext":{"${'$'}bytes":"3q2+7w=="},"sig":{"${'$'}bytes":"$sig"},"authorEpochHead":{"${'$'}bytes":"$head"}}"""
+        val record = json.decodeFromString<BlueCatbirdCirclePost>(data)
+        assertEquals(circleId, record.circleId)
+        assertEquals(2, record.keyVersion)
+        assertNull(record.reply)
+        assertNull(record.attachments)
+        val reencoded = json.encodeToString(BlueCatbirdCirclePost.serializer(), record)
+        assertEquals(
+            json.parseToJsonElement(data),
+            json.parseToJsonElement(reencoded)
+        )
     }
 }

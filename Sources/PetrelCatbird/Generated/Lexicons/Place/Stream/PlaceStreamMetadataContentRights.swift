@@ -4,87 +4,109 @@ import Petrel
 
 // lexicon: 1, id: place.stream.metadata.contentRights
 
+/// Content rights and attribution information.
 public struct PlaceStreamMetadataContentRights: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "place.stream.metadata.contentRights"
-    public let creator: String?
-    public let copyrightNotice: String?
-    public let copyrightYear: Int?
-    public let license: String?
-    public let creditLine: String?
 
-    public init(creator: String? = nil, copyrightNotice: String? = nil, copyrightYear: Int? = nil, license: String? = nil, creditLine: String? = nil) {
+    /// Name of the creator of the work.
+    public let creator: String?
+    /// Copyright notice for the work.
+    public let copyrightNotice: String?
+    /// Year of creation or publication.
+    public let copyrightYear: Int?
+    /// License URL or identifier.
+    public let license: String?
+    /// Credit line for the work.
+    public let creditLine: String?
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
+
+    public init(
+        creator: String? = nil,
+        copyrightNotice: String? = nil,
+        copyrightYear: Int? = nil,
+        license: String? = nil,
+        creditLine: String? = nil,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.creator = creator
         self.copyrightNotice = copyrightNotice
         self.copyrightYear = copyrightYear
         self.license = license
         self.creditLine = creditLine
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.creator = try container.decodeIfPresent(String.self, forKey: .creator)
-        self.copyrightNotice = try container.decodeIfPresent(String.self, forKey: .copyrightNotice)
-        self.copyrightYear = try container.decodeIfPresent(Int.self, forKey: .copyrightYear)
-        self.license = try container.decodeIfPresent(String.self, forKey: .license)
-        self.creditLine = try container.decodeIfPresent(String.self, forKey: .creditLine)
+        let strict = decoder.isATProtoStrictDecoding
+        self.creator = try container.decodeIfPresent(String.self, forKey: .creator, rejectingNull: strict)
+        self.copyrightNotice = try container.decodeIfPresent(String.self, forKey: .copyrightNotice, rejectingNull: strict)
+        self.copyrightYear = try container.decodeIfPresent(Int.self, forKey: .copyrightYear, rejectingNull: strict)
+        self.license = try container.decodeIfPresent(String.self, forKey: .license, rejectingNull: strict)
+        self.creditLine = try container.decodeIfPresent(String.self, forKey: .creditLine, rejectingNull: strict)
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(creator, forKey: .creator)
-        try container.encodeIfPresent(copyrightNotice, forKey: .copyrightNotice)
-        try container.encodeIfPresent(copyrightYear, forKey: .copyrightYear)
-        try container.encodeIfPresent(license, forKey: .license)
-        try container.encodeIfPresent(creditLine, forKey: .creditLine)
+        try container.encodeIfPresent(self.creator, forKey: .creator)
+        try container.encodeIfPresent(self.copyrightNotice, forKey: .copyrightNotice)
+        try container.encodeIfPresent(self.copyrightYear, forKey: .copyrightYear)
+        try container.encodeIfPresent(self.license, forKey: .license)
+        try container.encodeIfPresent(self.creditLine, forKey: .creditLine)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
     }
 
     public func hash(into hasher: inout Hasher) {
-        if let value = creator {
+        if let value = self.creator {
             hasher.combine(value)
         } else {
             hasher.combine(nil as Int?)
         }
-        if let value = copyrightNotice {
+        if let value = self.copyrightNotice {
             hasher.combine(value)
         } else {
             hasher.combine(nil as Int?)
         }
-        if let value = copyrightYear {
+        if let value = self.copyrightYear {
             hasher.combine(value)
         } else {
             hasher.combine(nil as Int?)
         }
-        if let value = license {
+        if let value = self.license {
             hasher.combine(value)
         } else {
             hasher.combine(nil as Int?)
         }
-        if let value = creditLine {
+        if let value = self.creditLine {
             hasher.combine(value)
         } else {
             hasher.combine(nil as Int?)
         }
+        hasher.combine(extraFields)
     }
 
     public func isEqual(to other: any ATProtocolValue) -> Bool {
         guard let other = other as? Self else { return false }
-        if creator != other.creator {
+        if self.creator != other.creator {
             return false
         }
-        if copyrightNotice != other.copyrightNotice {
+        if self.copyrightNotice != other.copyrightNotice {
             return false
         }
-        if copyrightYear != other.copyrightYear {
+        if self.copyrightYear != other.copyrightYear {
             return false
         }
-        if license != other.license {
+        if self.license != other.license {
             return false
         }
-        if creditLine != other.creditLine {
+        if self.creditLine != other.creditLine {
             return false
         }
-        return true
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -93,28 +115,30 @@ public struct PlaceStreamMetadataContentRights: ATProtocolCodable, ATProtocolVal
 
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
-        if let value = creator {
+        if let value = self.creator {
             let creatorValue = try value.toCBORValue()
             map = map.adding(key: "creator", value: creatorValue)
         }
-        if let value = copyrightNotice {
+        if let value = self.copyrightNotice {
             let copyrightNoticeValue = try value.toCBORValue()
             map = map.adding(key: "copyrightNotice", value: copyrightNoticeValue)
         }
-        if let value = copyrightYear {
+        if let value = self.copyrightYear {
             let copyrightYearValue = try value.toCBORValue()
             map = map.adding(key: "copyrightYear", value: copyrightYearValue)
         }
-        if let value = license {
+        if let value = self.license {
             let licenseValue = try value.toCBORValue()
             map = map.adding(key: "license", value: licenseValue)
         }
-        if let value = creditLine {
+        if let value = self.creditLine {
             let creditLineValue = try value.toCBORValue()
             map = map.adding(key: "creditLine", value: creditLineValue)
         }
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
     }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "creator", "copyrightNotice", "copyrightYear", "license", "creditLine"]
 
     private enum CodingKeys: String, CodingKey {
         case creator
@@ -123,5 +147,29 @@ public struct PlaceStreamMetadataContentRights: ATProtocolCodable, ATProtocolVal
         case license
         case creditLine
     }
+
+    /// All rights reserved to the creator — others cannot use, modify, or share without explicit authorization.
+    public static let allRightsReserved = "place.stream.metadata.contentRights#all-rights-reserved"
+
+    /// Public domain dedication. You waive all copyright and related rights where possible. Others may copy, modify, distribute, or perform your work for any purpose without attribution.
+    public static let cc0_1__0 = "place.stream.metadata.contentRights#cc0_1__0"
+
+    /// Attribution required. Others may copy, distribute, remix, and build upon your work, even commercially, if they credit you.
+    public static let ccBy_4__0 = "place.stream.metadata.contentRights#cc-by_4__0"
+
+    /// Attribution + share-alike. Others may adapt and build upon your work, even commercially, if they credit you and license their new creations under identical terms.
+    public static let ccBySa_4__0 = "place.stream.metadata.contentRights#cc-by-sa_4__0"
+
+    /// Attribution + non-commercial. Others may adapt and build upon your work for non-commercial purposes only, and must credit you.
+    public static let ccByNc_4__0 = "place.stream.metadata.contentRights#cc-by-nc_4__0"
+
+    /// Attribution + non-commercial + share-alike. Others may adapt and build upon your work for non-commercial purposes only, must credit you, and must license their new creations under identical terms.
+    public static let ccByNcSa_4__0 = "place.stream.metadata.contentRights#cc-by-nc-sa_4__0"
+
+    /// Attribution + no derivatives. Others may reuse your work, even commercially, but it must remain unchanged and you must be credited.
+    public static let ccByNd_4__0 = "place.stream.metadata.contentRights#cc-by-nd_4__0"
+
+    /// Attribution + non-commercial + no derivatives. Others may download and share your work with credit, but cannot change it or use it commercially.
+    public static let ccByNcNd_4__0 = "place.stream.metadata.contentRights#cc-by-nc-nd_4__0"
 
 }

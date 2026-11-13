@@ -16,6 +16,20 @@ object BlueCatbirdCircleMetadataDefs {
     const val TYPE_IDENTIFIER = "blue.catbird.circle.metadata"
 }
 
+@Serializable
+enum class BlueCatbirdCircleMetadataEncryptionScheme {
+    @SerialName("circle-v1")
+    value_circle_u2d_v1}
+
+    @Serializable
+    data class BlueCatbirdCircleMetadataEncryption(
+/** Encryption scheme identifier. */        @SerialName("scheme")
+        val scheme: BlueCatbirdCircleMetadataEncryptionScheme    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdCircleMetadataEncryption"
+        }
+    }
+
     /**
      * Circle metadata, authored by the Space authority into its own permissioned repo. The only Catbird-specific record type in a Circle; posts and likes are unmodified Bluesky records.
      */
@@ -26,7 +40,9 @@ object BlueCatbirdCircleMetadataDefs {
         val name: String,        @SerialName("createdAt")
         val createdAt: ATProtocolDate,/** The Space this Circle's content was migrated from, if any. */        @SerialName("migratedFrom")
         val migratedFrom: SpaceRef? = null,/** The Space this Circle's content was migrated to, if any. Set when the Circle has moved and this Space is retained read-only. */        @SerialName("migratedTo")
-        val migratedTo: SpaceRef? = null    ) {
+        val migratedTo: SpaceRef? = null,/** Whether members added later can decrypt posts made before they joined. Only meaningful for encrypted Circles. */        @SerialName("historyForNewMembers")
+        val historyForNewMembers: Boolean? = null,/** Present only on encrypted Circles; absent on plaintext Circles. */        @SerialName("encryption")
+        val encryption: BlueCatbirdCircleMetadataEncryption? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = ""
         }

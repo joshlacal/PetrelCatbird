@@ -4,10 +4,13 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.acknowledgeEntries
 
+/// Device-signed post-commit acknowledgment of delivered entries up to upToSeq by an active leaf device. Once all active non-dormant leaf devices acknowledge an applicationMessageEntry, mls-ds prunes accepted_payload_bytes to NULL while preserving seq contiguity and all MLS control entries.
 public struct BlueCatbirdChatAcknowledgeEntries {
 
     public static let typeIdentifier = "blue.catbird.chat.acknowledgeEntries"
+
     public struct Input: ATProtocolCodable {
+
         public let conversationId: BlueCatbirdChatDefs.OperationId
         public let generation: Int
         public let actorDeviceId: BlueCatbirdChatDefs.DeviceId
@@ -17,8 +20,16 @@ public struct BlueCatbirdChatAcknowledgeEntries {
         public let signedAt: BlueCatbirdChatDefs.CanonicalDatetime
         public let signature: Bytes
 
-        /// Standard public initializer
-        public init(conversationId: BlueCatbirdChatDefs.OperationId, generation: Int, actorDeviceId: BlueCatbirdChatDefs.DeviceId, keyId: BlueCatbirdChatDefs.KeyId, authGeneration: Int, upToSeq: Int, signedAt: BlueCatbirdChatDefs.CanonicalDatetime, signature: Bytes) {
+        public init(
+            conversationId: BlueCatbirdChatDefs.OperationId,
+            generation: Int,
+            actorDeviceId: BlueCatbirdChatDefs.DeviceId,
+            keyId: BlueCatbirdChatDefs.KeyId,
+            authGeneration: Int,
+            upToSeq: Int,
+            signedAt: BlueCatbirdChatDefs.CanonicalDatetime,
+            signature: Bytes
+        ) {
             self.conversationId = conversationId
             self.generation = generation
             self.actorDeviceId = actorDeviceId
@@ -43,33 +54,33 @@ public struct BlueCatbirdChatAcknowledgeEntries {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(conversationId, forKey: .conversationId)
-            try container.encode(generation, forKey: .generation)
-            try container.encode(actorDeviceId, forKey: .actorDeviceId)
-            try container.encode(keyId, forKey: .keyId)
-            try container.encode(authGeneration, forKey: .authGeneration)
-            try container.encode(upToSeq, forKey: .upToSeq)
-            try container.encode(signedAt, forKey: .signedAt)
-            try container.encode(signature, forKey: .signature)
+            try container.encode(self.conversationId, forKey: .conversationId)
+            try container.encode(self.generation, forKey: .generation)
+            try container.encode(self.actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(self.keyId, forKey: .keyId)
+            try container.encode(self.authGeneration, forKey: .authGeneration)
+            try container.encode(self.upToSeq, forKey: .upToSeq)
+            try container.encode(self.signedAt, forKey: .signedAt)
+            try container.encode(self.signature, forKey: .signature)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let conversationIdValue = try conversationId.toCBORValue()
+            let conversationIdValue = try self.conversationId.toCBORValue()
             map = map.adding(key: "conversationId", value: conversationIdValue)
-            let generationValue = try generation.toCBORValue()
+            let generationValue = try self.generation.toCBORValue()
             map = map.adding(key: "generation", value: generationValue)
-            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            let actorDeviceIdValue = try self.actorDeviceId.toCBORValue()
             map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
-            let keyIdValue = try keyId.toCBORValue()
+            let keyIdValue = try self.keyId.toCBORValue()
             map = map.adding(key: "keyId", value: keyIdValue)
-            let authGenerationValue = try authGeneration.toCBORValue()
+            let authGenerationValue = try self.authGeneration.toCBORValue()
             map = map.adding(key: "authGeneration", value: authGenerationValue)
-            let upToSeqValue = try upToSeq.toCBORValue()
+            let upToSeqValue = try self.upToSeq.toCBORValue()
             map = map.adding(key: "upToSeq", value: upToSeqValue)
-            let signedAtValue = try signedAt.toCBORValue()
+            let signedAtValue = try self.signedAt.toCBORValue()
             map = map.adding(key: "signedAt", value: signedAtValue)
-            let signatureValue = try signature.toCBORValue()
+            let signatureValue = try self.signature.toCBORValue()
             map = map.adding(key: "signature", value: signatureValue)
             return map
         }
@@ -89,63 +100,41 @@ public struct BlueCatbirdChatAcknowledgeEntries {
     public struct Output: ATProtocolCodable {
 
         public let acknowledgedSeq: Int
-
         public let prunedCount: Int
 
-        // Standard public initializer
         public init(
-
             acknowledgedSeq: Int,
-
             prunedCount: Int
-
         ) {
-
             self.acknowledgedSeq = acknowledgedSeq
-
             self.prunedCount = prunedCount
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.acknowledgedSeq = try container.decode(Int.self, forKey: .acknowledgedSeq)
-
             self.prunedCount = try container.decode(Int.self, forKey: .prunedCount)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(acknowledgedSeq, forKey: .acknowledgedSeq)
-
-            try container.encode(prunedCount, forKey: .prunedCount)
-
+            try container.encode(self.acknowledgedSeq, forKey: .acknowledgedSeq)
+            try container.encode(self.prunedCount, forKey: .prunedCount)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let acknowledgedSeqValue = try acknowledgedSeq.toCBORValue()
+            let acknowledgedSeqValue = try self.acknowledgedSeq.toCBORValue()
             map = map.adding(key: "acknowledgedSeq", value: acknowledgedSeqValue)
-
-            let prunedCountValue = try prunedCount.toCBORValue()
+            let prunedCountValue = try self.prunedCount.toCBORValue()
             map = map.adding(key: "prunedCount", value: prunedCountValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case acknowledgedSeq
             case prunedCount
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -175,11 +164,10 @@ extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - acknowledgeEntries
     /// Device-signed post-commit acknowledgment of delivered entries up to upToSeq by an active leaf device. Once all active non-dormant leaf devices acknowledge an applicationMessageEntry, mls-ds prunes accepted_payload_bytes to NULL while preserving seq contiguity and all MLS control entries.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdChatAcknowledgeEntries.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func acknowledgeEntries(
 
         input: BlueCatbirdChatAcknowledgeEntries.Input
@@ -211,44 +199,24 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdChatAcknowledgeEntries.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatAcknowledgeEntries.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.acknowledgeEntries: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdChatAcknowledgeEntries.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdChatAcknowledgeEntries.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

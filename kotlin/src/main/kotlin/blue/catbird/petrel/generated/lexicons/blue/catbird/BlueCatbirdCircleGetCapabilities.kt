@@ -21,7 +21,8 @@ object BlueCatbirdCircleGetCapabilitiesDefs {
         @SerialName("enabled")
         val enabled: Boolean,        @SerialName("protocolRevision")
         val protocolRevision: String,        @SerialName("supportsImages")
-        val supportsImages: Boolean    )
+        val supportsImages: Boolean,// Whether this service accepts and serves encrypted Circle posts.        @SerialName("supportsEncryptedPosts")
+        val supportsEncryptedPosts: Boolean? = null    )
 
 sealed class BlueCatbirdCircleGetCapabilitiesError(val name: String, val description: String?) {
         object AuthRequired: BlueCatbirdCircleGetCapabilitiesError("AuthRequired", null)

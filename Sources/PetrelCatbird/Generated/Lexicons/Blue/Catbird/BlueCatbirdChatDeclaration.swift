@@ -4,19 +4,38 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.declaration
 
+/// A declaration of a Catbird secure chat account.
 public struct BlueCatbirdChatDeclaration: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "blue.catbird.chat.declaration"
-    public let allowIncoming: String
-    public let deliveryService: DID
-    public let protocolVersion: String
-    public let createdAt: ATProtocolDate
 
-    public init(allowIncoming: String, deliveryService: DID, protocolVersion: String, createdAt: ATProtocolDate) {
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "literal:self")
+
+    /// Incoming message consent policy: 'all', 'following', or 'none'.
+    public let allowIncoming: String
+    /// DID of the delivery service that serves this actor (e.g. did:web:chat.catbird.blue).
+    public let deliveryService: DID
+    /// Secure chat protocol version.
+    public let protocolVersion: String
+    /// Timestamp when this declaration record was created.
+    public let createdAt: ATProtocolDate
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
+
+    public init(
+        allowIncoming: String,
+        deliveryService: DID,
+        protocolVersion: String,
+        createdAt: ATProtocolDate,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.allowIncoming = allowIncoming
         self.deliveryService = deliveryService
         self.protocolVersion = protocolVersion
         self.createdAt = createdAt
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
@@ -25,58 +44,63 @@ public struct BlueCatbirdChatDeclaration: ATProtocolCodable, ATProtocolValue {
         self.deliveryService = try container.decode(DID.self, forKey: .deliveryService)
         self.protocolVersion = try container.decode(String.self, forKey: .protocolVersion)
         self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(allowIncoming, forKey: .allowIncoming)
-        try container.encode(deliveryService, forKey: .deliveryService)
-        try container.encode(protocolVersion, forKey: .protocolVersion)
-        try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(self.allowIncoming, forKey: .allowIncoming)
+        try container.encode(self.deliveryService, forKey: .deliveryService)
+        try container.encode(self.protocolVersion, forKey: .protocolVersion)
+        try container.encode(self.createdAt, forKey: .createdAt)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.allowIncoming)
+        hasher.combine(self.deliveryService)
+        hasher.combine(self.protocolVersion)
+        hasher.combine(self.createdAt)
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.allowIncoming != other.allowIncoming {
+            return false
+        }
+        if self.deliveryService != other.deliveryService {
+            return false
+        }
+        if self.protocolVersion != other.protocolVersion {
+            return false
+        }
+        if self.createdAt != other.createdAt {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if allowIncoming != other.allowIncoming {
-            return false
-        }
-        if deliveryService != other.deliveryService {
-            return false
-        }
-        if protocolVersion != other.protocolVersion {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(allowIncoming)
-        hasher.combine(deliveryService)
-        hasher.combine(protocolVersion)
-        hasher.combine(createdAt)
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let allowIncomingValue = try allowIncoming.toCBORValue()
+        let allowIncomingValue = try self.allowIncoming.toCBORValue()
         map = map.adding(key: "allowIncoming", value: allowIncomingValue)
-        let deliveryServiceValue = try deliveryService.toCBORValue()
+        let deliveryServiceValue = try self.deliveryService.toCBORValue()
         map = map.adding(key: "deliveryService", value: deliveryServiceValue)
-        let protocolVersionValue = try protocolVersion.toCBORValue()
+        let protocolVersionValue = try self.protocolVersion.toCBORValue()
         map = map.adding(key: "protocolVersion", value: protocolVersionValue)
-        let createdAtValue = try createdAt.toCBORValue()
+        let createdAtValue = try self.createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
     }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "allowIncoming", "deliveryService", "protocolVersion", "createdAt"]
 
     private enum CodingKeys: String, CodingKey {
         case typeIdentifier = "$type"

@@ -4,17 +4,32 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.ownerBatch
 
+/// Owner-encrypted (v1.0 mode) messages of one thread, batched to respect repo rate limits ([CB-20]). Personal mailbox space. rkey = TID.
 public struct BlueCatbirdLabyrinthOwnerBatch: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.ownerBatch"
+
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "tid")
+
+    /// Conversation id; every item has the same threadId.
     public let threadId: String
     public let items: [BlueCatbirdLabyrinthDefs.OwnerMessage]
     public let createdAt: ATProtocolDate
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
 
-    public init(threadId: String, items: [BlueCatbirdLabyrinthDefs.OwnerMessage], createdAt: ATProtocolDate) {
+    public init(
+        threadId: String,
+        items: [BlueCatbirdLabyrinthDefs.OwnerMessage],
+        createdAt: ATProtocolDate,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.threadId = threadId
         self.items = items
         self.createdAt = createdAt
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
@@ -22,51 +37,56 @@ public struct BlueCatbirdLabyrinthOwnerBatch: ATProtocolCodable, ATProtocolValue
         self.threadId = try container.decode(String.self, forKey: .threadId)
         self.items = try container.decode([BlueCatbirdLabyrinthDefs.OwnerMessage].self, forKey: .items)
         self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(threadId, forKey: .threadId)
-        try container.encode(items, forKey: .items)
-        try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(self.threadId, forKey: .threadId)
+        try container.encode(self.items, forKey: .items)
+        try container.encode(self.createdAt, forKey: .createdAt)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.threadId)
+        hasher.combine(self.items)
+        hasher.combine(self.createdAt)
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.threadId != other.threadId {
+            return false
+        }
+        if self.items != other.items {
+            return false
+        }
+        if self.createdAt != other.createdAt {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if threadId != other.threadId {
-            return false
-        }
-        if items != other.items {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(threadId)
-        hasher.combine(items)
-        hasher.combine(createdAt)
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let threadIdValue = try threadId.toCBORValue()
+        let threadIdValue = try self.threadId.toCBORValue()
         map = map.adding(key: "threadId", value: threadIdValue)
-        let itemsValue = try items.toCBORValue()
+        let itemsValue = try self.items.toCBORValue()
         map = map.adding(key: "items", value: itemsValue)
-        let createdAtValue = try createdAt.toCBORValue()
+        let createdAtValue = try self.createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
     }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "threadId", "items", "createdAt"]
 
     private enum CodingKeys: String, CodingKey {
         case typeIdentifier = "$type"

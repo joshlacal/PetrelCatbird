@@ -19,14 +19,19 @@
           "minimum": 0,
           "description": "Number of members on the owner's PDS member list. The member list itself is owner-only and is read from the owner's PDS, not from this service."
         },
-        "muted": { "type": "boolean" }
+        "muted": { "type": "boolean" },
+        "latestKeyVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Latest content-key version known for an encrypted Circle; absent for plaintext Circles."
+        }
       }
     },
     "feedItem": {
       "type": "object",
       "required": ["post", "circle"],
       "properties": {
-        "post": { "type": "ref", "ref": "app.bsky.feed.defs#feedViewPost" },
+        "post": { "type": "union", "refs": ["app.bsky.feed.defs#feedViewPost", "#encryptedPostView"] },
         "circle": { "type": "ref", "ref": "#circleSummary" }
       }
     },
@@ -40,6 +45,20 @@
         "subject": { "type": "string", "format": "at-uri" },
         "indexedAt": { "type": "string", "format": "datetime" },
         "circle": { "type": "ref", "ref": "#circleSummary" }
+      }
+    },
+    "encryptedPostView": {
+      "type": "object",
+      "required": ["uri", "cid", "author", "record", "indexedAt"],
+      "properties": {
+        "uri": { "type": "string", "format": "at-uri" },
+        "cid": { "type": "string", "format": "cid" },
+        "author": { "type": "ref", "ref": "app.bsky.actor.defs#profileViewBasic" },
+        "record": { "type": "ref", "ref": "blue.catbird.circle.post" },
+        "indexedAt": { "type": "string", "format": "datetime" },
+        "likeCount": { "type": "integer", "minimum": 0 },
+        "replyCount": { "type": "integer", "minimum": 0 },
+        "viewer": { "type": "ref", "ref": "app.bsky.feed.defs#viewerState" }
       }
     }
   }

@@ -4,86 +4,65 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.mlsDS.getFederationMode
 
+/// Get the current federation mode (admin only). Return the effective, override, and environment federation mode settings.
 public struct BlueCatbirdMlsDSGetFederationMode {
 
     public static let typeIdentifier = "blue.catbird.mlsDS.getFederationMode"
 
     public struct Output: ATProtocolCodable {
 
+        /// Currently effective federation mode
         public let effectiveMode: String
-
+        /// Runtime override mode (if set)
         public let overrideMode: String?
-
+        /// Federation mode from environment configuration
         public let envMode: String
 
-        // Standard public initializer
         public init(
-
             effectiveMode: String,
-
             overrideMode: String? = nil,
-
             envMode: String
-
         ) {
-
             self.effectiveMode = effectiveMode
-
             self.overrideMode = overrideMode
-
             self.envMode = envMode
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
+            let strict = decoder.isATProtoStrictDecoding
             self.effectiveMode = try container.decode(String.self, forKey: .effectiveMode)
-
             do {
-                self.overrideMode = try container.decodeIfPresent(String.self, forKey: .overrideMode)
+                self.overrideMode = try container.decodeIfPresent(String.self, forKey: .overrideMode, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'overrideMode' — degrading to nil: \(error)")
                 self.overrideMode = nil
             }
-
             self.envMode = try container.decode(String.self, forKey: .envMode)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(effectiveMode, forKey: .effectiveMode)
-
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(overrideMode, forKey: .overrideMode)
-
-            try container.encode(envMode, forKey: .envMode)
-
+            try container.encode(self.effectiveMode, forKey: .effectiveMode)
+            try container.encodeIfPresent(self.overrideMode, forKey: .overrideMode)
+            try container.encode(self.envMode, forKey: .envMode)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let effectiveModeValue = try effectiveMode.toCBORValue()
+            let effectiveModeValue = try self.effectiveMode.toCBORValue()
             map = map.adding(key: "effectiveMode", value: effectiveModeValue)
-
-            if let value = overrideMode {
-                // Encode optional property even if it's an empty array for CBOR
+            if let value = self.overrideMode {
                 let overrideModeValue = try value.toCBORValue()
                 map = map.adding(key: "overrideMode", value: overrideModeValue)
             }
-
-            let envModeValue = try envMode.toCBORValue()
+            let envModeValue = try self.envMode.toCBORValue()
             map = map.adding(key: "envMode", value: envModeValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -91,7 +70,6 @@ public struct BlueCatbirdMlsDSGetFederationMode {
             case overrideMode
             case envMode
         }
-
     }
 
 }
@@ -100,8 +78,8 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
     // MARK: - getFederationMode
     /// Get the current federation mode (admin only). Return the effective, override, and environment federation mode settings.
     ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoXRPCError` for a non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getFederationMode() async throws -> (responseCode: Int, data: BlueCatbirdMlsDSGetFederationMode.Output?) {
         let endpoint = "blue.catbird.mlsDS.getFederationMode"
 
@@ -118,37 +96,27 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
         // Determine service DID for this endpoint
         let serviceDID = await networkService.getServiceDID(for: "blue.catbird.mlsDS.getFederationMode")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
-        let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
+        let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSGetFederationMode.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.getFederationMode: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdMlsDSGetFederationMode.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

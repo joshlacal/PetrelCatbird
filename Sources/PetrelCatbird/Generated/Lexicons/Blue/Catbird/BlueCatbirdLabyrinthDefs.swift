@@ -8,21 +8,45 @@ public struct BlueCatbirdLabyrinthDefs {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.defs"
 
+    /// Public data of one mailbox epoch (SPEC §5.2-5.3). Everything needed to recompute and verify the epoch head.
     public struct EpochPublic: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.labyrinth.defs#epochPublic"
+
+        /// epochSequenceID, starting at 0.
         public let epochNumber: Int
+        /// Hawk auth public key (X25519, 32 bytes).
         public let authPubkey: Bytes
+        /// Hawk encryption public key: X25519(32) || ML-KEM-768 ek(1184).
         public let encryptionPubkey: Bytes
+        /// XEdDSA mailbox signing public key (32 bytes).
         public let signingPubkey: Bytes
+        /// [Gate 3] SHA-256 over canonical sorted active epoch member deviceKeyPubkeys bound into epochHead.
         public let membersHash: Bytes
+        /// Head of epoch N-1; absent for epoch 0.
         public let previousEpochHead: Bytes?
+        /// sha256 epoch head (SPEC §5.3, Gate 3 membersHash bound).
         public let epochHead: Bytes
+        /// XEdDSA by this epoch's signing key over 'minos.unstructured_signature.epoch_self:' || head.
         public let selfSig: Bytes
+        /// XEdDSA by the previous epoch's signing key over 'minos.unstructured_signature.epoch_prev:' || head.
         public let prevSig: Bytes?
         public let attestation: TransportAttestation
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            epochNumber: Int, authPubkey: Bytes, encryptionPubkey: Bytes, signingPubkey: Bytes, membersHash: Bytes, previousEpochHead: Bytes? = nil, epochHead: Bytes, selfSig: Bytes, prevSig: Bytes? = nil, attestation: TransportAttestation
+            epochNumber: Int,
+            authPubkey: Bytes,
+            encryptionPubkey: Bytes,
+            signingPubkey: Bytes,
+            membersHash: Bytes,
+            previousEpochHead: Bytes? = nil,
+            epochHead: Bytes,
+            selfSig: Bytes,
+            prevSig: Bytes? = nil,
+            attestation: TransportAttestation,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.epochNumber = epochNumber
             self.authPubkey = authPubkey
@@ -34,145 +58,118 @@ public struct BlueCatbirdLabyrinthDefs {
             self.selfSig = selfSig
             self.prevSig = prevSig
             self.attestation = attestation
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.epochNumber = try container.decode(Int.self, forKey: .epochNumber)
+            self.authPubkey = try container.decode(Bytes.self, forKey: .authPubkey)
+            self.encryptionPubkey = try container.decode(Bytes.self, forKey: .encryptionPubkey)
+            self.signingPubkey = try container.decode(Bytes.self, forKey: .signingPubkey)
+            self.membersHash = try container.decode(Bytes.self, forKey: .membersHash)
             do {
-                self.epochNumber = try container.decode(Int.self, forKey: .epochNumber)
+                self.previousEpochHead = try container.decodeIfPresent(Bytes.self, forKey: .previousEpochHead, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'epochNumber': \(error)")
-                throw error
-            }
-            do {
-                self.authPubkey = try container.decode(Bytes.self, forKey: .authPubkey)
-            } catch {
-                LogManager.logError("Decoding error for required property 'authPubkey': \(error)")
-                throw error
-            }
-            do {
-                self.encryptionPubkey = try container.decode(Bytes.self, forKey: .encryptionPubkey)
-            } catch {
-                LogManager.logError("Decoding error for required property 'encryptionPubkey': \(error)")
-                throw error
-            }
-            do {
-                self.signingPubkey = try container.decode(Bytes.self, forKey: .signingPubkey)
-            } catch {
-                LogManager.logError("Decoding error for required property 'signingPubkey': \(error)")
-                throw error
-            }
-            do {
-                self.membersHash = try container.decode(Bytes.self, forKey: .membersHash)
-            } catch {
-                LogManager.logError("Decoding error for required property 'membersHash': \(error)")
-                throw error
-            }
-            do {
-                self.previousEpochHead = try container.decodeIfPresent(Bytes.self, forKey: .previousEpochHead)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'previousEpochHead' — degrading to nil: \(error)")
                 self.previousEpochHead = nil
+                malformedFields.insert("previousEpochHead")
             }
+            self.epochHead = try container.decode(Bytes.self, forKey: .epochHead)
+            self.selfSig = try container.decode(Bytes.self, forKey: .selfSig)
             do {
-                self.epochHead = try container.decode(Bytes.self, forKey: .epochHead)
+                self.prevSig = try container.decodeIfPresent(Bytes.self, forKey: .prevSig, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'epochHead': \(error)")
-                throw error
-            }
-            do {
-                self.selfSig = try container.decode(Bytes.self, forKey: .selfSig)
-            } catch {
-                LogManager.logError("Decoding error for required property 'selfSig': \(error)")
-                throw error
-            }
-            do {
-                self.prevSig = try container.decodeIfPresent(Bytes.self, forKey: .prevSig)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'prevSig' — degrading to nil: \(error)")
                 self.prevSig = nil
+                malformedFields.insert("prevSig")
             }
-            do {
-                self.attestation = try container.decode(TransportAttestation.self, forKey: .attestation)
-            } catch {
-                LogManager.logError("Decoding error for required property 'attestation': \(error)")
-                throw error
-            }
+            self.attestation = try container.decode(TransportAttestation.self, forKey: .attestation)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(epochNumber, forKey: .epochNumber)
-            try container.encode(authPubkey, forKey: .authPubkey)
-            try container.encode(encryptionPubkey, forKey: .encryptionPubkey)
-            try container.encode(signingPubkey, forKey: .signingPubkey)
-            try container.encode(membersHash, forKey: .membersHash)
-            try container.encodeIfPresent(previousEpochHead, forKey: .previousEpochHead)
-            try container.encode(epochHead, forKey: .epochHead)
-            try container.encode(selfSig, forKey: .selfSig)
-            try container.encodeIfPresent(prevSig, forKey: .prevSig)
-            try container.encode(attestation, forKey: .attestation)
+            try container.encode(self.epochNumber, forKey: .epochNumber)
+            try container.encode(self.authPubkey, forKey: .authPubkey)
+            try container.encode(self.encryptionPubkey, forKey: .encryptionPubkey)
+            try container.encode(self.signingPubkey, forKey: .signingPubkey)
+            try container.encode(self.membersHash, forKey: .membersHash)
+            try container.encodeIfPresent(self.previousEpochHead, forKey: .previousEpochHead)
+            try container.encode(self.epochHead, forKey: .epochHead)
+            try container.encode(self.selfSig, forKey: .selfSig)
+            try container.encodeIfPresent(self.prevSig, forKey: .prevSig)
+            try container.encode(self.attestation, forKey: .attestation)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(epochNumber)
-            hasher.combine(authPubkey)
-            hasher.combine(encryptionPubkey)
-            hasher.combine(signingPubkey)
-            hasher.combine(membersHash)
-            if let value = previousEpochHead {
+            hasher.combine(self.epochNumber)
+            hasher.combine(self.authPubkey)
+            hasher.combine(self.encryptionPubkey)
+            hasher.combine(self.signingPubkey)
+            hasher.combine(self.membersHash)
+            if let value = self.previousEpochHead {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            hasher.combine(epochHead)
-            hasher.combine(selfSig)
-            if let value = prevSig {
+            hasher.combine(self.epochHead)
+            hasher.combine(self.selfSig)
+            if let value = self.prevSig {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            hasher.combine(attestation)
+            hasher.combine(self.attestation)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if epochNumber != other.epochNumber {
+            if self.epochNumber != other.epochNumber {
                 return false
             }
-            if authPubkey != other.authPubkey {
+            if self.authPubkey != other.authPubkey {
                 return false
             }
-            if encryptionPubkey != other.encryptionPubkey {
+            if self.encryptionPubkey != other.encryptionPubkey {
                 return false
             }
-            if signingPubkey != other.signingPubkey {
+            if self.signingPubkey != other.signingPubkey {
                 return false
             }
-            if membersHash != other.membersHash {
+            if self.membersHash != other.membersHash {
                 return false
             }
-            if previousEpochHead != other.previousEpochHead {
+            if self.previousEpochHead != other.previousEpochHead {
                 return false
             }
-            if epochHead != other.epochHead {
+            if self.epochHead != other.epochHead {
                 return false
             }
-            if selfSig != other.selfSig {
+            if self.selfSig != other.selfSig {
                 return false
             }
-            if prevSig != other.prevSig {
+            if self.prevSig != other.prevSig {
                 return false
             }
-            if attestation != other.attestation {
+            if self.attestation != other.attestation {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -181,36 +178,54 @@ public struct BlueCatbirdLabyrinthDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let epochNumberValue = try epochNumber.toCBORValue()
+            let epochNumberValue = try self.epochNumber.toCBORValue()
             map = map.adding(key: "epochNumber", value: epochNumberValue)
-            let authPubkeyValue = try authPubkey.toCBORValue()
+            let authPubkeyValue = try self.authPubkey.toCBORValue()
             map = map.adding(key: "authPubkey", value: authPubkeyValue)
-            let encryptionPubkeyValue = try encryptionPubkey.toCBORValue()
+            let encryptionPubkeyValue = try self.encryptionPubkey.toCBORValue()
             map = map.adding(key: "encryptionPubkey", value: encryptionPubkeyValue)
-            let signingPubkeyValue = try signingPubkey.toCBORValue()
+            let signingPubkeyValue = try self.signingPubkey.toCBORValue()
             map = map.adding(key: "signingPubkey", value: signingPubkeyValue)
-            let membersHashValue = try membersHash.toCBORValue()
+            let membersHashValue = try self.membersHash.toCBORValue()
             map = map.adding(key: "membersHash", value: membersHashValue)
-            if let value = previousEpochHead {
+            if let value = self.previousEpochHead {
                 let previousEpochHeadValue = try value.toCBORValue()
                 map = map.adding(key: "previousEpochHead", value: previousEpochHeadValue)
             }
-            let epochHeadValue = try epochHead.toCBORValue()
+            let epochHeadValue = try self.epochHead.toCBORValue()
             map = map.adding(key: "epochHead", value: epochHeadValue)
-            let selfSigValue = try selfSig.toCBORValue()
+            let selfSigValue = try self.selfSig.toCBORValue()
             map = map.adding(key: "selfSig", value: selfSigValue)
-            if let value = prevSig {
+            if let value = self.prevSig {
                 let prevSigValue = try value.toCBORValue()
                 map = map.adding(key: "prevSig", value: prevSigValue)
             }
-            let attestationValue = try attestation.toCBORValue()
+            let attestationValue = try self.attestation.toCBORValue()
             map = map.adding(key: "attestation", value: attestationValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "epochNumber", "authPubkey", "encryptionPubkey", "signingPubkey", "membersHash", "previousEpochHead", "epochHead", "selfSig", "prevSig", "attestation"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "epochNumber": return true
+            case "authPubkey": return true
+            case "encryptionPubkey": return true
+            case "signingPubkey": return true
+            case "membersHash": return true
+            case "previousEpochHead": return self.previousEpochHead != nil
+            case "epochHead": return true
+            case "selfSig": return true
+            case "prevSig": return self.prevSig != nil
+            case "attestation": return true
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case epochNumber
             case authPubkey
             case encryptionPubkey
@@ -223,56 +238,57 @@ public struct BlueCatbirdLabyrinthDefs {
             case attestation
         }
     }
-
+    /// [CB-18] Binds an epoch head to the account's MLS chat identity: Ed25519 by a chat device transport key over 'catbird.labyrinth.epoch_head_attest:' || did || ':' || head.
     public struct TransportAttestation: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.labyrinth.defs#transportAttestation"
+
+        /// Ed25519 public key of the attesting chat device.
         public let transportPubkey: Bytes
+        /// Ed25519 signature.
         public let sig: Bytes
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            transportPubkey: Bytes, sig: Bytes
+            transportPubkey: Bytes,
+            sig: Bytes,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.transportPubkey = transportPubkey
             self.sig = sig
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.transportPubkey = try container.decode(Bytes.self, forKey: .transportPubkey)
-            } catch {
-                LogManager.logError("Decoding error for required property 'transportPubkey': \(error)")
-                throw error
-            }
-            do {
-                self.sig = try container.decode(Bytes.self, forKey: .sig)
-            } catch {
-                LogManager.logError("Decoding error for required property 'sig': \(error)")
-                throw error
-            }
+            self.transportPubkey = try container.decode(Bytes.self, forKey: .transportPubkey)
+            self.sig = try container.decode(Bytes.self, forKey: .sig)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(transportPubkey, forKey: .transportPubkey)
-            try container.encode(sig, forKey: .sig)
+            try container.encode(self.transportPubkey, forKey: .transportPubkey)
+            try container.encode(self.sig, forKey: .sig)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(transportPubkey)
-            hasher.combine(sig)
+            hasher.combine(self.transportPubkey)
+            hasher.combine(self.sig)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if transportPubkey != other.transportPubkey {
+            if self.transportPubkey != other.transportPubkey {
                 return false
             }
-            if sig != other.sig {
+            if self.sig != other.sig {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -281,23 +297,192 @@ public struct BlueCatbirdLabyrinthDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let transportPubkeyValue = try transportPubkey.toCBORValue()
+            let transportPubkeyValue = try self.transportPubkey.toCBORValue()
             map = map.adding(key: "transportPubkey", value: transportPubkeyValue)
-            let sigValue = try sig.toCBORValue()
+            let sigValue = try self.sig.toCBORValue()
             map = map.adding(key: "sig", value: sigValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "transportPubkey", "sig"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case transportPubkey
             case sig
         }
     }
+    /// Authenticated device revocation statement signed by a physical mailbox device over the target device key and revocation timestamp.
+    public struct DeviceRevocation: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.labyrinth.defs#deviceRevocation"
 
+        /// XEdDSA deviceKeyPubkey of the physical device that signed this revocation.
+        public let revokedBy: Bytes
+        /// XEdDSA signature over the domain-separated (did, targetDeviceKey, revokedAt) revocation statement.
+        public let sig: Bytes
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
+
+        public init(
+            revokedBy: Bytes,
+            sig: Bytes,
+            extraFields: [String: ATProtocolValueContainer] = [:]
+        ) {
+            self.revokedBy = revokedBy
+            self.sig = sig
+            self.extraFields = extraFields
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.revokedBy = try container.decode(Bytes.self, forKey: .revokedBy)
+            self.sig = try container.decode(Bytes.self, forKey: .sig)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(self.revokedBy, forKey: .revokedBy)
+            try container.encode(self.sig, forKey: .sig)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(self.revokedBy)
+            hasher.combine(self.sig)
+            hasher.combine(extraFields)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if self.revokedBy != other.revokedBy {
+                return false
+            }
+            if self.sig != other.sig {
+                return false
+            }
+            return self.extraFields == other.extraFields
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            let revokedByValue = try self.revokedBy.toCBORValue()
+            map = map.adding(key: "revokedBy", value: revokedByValue)
+            let sigValue = try self.sig.toCBORValue()
+            map = map.adding(key: "sig", value: sigValue)
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "revokedBy", "sig"]
+
+        private enum CodingKeys: String, CodingKey {
+            case revokedBy
+            case sig
+        }
+    }
+    /// Original sender device signature over the domain-separated canonical (threadId, messageId, archiveCommitment) tuple. Stored beside, never inside, the commitment input.
+    public struct OriginalSenderArchiveAttestation: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.labyrinth.defs#originalSenderArchiveAttestation"
+
+        public let senderDid: DID
+        public let senderDeviceId: String
+        public let senderTransportPubkey: Bytes
+        public let signature: Bytes
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
+
+        public init(
+            senderDid: DID,
+            senderDeviceId: String,
+            senderTransportPubkey: Bytes,
+            signature: Bytes,
+            extraFields: [String: ATProtocolValueContainer] = [:]
+        ) {
+            self.senderDid = senderDid
+            self.senderDeviceId = senderDeviceId
+            self.senderTransportPubkey = senderTransportPubkey
+            self.signature = signature
+            self.extraFields = extraFields
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.senderDid = try container.decode(DID.self, forKey: .senderDid)
+            self.senderDeviceId = try container.decode(String.self, forKey: .senderDeviceId)
+            self.senderTransportPubkey = try container.decode(Bytes.self, forKey: .senderTransportPubkey)
+            self.signature = try container.decode(Bytes.self, forKey: .signature)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(self.senderDid, forKey: .senderDid)
+            try container.encode(self.senderDeviceId, forKey: .senderDeviceId)
+            try container.encode(self.senderTransportPubkey, forKey: .senderTransportPubkey)
+            try container.encode(self.signature, forKey: .signature)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(self.senderDid)
+            hasher.combine(self.senderDeviceId)
+            hasher.combine(self.senderTransportPubkey)
+            hasher.combine(self.signature)
+            hasher.combine(extraFields)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if self.senderDid != other.senderDid {
+                return false
+            }
+            if self.senderDeviceId != other.senderDeviceId {
+                return false
+            }
+            if self.senderTransportPubkey != other.senderTransportPubkey {
+                return false
+            }
+            if self.signature != other.signature {
+                return false
+            }
+            return self.extraFields == other.extraFields
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            let senderDidValue = try self.senderDid.toCBORValue()
+            map = map.adding(key: "senderDid", value: senderDidValue)
+            let senderDeviceIdValue = try self.senderDeviceId.toCBORValue()
+            map = map.adding(key: "senderDeviceId", value: senderDeviceIdValue)
+            let senderTransportPubkeyValue = try self.senderTransportPubkey.toCBORValue()
+            map = map.adding(key: "senderTransportPubkey", value: senderTransportPubkeyValue)
+            let signatureValue = try self.signature.toCBORValue()
+            map = map.adding(key: "signature", value: signatureValue)
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "senderDid", "senderDeviceId", "senderTransportPubkey", "signature"]
+
+        private enum CodingKeys: String, CodingKey {
+            case senderDid
+            case senderDeviceId
+            case senderTransportPubkey
+            case signature
+        }
+    }
+    /// [I13] Sequencer receipt signed by {sequencerDid}#mls-receipt-1 binding Labyrinth history items to live MLS applicationAad.archiveCommitment.
     public struct SequencerReceipt: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.labyrinth.defs#sequencerReceipt"
+
         public let conversationId: String
         public let generation: Int
         public let groupId: Bytes
@@ -311,9 +496,27 @@ public struct BlueCatbirdLabyrinthDefs {
         public let sequencerDid: DID
         public let kid: String
         public let signature: Bytes
+        public let originalSenderAttestation: OriginalSenderArchiveAttestation
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            conversationId: String, generation: Int, groupId: Bytes, epoch: Int, entryId: String, seq: Int, senderDid: DID, senderDeviceId: String, archiveCommitment: Bytes, issuedAtMs: Int, sequencerDid: DID, kid: String, signature: Bytes
+            conversationId: String,
+            generation: Int,
+            groupId: Bytes,
+            epoch: Int,
+            entryId: String,
+            seq: Int,
+            senderDid: DID,
+            senderDeviceId: String,
+            archiveCommitment: Bytes,
+            issuedAtMs: Int,
+            sequencerDid: DID,
+            kid: String,
+            signature: Bytes,
+            originalSenderAttestation: OriginalSenderArchiveAttestation,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.conversationId = conversationId
             self.generation = generation
@@ -328,166 +531,111 @@ public struct BlueCatbirdLabyrinthDefs {
             self.sequencerDid = sequencerDid
             self.kid = kid
             self.signature = signature
+            self.originalSenderAttestation = originalSenderAttestation
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.conversationId = try container.decode(String.self, forKey: .conversationId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'conversationId': \(error)")
-                throw error
-            }
-            do {
-                self.generation = try container.decode(Int.self, forKey: .generation)
-            } catch {
-                LogManager.logError("Decoding error for required property 'generation': \(error)")
-                throw error
-            }
-            do {
-                self.groupId = try container.decode(Bytes.self, forKey: .groupId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'groupId': \(error)")
-                throw error
-            }
-            do {
-                self.epoch = try container.decode(Int.self, forKey: .epoch)
-            } catch {
-                LogManager.logError("Decoding error for required property 'epoch': \(error)")
-                throw error
-            }
-            do {
-                self.entryId = try container.decode(String.self, forKey: .entryId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'entryId': \(error)")
-                throw error
-            }
-            do {
-                self.seq = try container.decode(Int.self, forKey: .seq)
-            } catch {
-                LogManager.logError("Decoding error for required property 'seq': \(error)")
-                throw error
-            }
-            do {
-                self.senderDid = try container.decode(DID.self, forKey: .senderDid)
-            } catch {
-                LogManager.logError("Decoding error for required property 'senderDid': \(error)")
-                throw error
-            }
-            do {
-                self.senderDeviceId = try container.decode(String.self, forKey: .senderDeviceId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'senderDeviceId': \(error)")
-                throw error
-            }
-            do {
-                self.archiveCommitment = try container.decode(Bytes.self, forKey: .archiveCommitment)
-            } catch {
-                LogManager.logError("Decoding error for required property 'archiveCommitment': \(error)")
-                throw error
-            }
-            do {
-                self.issuedAtMs = try container.decode(Int.self, forKey: .issuedAtMs)
-            } catch {
-                LogManager.logError("Decoding error for required property 'issuedAtMs': \(error)")
-                throw error
-            }
-            do {
-                self.sequencerDid = try container.decode(DID.self, forKey: .sequencerDid)
-            } catch {
-                LogManager.logError("Decoding error for required property 'sequencerDid': \(error)")
-                throw error
-            }
-            do {
-                self.kid = try container.decode(String.self, forKey: .kid)
-            } catch {
-                LogManager.logError("Decoding error for required property 'kid': \(error)")
-                throw error
-            }
-            do {
-                self.signature = try container.decode(Bytes.self, forKey: .signature)
-            } catch {
-                LogManager.logError("Decoding error for required property 'signature': \(error)")
-                throw error
-            }
+            self.conversationId = try container.decode(String.self, forKey: .conversationId)
+            self.generation = try container.decode(Int.self, forKey: .generation)
+            self.groupId = try container.decode(Bytes.self, forKey: .groupId)
+            self.epoch = try container.decode(Int.self, forKey: .epoch)
+            self.entryId = try container.decode(String.self, forKey: .entryId)
+            self.seq = try container.decode(Int.self, forKey: .seq)
+            self.senderDid = try container.decode(DID.self, forKey: .senderDid)
+            self.senderDeviceId = try container.decode(String.self, forKey: .senderDeviceId)
+            self.archiveCommitment = try container.decode(Bytes.self, forKey: .archiveCommitment)
+            self.issuedAtMs = try container.decode(Int.self, forKey: .issuedAtMs)
+            self.sequencerDid = try container.decode(DID.self, forKey: .sequencerDid)
+            self.kid = try container.decode(String.self, forKey: .kid)
+            self.signature = try container.decode(Bytes.self, forKey: .signature)
+            self.originalSenderAttestation = try container.decode(OriginalSenderArchiveAttestation.self, forKey: .originalSenderAttestation)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(conversationId, forKey: .conversationId)
-            try container.encode(generation, forKey: .generation)
-            try container.encode(groupId, forKey: .groupId)
-            try container.encode(epoch, forKey: .epoch)
-            try container.encode(entryId, forKey: .entryId)
-            try container.encode(seq, forKey: .seq)
-            try container.encode(senderDid, forKey: .senderDid)
-            try container.encode(senderDeviceId, forKey: .senderDeviceId)
-            try container.encode(archiveCommitment, forKey: .archiveCommitment)
-            try container.encode(issuedAtMs, forKey: .issuedAtMs)
-            try container.encode(sequencerDid, forKey: .sequencerDid)
-            try container.encode(kid, forKey: .kid)
-            try container.encode(signature, forKey: .signature)
+            try container.encode(self.conversationId, forKey: .conversationId)
+            try container.encode(self.generation, forKey: .generation)
+            try container.encode(self.groupId, forKey: .groupId)
+            try container.encode(self.epoch, forKey: .epoch)
+            try container.encode(self.entryId, forKey: .entryId)
+            try container.encode(self.seq, forKey: .seq)
+            try container.encode(self.senderDid, forKey: .senderDid)
+            try container.encode(self.senderDeviceId, forKey: .senderDeviceId)
+            try container.encode(self.archiveCommitment, forKey: .archiveCommitment)
+            try container.encode(self.issuedAtMs, forKey: .issuedAtMs)
+            try container.encode(self.sequencerDid, forKey: .sequencerDid)
+            try container.encode(self.kid, forKey: .kid)
+            try container.encode(self.signature, forKey: .signature)
+            try container.encode(self.originalSenderAttestation, forKey: .originalSenderAttestation)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(conversationId)
-            hasher.combine(generation)
-            hasher.combine(groupId)
-            hasher.combine(epoch)
-            hasher.combine(entryId)
-            hasher.combine(seq)
-            hasher.combine(senderDid)
-            hasher.combine(senderDeviceId)
-            hasher.combine(archiveCommitment)
-            hasher.combine(issuedAtMs)
-            hasher.combine(sequencerDid)
-            hasher.combine(kid)
-            hasher.combine(signature)
+            hasher.combine(self.conversationId)
+            hasher.combine(self.generation)
+            hasher.combine(self.groupId)
+            hasher.combine(self.epoch)
+            hasher.combine(self.entryId)
+            hasher.combine(self.seq)
+            hasher.combine(self.senderDid)
+            hasher.combine(self.senderDeviceId)
+            hasher.combine(self.archiveCommitment)
+            hasher.combine(self.issuedAtMs)
+            hasher.combine(self.sequencerDid)
+            hasher.combine(self.kid)
+            hasher.combine(self.signature)
+            hasher.combine(self.originalSenderAttestation)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if conversationId != other.conversationId {
+            if self.conversationId != other.conversationId {
                 return false
             }
-            if generation != other.generation {
+            if self.generation != other.generation {
                 return false
             }
-            if groupId != other.groupId {
+            if self.groupId != other.groupId {
                 return false
             }
-            if epoch != other.epoch {
+            if self.epoch != other.epoch {
                 return false
             }
-            if entryId != other.entryId {
+            if self.entryId != other.entryId {
                 return false
             }
-            if seq != other.seq {
+            if self.seq != other.seq {
                 return false
             }
-            if senderDid != other.senderDid {
+            if self.senderDid != other.senderDid {
                 return false
             }
-            if senderDeviceId != other.senderDeviceId {
+            if self.senderDeviceId != other.senderDeviceId {
                 return false
             }
-            if archiveCommitment != other.archiveCommitment {
+            if self.archiveCommitment != other.archiveCommitment {
                 return false
             }
-            if issuedAtMs != other.issuedAtMs {
+            if self.issuedAtMs != other.issuedAtMs {
                 return false
             }
-            if sequencerDid != other.sequencerDid {
+            if self.sequencerDid != other.sequencerDid {
                 return false
             }
-            if kid != other.kid {
+            if self.kid != other.kid {
                 return false
             }
-            if signature != other.signature {
+            if self.signature != other.signature {
                 return false
             }
-            return true
+            if self.originalSenderAttestation != other.originalSenderAttestation {
+                return false
+            }
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -496,38 +644,40 @@ public struct BlueCatbirdLabyrinthDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let conversationIdValue = try conversationId.toCBORValue()
+            let conversationIdValue = try self.conversationId.toCBORValue()
             map = map.adding(key: "conversationId", value: conversationIdValue)
-            let generationValue = try generation.toCBORValue()
+            let generationValue = try self.generation.toCBORValue()
             map = map.adding(key: "generation", value: generationValue)
-            let groupIdValue = try groupId.toCBORValue()
+            let groupIdValue = try self.groupId.toCBORValue()
             map = map.adding(key: "groupId", value: groupIdValue)
-            let epochValue = try epoch.toCBORValue()
+            let epochValue = try self.epoch.toCBORValue()
             map = map.adding(key: "epoch", value: epochValue)
-            let entryIdValue = try entryId.toCBORValue()
+            let entryIdValue = try self.entryId.toCBORValue()
             map = map.adding(key: "entryId", value: entryIdValue)
-            let seqValue = try seq.toCBORValue()
+            let seqValue = try self.seq.toCBORValue()
             map = map.adding(key: "seq", value: seqValue)
-            let senderDidValue = try senderDid.toCBORValue()
+            let senderDidValue = try self.senderDid.toCBORValue()
             map = map.adding(key: "senderDid", value: senderDidValue)
-            let senderDeviceIdValue = try senderDeviceId.toCBORValue()
+            let senderDeviceIdValue = try self.senderDeviceId.toCBORValue()
             map = map.adding(key: "senderDeviceId", value: senderDeviceIdValue)
-            let archiveCommitmentValue = try archiveCommitment.toCBORValue()
+            let archiveCommitmentValue = try self.archiveCommitment.toCBORValue()
             map = map.adding(key: "archiveCommitment", value: archiveCommitmentValue)
-            let issuedAtMsValue = try issuedAtMs.toCBORValue()
+            let issuedAtMsValue = try self.issuedAtMs.toCBORValue()
             map = map.adding(key: "issuedAtMs", value: issuedAtMsValue)
-            let sequencerDidValue = try sequencerDid.toCBORValue()
+            let sequencerDidValue = try self.sequencerDid.toCBORValue()
             map = map.adding(key: "sequencerDid", value: sequencerDidValue)
-            let kidValue = try kid.toCBORValue()
+            let kidValue = try self.kid.toCBORValue()
             map = map.adding(key: "kid", value: kidValue)
-            let signatureValue = try signature.toCBORValue()
+            let signatureValue = try self.signature.toCBORValue()
             map = map.adding(key: "signature", value: signatureValue)
-            return map
+            let originalSenderAttestationValue = try self.originalSenderAttestation.toCBORValue()
+            map = map.adding(key: "originalSenderAttestation", value: originalSenderAttestationValue)
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "conversationId", "generation", "groupId", "epoch", "entryId", "seq", "senderDid", "senderDeviceId", "archiveCommitment", "issuedAtMs", "sequencerDid", "kid", "signature", "originalSenderAttestation"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case conversationId
             case generation
             case groupId
@@ -541,22 +691,42 @@ public struct BlueCatbirdLabyrinthDefs {
             case sequencerDid
             case kid
             case signature
+            case originalSenderAttestation
         }
     }
-
+    /// One v1.1 sender-encrypted message (SPEC §7.2, I13). frameNonce lives strictly inside MEK-encrypted signedEncMessage so archiveCommitment remains hiding. A redacted item ([CB-38]) keeps messageId, timestamp, mekId and senderTransportPubkey, carries redaction, and has an empty signedEncMessage.
     public struct SealedMessage: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.labyrinth.defs#sealedMessage"
+
+        /// Chat message id.
         public let messageId: String
+        /// Sequenced MLS entry seq from sequencerReceipt (I13).
         public let seq: Int?
+        /// Milliseconds since Unix epoch.
         public let timestamp: Int
+        /// 12-byte MEK id.
         public let mekId: Bytes
+        /// Sender chat device Ed25519 key.
         public let senderTransportPubkey: Bytes
+        /// Ed25519 sig(64) || suite-tagged AEAD ciphertext of the padded (frameNonce || canonicalPayloadBytes) frame; empty once redacted.
         public let signedEncMessage: Bytes
         public let sequencerReceipt: SequencerReceipt?
+        /// Present when the author unsent the message ([CB-38]).
         public let redaction: Redaction?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            messageId: String, seq: Int? = nil, timestamp: Int, mekId: Bytes, senderTransportPubkey: Bytes, signedEncMessage: Bytes, sequencerReceipt: SequencerReceipt? = nil, redaction: Redaction? = nil
+            messageId: String,
+            seq: Int? = nil,
+            timestamp: Int,
+            mekId: Bytes,
+            senderTransportPubkey: Bytes,
+            signedEncMessage: Bytes,
+            sequencerReceipt: SequencerReceipt? = nil,
+            redaction: Redaction? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.messageId = messageId
             self.seq = seq
@@ -566,129 +736,121 @@ public struct BlueCatbirdLabyrinthDefs {
             self.signedEncMessage = signedEncMessage
             self.sequencerReceipt = sequencerReceipt
             self.redaction = redaction
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.messageId = try container.decode(String.self, forKey: .messageId)
             do {
-                self.messageId = try container.decode(String.self, forKey: .messageId)
+                self.seq = try container.decodeIfPresent(Int.self, forKey: .seq, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'messageId': \(error)")
-                throw error
-            }
-            do {
-                self.seq = try container.decodeIfPresent(Int.self, forKey: .seq)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'seq' — degrading to nil: \(error)")
                 self.seq = nil
+                malformedFields.insert("seq")
             }
+            self.timestamp = try container.decode(Int.self, forKey: .timestamp)
+            self.mekId = try container.decode(Bytes.self, forKey: .mekId)
+            self.senderTransportPubkey = try container.decode(Bytes.self, forKey: .senderTransportPubkey)
+            self.signedEncMessage = try container.decode(Bytes.self, forKey: .signedEncMessage)
             do {
-                self.timestamp = try container.decode(Int.self, forKey: .timestamp)
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'timestamp': \(error)")
-                throw error
-            }
-            do {
-                self.mekId = try container.decode(Bytes.self, forKey: .mekId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'mekId': \(error)")
-                throw error
-            }
-            do {
-                self.senderTransportPubkey = try container.decode(Bytes.self, forKey: .senderTransportPubkey)
-            } catch {
-                LogManager.logError("Decoding error for required property 'senderTransportPubkey': \(error)")
-                throw error
-            }
-            do {
-                self.signedEncMessage = try container.decode(Bytes.self, forKey: .signedEncMessage)
-            } catch {
-                LogManager.logError("Decoding error for required property 'signedEncMessage': \(error)")
-                throw error
-            }
-            do {
-                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
                 self.sequencerReceipt = nil
+                malformedFields.insert("sequencerReceipt")
             }
             do {
-                self.redaction = try container.decodeIfPresent(Redaction.self, forKey: .redaction)
+                self.redaction = try container.decodeIfPresent(Redaction.self, forKey: .redaction, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'redaction' — degrading to nil: \(error)")
                 self.redaction = nil
+                malformedFields.insert("redaction")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(messageId, forKey: .messageId)
-            try container.encodeIfPresent(seq, forKey: .seq)
-            try container.encode(timestamp, forKey: .timestamp)
-            try container.encode(mekId, forKey: .mekId)
-            try container.encode(senderTransportPubkey, forKey: .senderTransportPubkey)
-            try container.encode(signedEncMessage, forKey: .signedEncMessage)
-            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
-            try container.encodeIfPresent(redaction, forKey: .redaction)
+            try container.encode(self.messageId, forKey: .messageId)
+            try container.encodeIfPresent(self.seq, forKey: .seq)
+            try container.encode(self.timestamp, forKey: .timestamp)
+            try container.encode(self.mekId, forKey: .mekId)
+            try container.encode(self.senderTransportPubkey, forKey: .senderTransportPubkey)
+            try container.encode(self.signedEncMessage, forKey: .signedEncMessage)
+            try container.encodeIfPresent(self.sequencerReceipt, forKey: .sequencerReceipt)
+            try container.encodeIfPresent(self.redaction, forKey: .redaction)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(messageId)
-            if let value = seq {
+            hasher.combine(self.messageId)
+            if let value = self.seq {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            hasher.combine(timestamp)
-            hasher.combine(mekId)
-            hasher.combine(senderTransportPubkey)
-            hasher.combine(signedEncMessage)
-            if let value = sequencerReceipt {
+            hasher.combine(self.timestamp)
+            hasher.combine(self.mekId)
+            hasher.combine(self.senderTransportPubkey)
+            hasher.combine(self.signedEncMessage)
+            if let value = self.sequencerReceipt {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = redaction {
+            if let value = self.redaction {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if messageId != other.messageId {
+            if self.messageId != other.messageId {
                 return false
             }
-            if seq != other.seq {
+            if self.seq != other.seq {
                 return false
             }
-            if timestamp != other.timestamp {
+            if self.timestamp != other.timestamp {
                 return false
             }
-            if mekId != other.mekId {
+            if self.mekId != other.mekId {
                 return false
             }
-            if senderTransportPubkey != other.senderTransportPubkey {
+            if self.senderTransportPubkey != other.senderTransportPubkey {
                 return false
             }
-            if signedEncMessage != other.signedEncMessage {
+            if self.signedEncMessage != other.signedEncMessage {
                 return false
             }
-            if sequencerReceipt != other.sequencerReceipt {
+            if self.sequencerReceipt != other.sequencerReceipt {
                 return false
             }
-            if redaction != other.redaction {
+            if self.redaction != other.redaction {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -697,34 +859,50 @@ public struct BlueCatbirdLabyrinthDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let messageIdValue = try messageId.toCBORValue()
+            let messageIdValue = try self.messageId.toCBORValue()
             map = map.adding(key: "messageId", value: messageIdValue)
-            if let value = seq {
+            if let value = self.seq {
                 let seqValue = try value.toCBORValue()
                 map = map.adding(key: "seq", value: seqValue)
             }
-            let timestampValue = try timestamp.toCBORValue()
+            let timestampValue = try self.timestamp.toCBORValue()
             map = map.adding(key: "timestamp", value: timestampValue)
-            let mekIdValue = try mekId.toCBORValue()
+            let mekIdValue = try self.mekId.toCBORValue()
             map = map.adding(key: "mekId", value: mekIdValue)
-            let senderTransportPubkeyValue = try senderTransportPubkey.toCBORValue()
+            let senderTransportPubkeyValue = try self.senderTransportPubkey.toCBORValue()
             map = map.adding(key: "senderTransportPubkey", value: senderTransportPubkeyValue)
-            let signedEncMessageValue = try signedEncMessage.toCBORValue()
+            let signedEncMessageValue = try self.signedEncMessage.toCBORValue()
             map = map.adding(key: "signedEncMessage", value: signedEncMessageValue)
-            if let value = sequencerReceipt {
+            if let value = self.sequencerReceipt {
                 let sequencerReceiptValue = try value.toCBORValue()
                 map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
             }
-            if let value = redaction {
+            if let value = self.redaction {
                 let redactionValue = try value.toCBORValue()
                 map = map.adding(key: "redaction", value: redactionValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "messageId", "seq", "timestamp", "mekId", "senderTransportPubkey", "signedEncMessage", "sequencerReceipt", "redaction"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "messageId": return true
+            case "seq": return self.seq != nil
+            case "timestamp": return true
+            case "mekId": return true
+            case "senderTransportPubkey": return true
+            case "signedEncMessage": return true
+            case "sequencerReceipt": return self.sequencerReceipt != nil
+            case "redaction": return self.redaction != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case messageId
             case seq
             case timestamp
@@ -735,20 +913,39 @@ public struct BlueCatbirdLabyrinthDefs {
             case redaction
         }
     }
-
+    /// One owner-encrypted message or delete-for-me tombstone (SPEC §7.1, [CB-37], [CB-38], I13). frameNonce lives strictly inside owner-encrypted ciphertext.
     public struct OwnerMessage: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.labyrinth.defs#ownerMessage"
+
+        /// Conversation id.
         public let threadId: String
+        /// Message id.
         public let messageId: String
+        /// Sequenced MLS entry seq when archived from a live conversation.
         public let seq: Int?
+        /// ms since Unix epoch.
         public let timestamp: Int
+        /// Epoch whose root key derived the message key.
         public let epochNumber: Int
+        /// Cipher version. Writers use 5 ([CB-37]: binds messageId and timestamp; content kind byte for delete-for-me tombstones); readers also accept 0, 2, 3 and 4 (SPEC §7.1).
         public let version: Int
+        /// Suite-tagged AEAD ciphertext of the padded frame (carrying frameNonce inside ciphertext when sequencerReceipt is present).
         public let encrypted: Bytes
         public let sequencerReceipt: SequencerReceipt?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            threadId: String, messageId: String, seq: Int? = nil, timestamp: Int, epochNumber: Int, version: Int, encrypted: Bytes, sequencerReceipt: SequencerReceipt? = nil
+            threadId: String,
+            messageId: String,
+            seq: Int? = nil,
+            timestamp: Int,
+            epochNumber: Int,
+            version: Int,
+            encrypted: Bytes,
+            sequencerReceipt: SequencerReceipt? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.threadId = threadId
             self.messageId = messageId
@@ -758,123 +955,106 @@ public struct BlueCatbirdLabyrinthDefs {
             self.version = version
             self.encrypted = encrypted
             self.sequencerReceipt = sequencerReceipt
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.threadId = try container.decode(String.self, forKey: .threadId)
+            self.messageId = try container.decode(String.self, forKey: .messageId)
             do {
-                self.threadId = try container.decode(String.self, forKey: .threadId)
+                self.seq = try container.decodeIfPresent(Int.self, forKey: .seq, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'threadId': \(error)")
-                throw error
-            }
-            do {
-                self.messageId = try container.decode(String.self, forKey: .messageId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'messageId': \(error)")
-                throw error
-            }
-            do {
-                self.seq = try container.decodeIfPresent(Int.self, forKey: .seq)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'seq' — degrading to nil: \(error)")
                 self.seq = nil
+                malformedFields.insert("seq")
             }
+            self.timestamp = try container.decode(Int.self, forKey: .timestamp)
+            self.epochNumber = try container.decode(Int.self, forKey: .epochNumber)
+            self.version = try container.decode(Int.self, forKey: .version)
+            self.encrypted = try container.decode(Bytes.self, forKey: .encrypted)
             do {
-                self.timestamp = try container.decode(Int.self, forKey: .timestamp)
+                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'timestamp': \(error)")
-                throw error
-            }
-            do {
-                self.epochNumber = try container.decode(Int.self, forKey: .epochNumber)
-            } catch {
-                LogManager.logError("Decoding error for required property 'epochNumber': \(error)")
-                throw error
-            }
-            do {
-                self.version = try container.decode(Int.self, forKey: .version)
-            } catch {
-                LogManager.logError("Decoding error for required property 'version': \(error)")
-                throw error
-            }
-            do {
-                self.encrypted = try container.decode(Bytes.self, forKey: .encrypted)
-            } catch {
-                LogManager.logError("Decoding error for required property 'encrypted': \(error)")
-                throw error
-            }
-            do {
-                self.sequencerReceipt = try container.decodeIfPresent(SequencerReceipt.self, forKey: .sequencerReceipt)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'sequencerReceipt' — degrading to nil: \(error)")
                 self.sequencerReceipt = nil
+                malformedFields.insert("sequencerReceipt")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(threadId, forKey: .threadId)
-            try container.encode(messageId, forKey: .messageId)
-            try container.encodeIfPresent(seq, forKey: .seq)
-            try container.encode(timestamp, forKey: .timestamp)
-            try container.encode(epochNumber, forKey: .epochNumber)
-            try container.encode(version, forKey: .version)
-            try container.encode(encrypted, forKey: .encrypted)
-            try container.encodeIfPresent(sequencerReceipt, forKey: .sequencerReceipt)
+            try container.encode(self.threadId, forKey: .threadId)
+            try container.encode(self.messageId, forKey: .messageId)
+            try container.encodeIfPresent(self.seq, forKey: .seq)
+            try container.encode(self.timestamp, forKey: .timestamp)
+            try container.encode(self.epochNumber, forKey: .epochNumber)
+            try container.encode(self.version, forKey: .version)
+            try container.encode(self.encrypted, forKey: .encrypted)
+            try container.encodeIfPresent(self.sequencerReceipt, forKey: .sequencerReceipt)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(threadId)
-            hasher.combine(messageId)
-            if let value = seq {
+            hasher.combine(self.threadId)
+            hasher.combine(self.messageId)
+            if let value = self.seq {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            hasher.combine(timestamp)
-            hasher.combine(epochNumber)
-            hasher.combine(version)
-            hasher.combine(encrypted)
-            if let value = sequencerReceipt {
+            hasher.combine(self.timestamp)
+            hasher.combine(self.epochNumber)
+            hasher.combine(self.version)
+            hasher.combine(self.encrypted)
+            if let value = self.sequencerReceipt {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if threadId != other.threadId {
+            if self.threadId != other.threadId {
                 return false
             }
-            if messageId != other.messageId {
+            if self.messageId != other.messageId {
                 return false
             }
-            if seq != other.seq {
+            if self.seq != other.seq {
                 return false
             }
-            if timestamp != other.timestamp {
+            if self.timestamp != other.timestamp {
                 return false
             }
-            if epochNumber != other.epochNumber {
+            if self.epochNumber != other.epochNumber {
                 return false
             }
-            if version != other.version {
+            if self.version != other.version {
                 return false
             }
-            if encrypted != other.encrypted {
+            if self.encrypted != other.encrypted {
                 return false
             }
-            if sequencerReceipt != other.sequencerReceipt {
+            if self.sequencerReceipt != other.sequencerReceipt {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -883,32 +1063,48 @@ public struct BlueCatbirdLabyrinthDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let threadIdValue = try threadId.toCBORValue()
+            let threadIdValue = try self.threadId.toCBORValue()
             map = map.adding(key: "threadId", value: threadIdValue)
-            let messageIdValue = try messageId.toCBORValue()
+            let messageIdValue = try self.messageId.toCBORValue()
             map = map.adding(key: "messageId", value: messageIdValue)
-            if let value = seq {
+            if let value = self.seq {
                 let seqValue = try value.toCBORValue()
                 map = map.adding(key: "seq", value: seqValue)
             }
-            let timestampValue = try timestamp.toCBORValue()
+            let timestampValue = try self.timestamp.toCBORValue()
             map = map.adding(key: "timestamp", value: timestampValue)
-            let epochNumberValue = try epochNumber.toCBORValue()
+            let epochNumberValue = try self.epochNumber.toCBORValue()
             map = map.adding(key: "epochNumber", value: epochNumberValue)
-            let versionValue = try version.toCBORValue()
+            let versionValue = try self.version.toCBORValue()
             map = map.adding(key: "version", value: versionValue)
-            let encryptedValue = try encrypted.toCBORValue()
+            let encryptedValue = try self.encrypted.toCBORValue()
             map = map.adding(key: "encrypted", value: encryptedValue)
-            if let value = sequencerReceipt {
+            if let value = self.sequencerReceipt {
                 let sequencerReceiptValue = try value.toCBORValue()
                 map = map.adding(key: "sequencerReceipt", value: sequencerReceiptValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "threadId", "messageId", "seq", "timestamp", "epochNumber", "version", "encrypted", "sequencerReceipt"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "threadId": return true
+            case "messageId": return true
+            case "seq": return self.seq != nil
+            case "timestamp": return true
+            case "epochNumber": return true
+            case "version": return true
+            case "encrypted": return true
+            case "sequencerReceipt": return self.sequencerReceipt != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case threadId
             case messageId
             case seq
@@ -919,69 +1115,66 @@ public struct BlueCatbirdLabyrinthDefs {
             case sequencerReceipt
         }
     }
-
     public struct MekRecipient: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.labyrinth.defs#mekRecipient"
+
+        /// Recipient account.
         public let did: DID
+        /// Head of the recipient epoch the MEK is encrypted to.
         public let recipientEpochHead: Bytes
+        /// hawk_encrypt output: 0x01 || eph(32) || kemCt(1088) || ct.
         public let ciphertext: Bytes
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            did: DID, recipientEpochHead: Bytes, ciphertext: Bytes
+            did: DID,
+            recipientEpochHead: Bytes,
+            ciphertext: Bytes,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.did = did
             self.recipientEpochHead = recipientEpochHead
             self.ciphertext = ciphertext
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.did = try container.decode(DID.self, forKey: .did)
-            } catch {
-                LogManager.logError("Decoding error for required property 'did': \(error)")
-                throw error
-            }
-            do {
-                self.recipientEpochHead = try container.decode(Bytes.self, forKey: .recipientEpochHead)
-            } catch {
-                LogManager.logError("Decoding error for required property 'recipientEpochHead': \(error)")
-                throw error
-            }
-            do {
-                self.ciphertext = try container.decode(Bytes.self, forKey: .ciphertext)
-            } catch {
-                LogManager.logError("Decoding error for required property 'ciphertext': \(error)")
-                throw error
-            }
+            self.did = try container.decode(DID.self, forKey: .did)
+            self.recipientEpochHead = try container.decode(Bytes.self, forKey: .recipientEpochHead)
+            self.ciphertext = try container.decode(Bytes.self, forKey: .ciphertext)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(did, forKey: .did)
-            try container.encode(recipientEpochHead, forKey: .recipientEpochHead)
-            try container.encode(ciphertext, forKey: .ciphertext)
+            try container.encode(self.did, forKey: .did)
+            try container.encode(self.recipientEpochHead, forKey: .recipientEpochHead)
+            try container.encode(self.ciphertext, forKey: .ciphertext)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(did)
-            hasher.combine(recipientEpochHead)
-            hasher.combine(ciphertext)
+            hasher.combine(self.did)
+            hasher.combine(self.recipientEpochHead)
+            hasher.combine(self.ciphertext)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if did != other.did {
+            if self.did != other.did {
                 return false
             }
-            if recipientEpochHead != other.recipientEpochHead {
+            if self.recipientEpochHead != other.recipientEpochHead {
                 return false
             }
-            if ciphertext != other.ciphertext {
+            if self.ciphertext != other.ciphertext {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -990,92 +1183,101 @@ public struct BlueCatbirdLabyrinthDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let didValue = try did.toCBORValue()
+            let didValue = try self.did.toCBORValue()
             map = map.adding(key: "did", value: didValue)
-            let recipientEpochHeadValue = try recipientEpochHead.toCBORValue()
+            let recipientEpochHeadValue = try self.recipientEpochHead.toCBORValue()
             map = map.adding(key: "recipientEpochHead", value: recipientEpochHeadValue)
-            let ciphertextValue = try ciphertext.toCBORValue()
+            let ciphertextValue = try self.ciphertext.toCBORValue()
             map = map.adding(key: "ciphertext", value: ciphertextValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "did", "recipientEpochHead", "ciphertext"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case did
             case recipientEpochHead
             case ciphertext
         }
     }
-
+    /// The order mls-ds assigned to a record when it was written ([CB-27]). Readers bound a removed chat key by it instead of the sender's timestamp.
     public struct ServerOrder: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.labyrinth.defs#serverOrder"
+
+        /// Per-conversation (owner batches: per-mailbox) Labyrinth write counter.
         public let seq: Int
+        /// The conversation's last chat entry seq at the write, linearized against MLS commits; absent outside a conversation.
         public let chatSeq: Int?
+        /// Receive time on the server clock.
         public let receivedAt: ATProtocolDate
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            seq: Int, chatSeq: Int? = nil, receivedAt: ATProtocolDate
+            seq: Int,
+            chatSeq: Int? = nil,
+            receivedAt: ATProtocolDate,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.seq = seq
             self.chatSeq = chatSeq
             self.receivedAt = receivedAt
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.seq = try container.decode(Int.self, forKey: .seq)
             do {
-                self.seq = try container.decode(Int.self, forKey: .seq)
+                self.chatSeq = try container.decodeIfPresent(Int.self, forKey: .chatSeq, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'seq': \(error)")
-                throw error
-            }
-            do {
-                self.chatSeq = try container.decodeIfPresent(Int.self, forKey: .chatSeq)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'chatSeq' — degrading to nil: \(error)")
                 self.chatSeq = nil
+                malformedFields.insert("chatSeq")
             }
-            do {
-                self.receivedAt = try container.decode(ATProtocolDate.self, forKey: .receivedAt)
-            } catch {
-                LogManager.logError("Decoding error for required property 'receivedAt': \(error)")
-                throw error
-            }
+            self.receivedAt = try container.decode(ATProtocolDate.self, forKey: .receivedAt)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(seq, forKey: .seq)
-            try container.encodeIfPresent(chatSeq, forKey: .chatSeq)
-            try container.encode(receivedAt, forKey: .receivedAt)
+            try container.encode(self.seq, forKey: .seq)
+            try container.encodeIfPresent(self.chatSeq, forKey: .chatSeq)
+            try container.encode(self.receivedAt, forKey: .receivedAt)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(seq)
-            if let value = chatSeq {
+            hasher.combine(self.seq)
+            if let value = self.chatSeq {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            hasher.combine(receivedAt)
+            hasher.combine(self.receivedAt)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if seq != other.seq {
+            if self.seq != other.seq {
                 return false
             }
-            if chatSeq != other.chatSeq {
+            if self.chatSeq != other.chatSeq {
                 return false
             }
-            if receivedAt != other.receivedAt {
+            if self.receivedAt != other.receivedAt {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -1084,144 +1286,194 @@ public struct BlueCatbirdLabyrinthDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let seqValue = try seq.toCBORValue()
+            let seqValue = try self.seq.toCBORValue()
             map = map.adding(key: "seq", value: seqValue)
-            if let value = chatSeq {
+            if let value = self.chatSeq {
                 let chatSeqValue = try value.toCBORValue()
                 map = map.adding(key: "chatSeq", value: chatSeqValue)
             }
-            let receivedAtValue = try receivedAt.toCBORValue()
+            let receivedAtValue = try self.receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "seq", "chatSeq", "receivedAt"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "seq": return true
+            case "chatSeq": return self.chatSeq != nil
+            case "receivedAt": return true
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case seq
             case chatSeq
             case receivedAt
         }
     }
-
+    /// A redaction of a sender item. Two variants. (1) [CB-38] author unsend: transportPubkey and sig, Ed25519 by one of the author's chat device keys over 'catbird.labyrinth.redaction:did=' || did || ';message_id=' || messageId || ';thread_id=' || hex(threadId). (2) Server redaction for an account deletion (deleteAccountData / purgeAuthor): transportPubkey is absent; by is the redacting (sequencer) DS's DID, reason is 'accountDeleted', redactedAt is the server's, and sig, when present, is Ed25519 by that DS's redaction key over the UTF-8 string 'catbird.labyrinth.ds_redaction:by=' || by || ';did=' || author DID || ';message_id=' || messageId || ';reason=accountDeleted;redacted_at=' || redactedAt || ';thread_id=' || hex(utf8(threadId)). Readers show variant 2 as 'account deleted' only when sig verifies under the key of the conversation's sequencer DID, and otherwise as 'removed by server'; never as an author unsend.
     public struct Redaction: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.labyrinth.defs#redaction"
+
+        /// The author's chat device Ed25519 key.
         public let transportPubkey: Bytes?
+        /// Ed25519 signature: by the author's chat device key (unsend) or by the DS redaction key (server redactions; optional there).
         public let sig: Bytes?
+        /// Set by the server when it applied the redaction.
         public let redactedAt: ATProtocolDate?
+        /// Server redactions: the DID of the DS that applied it (the conversation's sequencer).
         public let by: DID?
+        /// Server redactions: why the server redacted the item.
         public let reason: String?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            transportPubkey: Bytes? = nil, sig: Bytes? = nil, redactedAt: ATProtocolDate? = nil, by: DID? = nil, reason: String? = nil
+            transportPubkey: Bytes? = nil,
+            sig: Bytes? = nil,
+            redactedAt: ATProtocolDate? = nil,
+            by: DID? = nil,
+            reason: String? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.transportPubkey = transportPubkey
             self.sig = sig
             self.redactedAt = redactedAt
             self.by = by
             self.reason = reason
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
             do {
-                self.transportPubkey = try container.decodeIfPresent(Bytes.self, forKey: .transportPubkey)
+                self.transportPubkey = try container.decodeIfPresent(Bytes.self, forKey: .transportPubkey, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'transportPubkey' — degrading to nil: \(error)")
                 self.transportPubkey = nil
+                malformedFields.insert("transportPubkey")
             }
             do {
-                self.sig = try container.decodeIfPresent(Bytes.self, forKey: .sig)
+                self.sig = try container.decodeIfPresent(Bytes.self, forKey: .sig, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'sig' — degrading to nil: \(error)")
                 self.sig = nil
+                malformedFields.insert("sig")
             }
             do {
-                self.redactedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .redactedAt)
+                self.redactedAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .redactedAt, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'redactedAt' — degrading to nil: \(error)")
                 self.redactedAt = nil
+                malformedFields.insert("redactedAt")
             }
             do {
-                self.by = try container.decodeIfPresent(DID.self, forKey: .by)
+                self.by = try container.decodeIfPresent(DID.self, forKey: .by, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'by' — degrading to nil: \(error)")
                 self.by = nil
+                malformedFields.insert("by")
             }
             do {
-                self.reason = try container.decodeIfPresent(String.self, forKey: .reason)
+                self.reason = try container.decodeIfPresent(String.self, forKey: .reason, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'reason' — degrading to nil: \(error)")
                 self.reason = nil
+                malformedFields.insert("reason")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encodeIfPresent(transportPubkey, forKey: .transportPubkey)
-            try container.encodeIfPresent(sig, forKey: .sig)
-            try container.encodeIfPresent(redactedAt, forKey: .redactedAt)
-            try container.encodeIfPresent(by, forKey: .by)
-            try container.encodeIfPresent(reason, forKey: .reason)
+            try container.encodeIfPresent(self.transportPubkey, forKey: .transportPubkey)
+            try container.encodeIfPresent(self.sig, forKey: .sig)
+            try container.encodeIfPresent(self.redactedAt, forKey: .redactedAt)
+            try container.encodeIfPresent(self.by, forKey: .by)
+            try container.encodeIfPresent(self.reason, forKey: .reason)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            if let value = transportPubkey {
+            if let value = self.transportPubkey {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = sig {
+            if let value = self.sig {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = redactedAt {
+            if let value = self.redactedAt {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = by {
+            if let value = self.by {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = reason {
+            if let value = self.reason {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if transportPubkey != other.transportPubkey {
+            if self.transportPubkey != other.transportPubkey {
                 return false
             }
-            if sig != other.sig {
+            if self.sig != other.sig {
                 return false
             }
-            if redactedAt != other.redactedAt {
+            if self.redactedAt != other.redactedAt {
                 return false
             }
-            if by != other.by {
+            if self.by != other.by {
                 return false
             }
-            if reason != other.reason {
+            if self.reason != other.reason {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -1230,32 +1482,45 @@ public struct BlueCatbirdLabyrinthDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            if let value = transportPubkey {
+            if let value = self.transportPubkey {
                 let transportPubkeyValue = try value.toCBORValue()
                 map = map.adding(key: "transportPubkey", value: transportPubkeyValue)
             }
-            if let value = sig {
+            if let value = self.sig {
                 let sigValue = try value.toCBORValue()
                 map = map.adding(key: "sig", value: sigValue)
             }
-            if let value = redactedAt {
+            if let value = self.redactedAt {
                 let redactedAtValue = try value.toCBORValue()
                 map = map.adding(key: "redactedAt", value: redactedAtValue)
             }
-            if let value = by {
+            if let value = self.by {
                 let byValue = try value.toCBORValue()
                 map = map.adding(key: "by", value: byValue)
             }
-            if let value = reason {
+            if let value = self.reason {
                 let reasonValue = try value.toCBORValue()
                 map = map.adding(key: "reason", value: reasonValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "transportPubkey", "sig", "redactedAt", "by", "reason"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "transportPubkey": return self.transportPubkey != nil
+            case "sig": return self.sig != nil
+            case "redactedAt": return self.redactedAt != nil
+            case "by": return self.by != nil
+            case "reason": return self.reason != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case transportPubkey
             case sig
             case redactedAt
@@ -1263,69 +1528,64 @@ public struct BlueCatbirdLabyrinthDefs {
             case reason
         }
     }
-
+    /// Authoritative tombstone overlay for an item in an immutable sender batch. Apply after verifying the source record.
     public struct SpaceBatchRedaction: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.labyrinth.defs#spaceBatchRedaction"
+
         public let messageId: String
         public let timestamp: Int
         public let redaction: BlueCatbirdLabyrinthDefs.Redaction
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            messageId: String, timestamp: Int, redaction: BlueCatbirdLabyrinthDefs.Redaction
+            messageId: String,
+            timestamp: Int,
+            redaction: BlueCatbirdLabyrinthDefs.Redaction,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.messageId = messageId
             self.timestamp = timestamp
             self.redaction = redaction
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.messageId = try container.decode(String.self, forKey: .messageId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'messageId': \(error)")
-                throw error
-            }
-            do {
-                self.timestamp = try container.decode(Int.self, forKey: .timestamp)
-            } catch {
-                LogManager.logError("Decoding error for required property 'timestamp': \(error)")
-                throw error
-            }
-            do {
-                self.redaction = try container.decode(BlueCatbirdLabyrinthDefs.Redaction.self, forKey: .redaction)
-            } catch {
-                LogManager.logError("Decoding error for required property 'redaction': \(error)")
-                throw error
-            }
+            self.messageId = try container.decode(String.self, forKey: .messageId)
+            self.timestamp = try container.decode(Int.self, forKey: .timestamp)
+            self.redaction = try container.decode(BlueCatbirdLabyrinthDefs.Redaction.self, forKey: .redaction)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(messageId, forKey: .messageId)
-            try container.encode(timestamp, forKey: .timestamp)
-            try container.encode(redaction, forKey: .redaction)
+            try container.encode(self.messageId, forKey: .messageId)
+            try container.encode(self.timestamp, forKey: .timestamp)
+            try container.encode(self.redaction, forKey: .redaction)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(messageId)
-            hasher.combine(timestamp)
-            hasher.combine(redaction)
+            hasher.combine(self.messageId)
+            hasher.combine(self.timestamp)
+            hasher.combine(self.redaction)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if messageId != other.messageId {
+            if self.messageId != other.messageId {
                 return false
             }
-            if timestamp != other.timestamp {
+            if self.timestamp != other.timestamp {
                 return false
             }
-            if redaction != other.redaction {
+            if self.redaction != other.redaction {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -1334,37 +1594,52 @@ public struct BlueCatbirdLabyrinthDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let messageIdValue = try messageId.toCBORValue()
+            let messageIdValue = try self.messageId.toCBORValue()
             map = map.adding(key: "messageId", value: messageIdValue)
-            let timestampValue = try timestamp.toCBORValue()
+            let timestampValue = try self.timestamp.toCBORValue()
             map = map.adding(key: "timestamp", value: timestampValue)
-            let redactionValue = try redaction.toCBORValue()
+            let redactionValue = try self.redaction.toCBORValue()
             map = map.adding(key: "redaction", value: redactionValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "messageId", "timestamp", "redaction"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case messageId
             case timestamp
             case redaction
         }
     }
-
+    /// An immutable Space batch reference and its authenticated sequencer order. Server tombstones remain authoritative even if the source ciphertext is still readable.
     public struct SpaceBatchView: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.labyrinth.defs#spaceBatchView"
+
         public let author: DID
         public let rkey: RecordKey
+        /// Conversation Space reference, bound to the storage generation.
         public let space: SpaceRef
+        /// Immutable UUID identifying this conversation storage lifecycle. A recreated Space requires a new generation.
         public let generation: String
-        public let cid: CID
+        public let cid: CIDString
         public let order: BlueCatbirdLabyrinthDefs.ServerOrder
         public let redactions: [BlueCatbirdLabyrinthDefs.SpaceBatchRedaction]
+        /// Original batch item count. Only a complete distinct redaction overlay can replace a purged source record.
         public let itemCount: Int
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            author: DID, rkey: RecordKey, space: SpaceRef, generation: String, cid: CID, order: BlueCatbirdLabyrinthDefs.ServerOrder, redactions: [BlueCatbirdLabyrinthDefs.SpaceBatchRedaction], itemCount: Int
+            author: DID,
+            rkey: RecordKey,
+            space: SpaceRef,
+            generation: String,
+            cid: CIDString,
+            order: BlueCatbirdLabyrinthDefs.ServerOrder,
+            redactions: [BlueCatbirdLabyrinthDefs.SpaceBatchRedaction],
+            itemCount: Int,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.author = author
             self.rkey = rkey
@@ -1374,111 +1649,74 @@ public struct BlueCatbirdLabyrinthDefs {
             self.order = order
             self.redactions = redactions
             self.itemCount = itemCount
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.author = try container.decode(DID.self, forKey: .author)
-            } catch {
-                LogManager.logError("Decoding error for required property 'author': \(error)")
-                throw error
-            }
-            do {
-                self.rkey = try container.decode(RecordKey.self, forKey: .rkey)
-            } catch {
-                LogManager.logError("Decoding error for required property 'rkey': \(error)")
-                throw error
-            }
-            do {
-                self.space = try container.decode(SpaceRef.self, forKey: .space)
-            } catch {
-                LogManager.logError("Decoding error for required property 'space': \(error)")
-                throw error
-            }
-            do {
-                self.generation = try container.decode(String.self, forKey: .generation)
-            } catch {
-                LogManager.logError("Decoding error for required property 'generation': \(error)")
-                throw error
-            }
-            do {
-                self.cid = try container.decode(CID.self, forKey: .cid)
-            } catch {
-                LogManager.logError("Decoding error for required property 'cid': \(error)")
-                throw error
-            }
-            do {
-                self.order = try container.decode(BlueCatbirdLabyrinthDefs.ServerOrder.self, forKey: .order)
-            } catch {
-                LogManager.logError("Decoding error for required property 'order': \(error)")
-                throw error
-            }
-            do {
-                self.redactions = try container.decode([BlueCatbirdLabyrinthDefs.SpaceBatchRedaction].self, forKey: .redactions)
-            } catch {
-                LogManager.logError("Decoding error for required property 'redactions': \(error)")
-                throw error
-            }
-            do {
-                self.itemCount = try container.decode(Int.self, forKey: .itemCount)
-            } catch {
-                LogManager.logError("Decoding error for required property 'itemCount': \(error)")
-                throw error
-            }
+            self.author = try container.decode(DID.self, forKey: .author)
+            self.rkey = try container.decode(RecordKey.self, forKey: .rkey)
+            self.space = try container.decode(SpaceRef.self, forKey: .space)
+            self.generation = try container.decode(String.self, forKey: .generation)
+            self.cid = try container.decode(CIDString.self, forKey: .cid)
+            self.order = try container.decode(BlueCatbirdLabyrinthDefs.ServerOrder.self, forKey: .order)
+            self.redactions = try container.decode([BlueCatbirdLabyrinthDefs.SpaceBatchRedaction].self, forKey: .redactions)
+            self.itemCount = try container.decode(Int.self, forKey: .itemCount)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(author, forKey: .author)
-            try container.encode(rkey, forKey: .rkey)
-            try container.encode(space, forKey: .space)
-            try container.encode(generation, forKey: .generation)
-            try container.encode(cid, forKey: .cid)
-            try container.encode(order, forKey: .order)
-            try container.encode(redactions, forKey: .redactions)
-            try container.encode(itemCount, forKey: .itemCount)
+            try container.encode(self.author, forKey: .author)
+            try container.encode(self.rkey, forKey: .rkey)
+            try container.encode(self.space, forKey: .space)
+            try container.encode(self.generation, forKey: .generation)
+            try container.encode(self.cid, forKey: .cid)
+            try container.encode(self.order, forKey: .order)
+            try container.encode(self.redactions, forKey: .redactions)
+            try container.encode(self.itemCount, forKey: .itemCount)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(author)
-            hasher.combine(rkey)
-            hasher.combine(space)
-            hasher.combine(generation)
-            hasher.combine(cid)
-            hasher.combine(order)
-            hasher.combine(redactions)
-            hasher.combine(itemCount)
+            hasher.combine(self.author)
+            hasher.combine(self.rkey)
+            hasher.combine(self.space)
+            hasher.combine(self.generation)
+            hasher.combine(self.cid)
+            hasher.combine(self.order)
+            hasher.combine(self.redactions)
+            hasher.combine(self.itemCount)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if author != other.author {
+            if self.author != other.author {
                 return false
             }
-            if rkey != other.rkey {
+            if self.rkey != other.rkey {
                 return false
             }
-            if space != other.space {
+            if self.space != other.space {
                 return false
             }
-            if generation != other.generation {
+            if self.generation != other.generation {
                 return false
             }
-            if cid != other.cid {
+            if self.cid != other.cid {
                 return false
             }
-            if order != other.order {
+            if self.order != other.order {
                 return false
             }
-            if redactions != other.redactions {
+            if self.redactions != other.redactions {
                 return false
             }
-            if itemCount != other.itemCount {
+            if self.itemCount != other.itemCount {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -1487,28 +1725,28 @@ public struct BlueCatbirdLabyrinthDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let authorValue = try author.toCBORValue()
+            let authorValue = try self.author.toCBORValue()
             map = map.adding(key: "author", value: authorValue)
-            let rkeyValue = try rkey.toCBORValue()
+            let rkeyValue = try self.rkey.toCBORValue()
             map = map.adding(key: "rkey", value: rkeyValue)
-            let spaceValue = try space.toCBORValue()
+            let spaceValue = try self.space.toCBORValue()
             map = map.adding(key: "space", value: spaceValue)
-            let generationValue = try generation.toCBORValue()
+            let generationValue = try self.generation.toCBORValue()
             map = map.adding(key: "generation", value: generationValue)
-            let cidValue = try cid.toCBORValue()
+            let cidValue = try self.cid.toCBORValue()
             map = map.adding(key: "cid", value: cidValue)
-            let orderValue = try order.toCBORValue()
+            let orderValue = try self.order.toCBORValue()
             map = map.adding(key: "order", value: orderValue)
-            let redactionsValue = try redactions.toCBORValue()
+            let redactionsValue = try self.redactions.toCBORValue()
             map = map.adding(key: "redactions", value: redactionsValue)
-            let itemCountValue = try itemCount.toCBORValue()
+            let itemCountValue = try self.itemCount.toCBORValue()
             map = map.adding(key: "itemCount", value: itemCountValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "author", "rkey", "space", "generation", "cid", "order", "redactions", "itemCount"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case author
             case rkey
             case space

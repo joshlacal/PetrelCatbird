@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.getSpaceMembership
 
+/// Internal Space authority policy lookup. Requires authority service JWT, DS audience, exact lxm, jti and a lifetime of at most 60 seconds. User is the DID from the authority's verified canonical delegation. No user device proof is accepted here. Positive policy must not be cached.
 public struct BlueCatbirdLabyrinthGetSpaceMembership {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.getSpaceMembership"
+
     public struct Parameters: Parametrizable {
         public let space: SpaceRef
         public let user: DID
@@ -24,95 +26,56 @@ public struct BlueCatbirdLabyrinthGetSpaceMembership {
     public struct Output: ATProtocolCodable {
 
         public let space: SpaceRef
-
         public let generation: String
-
         public let user: DID
-
         public let chatGeneration: Int
-
         public let chatSeq: Int
 
-        // Standard public initializer
         public init(
-
             space: SpaceRef,
-
             generation: String,
-
             user: DID,
-
             chatGeneration: Int,
-
             chatSeq: Int
-
         ) {
-
             self.space = space
-
             self.generation = generation
-
             self.user = user
-
             self.chatGeneration = chatGeneration
-
             self.chatSeq = chatSeq
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.space = try container.decode(SpaceRef.self, forKey: .space)
-
             self.generation = try container.decode(String.self, forKey: .generation)
-
             self.user = try container.decode(DID.self, forKey: .user)
-
             self.chatGeneration = try container.decode(Int.self, forKey: .chatGeneration)
-
             self.chatSeq = try container.decode(Int.self, forKey: .chatSeq)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(space, forKey: .space)
-
-            try container.encode(generation, forKey: .generation)
-
-            try container.encode(user, forKey: .user)
-
-            try container.encode(chatGeneration, forKey: .chatGeneration)
-
-            try container.encode(chatSeq, forKey: .chatSeq)
-
+            try container.encode(self.space, forKey: .space)
+            try container.encode(self.generation, forKey: .generation)
+            try container.encode(self.user, forKey: .user)
+            try container.encode(self.chatGeneration, forKey: .chatGeneration)
+            try container.encode(self.chatSeq, forKey: .chatSeq)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let spaceValue = try space.toCBORValue()
+            let spaceValue = try self.space.toCBORValue()
             map = map.adding(key: "space", value: spaceValue)
-
-            let generationValue = try generation.toCBORValue()
+            let generationValue = try self.generation.toCBORValue()
             map = map.adding(key: "generation", value: generationValue)
-
-            let userValue = try user.toCBORValue()
+            let userValue = try self.user.toCBORValue()
             map = map.adding(key: "user", value: userValue)
-
-            let chatGenerationValue = try chatGeneration.toCBORValue()
+            let chatGenerationValue = try self.chatGeneration.toCBORValue()
             map = map.adding(key: "chatGeneration", value: chatGenerationValue)
-
-            let chatSeqValue = try chatSeq.toCBORValue()
+            let chatSeqValue = try self.chatSeq.toCBORValue()
             map = map.adding(key: "chatSeq", value: chatSeqValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -122,7 +85,6 @@ public struct BlueCatbirdLabyrinthGetSpaceMembership {
             case chatGeneration
             case chatSeq
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -146,9 +108,8 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
     /// Internal Space authority policy lookup. Requires authority service JWT, DS audience, exact lxm, jti and a lifetime of at most 60 seconds. User is the DID from the authority's verified canonical delegation. No user device proof is accepted here. Positive policy must not be cached.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdLabyrinthGetSpaceMembership.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getSpaceMembership(input: BlueCatbirdLabyrinthGetSpaceMembership.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetSpaceMembership.Output?) {
         let endpoint = "blue.catbird.labyrinth.getSpaceMembership"
 
@@ -168,42 +129,24 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdLabyrinthGetSpaceMembership.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.getSpaceMembership: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdLabyrinthGetSpaceMembership.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdLabyrinthGetSpaceMembership.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdLabyrinthGetSpaceMembership.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

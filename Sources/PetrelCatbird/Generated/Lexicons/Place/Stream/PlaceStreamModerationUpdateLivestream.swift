@@ -4,16 +4,25 @@ import Petrel
 
 // lexicon: 1, id: place.stream.moderation.updateLivestream
 
+/// Update livestream metadata on behalf of a streamer. Requires 'livestream.manage' permission. Updates a place.stream.livestream record in the streamer's repository.
 public struct PlaceStreamModerationUpdateLivestream {
 
     public static let typeIdentifier = "place.stream.moderation.updateLivestream"
+
     public struct Input: ATProtocolCodable {
+
+        /// The DID of the streamer.
         public let streamer: DID
+        /// The AT-URI of the livestream record to update.
         public let livestreamUri: ATProtocolURI
+        /// New title for the livestream.
         public let title: String?
 
-        /// Standard public initializer
-        public init(streamer: DID, livestreamUri: ATProtocolURI, title: String? = nil) {
+        public init(
+            streamer: DID,
+            livestreamUri: ATProtocolURI,
+            title: String? = nil
+        ) {
             self.streamer = streamer
             self.livestreamUri = livestreamUri
             self.title = title
@@ -21,25 +30,26 @@ public struct PlaceStreamModerationUpdateLivestream {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
             self.streamer = try container.decode(DID.self, forKey: .streamer)
             self.livestreamUri = try container.decode(ATProtocolURI.self, forKey: .livestreamUri)
-            self.title = try container.decodeIfPresent(String.self, forKey: .title)
+            self.title = try container.decodeIfPresent(String.self, forKey: .title, rejectingNull: strict)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(streamer, forKey: .streamer)
-            try container.encode(livestreamUri, forKey: .livestreamUri)
-            try container.encodeIfPresent(title, forKey: .title)
+            try container.encode(self.streamer, forKey: .streamer)
+            try container.encode(self.livestreamUri, forKey: .livestreamUri)
+            try container.encodeIfPresent(self.title, forKey: .title)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let streamerValue = try streamer.toCBORValue()
+            let streamerValue = try self.streamer.toCBORValue()
             map = map.adding(key: "streamer", value: streamerValue)
-            let livestreamUriValue = try livestreamUri.toCBORValue()
+            let livestreamUriValue = try self.livestreamUri.toCBORValue()
             map = map.adding(key: "livestreamUri", value: livestreamUriValue)
-            if let value = title {
+            if let value = self.title {
                 let titleValue = try value.toCBORValue()
                 map = map.adding(key: "title", value: titleValue)
             }
@@ -55,64 +65,44 @@ public struct PlaceStreamModerationUpdateLivestream {
 
     public struct Output: ATProtocolCodable {
 
+        /// The AT-URI of the updated livestream record.
         public let uri: ATProtocolURI
+        /// The CID of the updated livestream record.
+        public let cid: CIDString
 
-        public let cid: CID
-
-        // Standard public initializer
         public init(
-
             uri: ATProtocolURI,
-
-            cid: CID
-
+            cid: CIDString
         ) {
-
             self.uri = uri
-
             self.cid = cid
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
-
-            self.cid = try container.decode(CID.self, forKey: .cid)
-
+            self.cid = try container.decode(CIDString.self, forKey: .cid)
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(uri, forKey: .uri)
-
-            try container.encode(cid, forKey: .cid)
-
+            try container.encode(self.uri, forKey: .uri)
+            try container.encode(self.cid, forKey: .cid)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let uriValue = try uri.toCBORValue()
+            let uriValue = try self.uri.toCBORValue()
             map = map.adding(key: "uri", value: uriValue)
-
-            let cidValue = try cid.toCBORValue()
+            let cidValue = try self.cid.toCBORValue()
             map = map.adding(key: "cid", value: cidValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case uri
             case cid
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -139,11 +129,10 @@ extension ATProtoClient.Place.Stream.Moderation {
     // MARK: - updateLivestream
     /// Update livestream metadata on behalf of a streamer. Requires 'livestream.manage' permission. Updates a place.stream.livestream record in the streamer's repository.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<PlaceStreamModerationUpdateLivestream.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func updateLivestream(
 
         input: PlaceStreamModerationUpdateLivestream.Input
@@ -175,44 +164,24 @@ extension ATProtoClient.Place.Stream.Moderation {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: PlaceStreamModerationUpdateLivestream.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamModerationUpdateLivestream.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.moderation.updateLivestream: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: PlaceStreamModerationUpdateLivestream.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(PlaceStreamModerationUpdateLivestream.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

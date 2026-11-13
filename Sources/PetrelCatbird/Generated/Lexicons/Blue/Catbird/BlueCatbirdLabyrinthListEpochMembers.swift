@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.listEpochMembers
 
+/// The members of one epoch. Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
 public struct BlueCatbirdLabyrinthListEpochMembers {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.listEpochMembers"
+
     public struct Parameters: Parametrizable {
         public let epochNumber: Int
         public let cursor: String?
@@ -27,73 +29,54 @@ public struct BlueCatbirdLabyrinthListEpochMembers {
     public struct Output: ATProtocolCodable {
 
         public let items: [ATProtocolValueContainer]
-
+        /// Opaque cursor from the previous page.
         public let cursor: String?
 
-        // Standard public initializer
         public init(
-
             items: [ATProtocolValueContainer],
-
             cursor: String? = nil
-
         ) {
-
             self.items = items
-
             self.cursor = cursor
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
+            let strict = decoder.isATProtoStrictDecoding
             self.items = try container.decode([ATProtocolValueContainer].self, forKey: .items)
-
             do {
-                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
+                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
                 self.cursor = nil
             }
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(items, forKey: .items)
-
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(cursor, forKey: .cursor)
-
+            try container.encode(self.items, forKey: .items)
+            try container.encodeIfPresent(self.cursor, forKey: .cursor)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let itemsValue = try items.toCBORValue()
+            let itemsValue = try self.items.toCBORValue()
             map = map.adding(key: "items", value: itemsValue)
-
-            if let value = cursor {
-                // Encode optional property even if it's an empty array for CBOR
+            if let value = self.cursor {
                 let cursorValue = try value.toCBORValue()
                 map = map.adding(key: "cursor", value: cursorValue)
             }
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case items
             case cursor
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -114,9 +97,8 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
     /// The members of one epoch. Mailbox endpoint: the caller is a chat device of the mailbox owner; every call reads or writes the caller DID's own mailbox. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdLabyrinthListEpochMembers.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func listEpochMembers(input: BlueCatbirdLabyrinthListEpochMembers.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthListEpochMembers.Output?) {
         let endpoint = "blue.catbird.labyrinth.listEpochMembers"
 
@@ -136,42 +118,32 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdLabyrinthListEpochMembers.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.listEpochMembers: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdLabyrinthListEpochMembers.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdLabyrinthListEpochMembers.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdLabyrinthListEpochMembers.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }
+
+extension BlueCatbirdLabyrinthListEpochMembers.Parameters: XRPCCursorPaginatedParameters {
+    public func withCursor(_ cursor: String?) -> Self {
+        Self(epochNumber: epochNumber, cursor: cursor, limit: limit)
+    }
+}
+
+extension BlueCatbirdLabyrinthListEpochMembers.Output: XRPCCursorPaginatedOutput {}

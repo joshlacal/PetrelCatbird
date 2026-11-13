@@ -4,49 +4,67 @@ import Petrel
 
 // lexicon: 1, id: place.stream.chat.gate
 
+/// Record defining a single gated chat message.
 public struct PlaceStreamChatGate: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "place.stream.chat.gate"
-    public let hiddenMessage: ATProtocolURI
 
-    public init(hiddenMessage: ATProtocolURI) {
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "tid")
+
+    /// URI of the hidden chat message.
+    public let hiddenMessage: ATProtocolURI
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
+
+    public init(
+        hiddenMessage: ATProtocolURI,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.hiddenMessage = hiddenMessage
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.hiddenMessage = try container.decode(ATProtocolURI.self, forKey: .hiddenMessage)
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(hiddenMessage, forKey: .hiddenMessage)
+        try container.encode(self.hiddenMessage, forKey: .hiddenMessage)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.hiddenMessage)
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.hiddenMessage != other.hiddenMessage {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if hiddenMessage != other.hiddenMessage {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(hiddenMessage)
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let hiddenMessageValue = try hiddenMessage.toCBORValue()
+        let hiddenMessageValue = try self.hiddenMessage.toCBORValue()
         map = map.adding(key: "hiddenMessage", value: hiddenMessageValue)
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
     }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "hiddenMessage"]
 
     private enum CodingKeys: String, CodingKey {
         case typeIdentifier = "$type"

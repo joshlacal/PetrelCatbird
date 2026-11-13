@@ -10,85 +10,87 @@ public struct PlaceStreamMultistreamDefs {
 
     public struct TargetView: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.multistream.defs#targetView"
+
         public let uri: ATProtocolURI
-        public let cid: CID
+        public let cid: CIDString
         public let record: ATProtocolValueContainer
         public let latestEvent: PlaceStreamMultistreamDefs.Event?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            uri: ATProtocolURI, cid: CID, record: ATProtocolValueContainer, latestEvent: PlaceStreamMultistreamDefs.Event? = nil
+            uri: ATProtocolURI,
+            cid: CIDString,
+            record: ATProtocolValueContainer,
+            latestEvent: PlaceStreamMultistreamDefs.Event? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.uri = uri
             self.cid = cid
             self.record = record
             self.latestEvent = latestEvent
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+            self.cid = try container.decode(CIDString.self, forKey: .cid)
+            self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
             do {
-                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+                self.latestEvent = try container.decodeIfPresent(PlaceStreamMultistreamDefs.Event.self, forKey: .latestEvent, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'uri': \(error)")
-                throw error
-            }
-            do {
-                self.cid = try container.decode(CID.self, forKey: .cid)
-            } catch {
-                LogManager.logError("Decoding error for required property 'cid': \(error)")
-                throw error
-            }
-            do {
-                self.record = try container.decode(ATProtocolValueContainer.self, forKey: .record)
-            } catch {
-                LogManager.logError("Decoding error for required property 'record': \(error)")
-                throw error
-            }
-            do {
-                self.latestEvent = try container.decodeIfPresent(PlaceStreamMultistreamDefs.Event.self, forKey: .latestEvent)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'latestEvent' — degrading to nil: \(error)")
                 self.latestEvent = nil
+                malformedFields.insert("latestEvent")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(uri, forKey: .uri)
-            try container.encode(cid, forKey: .cid)
-            try container.encode(record, forKey: .record)
-            try container.encodeIfPresent(latestEvent, forKey: .latestEvent)
+            try container.encode(self.uri, forKey: .uri)
+            try container.encode(self.cid, forKey: .cid)
+            try container.encode(self.record, forKey: .record)
+            try container.encodeIfPresent(self.latestEvent, forKey: .latestEvent)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(uri)
-            hasher.combine(cid)
-            hasher.combine(record)
-            if let value = latestEvent {
+            hasher.combine(self.uri)
+            hasher.combine(self.cid)
+            hasher.combine(self.record)
+            if let value = self.latestEvent {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if uri != other.uri {
+            if self.uri != other.uri {
                 return false
             }
-            if cid != other.cid {
+            if self.cid != other.cid {
                 return false
             }
-            if record != other.record {
+            if self.record != other.record {
                 return false
             }
-            if latestEvent != other.latestEvent {
+            if self.latestEvent != other.latestEvent {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -97,91 +99,97 @@ public struct PlaceStreamMultistreamDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let uriValue = try uri.toCBORValue()
+            let uriValue = try self.uri.toCBORValue()
             map = map.adding(key: "uri", value: uriValue)
-            let cidValue = try cid.toCBORValue()
+            let cidValue = try self.cid.toCBORValue()
             map = map.adding(key: "cid", value: cidValue)
-            let recordValue = try record.toCBORValue()
+            let recordValue = try self.record.toCBORValue()
             map = map.adding(key: "record", value: recordValue)
-            if let value = latestEvent {
+            if let value = self.latestEvent {
                 let latestEventValue = try value.toCBORValue()
                 map = map.adding(key: "latestEvent", value: latestEventValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "uri", "cid", "record", "latestEvent"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "uri": return true
+            case "cid": return true
+            case "record": return true
+            case "latestEvent": return self.latestEvent != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case uri
             case cid
             case record
             case latestEvent
         }
     }
-
     public struct Event: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.multistream.defs#event"
+
         public let message: String
         public let status: EventStatus
         public let createdAt: ATProtocolDate
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            message: String, status: EventStatus, createdAt: ATProtocolDate
+            message: String,
+            status: EventStatus,
+            createdAt: ATProtocolDate,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.message = message
             self.status = status
             self.createdAt = createdAt
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.message = try container.decode(String.self, forKey: .message)
-            } catch {
-                LogManager.logError("Decoding error for required property 'message': \(error)")
-                throw error
-            }
-            do {
-                self.status = try container.decode(EventStatus.self, forKey: .status)
-            } catch {
-                LogManager.logError("Decoding error for required property 'status': \(error)")
-                throw error
-            }
-            do {
-                self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
-            } catch {
-                LogManager.logError("Decoding error for required property 'createdAt': \(error)")
-                throw error
-            }
+            self.message = try container.decode(String.self, forKey: .message)
+            self.status = try container.decode(EventStatus.self, forKey: .status)
+            self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(message, forKey: .message)
-            try container.encode(status, forKey: .status)
-            try container.encode(createdAt, forKey: .createdAt)
+            try container.encode(self.message, forKey: .message)
+            try container.encode(self.status, forKey: .status)
+            try container.encode(self.createdAt, forKey: .createdAt)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(message)
-            hasher.combine(status)
-            hasher.combine(createdAt)
+            hasher.combine(self.message)
+            hasher.combine(self.status)
+            hasher.combine(self.createdAt)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if message != other.message {
+            if self.message != other.message {
                 return false
             }
-            if status != other.status {
+            if self.status != other.status {
                 return false
             }
-            if createdAt != other.createdAt {
+            if self.createdAt != other.createdAt {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -190,18 +198,18 @@ public struct PlaceStreamMultistreamDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let messageValue = try message.toCBORValue()
+            let messageValue = try self.message.toCBORValue()
             map = map.adding(key: "message", value: messageValue)
-            let statusValue = try status.toCBORValue()
+            let statusValue = try self.status.toCBORValue()
             map = map.adding(key: "status", value: statusValue)
-            let createdAtValue = try createdAt.toCBORValue()
+            let createdAtValue = try self.createdAt.toCBORValue()
             map = map.adding(key: "createdAt", value: createdAtValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "message", "status", "createdAt"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case message
             case status
             case createdAt

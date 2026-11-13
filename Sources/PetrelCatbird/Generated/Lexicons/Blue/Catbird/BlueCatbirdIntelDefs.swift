@@ -8,8 +8,10 @@ public struct BlueCatbirdIntelDefs {
 
     public static let typeIdentifier = "blue.catbird.intel.defs"
 
+    /// A human-curated macro scene grouping related subcultural communities.
     public struct SceneGroup: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.intel.defs#sceneGroup"
+
         public let sceneId: Int
         public let sceneSlug: String
         public let sceneTitle: String
@@ -18,9 +20,20 @@ public struct BlueCatbirdIntelDefs {
         public let cardCount: Int
         public let totalEligibleAccounts: Int
         public let topCommunityIds: [Int]
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            sceneId: Int, sceneSlug: String, sceneTitle: String, macroCategory: String, symbolName: String, cardCount: Int, totalEligibleAccounts: Int, topCommunityIds: [Int]
+            sceneId: Int,
+            sceneSlug: String,
+            sceneTitle: String,
+            macroCategory: String,
+            symbolName: String,
+            cardCount: Int,
+            totalEligibleAccounts: Int,
+            topCommunityIds: [Int],
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.sceneId = sceneId
             self.sceneSlug = sceneSlug
@@ -30,111 +43,74 @@ public struct BlueCatbirdIntelDefs {
             self.cardCount = cardCount
             self.totalEligibleAccounts = totalEligibleAccounts
             self.topCommunityIds = topCommunityIds
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.sceneId = try container.decode(Int.self, forKey: .sceneId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'sceneId': \(error)")
-                throw error
-            }
-            do {
-                self.sceneSlug = try container.decode(String.self, forKey: .sceneSlug)
-            } catch {
-                LogManager.logError("Decoding error for required property 'sceneSlug': \(error)")
-                throw error
-            }
-            do {
-                self.sceneTitle = try container.decode(String.self, forKey: .sceneTitle)
-            } catch {
-                LogManager.logError("Decoding error for required property 'sceneTitle': \(error)")
-                throw error
-            }
-            do {
-                self.macroCategory = try container.decode(String.self, forKey: .macroCategory)
-            } catch {
-                LogManager.logError("Decoding error for required property 'macroCategory': \(error)")
-                throw error
-            }
-            do {
-                self.symbolName = try container.decode(String.self, forKey: .symbolName)
-            } catch {
-                LogManager.logError("Decoding error for required property 'symbolName': \(error)")
-                throw error
-            }
-            do {
-                self.cardCount = try container.decode(Int.self, forKey: .cardCount)
-            } catch {
-                LogManager.logError("Decoding error for required property 'cardCount': \(error)")
-                throw error
-            }
-            do {
-                self.totalEligibleAccounts = try container.decode(Int.self, forKey: .totalEligibleAccounts)
-            } catch {
-                LogManager.logError("Decoding error for required property 'totalEligibleAccounts': \(error)")
-                throw error
-            }
-            do {
-                self.topCommunityIds = try container.decode([Int].self, forKey: .topCommunityIds)
-            } catch {
-                LogManager.logError("Decoding error for required property 'topCommunityIds': \(error)")
-                throw error
-            }
+            self.sceneId = try container.decode(Int.self, forKey: .sceneId)
+            self.sceneSlug = try container.decode(String.self, forKey: .sceneSlug)
+            self.sceneTitle = try container.decode(String.self, forKey: .sceneTitle)
+            self.macroCategory = try container.decode(String.self, forKey: .macroCategory)
+            self.symbolName = try container.decode(String.self, forKey: .symbolName)
+            self.cardCount = try container.decode(Int.self, forKey: .cardCount)
+            self.totalEligibleAccounts = try container.decode(Int.self, forKey: .totalEligibleAccounts)
+            self.topCommunityIds = try container.decode([Int].self, forKey: .topCommunityIds)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(sceneId, forKey: .sceneId)
-            try container.encode(sceneSlug, forKey: .sceneSlug)
-            try container.encode(sceneTitle, forKey: .sceneTitle)
-            try container.encode(macroCategory, forKey: .macroCategory)
-            try container.encode(symbolName, forKey: .symbolName)
-            try container.encode(cardCount, forKey: .cardCount)
-            try container.encode(totalEligibleAccounts, forKey: .totalEligibleAccounts)
-            try container.encode(topCommunityIds, forKey: .topCommunityIds)
+            try container.encode(self.sceneId, forKey: .sceneId)
+            try container.encode(self.sceneSlug, forKey: .sceneSlug)
+            try container.encode(self.sceneTitle, forKey: .sceneTitle)
+            try container.encode(self.macroCategory, forKey: .macroCategory)
+            try container.encode(self.symbolName, forKey: .symbolName)
+            try container.encode(self.cardCount, forKey: .cardCount)
+            try container.encode(self.totalEligibleAccounts, forKey: .totalEligibleAccounts)
+            try container.encode(self.topCommunityIds, forKey: .topCommunityIds)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(sceneId)
-            hasher.combine(sceneSlug)
-            hasher.combine(sceneTitle)
-            hasher.combine(macroCategory)
-            hasher.combine(symbolName)
-            hasher.combine(cardCount)
-            hasher.combine(totalEligibleAccounts)
-            hasher.combine(topCommunityIds)
+            hasher.combine(self.sceneId)
+            hasher.combine(self.sceneSlug)
+            hasher.combine(self.sceneTitle)
+            hasher.combine(self.macroCategory)
+            hasher.combine(self.symbolName)
+            hasher.combine(self.cardCount)
+            hasher.combine(self.totalEligibleAccounts)
+            hasher.combine(self.topCommunityIds)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if sceneId != other.sceneId {
+            if self.sceneId != other.sceneId {
                 return false
             }
-            if sceneSlug != other.sceneSlug {
+            if self.sceneSlug != other.sceneSlug {
                 return false
             }
-            if sceneTitle != other.sceneTitle {
+            if self.sceneTitle != other.sceneTitle {
                 return false
             }
-            if macroCategory != other.macroCategory {
+            if self.macroCategory != other.macroCategory {
                 return false
             }
-            if symbolName != other.symbolName {
+            if self.symbolName != other.symbolName {
                 return false
             }
-            if cardCount != other.cardCount {
+            if self.cardCount != other.cardCount {
                 return false
             }
-            if totalEligibleAccounts != other.totalEligibleAccounts {
+            if self.totalEligibleAccounts != other.totalEligibleAccounts {
                 return false
             }
-            if topCommunityIds != other.topCommunityIds {
+            if self.topCommunityIds != other.topCommunityIds {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -143,28 +119,28 @@ public struct BlueCatbirdIntelDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let sceneIdValue = try sceneId.toCBORValue()
+            let sceneIdValue = try self.sceneId.toCBORValue()
             map = map.adding(key: "sceneId", value: sceneIdValue)
-            let sceneSlugValue = try sceneSlug.toCBORValue()
+            let sceneSlugValue = try self.sceneSlug.toCBORValue()
             map = map.adding(key: "sceneSlug", value: sceneSlugValue)
-            let sceneTitleValue = try sceneTitle.toCBORValue()
+            let sceneTitleValue = try self.sceneTitle.toCBORValue()
             map = map.adding(key: "sceneTitle", value: sceneTitleValue)
-            let macroCategoryValue = try macroCategory.toCBORValue()
+            let macroCategoryValue = try self.macroCategory.toCBORValue()
             map = map.adding(key: "macroCategory", value: macroCategoryValue)
-            let symbolNameValue = try symbolName.toCBORValue()
+            let symbolNameValue = try self.symbolName.toCBORValue()
             map = map.adding(key: "symbolName", value: symbolNameValue)
-            let cardCountValue = try cardCount.toCBORValue()
+            let cardCountValue = try self.cardCount.toCBORValue()
             map = map.adding(key: "cardCount", value: cardCountValue)
-            let totalEligibleAccountsValue = try totalEligibleAccounts.toCBORValue()
+            let totalEligibleAccountsValue = try self.totalEligibleAccounts.toCBORValue()
             map = map.adding(key: "totalEligibleAccounts", value: totalEligibleAccountsValue)
-            let topCommunityIdsValue = try topCommunityIds.toCBORValue()
+            let topCommunityIdsValue = try self.topCommunityIds.toCBORValue()
             map = map.adding(key: "topCommunityIds", value: topCommunityIdsValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "sceneId", "sceneSlug", "sceneTitle", "macroCategory", "symbolName", "cardCount", "totalEligibleAccounts", "topCommunityIds"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case sceneId
             case sceneSlug
             case sceneTitle
@@ -175,9 +151,10 @@ public struct BlueCatbirdIntelDefs {
             case topCommunityIds
         }
     }
-
+    /// Summary card for an active community in the Catbird intelligence catalog. Contains only DIDs and AT-URI skeletons for viewer-aware client hydration.
     public struct CommunitySummary: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.intel.defs#communitySummary"
+
         public let communityId: Int
         public let title: String
         public let description: String
@@ -195,9 +172,29 @@ public struct BlueCatbirdIntelDefs {
         public let sampleAccountDids: [DID]
         public let feedGeneratorUris: [ATProtocolURI]
         public let starterPackUris: [ATProtocolURI]
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            communityId: Int, title: String, description: String, sceneId: Int, sceneSlug: String, sceneTitle: String, macroCategory: String, symbolName: String, eligibleCount: Int, postCoherenceBps: Int, socialCoherenceBps: Int, curatedListTags: [String], neighborCommunityIds: [Int], samplePostUris: [ATProtocolURI], sampleAccountDids: [DID], feedGeneratorUris: [ATProtocolURI], starterPackUris: [ATProtocolURI]
+            communityId: Int,
+            title: String,
+            description: String,
+            sceneId: Int,
+            sceneSlug: String,
+            sceneTitle: String,
+            macroCategory: String,
+            symbolName: String,
+            eligibleCount: Int,
+            postCoherenceBps: Int,
+            socialCoherenceBps: Int,
+            curatedListTags: [String],
+            neighborCommunityIds: [Int],
+            samplePostUris: [ATProtocolURI],
+            sampleAccountDids: [DID],
+            feedGeneratorUris: [ATProtocolURI],
+            starterPackUris: [ATProtocolURI],
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.communityId = communityId
             self.title = title
@@ -216,210 +213,128 @@ public struct BlueCatbirdIntelDefs {
             self.sampleAccountDids = sampleAccountDids
             self.feedGeneratorUris = feedGeneratorUris
             self.starterPackUris = starterPackUris
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.communityId = try container.decode(Int.self, forKey: .communityId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'communityId': \(error)")
-                throw error
-            }
-            do {
-                self.title = try container.decode(String.self, forKey: .title)
-            } catch {
-                LogManager.logError("Decoding error for required property 'title': \(error)")
-                throw error
-            }
-            do {
-                self.description = try container.decode(String.self, forKey: .description)
-            } catch {
-                LogManager.logError("Decoding error for required property 'description': \(error)")
-                throw error
-            }
-            do {
-                self.sceneId = try container.decode(Int.self, forKey: .sceneId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'sceneId': \(error)")
-                throw error
-            }
-            do {
-                self.sceneSlug = try container.decode(String.self, forKey: .sceneSlug)
-            } catch {
-                LogManager.logError("Decoding error for required property 'sceneSlug': \(error)")
-                throw error
-            }
-            do {
-                self.sceneTitle = try container.decode(String.self, forKey: .sceneTitle)
-            } catch {
-                LogManager.logError("Decoding error for required property 'sceneTitle': \(error)")
-                throw error
-            }
-            do {
-                self.macroCategory = try container.decode(String.self, forKey: .macroCategory)
-            } catch {
-                LogManager.logError("Decoding error for required property 'macroCategory': \(error)")
-                throw error
-            }
-            do {
-                self.symbolName = try container.decode(String.self, forKey: .symbolName)
-            } catch {
-                LogManager.logError("Decoding error for required property 'symbolName': \(error)")
-                throw error
-            }
-            do {
-                self.eligibleCount = try container.decode(Int.self, forKey: .eligibleCount)
-            } catch {
-                LogManager.logError("Decoding error for required property 'eligibleCount': \(error)")
-                throw error
-            }
-            do {
-                self.postCoherenceBps = try container.decode(Int.self, forKey: .postCoherenceBps)
-            } catch {
-                LogManager.logError("Decoding error for required property 'postCoherenceBps': \(error)")
-                throw error
-            }
-            do {
-                self.socialCoherenceBps = try container.decode(Int.self, forKey: .socialCoherenceBps)
-            } catch {
-                LogManager.logError("Decoding error for required property 'socialCoherenceBps': \(error)")
-                throw error
-            }
-            do {
-                self.curatedListTags = try container.decode([String].self, forKey: .curatedListTags)
-            } catch {
-                LogManager.logError("Decoding error for required property 'curatedListTags': \(error)")
-                throw error
-            }
-            do {
-                self.neighborCommunityIds = try container.decode([Int].self, forKey: .neighborCommunityIds)
-            } catch {
-                LogManager.logError("Decoding error for required property 'neighborCommunityIds': \(error)")
-                throw error
-            }
-            do {
-                self.samplePostUris = try container.decode([ATProtocolURI].self, forKey: .samplePostUris)
-            } catch {
-                LogManager.logError("Decoding error for required property 'samplePostUris': \(error)")
-                throw error
-            }
-            do {
-                self.sampleAccountDids = try container.decode([DID].self, forKey: .sampleAccountDids)
-            } catch {
-                LogManager.logError("Decoding error for required property 'sampleAccountDids': \(error)")
-                throw error
-            }
-            do {
-                self.feedGeneratorUris = try container.decode([ATProtocolURI].self, forKey: .feedGeneratorUris)
-            } catch {
-                LogManager.logError("Decoding error for required property 'feedGeneratorUris': \(error)")
-                throw error
-            }
-            do {
-                self.starterPackUris = try container.decode([ATProtocolURI].self, forKey: .starterPackUris)
-            } catch {
-                LogManager.logError("Decoding error for required property 'starterPackUris': \(error)")
-                throw error
-            }
+            self.communityId = try container.decode(Int.self, forKey: .communityId)
+            self.title = try container.decode(String.self, forKey: .title)
+            self.description = try container.decode(String.self, forKey: .description)
+            self.sceneId = try container.decode(Int.self, forKey: .sceneId)
+            self.sceneSlug = try container.decode(String.self, forKey: .sceneSlug)
+            self.sceneTitle = try container.decode(String.self, forKey: .sceneTitle)
+            self.macroCategory = try container.decode(String.self, forKey: .macroCategory)
+            self.symbolName = try container.decode(String.self, forKey: .symbolName)
+            self.eligibleCount = try container.decode(Int.self, forKey: .eligibleCount)
+            self.postCoherenceBps = try container.decode(Int.self, forKey: .postCoherenceBps)
+            self.socialCoherenceBps = try container.decode(Int.self, forKey: .socialCoherenceBps)
+            self.curatedListTags = try container.decode([String].self, forKey: .curatedListTags)
+            self.neighborCommunityIds = try container.decode([Int].self, forKey: .neighborCommunityIds)
+            self.samplePostUris = try container.decode([ATProtocolURI].self, forKey: .samplePostUris)
+            self.sampleAccountDids = try container.decode([DID].self, forKey: .sampleAccountDids)
+            self.feedGeneratorUris = try container.decode([ATProtocolURI].self, forKey: .feedGeneratorUris)
+            self.starterPackUris = try container.decode([ATProtocolURI].self, forKey: .starterPackUris)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(communityId, forKey: .communityId)
-            try container.encode(title, forKey: .title)
-            try container.encode(description, forKey: .description)
-            try container.encode(sceneId, forKey: .sceneId)
-            try container.encode(sceneSlug, forKey: .sceneSlug)
-            try container.encode(sceneTitle, forKey: .sceneTitle)
-            try container.encode(macroCategory, forKey: .macroCategory)
-            try container.encode(symbolName, forKey: .symbolName)
-            try container.encode(eligibleCount, forKey: .eligibleCount)
-            try container.encode(postCoherenceBps, forKey: .postCoherenceBps)
-            try container.encode(socialCoherenceBps, forKey: .socialCoherenceBps)
-            try container.encode(curatedListTags, forKey: .curatedListTags)
-            try container.encode(neighborCommunityIds, forKey: .neighborCommunityIds)
-            try container.encode(samplePostUris, forKey: .samplePostUris)
-            try container.encode(sampleAccountDids, forKey: .sampleAccountDids)
-            try container.encode(feedGeneratorUris, forKey: .feedGeneratorUris)
-            try container.encode(starterPackUris, forKey: .starterPackUris)
+            try container.encode(self.communityId, forKey: .communityId)
+            try container.encode(self.title, forKey: .title)
+            try container.encode(self.description, forKey: .description)
+            try container.encode(self.sceneId, forKey: .sceneId)
+            try container.encode(self.sceneSlug, forKey: .sceneSlug)
+            try container.encode(self.sceneTitle, forKey: .sceneTitle)
+            try container.encode(self.macroCategory, forKey: .macroCategory)
+            try container.encode(self.symbolName, forKey: .symbolName)
+            try container.encode(self.eligibleCount, forKey: .eligibleCount)
+            try container.encode(self.postCoherenceBps, forKey: .postCoherenceBps)
+            try container.encode(self.socialCoherenceBps, forKey: .socialCoherenceBps)
+            try container.encode(self.curatedListTags, forKey: .curatedListTags)
+            try container.encode(self.neighborCommunityIds, forKey: .neighborCommunityIds)
+            try container.encode(self.samplePostUris, forKey: .samplePostUris)
+            try container.encode(self.sampleAccountDids, forKey: .sampleAccountDids)
+            try container.encode(self.feedGeneratorUris, forKey: .feedGeneratorUris)
+            try container.encode(self.starterPackUris, forKey: .starterPackUris)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(communityId)
-            hasher.combine(title)
-            hasher.combine(description)
-            hasher.combine(sceneId)
-            hasher.combine(sceneSlug)
-            hasher.combine(sceneTitle)
-            hasher.combine(macroCategory)
-            hasher.combine(symbolName)
-            hasher.combine(eligibleCount)
-            hasher.combine(postCoherenceBps)
-            hasher.combine(socialCoherenceBps)
-            hasher.combine(curatedListTags)
-            hasher.combine(neighborCommunityIds)
-            hasher.combine(samplePostUris)
-            hasher.combine(sampleAccountDids)
-            hasher.combine(feedGeneratorUris)
-            hasher.combine(starterPackUris)
+            hasher.combine(self.communityId)
+            hasher.combine(self.title)
+            hasher.combine(self.description)
+            hasher.combine(self.sceneId)
+            hasher.combine(self.sceneSlug)
+            hasher.combine(self.sceneTitle)
+            hasher.combine(self.macroCategory)
+            hasher.combine(self.symbolName)
+            hasher.combine(self.eligibleCount)
+            hasher.combine(self.postCoherenceBps)
+            hasher.combine(self.socialCoherenceBps)
+            hasher.combine(self.curatedListTags)
+            hasher.combine(self.neighborCommunityIds)
+            hasher.combine(self.samplePostUris)
+            hasher.combine(self.sampleAccountDids)
+            hasher.combine(self.feedGeneratorUris)
+            hasher.combine(self.starterPackUris)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if communityId != other.communityId {
+            if self.communityId != other.communityId {
                 return false
             }
-            if title != other.title {
+            if self.title != other.title {
                 return false
             }
-            if description != other.description {
+            if self.description != other.description {
                 return false
             }
-            if sceneId != other.sceneId {
+            if self.sceneId != other.sceneId {
                 return false
             }
-            if sceneSlug != other.sceneSlug {
+            if self.sceneSlug != other.sceneSlug {
                 return false
             }
-            if sceneTitle != other.sceneTitle {
+            if self.sceneTitle != other.sceneTitle {
                 return false
             }
-            if macroCategory != other.macroCategory {
+            if self.macroCategory != other.macroCategory {
                 return false
             }
-            if symbolName != other.symbolName {
+            if self.symbolName != other.symbolName {
                 return false
             }
-            if eligibleCount != other.eligibleCount {
+            if self.eligibleCount != other.eligibleCount {
                 return false
             }
-            if postCoherenceBps != other.postCoherenceBps {
+            if self.postCoherenceBps != other.postCoherenceBps {
                 return false
             }
-            if socialCoherenceBps != other.socialCoherenceBps {
+            if self.socialCoherenceBps != other.socialCoherenceBps {
                 return false
             }
-            if curatedListTags != other.curatedListTags {
+            if self.curatedListTags != other.curatedListTags {
                 return false
             }
-            if neighborCommunityIds != other.neighborCommunityIds {
+            if self.neighborCommunityIds != other.neighborCommunityIds {
                 return false
             }
-            if samplePostUris != other.samplePostUris {
+            if self.samplePostUris != other.samplePostUris {
                 return false
             }
-            if sampleAccountDids != other.sampleAccountDids {
+            if self.sampleAccountDids != other.sampleAccountDids {
                 return false
             }
-            if feedGeneratorUris != other.feedGeneratorUris {
+            if self.feedGeneratorUris != other.feedGeneratorUris {
                 return false
             }
-            if starterPackUris != other.starterPackUris {
+            if self.starterPackUris != other.starterPackUris {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -428,46 +343,46 @@ public struct BlueCatbirdIntelDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let communityIdValue = try communityId.toCBORValue()
+            let communityIdValue = try self.communityId.toCBORValue()
             map = map.adding(key: "communityId", value: communityIdValue)
-            let titleValue = try title.toCBORValue()
+            let titleValue = try self.title.toCBORValue()
             map = map.adding(key: "title", value: titleValue)
-            let descriptionValue = try description.toCBORValue()
+            let descriptionValue = try self.description.toCBORValue()
             map = map.adding(key: "description", value: descriptionValue)
-            let sceneIdValue = try sceneId.toCBORValue()
+            let sceneIdValue = try self.sceneId.toCBORValue()
             map = map.adding(key: "sceneId", value: sceneIdValue)
-            let sceneSlugValue = try sceneSlug.toCBORValue()
+            let sceneSlugValue = try self.sceneSlug.toCBORValue()
             map = map.adding(key: "sceneSlug", value: sceneSlugValue)
-            let sceneTitleValue = try sceneTitle.toCBORValue()
+            let sceneTitleValue = try self.sceneTitle.toCBORValue()
             map = map.adding(key: "sceneTitle", value: sceneTitleValue)
-            let macroCategoryValue = try macroCategory.toCBORValue()
+            let macroCategoryValue = try self.macroCategory.toCBORValue()
             map = map.adding(key: "macroCategory", value: macroCategoryValue)
-            let symbolNameValue = try symbolName.toCBORValue()
+            let symbolNameValue = try self.symbolName.toCBORValue()
             map = map.adding(key: "symbolName", value: symbolNameValue)
-            let eligibleCountValue = try eligibleCount.toCBORValue()
+            let eligibleCountValue = try self.eligibleCount.toCBORValue()
             map = map.adding(key: "eligibleCount", value: eligibleCountValue)
-            let postCoherenceBpsValue = try postCoherenceBps.toCBORValue()
+            let postCoherenceBpsValue = try self.postCoherenceBps.toCBORValue()
             map = map.adding(key: "postCoherenceBps", value: postCoherenceBpsValue)
-            let socialCoherenceBpsValue = try socialCoherenceBps.toCBORValue()
+            let socialCoherenceBpsValue = try self.socialCoherenceBps.toCBORValue()
             map = map.adding(key: "socialCoherenceBps", value: socialCoherenceBpsValue)
-            let curatedListTagsValue = try curatedListTags.toCBORValue()
+            let curatedListTagsValue = try self.curatedListTags.toCBORValue()
             map = map.adding(key: "curatedListTags", value: curatedListTagsValue)
-            let neighborCommunityIdsValue = try neighborCommunityIds.toCBORValue()
+            let neighborCommunityIdsValue = try self.neighborCommunityIds.toCBORValue()
             map = map.adding(key: "neighborCommunityIds", value: neighborCommunityIdsValue)
-            let samplePostUrisValue = try samplePostUris.toCBORValue()
+            let samplePostUrisValue = try self.samplePostUris.toCBORValue()
             map = map.adding(key: "samplePostUris", value: samplePostUrisValue)
-            let sampleAccountDidsValue = try sampleAccountDids.toCBORValue()
+            let sampleAccountDidsValue = try self.sampleAccountDids.toCBORValue()
             map = map.adding(key: "sampleAccountDids", value: sampleAccountDidsValue)
-            let feedGeneratorUrisValue = try feedGeneratorUris.toCBORValue()
+            let feedGeneratorUrisValue = try self.feedGeneratorUris.toCBORValue()
             map = map.adding(key: "feedGeneratorUris", value: feedGeneratorUrisValue)
-            let starterPackUrisValue = try starterPackUris.toCBORValue()
+            let starterPackUrisValue = try self.starterPackUris.toCBORValue()
             map = map.adding(key: "starterPackUris", value: starterPackUrisValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "communityId", "title", "description", "sceneId", "sceneSlug", "sceneTitle", "macroCategory", "symbolName", "eligibleCount", "postCoherenceBps", "socialCoherenceBps", "curatedListTags", "neighborCommunityIds", "samplePostUris", "sampleAccountDids", "feedGeneratorUris", "starterPackUris"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case communityId
             case title
             case description
@@ -487,9 +402,10 @@ public struct BlueCatbirdIntelDefs {
             case starterPackUris
         }
     }
-
+    /// Account membership and role metadata within a community. Profile bios and display names must be hydrated by the client.
     public struct CommunityMemberRef: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.intel.defs#communityMemberRef"
+
         public let did: DID
         public let role: String
         public let recommendedMode: String
@@ -499,9 +415,21 @@ public struct BlueCatbirdIntelDefs {
         public let mediaShareBps: Int
         public let estimatedPostsPerWeek: Int
         public let samplePostUri: ATProtocolURI?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            did: DID, role: String, recommendedMode: String, whyPicked: String, rankScoreBps: Int, repostShareBps: Int, mediaShareBps: Int, estimatedPostsPerWeek: Int, samplePostUri: ATProtocolURI? = nil
+            did: DID,
+            role: String,
+            recommendedMode: String,
+            whyPicked: String,
+            rankScoreBps: Int,
+            repostShareBps: Int,
+            mediaShareBps: Int,
+            estimatedPostsPerWeek: Int,
+            samplePostUri: ATProtocolURI? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.did = did
             self.role = role
@@ -512,128 +440,97 @@ public struct BlueCatbirdIntelDefs {
             self.mediaShareBps = mediaShareBps
             self.estimatedPostsPerWeek = estimatedPostsPerWeek
             self.samplePostUri = samplePostUri
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.did = try container.decode(DID.self, forKey: .did)
+            self.role = try container.decode(String.self, forKey: .role)
+            self.recommendedMode = try container.decode(String.self, forKey: .recommendedMode)
+            self.whyPicked = try container.decode(String.self, forKey: .whyPicked)
+            self.rankScoreBps = try container.decode(Int.self, forKey: .rankScoreBps)
+            self.repostShareBps = try container.decode(Int.self, forKey: .repostShareBps)
+            self.mediaShareBps = try container.decode(Int.self, forKey: .mediaShareBps)
+            self.estimatedPostsPerWeek = try container.decode(Int.self, forKey: .estimatedPostsPerWeek)
             do {
-                self.did = try container.decode(DID.self, forKey: .did)
+                self.samplePostUri = try container.decodeIfPresent(ATProtocolURI.self, forKey: .samplePostUri, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'did': \(error)")
-                throw error
-            }
-            do {
-                self.role = try container.decode(String.self, forKey: .role)
-            } catch {
-                LogManager.logError("Decoding error for required property 'role': \(error)")
-                throw error
-            }
-            do {
-                self.recommendedMode = try container.decode(String.self, forKey: .recommendedMode)
-            } catch {
-                LogManager.logError("Decoding error for required property 'recommendedMode': \(error)")
-                throw error
-            }
-            do {
-                self.whyPicked = try container.decode(String.self, forKey: .whyPicked)
-            } catch {
-                LogManager.logError("Decoding error for required property 'whyPicked': \(error)")
-                throw error
-            }
-            do {
-                self.rankScoreBps = try container.decode(Int.self, forKey: .rankScoreBps)
-            } catch {
-                LogManager.logError("Decoding error for required property 'rankScoreBps': \(error)")
-                throw error
-            }
-            do {
-                self.repostShareBps = try container.decode(Int.self, forKey: .repostShareBps)
-            } catch {
-                LogManager.logError("Decoding error for required property 'repostShareBps': \(error)")
-                throw error
-            }
-            do {
-                self.mediaShareBps = try container.decode(Int.self, forKey: .mediaShareBps)
-            } catch {
-                LogManager.logError("Decoding error for required property 'mediaShareBps': \(error)")
-                throw error
-            }
-            do {
-                self.estimatedPostsPerWeek = try container.decode(Int.self, forKey: .estimatedPostsPerWeek)
-            } catch {
-                LogManager.logError("Decoding error for required property 'estimatedPostsPerWeek': \(error)")
-                throw error
-            }
-            do {
-                self.samplePostUri = try container.decodeIfPresent(ATProtocolURI.self, forKey: .samplePostUri)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'samplePostUri' — degrading to nil: \(error)")
                 self.samplePostUri = nil
+                malformedFields.insert("samplePostUri")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(did, forKey: .did)
-            try container.encode(role, forKey: .role)
-            try container.encode(recommendedMode, forKey: .recommendedMode)
-            try container.encode(whyPicked, forKey: .whyPicked)
-            try container.encode(rankScoreBps, forKey: .rankScoreBps)
-            try container.encode(repostShareBps, forKey: .repostShareBps)
-            try container.encode(mediaShareBps, forKey: .mediaShareBps)
-            try container.encode(estimatedPostsPerWeek, forKey: .estimatedPostsPerWeek)
-            try container.encodeIfPresent(samplePostUri, forKey: .samplePostUri)
+            try container.encode(self.did, forKey: .did)
+            try container.encode(self.role, forKey: .role)
+            try container.encode(self.recommendedMode, forKey: .recommendedMode)
+            try container.encode(self.whyPicked, forKey: .whyPicked)
+            try container.encode(self.rankScoreBps, forKey: .rankScoreBps)
+            try container.encode(self.repostShareBps, forKey: .repostShareBps)
+            try container.encode(self.mediaShareBps, forKey: .mediaShareBps)
+            try container.encode(self.estimatedPostsPerWeek, forKey: .estimatedPostsPerWeek)
+            try container.encodeIfPresent(self.samplePostUri, forKey: .samplePostUri)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(did)
-            hasher.combine(role)
-            hasher.combine(recommendedMode)
-            hasher.combine(whyPicked)
-            hasher.combine(rankScoreBps)
-            hasher.combine(repostShareBps)
-            hasher.combine(mediaShareBps)
-            hasher.combine(estimatedPostsPerWeek)
-            if let value = samplePostUri {
+            hasher.combine(self.did)
+            hasher.combine(self.role)
+            hasher.combine(self.recommendedMode)
+            hasher.combine(self.whyPicked)
+            hasher.combine(self.rankScoreBps)
+            hasher.combine(self.repostShareBps)
+            hasher.combine(self.mediaShareBps)
+            hasher.combine(self.estimatedPostsPerWeek)
+            if let value = self.samplePostUri {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if did != other.did {
+            if self.did != other.did {
                 return false
             }
-            if role != other.role {
+            if self.role != other.role {
                 return false
             }
-            if recommendedMode != other.recommendedMode {
+            if self.recommendedMode != other.recommendedMode {
                 return false
             }
-            if whyPicked != other.whyPicked {
+            if self.whyPicked != other.whyPicked {
                 return false
             }
-            if rankScoreBps != other.rankScoreBps {
+            if self.rankScoreBps != other.rankScoreBps {
                 return false
             }
-            if repostShareBps != other.repostShareBps {
+            if self.repostShareBps != other.repostShareBps {
                 return false
             }
-            if mediaShareBps != other.mediaShareBps {
+            if self.mediaShareBps != other.mediaShareBps {
                 return false
             }
-            if estimatedPostsPerWeek != other.estimatedPostsPerWeek {
+            if self.estimatedPostsPerWeek != other.estimatedPostsPerWeek {
                 return false
             }
-            if samplePostUri != other.samplePostUri {
+            if self.samplePostUri != other.samplePostUri {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -642,32 +539,49 @@ public struct BlueCatbirdIntelDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let didValue = try did.toCBORValue()
+            let didValue = try self.did.toCBORValue()
             map = map.adding(key: "did", value: didValue)
-            let roleValue = try role.toCBORValue()
+            let roleValue = try self.role.toCBORValue()
             map = map.adding(key: "role", value: roleValue)
-            let recommendedModeValue = try recommendedMode.toCBORValue()
+            let recommendedModeValue = try self.recommendedMode.toCBORValue()
             map = map.adding(key: "recommendedMode", value: recommendedModeValue)
-            let whyPickedValue = try whyPicked.toCBORValue()
+            let whyPickedValue = try self.whyPicked.toCBORValue()
             map = map.adding(key: "whyPicked", value: whyPickedValue)
-            let rankScoreBpsValue = try rankScoreBps.toCBORValue()
+            let rankScoreBpsValue = try self.rankScoreBps.toCBORValue()
             map = map.adding(key: "rankScoreBps", value: rankScoreBpsValue)
-            let repostShareBpsValue = try repostShareBps.toCBORValue()
+            let repostShareBpsValue = try self.repostShareBps.toCBORValue()
             map = map.adding(key: "repostShareBps", value: repostShareBpsValue)
-            let mediaShareBpsValue = try mediaShareBps.toCBORValue()
+            let mediaShareBpsValue = try self.mediaShareBps.toCBORValue()
             map = map.adding(key: "mediaShareBps", value: mediaShareBpsValue)
-            let estimatedPostsPerWeekValue = try estimatedPostsPerWeek.toCBORValue()
+            let estimatedPostsPerWeekValue = try self.estimatedPostsPerWeek.toCBORValue()
             map = map.adding(key: "estimatedPostsPerWeek", value: estimatedPostsPerWeekValue)
-            if let value = samplePostUri {
+            if let value = self.samplePostUri {
                 let samplePostUriValue = try value.toCBORValue()
                 map = map.adding(key: "samplePostUri", value: samplePostUriValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "did", "role", "recommendedMode", "whyPicked", "rankScoreBps", "repostShareBps", "mediaShareBps", "estimatedPostsPerWeek", "samplePostUri"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "did": return true
+            case "role": return true
+            case "recommendedMode": return true
+            case "whyPicked": return true
+            case "rankScoreBps": return true
+            case "repostShareBps": return true
+            case "mediaShareBps": return true
+            case "estimatedPostsPerWeek": return true
+            case "samplePostUri": return self.samplePostUri != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case did
             case role
             case recommendedMode
@@ -679,88 +593,90 @@ public struct BlueCatbirdIntelDefs {
             case samplePostUri
         }
     }
-
+    /// Viewer-safe post AT-URI skeleton with community attribution.
     public struct PostSkeletonItem: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.intel.defs#postSkeletonItem"
+
         public let post: ATProtocolURI
         public let communityId: Int
         public let communityTitle: String
         public let authorRole: String?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            post: ATProtocolURI, communityId: Int, communityTitle: String, authorRole: String? = nil
+            post: ATProtocolURI,
+            communityId: Int,
+            communityTitle: String,
+            authorRole: String? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.post = post
             self.communityId = communityId
             self.communityTitle = communityTitle
             self.authorRole = authorRole
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.post = try container.decode(ATProtocolURI.self, forKey: .post)
+            self.communityId = try container.decode(Int.self, forKey: .communityId)
+            self.communityTitle = try container.decode(String.self, forKey: .communityTitle)
             do {
-                self.post = try container.decode(ATProtocolURI.self, forKey: .post)
+                self.authorRole = try container.decodeIfPresent(String.self, forKey: .authorRole, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'post': \(error)")
-                throw error
-            }
-            do {
-                self.communityId = try container.decode(Int.self, forKey: .communityId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'communityId': \(error)")
-                throw error
-            }
-            do {
-                self.communityTitle = try container.decode(String.self, forKey: .communityTitle)
-            } catch {
-                LogManager.logError("Decoding error for required property 'communityTitle': \(error)")
-                throw error
-            }
-            do {
-                self.authorRole = try container.decodeIfPresent(String.self, forKey: .authorRole)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'authorRole' — degrading to nil: \(error)")
                 self.authorRole = nil
+                malformedFields.insert("authorRole")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(post, forKey: .post)
-            try container.encode(communityId, forKey: .communityId)
-            try container.encode(communityTitle, forKey: .communityTitle)
-            try container.encodeIfPresent(authorRole, forKey: .authorRole)
+            try container.encode(self.post, forKey: .post)
+            try container.encode(self.communityId, forKey: .communityId)
+            try container.encode(self.communityTitle, forKey: .communityTitle)
+            try container.encodeIfPresent(self.authorRole, forKey: .authorRole)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(post)
-            hasher.combine(communityId)
-            hasher.combine(communityTitle)
-            if let value = authorRole {
+            hasher.combine(self.post)
+            hasher.combine(self.communityId)
+            hasher.combine(self.communityTitle)
+            if let value = self.authorRole {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if post != other.post {
+            if self.post != other.post {
                 return false
             }
-            if communityId != other.communityId {
+            if self.communityId != other.communityId {
                 return false
             }
-            if communityTitle != other.communityTitle {
+            if self.communityTitle != other.communityTitle {
                 return false
             }
-            if authorRole != other.authorRole {
+            if self.authorRole != other.authorRole {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -769,22 +685,34 @@ public struct BlueCatbirdIntelDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let postValue = try post.toCBORValue()
+            let postValue = try self.post.toCBORValue()
             map = map.adding(key: "post", value: postValue)
-            let communityIdValue = try communityId.toCBORValue()
+            let communityIdValue = try self.communityId.toCBORValue()
             map = map.adding(key: "communityId", value: communityIdValue)
-            let communityTitleValue = try communityTitle.toCBORValue()
+            let communityTitleValue = try self.communityTitle.toCBORValue()
             map = map.adding(key: "communityTitle", value: communityTitleValue)
-            if let value = authorRole {
+            if let value = self.authorRole {
                 let authorRoleValue = try value.toCBORValue()
                 map = map.adding(key: "authorRole", value: authorRoleValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "post", "communityId", "communityTitle", "authorRole"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "post": return true
+            case "communityId": return true
+            case "communityTitle": return true
+            case "authorRole": return self.authorRole != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case post
             case communityId
             case communityTitle

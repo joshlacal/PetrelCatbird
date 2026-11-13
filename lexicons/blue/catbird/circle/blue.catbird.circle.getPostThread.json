@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "query",
-      "description": "Get a thread of posts within a Circle Space",
+      "description": "Get a thread of posts within a Circle Space. Encrypted thread nodes are served as postView with an opaque envelope until a union variant exists.",
       "parameters": {
         "type": "params",
         "required": ["uri", "space"],
@@ -22,6 +22,10 @@
             "minimum": 0,
             "maximum": 100,
             "default": 80
+          },
+          "includeEncrypted": {
+            "type": "boolean",
+            "description": "When absent or false the server omits encrypted posts (and encrypted thread nodes). Clients that understand blue.catbird.circle.post envelopes send true."
           }
         }
       },

@@ -8,55 +8,55 @@ public struct BlueCatbirdOnboardingDefs {
 
     public static let typeIdentifier = "blue.catbird.onboarding.defs"
 
+    /// A user-selected community card with 1x (picked) or 2x (heart-boosted) priority weight.
     public struct CommunitySelection: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.onboarding.defs#communitySelection"
+
         public let communityId: Int
         public let weight: Int
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            communityId: Int, weight: Int
+            communityId: Int,
+            weight: Int,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.communityId = communityId
             self.weight = weight
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.communityId = try container.decode(Int.self, forKey: .communityId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'communityId': \(error)")
-                throw error
-            }
-            do {
-                self.weight = try container.decode(Int.self, forKey: .weight)
-            } catch {
-                LogManager.logError("Decoding error for required property 'weight': \(error)")
-                throw error
-            }
+            self.communityId = try container.decode(Int.self, forKey: .communityId)
+            self.weight = try container.decode(Int.self, forKey: .weight)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(communityId, forKey: .communityId)
-            try container.encode(weight, forKey: .weight)
+            try container.encode(self.communityId, forKey: .communityId)
+            try container.encode(self.weight, forKey: .weight)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(communityId)
-            hasher.combine(weight)
+            hasher.combine(self.communityId)
+            hasher.combine(self.weight)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if communityId != other.communityId {
+            if self.communityId != other.communityId {
                 return false
             }
-            if weight != other.weight {
+            if self.weight != other.weight {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -65,109 +65,95 @@ public struct BlueCatbirdOnboardingDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let communityIdValue = try communityId.toCBORValue()
+            let communityIdValue = try self.communityId.toCBORValue()
             map = map.adding(key: "communityId", value: communityIdValue)
-            let weightValue = try weight.toCBORValue()
+            let weightValue = try self.weight.toCBORValue()
             map = map.adding(key: "weight", value: weightValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "communityId", "weight"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case communityId
             case weight
         }
     }
-
     public struct CalibrationOption: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.onboarding.defs#calibrationOption"
+
         public let communityId: Int
         public let title: String
         public let subtitle: String
         public let sceneTitle: String
         public let samplePostUris: [ATProtocolURI]
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            communityId: Int, title: String, subtitle: String, sceneTitle: String, samplePostUris: [ATProtocolURI]
+            communityId: Int,
+            title: String,
+            subtitle: String,
+            sceneTitle: String,
+            samplePostUris: [ATProtocolURI],
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.communityId = communityId
             self.title = title
             self.subtitle = subtitle
             self.sceneTitle = sceneTitle
             self.samplePostUris = samplePostUris
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.communityId = try container.decode(Int.self, forKey: .communityId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'communityId': \(error)")
-                throw error
-            }
-            do {
-                self.title = try container.decode(String.self, forKey: .title)
-            } catch {
-                LogManager.logError("Decoding error for required property 'title': \(error)")
-                throw error
-            }
-            do {
-                self.subtitle = try container.decode(String.self, forKey: .subtitle)
-            } catch {
-                LogManager.logError("Decoding error for required property 'subtitle': \(error)")
-                throw error
-            }
-            do {
-                self.sceneTitle = try container.decode(String.self, forKey: .sceneTitle)
-            } catch {
-                LogManager.logError("Decoding error for required property 'sceneTitle': \(error)")
-                throw error
-            }
-            do {
-                self.samplePostUris = try container.decode([ATProtocolURI].self, forKey: .samplePostUris)
-            } catch {
-                LogManager.logError("Decoding error for required property 'samplePostUris': \(error)")
-                throw error
-            }
+            self.communityId = try container.decode(Int.self, forKey: .communityId)
+            self.title = try container.decode(String.self, forKey: .title)
+            self.subtitle = try container.decode(String.self, forKey: .subtitle)
+            self.sceneTitle = try container.decode(String.self, forKey: .sceneTitle)
+            self.samplePostUris = try container.decode([ATProtocolURI].self, forKey: .samplePostUris)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(communityId, forKey: .communityId)
-            try container.encode(title, forKey: .title)
-            try container.encode(subtitle, forKey: .subtitle)
-            try container.encode(sceneTitle, forKey: .sceneTitle)
-            try container.encode(samplePostUris, forKey: .samplePostUris)
+            try container.encode(self.communityId, forKey: .communityId)
+            try container.encode(self.title, forKey: .title)
+            try container.encode(self.subtitle, forKey: .subtitle)
+            try container.encode(self.sceneTitle, forKey: .sceneTitle)
+            try container.encode(self.samplePostUris, forKey: .samplePostUris)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(communityId)
-            hasher.combine(title)
-            hasher.combine(subtitle)
-            hasher.combine(sceneTitle)
-            hasher.combine(samplePostUris)
+            hasher.combine(self.communityId)
+            hasher.combine(self.title)
+            hasher.combine(self.subtitle)
+            hasher.combine(self.sceneTitle)
+            hasher.combine(self.samplePostUris)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if communityId != other.communityId {
+            if self.communityId != other.communityId {
                 return false
             }
-            if title != other.title {
+            if self.title != other.title {
                 return false
             }
-            if subtitle != other.subtitle {
+            if self.subtitle != other.subtitle {
                 return false
             }
-            if sceneTitle != other.sceneTitle {
+            if self.sceneTitle != other.sceneTitle {
                 return false
             }
-            if samplePostUris != other.samplePostUris {
+            if self.samplePostUris != other.samplePostUris {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -176,22 +162,22 @@ public struct BlueCatbirdOnboardingDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let communityIdValue = try communityId.toCBORValue()
+            let communityIdValue = try self.communityId.toCBORValue()
             map = map.adding(key: "communityId", value: communityIdValue)
-            let titleValue = try title.toCBORValue()
+            let titleValue = try self.title.toCBORValue()
             map = map.adding(key: "title", value: titleValue)
-            let subtitleValue = try subtitle.toCBORValue()
+            let subtitleValue = try self.subtitle.toCBORValue()
             map = map.adding(key: "subtitle", value: subtitleValue)
-            let sceneTitleValue = try sceneTitle.toCBORValue()
+            let sceneTitleValue = try self.sceneTitle.toCBORValue()
             map = map.adding(key: "sceneTitle", value: sceneTitleValue)
-            let samplePostUrisValue = try samplePostUris.toCBORValue()
+            let samplePostUrisValue = try self.samplePostUris.toCBORValue()
             map = map.adding(key: "samplePostUris", value: samplePostUrisValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "communityId", "title", "subtitle", "sceneTitle", "samplePostUris"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case communityId
             case title
             case subtitle
@@ -199,18 +185,27 @@ public struct BlueCatbirdOnboardingDefs {
             case samplePostUris
         }
     }
-
     public struct CalibrationSwipeCard: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.onboarding.defs#calibrationSwipeCard"
+
         public let swipeId: String
         public let step: Int
         public let kind: String
         public let prompt: String
         public let optionA: CalibrationOption
         public let optionB: CalibrationOption
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            swipeId: String, step: Int, kind: String, prompt: String, optionA: CalibrationOption, optionB: CalibrationOption
+            swipeId: String,
+            step: Int,
+            kind: String,
+            prompt: String,
+            optionA: CalibrationOption,
+            optionB: CalibrationOption,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.swipeId = swipeId
             self.step = step
@@ -218,89 +213,62 @@ public struct BlueCatbirdOnboardingDefs {
             self.prompt = prompt
             self.optionA = optionA
             self.optionB = optionB
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.swipeId = try container.decode(String.self, forKey: .swipeId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'swipeId': \(error)")
-                throw error
-            }
-            do {
-                self.step = try container.decode(Int.self, forKey: .step)
-            } catch {
-                LogManager.logError("Decoding error for required property 'step': \(error)")
-                throw error
-            }
-            do {
-                self.kind = try container.decode(String.self, forKey: .kind)
-            } catch {
-                LogManager.logError("Decoding error for required property 'kind': \(error)")
-                throw error
-            }
-            do {
-                self.prompt = try container.decode(String.self, forKey: .prompt)
-            } catch {
-                LogManager.logError("Decoding error for required property 'prompt': \(error)")
-                throw error
-            }
-            do {
-                self.optionA = try container.decode(CalibrationOption.self, forKey: .optionA)
-            } catch {
-                LogManager.logError("Decoding error for required property 'optionA': \(error)")
-                throw error
-            }
-            do {
-                self.optionB = try container.decode(CalibrationOption.self, forKey: .optionB)
-            } catch {
-                LogManager.logError("Decoding error for required property 'optionB': \(error)")
-                throw error
-            }
+            self.swipeId = try container.decode(String.self, forKey: .swipeId)
+            self.step = try container.decode(Int.self, forKey: .step)
+            self.kind = try container.decode(String.self, forKey: .kind)
+            self.prompt = try container.decode(String.self, forKey: .prompt)
+            self.optionA = try container.decode(CalibrationOption.self, forKey: .optionA)
+            self.optionB = try container.decode(CalibrationOption.self, forKey: .optionB)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(swipeId, forKey: .swipeId)
-            try container.encode(step, forKey: .step)
-            try container.encode(kind, forKey: .kind)
-            try container.encode(prompt, forKey: .prompt)
-            try container.encode(optionA, forKey: .optionA)
-            try container.encode(optionB, forKey: .optionB)
+            try container.encode(self.swipeId, forKey: .swipeId)
+            try container.encode(self.step, forKey: .step)
+            try container.encode(self.kind, forKey: .kind)
+            try container.encode(self.prompt, forKey: .prompt)
+            try container.encode(self.optionA, forKey: .optionA)
+            try container.encode(self.optionB, forKey: .optionB)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(swipeId)
-            hasher.combine(step)
-            hasher.combine(kind)
-            hasher.combine(prompt)
-            hasher.combine(optionA)
-            hasher.combine(optionB)
+            hasher.combine(self.swipeId)
+            hasher.combine(self.step)
+            hasher.combine(self.kind)
+            hasher.combine(self.prompt)
+            hasher.combine(self.optionA)
+            hasher.combine(self.optionB)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if swipeId != other.swipeId {
+            if self.swipeId != other.swipeId {
                 return false
             }
-            if step != other.step {
+            if self.step != other.step {
                 return false
             }
-            if kind != other.kind {
+            if self.kind != other.kind {
                 return false
             }
-            if prompt != other.prompt {
+            if self.prompt != other.prompt {
                 return false
             }
-            if optionA != other.optionA {
+            if self.optionA != other.optionA {
                 return false
             }
-            if optionB != other.optionB {
+            if self.optionB != other.optionB {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -309,24 +277,24 @@ public struct BlueCatbirdOnboardingDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let swipeIdValue = try swipeId.toCBORValue()
+            let swipeIdValue = try self.swipeId.toCBORValue()
             map = map.adding(key: "swipeId", value: swipeIdValue)
-            let stepValue = try step.toCBORValue()
+            let stepValue = try self.step.toCBORValue()
             map = map.adding(key: "step", value: stepValue)
-            let kindValue = try kind.toCBORValue()
+            let kindValue = try self.kind.toCBORValue()
             map = map.adding(key: "kind", value: kindValue)
-            let promptValue = try prompt.toCBORValue()
+            let promptValue = try self.prompt.toCBORValue()
             map = map.adding(key: "prompt", value: promptValue)
-            let optionAValue = try optionA.toCBORValue()
+            let optionAValue = try self.optionA.toCBORValue()
             map = map.adding(key: "optionA", value: optionAValue)
-            let optionBValue = try optionB.toCBORValue()
+            let optionBValue = try self.optionB.toCBORValue()
             map = map.adding(key: "optionB", value: optionBValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "swipeId", "step", "kind", "prompt", "optionA", "optionB"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case swipeId
             case step
             case kind
@@ -335,82 +303,72 @@ public struct BlueCatbirdOnboardingDefs {
             case optionB
         }
     }
-
     public struct CalibrationSwipeAnswer: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.onboarding.defs#calibrationSwipeAnswer"
+
         public let swipeId: String
         public let communityA: Int
         public let communityB: Int
         public let choice: CalibrationSwipeAnswerChoice
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            swipeId: String, communityA: Int, communityB: Int, choice: CalibrationSwipeAnswerChoice
+            swipeId: String,
+            communityA: Int,
+            communityB: Int,
+            choice: CalibrationSwipeAnswerChoice,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.swipeId = swipeId
             self.communityA = communityA
             self.communityB = communityB
             self.choice = choice
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.swipeId = try container.decode(String.self, forKey: .swipeId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'swipeId': \(error)")
-                throw error
-            }
-            do {
-                self.communityA = try container.decode(Int.self, forKey: .communityA)
-            } catch {
-                LogManager.logError("Decoding error for required property 'communityA': \(error)")
-                throw error
-            }
-            do {
-                self.communityB = try container.decode(Int.self, forKey: .communityB)
-            } catch {
-                LogManager.logError("Decoding error for required property 'communityB': \(error)")
-                throw error
-            }
-            do {
-                self.choice = try container.decode(CalibrationSwipeAnswerChoice.self, forKey: .choice)
-            } catch {
-                LogManager.logError("Decoding error for required property 'choice': \(error)")
-                throw error
-            }
+            self.swipeId = try container.decode(String.self, forKey: .swipeId)
+            self.communityA = try container.decode(Int.self, forKey: .communityA)
+            self.communityB = try container.decode(Int.self, forKey: .communityB)
+            self.choice = try container.decode(CalibrationSwipeAnswerChoice.self, forKey: .choice)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(swipeId, forKey: .swipeId)
-            try container.encode(communityA, forKey: .communityA)
-            try container.encode(communityB, forKey: .communityB)
-            try container.encode(choice, forKey: .choice)
+            try container.encode(self.swipeId, forKey: .swipeId)
+            try container.encode(self.communityA, forKey: .communityA)
+            try container.encode(self.communityB, forKey: .communityB)
+            try container.encode(self.choice, forKey: .choice)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(swipeId)
-            hasher.combine(communityA)
-            hasher.combine(communityB)
-            hasher.combine(choice)
+            hasher.combine(self.swipeId)
+            hasher.combine(self.communityA)
+            hasher.combine(self.communityB)
+            hasher.combine(self.choice)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if swipeId != other.swipeId {
+            if self.swipeId != other.swipeId {
                 return false
             }
-            if communityA != other.communityA {
+            if self.communityA != other.communityA {
                 return false
             }
-            if communityB != other.communityB {
+            if self.communityB != other.communityB {
                 return false
             }
-            if choice != other.choice {
+            if self.choice != other.choice {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -419,76 +377,74 @@ public struct BlueCatbirdOnboardingDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let swipeIdValue = try swipeId.toCBORValue()
+            let swipeIdValue = try self.swipeId.toCBORValue()
             map = map.adding(key: "swipeId", value: swipeIdValue)
-            let communityAValue = try communityA.toCBORValue()
+            let communityAValue = try self.communityA.toCBORValue()
             map = map.adding(key: "communityA", value: communityAValue)
-            let communityBValue = try communityB.toCBORValue()
+            let communityBValue = try self.communityB.toCBORValue()
             map = map.adding(key: "communityB", value: communityBValue)
-            let choiceValue = try choice.toCBORValue()
+            let choiceValue = try self.choice.toCBORValue()
             map = map.adding(key: "choice", value: choiceValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "swipeId", "communityA", "communityB", "choice"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case swipeId
             case communityA
             case communityB
             case choice
         }
     }
-
     public struct BundleControls: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.onboarding.defs#bundleControls"
+
         public let pace: BundleControlsPace
         public let originalsOnlyForHeavyReposters: Bool
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            pace: BundleControlsPace, originalsOnlyForHeavyReposters: Bool
+            pace: BundleControlsPace,
+            originalsOnlyForHeavyReposters: Bool,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.pace = pace
             self.originalsOnlyForHeavyReposters = originalsOnlyForHeavyReposters
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.pace = try container.decode(BundleControlsPace.self, forKey: .pace)
-            } catch {
-                LogManager.logError("Decoding error for required property 'pace': \(error)")
-                throw error
-            }
-            do {
-                self.originalsOnlyForHeavyReposters = try container.decode(Bool.self, forKey: .originalsOnlyForHeavyReposters)
-            } catch {
-                LogManager.logError("Decoding error for required property 'originalsOnlyForHeavyReposters': \(error)")
-                throw error
-            }
+            self.pace = try container.decode(BundleControlsPace.self, forKey: .pace)
+            self.originalsOnlyForHeavyReposters = try container.decode(Bool.self, forKey: .originalsOnlyForHeavyReposters)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(pace, forKey: .pace)
-            try container.encode(originalsOnlyForHeavyReposters, forKey: .originalsOnlyForHeavyReposters)
+            try container.encode(self.pace, forKey: .pace)
+            try container.encode(self.originalsOnlyForHeavyReposters, forKey: .originalsOnlyForHeavyReposters)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(pace)
-            hasher.combine(originalsOnlyForHeavyReposters)
+            hasher.combine(self.pace)
+            hasher.combine(self.originalsOnlyForHeavyReposters)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if pace != other.pace {
+            if self.pace != other.pace {
                 return false
             }
-            if originalsOnlyForHeavyReposters != other.originalsOnlyForHeavyReposters {
+            if self.originalsOnlyForHeavyReposters != other.originalsOnlyForHeavyReposters {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -497,23 +453,24 @@ public struct BlueCatbirdOnboardingDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let paceValue = try pace.toCBORValue()
+            let paceValue = try self.pace.toCBORValue()
             map = map.adding(key: "pace", value: paceValue)
-            let originalsOnlyForHeavyRepostersValue = try originalsOnlyForHeavyReposters.toCBORValue()
+            let originalsOnlyForHeavyRepostersValue = try self.originalsOnlyForHeavyReposters.toCBORValue()
             map = map.adding(key: "originalsOnlyForHeavyReposters", value: originalsOnlyForHeavyRepostersValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "pace", "originalsOnlyForHeavyReposters"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case pace
             case originalsOnlyForHeavyReposters
         }
     }
-
+    /// A transparent account recommendation in the solved starting lineup. Client applies follow and hideReposts only upon explicit user confirmation.
     public struct RecommendedFollow: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.onboarding.defs#recommendedFollow"
+
         public let did: DID
         public let communityId: Int
         public let communityTitle: String
@@ -523,9 +480,21 @@ public struct BlueCatbirdOnboardingDefs {
         public let whyPicked: String
         public let estimatedPostsPerWeek: Int
         public let samplePostUri: ATProtocolURI?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            did: DID, communityId: Int, communityTitle: String, role: String, deliveryMode: String, hideReposts: Bool, whyPicked: String, estimatedPostsPerWeek: Int, samplePostUri: ATProtocolURI? = nil
+            did: DID,
+            communityId: Int,
+            communityTitle: String,
+            role: String,
+            deliveryMode: String,
+            hideReposts: Bool,
+            whyPicked: String,
+            estimatedPostsPerWeek: Int,
+            samplePostUri: ATProtocolURI? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.did = did
             self.communityId = communityId
@@ -536,128 +505,97 @@ public struct BlueCatbirdOnboardingDefs {
             self.whyPicked = whyPicked
             self.estimatedPostsPerWeek = estimatedPostsPerWeek
             self.samplePostUri = samplePostUri
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.did = try container.decode(DID.self, forKey: .did)
+            self.communityId = try container.decode(Int.self, forKey: .communityId)
+            self.communityTitle = try container.decode(String.self, forKey: .communityTitle)
+            self.role = try container.decode(String.self, forKey: .role)
+            self.deliveryMode = try container.decode(String.self, forKey: .deliveryMode)
+            self.hideReposts = try container.decode(Bool.self, forKey: .hideReposts)
+            self.whyPicked = try container.decode(String.self, forKey: .whyPicked)
+            self.estimatedPostsPerWeek = try container.decode(Int.self, forKey: .estimatedPostsPerWeek)
             do {
-                self.did = try container.decode(DID.self, forKey: .did)
+                self.samplePostUri = try container.decodeIfPresent(ATProtocolURI.self, forKey: .samplePostUri, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'did': \(error)")
-                throw error
-            }
-            do {
-                self.communityId = try container.decode(Int.self, forKey: .communityId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'communityId': \(error)")
-                throw error
-            }
-            do {
-                self.communityTitle = try container.decode(String.self, forKey: .communityTitle)
-            } catch {
-                LogManager.logError("Decoding error for required property 'communityTitle': \(error)")
-                throw error
-            }
-            do {
-                self.role = try container.decode(String.self, forKey: .role)
-            } catch {
-                LogManager.logError("Decoding error for required property 'role': \(error)")
-                throw error
-            }
-            do {
-                self.deliveryMode = try container.decode(String.self, forKey: .deliveryMode)
-            } catch {
-                LogManager.logError("Decoding error for required property 'deliveryMode': \(error)")
-                throw error
-            }
-            do {
-                self.hideReposts = try container.decode(Bool.self, forKey: .hideReposts)
-            } catch {
-                LogManager.logError("Decoding error for required property 'hideReposts': \(error)")
-                throw error
-            }
-            do {
-                self.whyPicked = try container.decode(String.self, forKey: .whyPicked)
-            } catch {
-                LogManager.logError("Decoding error for required property 'whyPicked': \(error)")
-                throw error
-            }
-            do {
-                self.estimatedPostsPerWeek = try container.decode(Int.self, forKey: .estimatedPostsPerWeek)
-            } catch {
-                LogManager.logError("Decoding error for required property 'estimatedPostsPerWeek': \(error)")
-                throw error
-            }
-            do {
-                self.samplePostUri = try container.decodeIfPresent(ATProtocolURI.self, forKey: .samplePostUri)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'samplePostUri' — degrading to nil: \(error)")
                 self.samplePostUri = nil
+                malformedFields.insert("samplePostUri")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(did, forKey: .did)
-            try container.encode(communityId, forKey: .communityId)
-            try container.encode(communityTitle, forKey: .communityTitle)
-            try container.encode(role, forKey: .role)
-            try container.encode(deliveryMode, forKey: .deliveryMode)
-            try container.encode(hideReposts, forKey: .hideReposts)
-            try container.encode(whyPicked, forKey: .whyPicked)
-            try container.encode(estimatedPostsPerWeek, forKey: .estimatedPostsPerWeek)
-            try container.encodeIfPresent(samplePostUri, forKey: .samplePostUri)
+            try container.encode(self.did, forKey: .did)
+            try container.encode(self.communityId, forKey: .communityId)
+            try container.encode(self.communityTitle, forKey: .communityTitle)
+            try container.encode(self.role, forKey: .role)
+            try container.encode(self.deliveryMode, forKey: .deliveryMode)
+            try container.encode(self.hideReposts, forKey: .hideReposts)
+            try container.encode(self.whyPicked, forKey: .whyPicked)
+            try container.encode(self.estimatedPostsPerWeek, forKey: .estimatedPostsPerWeek)
+            try container.encodeIfPresent(self.samplePostUri, forKey: .samplePostUri)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(did)
-            hasher.combine(communityId)
-            hasher.combine(communityTitle)
-            hasher.combine(role)
-            hasher.combine(deliveryMode)
-            hasher.combine(hideReposts)
-            hasher.combine(whyPicked)
-            hasher.combine(estimatedPostsPerWeek)
-            if let value = samplePostUri {
+            hasher.combine(self.did)
+            hasher.combine(self.communityId)
+            hasher.combine(self.communityTitle)
+            hasher.combine(self.role)
+            hasher.combine(self.deliveryMode)
+            hasher.combine(self.hideReposts)
+            hasher.combine(self.whyPicked)
+            hasher.combine(self.estimatedPostsPerWeek)
+            if let value = self.samplePostUri {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if did != other.did {
+            if self.did != other.did {
                 return false
             }
-            if communityId != other.communityId {
+            if self.communityId != other.communityId {
                 return false
             }
-            if communityTitle != other.communityTitle {
+            if self.communityTitle != other.communityTitle {
                 return false
             }
-            if role != other.role {
+            if self.role != other.role {
                 return false
             }
-            if deliveryMode != other.deliveryMode {
+            if self.deliveryMode != other.deliveryMode {
                 return false
             }
-            if hideReposts != other.hideReposts {
+            if self.hideReposts != other.hideReposts {
                 return false
             }
-            if whyPicked != other.whyPicked {
+            if self.whyPicked != other.whyPicked {
                 return false
             }
-            if estimatedPostsPerWeek != other.estimatedPostsPerWeek {
+            if self.estimatedPostsPerWeek != other.estimatedPostsPerWeek {
                 return false
             }
-            if samplePostUri != other.samplePostUri {
+            if self.samplePostUri != other.samplePostUri {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -666,32 +604,49 @@ public struct BlueCatbirdOnboardingDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let didValue = try did.toCBORValue()
+            let didValue = try self.did.toCBORValue()
             map = map.adding(key: "did", value: didValue)
-            let communityIdValue = try communityId.toCBORValue()
+            let communityIdValue = try self.communityId.toCBORValue()
             map = map.adding(key: "communityId", value: communityIdValue)
-            let communityTitleValue = try communityTitle.toCBORValue()
+            let communityTitleValue = try self.communityTitle.toCBORValue()
             map = map.adding(key: "communityTitle", value: communityTitleValue)
-            let roleValue = try role.toCBORValue()
+            let roleValue = try self.role.toCBORValue()
             map = map.adding(key: "role", value: roleValue)
-            let deliveryModeValue = try deliveryMode.toCBORValue()
+            let deliveryModeValue = try self.deliveryMode.toCBORValue()
             map = map.adding(key: "deliveryMode", value: deliveryModeValue)
-            let hideRepostsValue = try hideReposts.toCBORValue()
+            let hideRepostsValue = try self.hideReposts.toCBORValue()
             map = map.adding(key: "hideReposts", value: hideRepostsValue)
-            let whyPickedValue = try whyPicked.toCBORValue()
+            let whyPickedValue = try self.whyPicked.toCBORValue()
             map = map.adding(key: "whyPicked", value: whyPickedValue)
-            let estimatedPostsPerWeekValue = try estimatedPostsPerWeek.toCBORValue()
+            let estimatedPostsPerWeekValue = try self.estimatedPostsPerWeek.toCBORValue()
             map = map.adding(key: "estimatedPostsPerWeek", value: estimatedPostsPerWeekValue)
-            if let value = samplePostUri {
+            if let value = self.samplePostUri {
                 let samplePostUriValue = try value.toCBORValue()
                 map = map.adding(key: "samplePostUri", value: samplePostUriValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "did", "communityId", "communityTitle", "role", "deliveryMode", "hideReposts", "whyPicked", "estimatedPostsPerWeek", "samplePostUri"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "did": return true
+            case "communityId": return true
+            case "communityTitle": return true
+            case "role": return true
+            case "deliveryMode": return true
+            case "hideReposts": return true
+            case "whyPicked": return true
+            case "estimatedPostsPerWeek": return true
+            case "samplePostUri": return self.samplePostUri != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case did
             case communityId
             case communityTitle
@@ -703,69 +658,63 @@ public struct BlueCatbirdOnboardingDefs {
             case samplePostUri
         }
     }
-
     public struct RecommendedFeed: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.onboarding.defs#recommendedFeed"
+
         public let uri: ATProtocolURI
         public let communityId: Int
         public let communityTitle: String
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            uri: ATProtocolURI, communityId: Int, communityTitle: String
+            uri: ATProtocolURI,
+            communityId: Int,
+            communityTitle: String,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.uri = uri
             self.communityId = communityId
             self.communityTitle = communityTitle
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
-            } catch {
-                LogManager.logError("Decoding error for required property 'uri': \(error)")
-                throw error
-            }
-            do {
-                self.communityId = try container.decode(Int.self, forKey: .communityId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'communityId': \(error)")
-                throw error
-            }
-            do {
-                self.communityTitle = try container.decode(String.self, forKey: .communityTitle)
-            } catch {
-                LogManager.logError("Decoding error for required property 'communityTitle': \(error)")
-                throw error
-            }
+            self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+            self.communityId = try container.decode(Int.self, forKey: .communityId)
+            self.communityTitle = try container.decode(String.self, forKey: .communityTitle)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(uri, forKey: .uri)
-            try container.encode(communityId, forKey: .communityId)
-            try container.encode(communityTitle, forKey: .communityTitle)
+            try container.encode(self.uri, forKey: .uri)
+            try container.encode(self.communityId, forKey: .communityId)
+            try container.encode(self.communityTitle, forKey: .communityTitle)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(uri)
-            hasher.combine(communityId)
-            hasher.combine(communityTitle)
+            hasher.combine(self.uri)
+            hasher.combine(self.communityId)
+            hasher.combine(self.communityTitle)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if uri != other.uri {
+            if self.uri != other.uri {
                 return false
             }
-            if communityId != other.communityId {
+            if self.communityId != other.communityId {
                 return false
             }
-            if communityTitle != other.communityTitle {
+            if self.communityTitle != other.communityTitle {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -774,86 +723,80 @@ public struct BlueCatbirdOnboardingDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let uriValue = try uri.toCBORValue()
+            let uriValue = try self.uri.toCBORValue()
             map = map.adding(key: "uri", value: uriValue)
-            let communityIdValue = try communityId.toCBORValue()
+            let communityIdValue = try self.communityId.toCBORValue()
             map = map.adding(key: "communityId", value: communityIdValue)
-            let communityTitleValue = try communityTitle.toCBORValue()
+            let communityTitleValue = try self.communityTitle.toCBORValue()
             map = map.adding(key: "communityTitle", value: communityTitleValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "uri", "communityId", "communityTitle"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case uri
             case communityId
             case communityTitle
         }
     }
-
     public struct RecommendedStarterPack: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.onboarding.defs#recommendedStarterPack"
+
         public let uri: ATProtocolURI
         public let communityId: Int
         public let communityTitle: String
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            uri: ATProtocolURI, communityId: Int, communityTitle: String
+            uri: ATProtocolURI,
+            communityId: Int,
+            communityTitle: String,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.uri = uri
             self.communityId = communityId
             self.communityTitle = communityTitle
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
-            } catch {
-                LogManager.logError("Decoding error for required property 'uri': \(error)")
-                throw error
-            }
-            do {
-                self.communityId = try container.decode(Int.self, forKey: .communityId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'communityId': \(error)")
-                throw error
-            }
-            do {
-                self.communityTitle = try container.decode(String.self, forKey: .communityTitle)
-            } catch {
-                LogManager.logError("Decoding error for required property 'communityTitle': \(error)")
-                throw error
-            }
+            self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+            self.communityId = try container.decode(Int.self, forKey: .communityId)
+            self.communityTitle = try container.decode(String.self, forKey: .communityTitle)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(uri, forKey: .uri)
-            try container.encode(communityId, forKey: .communityId)
-            try container.encode(communityTitle, forKey: .communityTitle)
+            try container.encode(self.uri, forKey: .uri)
+            try container.encode(self.communityId, forKey: .communityId)
+            try container.encode(self.communityTitle, forKey: .communityTitle)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(uri)
-            hasher.combine(communityId)
-            hasher.combine(communityTitle)
+            hasher.combine(self.uri)
+            hasher.combine(self.communityId)
+            hasher.combine(self.communityTitle)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if uri != other.uri {
+            if self.uri != other.uri {
                 return false
             }
-            if communityId != other.communityId {
+            if self.communityId != other.communityId {
                 return false
             }
-            if communityTitle != other.communityTitle {
+            if self.communityTitle != other.communityTitle {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -862,26 +805,26 @@ public struct BlueCatbirdOnboardingDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let uriValue = try uri.toCBORValue()
+            let uriValue = try self.uri.toCBORValue()
             map = map.adding(key: "uri", value: uriValue)
-            let communityIdValue = try communityId.toCBORValue()
+            let communityIdValue = try self.communityId.toCBORValue()
             map = map.adding(key: "communityId", value: communityIdValue)
-            let communityTitleValue = try communityTitle.toCBORValue()
+            let communityTitleValue = try self.communityTitle.toCBORValue()
             map = map.adding(key: "communityTitle", value: communityTitleValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "uri", "communityId", "communityTitle"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case uri
             case communityId
             case communityTitle
         }
     }
-
     public struct BundleSummary: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.onboarding.defs#bundleSummary"
+
         public let totalFollows: Int
         public let anchorCount: Int
         public let makerCount: Int
@@ -890,9 +833,20 @@ public struct BlueCatbirdOnboardingDefs {
         public let originalsOnlyCount: Int
         public let estimatedDailyPosts: Int
         public let coveredCommunities: Int
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            totalFollows: Int, anchorCount: Int, makerCount: Int, conversationalCount: Int, curatorCount: Int, originalsOnlyCount: Int, estimatedDailyPosts: Int, coveredCommunities: Int
+            totalFollows: Int,
+            anchorCount: Int,
+            makerCount: Int,
+            conversationalCount: Int,
+            curatorCount: Int,
+            originalsOnlyCount: Int,
+            estimatedDailyPosts: Int,
+            coveredCommunities: Int,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.totalFollows = totalFollows
             self.anchorCount = anchorCount
@@ -902,111 +856,74 @@ public struct BlueCatbirdOnboardingDefs {
             self.originalsOnlyCount = originalsOnlyCount
             self.estimatedDailyPosts = estimatedDailyPosts
             self.coveredCommunities = coveredCommunities
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            do {
-                self.totalFollows = try container.decode(Int.self, forKey: .totalFollows)
-            } catch {
-                LogManager.logError("Decoding error for required property 'totalFollows': \(error)")
-                throw error
-            }
-            do {
-                self.anchorCount = try container.decode(Int.self, forKey: .anchorCount)
-            } catch {
-                LogManager.logError("Decoding error for required property 'anchorCount': \(error)")
-                throw error
-            }
-            do {
-                self.makerCount = try container.decode(Int.self, forKey: .makerCount)
-            } catch {
-                LogManager.logError("Decoding error for required property 'makerCount': \(error)")
-                throw error
-            }
-            do {
-                self.conversationalCount = try container.decode(Int.self, forKey: .conversationalCount)
-            } catch {
-                LogManager.logError("Decoding error for required property 'conversationalCount': \(error)")
-                throw error
-            }
-            do {
-                self.curatorCount = try container.decode(Int.self, forKey: .curatorCount)
-            } catch {
-                LogManager.logError("Decoding error for required property 'curatorCount': \(error)")
-                throw error
-            }
-            do {
-                self.originalsOnlyCount = try container.decode(Int.self, forKey: .originalsOnlyCount)
-            } catch {
-                LogManager.logError("Decoding error for required property 'originalsOnlyCount': \(error)")
-                throw error
-            }
-            do {
-                self.estimatedDailyPosts = try container.decode(Int.self, forKey: .estimatedDailyPosts)
-            } catch {
-                LogManager.logError("Decoding error for required property 'estimatedDailyPosts': \(error)")
-                throw error
-            }
-            do {
-                self.coveredCommunities = try container.decode(Int.self, forKey: .coveredCommunities)
-            } catch {
-                LogManager.logError("Decoding error for required property 'coveredCommunities': \(error)")
-                throw error
-            }
+            self.totalFollows = try container.decode(Int.self, forKey: .totalFollows)
+            self.anchorCount = try container.decode(Int.self, forKey: .anchorCount)
+            self.makerCount = try container.decode(Int.self, forKey: .makerCount)
+            self.conversationalCount = try container.decode(Int.self, forKey: .conversationalCount)
+            self.curatorCount = try container.decode(Int.self, forKey: .curatorCount)
+            self.originalsOnlyCount = try container.decode(Int.self, forKey: .originalsOnlyCount)
+            self.estimatedDailyPosts = try container.decode(Int.self, forKey: .estimatedDailyPosts)
+            self.coveredCommunities = try container.decode(Int.self, forKey: .coveredCommunities)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(totalFollows, forKey: .totalFollows)
-            try container.encode(anchorCount, forKey: .anchorCount)
-            try container.encode(makerCount, forKey: .makerCount)
-            try container.encode(conversationalCount, forKey: .conversationalCount)
-            try container.encode(curatorCount, forKey: .curatorCount)
-            try container.encode(originalsOnlyCount, forKey: .originalsOnlyCount)
-            try container.encode(estimatedDailyPosts, forKey: .estimatedDailyPosts)
-            try container.encode(coveredCommunities, forKey: .coveredCommunities)
+            try container.encode(self.totalFollows, forKey: .totalFollows)
+            try container.encode(self.anchorCount, forKey: .anchorCount)
+            try container.encode(self.makerCount, forKey: .makerCount)
+            try container.encode(self.conversationalCount, forKey: .conversationalCount)
+            try container.encode(self.curatorCount, forKey: .curatorCount)
+            try container.encode(self.originalsOnlyCount, forKey: .originalsOnlyCount)
+            try container.encode(self.estimatedDailyPosts, forKey: .estimatedDailyPosts)
+            try container.encode(self.coveredCommunities, forKey: .coveredCommunities)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(totalFollows)
-            hasher.combine(anchorCount)
-            hasher.combine(makerCount)
-            hasher.combine(conversationalCount)
-            hasher.combine(curatorCount)
-            hasher.combine(originalsOnlyCount)
-            hasher.combine(estimatedDailyPosts)
-            hasher.combine(coveredCommunities)
+            hasher.combine(self.totalFollows)
+            hasher.combine(self.anchorCount)
+            hasher.combine(self.makerCount)
+            hasher.combine(self.conversationalCount)
+            hasher.combine(self.curatorCount)
+            hasher.combine(self.originalsOnlyCount)
+            hasher.combine(self.estimatedDailyPosts)
+            hasher.combine(self.coveredCommunities)
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if totalFollows != other.totalFollows {
+            if self.totalFollows != other.totalFollows {
                 return false
             }
-            if anchorCount != other.anchorCount {
+            if self.anchorCount != other.anchorCount {
                 return false
             }
-            if makerCount != other.makerCount {
+            if self.makerCount != other.makerCount {
                 return false
             }
-            if conversationalCount != other.conversationalCount {
+            if self.conversationalCount != other.conversationalCount {
                 return false
             }
-            if curatorCount != other.curatorCount {
+            if self.curatorCount != other.curatorCount {
                 return false
             }
-            if originalsOnlyCount != other.originalsOnlyCount {
+            if self.originalsOnlyCount != other.originalsOnlyCount {
                 return false
             }
-            if estimatedDailyPosts != other.estimatedDailyPosts {
+            if self.estimatedDailyPosts != other.estimatedDailyPosts {
                 return false
             }
-            if coveredCommunities != other.coveredCommunities {
+            if self.coveredCommunities != other.coveredCommunities {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -1015,28 +932,28 @@ public struct BlueCatbirdOnboardingDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let totalFollowsValue = try totalFollows.toCBORValue()
+            let totalFollowsValue = try self.totalFollows.toCBORValue()
             map = map.adding(key: "totalFollows", value: totalFollowsValue)
-            let anchorCountValue = try anchorCount.toCBORValue()
+            let anchorCountValue = try self.anchorCount.toCBORValue()
             map = map.adding(key: "anchorCount", value: anchorCountValue)
-            let makerCountValue = try makerCount.toCBORValue()
+            let makerCountValue = try self.makerCount.toCBORValue()
             map = map.adding(key: "makerCount", value: makerCountValue)
-            let conversationalCountValue = try conversationalCount.toCBORValue()
+            let conversationalCountValue = try self.conversationalCount.toCBORValue()
             map = map.adding(key: "conversationalCount", value: conversationalCountValue)
-            let curatorCountValue = try curatorCount.toCBORValue()
+            let curatorCountValue = try self.curatorCount.toCBORValue()
             map = map.adding(key: "curatorCount", value: curatorCountValue)
-            let originalsOnlyCountValue = try originalsOnlyCount.toCBORValue()
+            let originalsOnlyCountValue = try self.originalsOnlyCount.toCBORValue()
             map = map.adding(key: "originalsOnlyCount", value: originalsOnlyCountValue)
-            let estimatedDailyPostsValue = try estimatedDailyPosts.toCBORValue()
+            let estimatedDailyPostsValue = try self.estimatedDailyPosts.toCBORValue()
             map = map.adding(key: "estimatedDailyPosts", value: estimatedDailyPostsValue)
-            let coveredCommunitiesValue = try coveredCommunities.toCBORValue()
+            let coveredCommunitiesValue = try self.coveredCommunities.toCBORValue()
             map = map.adding(key: "coveredCommunities", value: coveredCommunitiesValue)
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
         }
 
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "totalFollows", "anchorCount", "makerCount", "conversationalCount", "curatorCount", "originalsOnlyCount", "estimatedDailyPosts", "coveredCommunities"]
+
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case totalFollows
             case anchorCount
             case makerCount

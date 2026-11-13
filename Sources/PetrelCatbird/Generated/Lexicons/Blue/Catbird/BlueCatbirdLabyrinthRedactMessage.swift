@@ -4,16 +4,24 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.redactMessage
 
+/// Unsend (decision J1): redact the caller's own sender copies of one message in a conversation's thread records. Every matching item of the caller keeps its batch, server order, messageId, timestamp, mekId and senderTransportPubkey; its signedEncMessage becomes empty and it gains the author's signed redaction (defs#redaction, with redactedAt set by the server). Author only: items written by other DIDs are never touched, even under a reused messageId ([CB-31]). Every attachment reference to the message is invalidated. Current membership is not required. Thread endpoint on the conversation's sequencer DS; a device homed elsewhere is relayed (labyrinthRelay). Idempotent: an unknown or already-redacted id counts zero. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
 public struct BlueCatbirdLabyrinthRedactMessage {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.redactMessage"
+
     public struct Input: ATProtocolCodable {
+
+        /// The chat conversation id ([CB-2]).
         public let threadId: String
         public let messageId: String
+        /// The author's signed request (transportPubkey, sig); redactedAt is set by the server and must be absent.
         public let redaction: BlueCatbirdLabyrinthDefs.Redaction
 
-        /// Standard public initializer
-        public init(threadId: String, messageId: String, redaction: BlueCatbirdLabyrinthDefs.Redaction) {
+        public init(
+            threadId: String,
+            messageId: String,
+            redaction: BlueCatbirdLabyrinthDefs.Redaction
+        ) {
             self.threadId = threadId
             self.messageId = messageId
             self.redaction = redaction
@@ -28,18 +36,18 @@ public struct BlueCatbirdLabyrinthRedactMessage {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(threadId, forKey: .threadId)
-            try container.encode(messageId, forKey: .messageId)
-            try container.encode(redaction, forKey: .redaction)
+            try container.encode(self.threadId, forKey: .threadId)
+            try container.encode(self.messageId, forKey: .messageId)
+            try container.encode(self.redaction, forKey: .redaction)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let threadIdValue = try threadId.toCBORValue()
+            let threadIdValue = try self.threadId.toCBORValue()
             map = map.adding(key: "threadId", value: threadIdValue)
-            let messageIdValue = try messageId.toCBORValue()
+            let messageIdValue = try self.messageId.toCBORValue()
             map = map.adding(key: "messageId", value: messageIdValue)
-            let redactionValue = try redaction.toCBORValue()
+            let redactionValue = try self.redaction.toCBORValue()
             map = map.adding(key: "redaction", value: redactionValue)
             return map
         }
@@ -53,50 +61,35 @@ public struct BlueCatbirdLabyrinthRedactMessage {
 
     public struct Output: ATProtocolCodable {
 
+        /// How many stored items this call redacted.
         public let redacted: Int
 
-        // Standard public initializer
         public init(
-
             redacted: Int
-
         ) {
-
             self.redacted = redacted
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.redacted = try container.decode(Int.self, forKey: .redacted)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(redacted, forKey: .redacted)
-
+            try container.encode(self.redacted, forKey: .redacted)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let redactedValue = try redacted.toCBORValue()
+            let redactedValue = try self.redacted.toCBORValue()
             map = map.adding(key: "redacted", value: redactedValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case redacted
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -118,11 +111,10 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - redactMessage
     /// Unsend (decision J1): redact the caller's own sender copies of one message in a conversation's thread records. Every matching item of the caller keeps its batch, server order, messageId, timestamp, mekId and senderTransportPubkey; its signedEncMessage becomes empty and it gains the author's signed redaction (defs#redaction, with redactedAt set by the server). Author only: items written by other DIDs are never touched, even under a reused messageId ([CB-31]). Every attachment reference to the message is invalidated. Current membership is not required. Thread endpoint on the conversation's sequencer DS; a device homed elsewhere is relayed (labyrinthRelay). Idempotent: an unknown or already-redacted id counts zero. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdLabyrinthRedactMessage.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func redactMessage(
 
         input: BlueCatbirdLabyrinthRedactMessage.Input
@@ -154,44 +146,24 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdLabyrinthRedactMessage.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdLabyrinthRedactMessage.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.redactMessage: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdLabyrinthRedactMessage.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdLabyrinthRedactMessage.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

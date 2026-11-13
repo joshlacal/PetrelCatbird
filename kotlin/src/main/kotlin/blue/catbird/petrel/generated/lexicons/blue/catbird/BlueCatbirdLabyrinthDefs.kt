@@ -51,6 +51,34 @@ object BlueCatbirdLabyrinthDefsDefs {
     }
 
     /**
+     * Authenticated device revocation statement signed by a physical mailbox device over the target device key and revocation timestamp.
+     */
+    @Serializable
+    data class BlueCatbirdLabyrinthDefsDeviceRevocation(
+/** XEdDSA deviceKeyPubkey of the physical device that signed this revocation. */        @SerialName("revokedBy")
+        val revokedBy: Bytes,/** XEdDSA signature over the domain-separated (did, targetDeviceKey, revokedAt) revocation statement. */        @SerialName("sig")
+        val sig: Bytes    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsDeviceRevocation"
+        }
+    }
+
+    /**
+     * Original sender device signature over the domain-separated canonical (threadId, messageId, archiveCommitment) tuple. Stored beside, never inside, the commitment input.
+     */
+    @Serializable
+    data class BlueCatbirdLabyrinthDefsOriginalSenderArchiveAttestation(
+        @SerialName("senderDid")
+        val senderDid: DID,        @SerialName("senderDeviceId")
+        val senderDeviceId: String,        @SerialName("senderTransportPubkey")
+        val senderTransportPubkey: Bytes,        @SerialName("signature")
+        val signature: Bytes    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsOriginalSenderArchiveAttestation"
+        }
+    }
+
+    /**
      * [I13] Sequencer receipt signed by {sequencerDid}#mls-receipt-1 binding Labyrinth history items to live MLS applicationAad.archiveCommitment.
      */
     @Serializable
@@ -68,7 +96,8 @@ object BlueCatbirdLabyrinthDefsDefs {
         val issuedAtMs: Long,        @SerialName("sequencerDid")
         val sequencerDid: DID,        @SerialName("kid")
         val kid: String,        @SerialName("signature")
-        val signature: Bytes    ) {
+        val signature: Bytes,        @SerialName("originalSenderAttestation")
+        val originalSenderAttestation: BlueCatbirdLabyrinthDefsOriginalSenderArchiveAttestation    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsSequencerReceipt"
         }

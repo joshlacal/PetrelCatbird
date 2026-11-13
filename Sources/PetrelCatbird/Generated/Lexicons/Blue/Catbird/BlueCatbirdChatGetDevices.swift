@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.getDevices
 
+/// Return the complete active addressable-device set for one to five strictly ordered, duplicate-free bare DIDs. At most 20 active devices exist per DID, so the bounded response is never truncated. Output devices are strictly ordered by (userDid exact UTF-8 bytes, deviceId raw UUID bytes). actorDeviceId identifies the authenticated caller's active device and is validated against the service-authenticated DID.
 public struct BlueCatbirdChatGetDevices {
 
     public static let typeIdentifier = "blue.catbird.chat.getDevices"
+
     public struct Parameters: Parametrizable {
         public let actorDeviceId: String
         public let userDids: [DID]
@@ -25,48 +27,32 @@ public struct BlueCatbirdChatGetDevices {
 
         public let devices: [BlueCatbirdChatDefs.AddressableDevice]
 
-        // Standard public initializer
         public init(
-
             devices: [BlueCatbirdChatDefs.AddressableDevice]
-
         ) {
-
             self.devices = devices
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.devices = try container.decode([BlueCatbirdChatDefs.AddressableDevice].self, forKey: .devices)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(devices, forKey: .devices)
-
+            try container.encode(self.devices, forKey: .devices)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let devicesValue = try devices.toCBORValue()
+            let devicesValue = try self.devices.toCBORValue()
             map = map.adding(key: "devices", value: devicesValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case devices
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -95,9 +81,8 @@ extension ATProtoClient.Blue.Catbird.Chat {
     /// Return the complete active addressable-device set for one to five strictly ordered, duplicate-free bare DIDs. At most 20 active devices exist per DID, so the bounded response is never truncated. Output devices are strictly ordered by (userDid exact UTF-8 bytes, deviceId raw UUID bytes). actorDeviceId identifies the authenticated caller's active device and is validated against the service-authenticated DID.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdChatGetDevices.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getDevices(input: BlueCatbirdChatGetDevices.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetDevices.Output?) {
         let endpoint = "blue.catbird.chat.getDevices"
 
@@ -117,42 +102,24 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatGetDevices.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.getDevices: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdChatGetDevices.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdChatGetDevices.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdChatGetDevices.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

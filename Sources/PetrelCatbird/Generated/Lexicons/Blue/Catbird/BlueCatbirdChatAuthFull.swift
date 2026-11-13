@@ -8,4 +8,18 @@ public struct BlueCatbirdChatAuthFull {
 
     public static let typeIdentifier = "blue.catbird.chat.authFull"
 
+    /// The permission set this lexicon declares. Request it as an OAuth scope with
+    /// `permissionSet.includeScope(audience:)`.
+    public static let permissionSet = LexiconPermissionSet(
+        nsid: "blue.catbird.chat.authFull",
+        title: "Use Catbird Encrypted Chat",
+        titleLang: [:],
+        detail: "Allows this client to use the MLS chat AppView through the account's PDS and publish create-only MLS device and Labyrinth mailbox key records. Account service authentication and device-signed mutation authority remain independently enforced.",
+        detailLang: [:],
+        permissions: [
+            LexiconPermission(resource: "rpc", parameters: ["lxm": ["blue.catbird.chat.acceptConversation", "blue.catbird.chat.acknowledgeEntries", "blue.catbird.chat.acknowledgeWelcome", "blue.catbird.chat.activateReset", "blue.catbird.chat.approveDevice", "blue.catbird.chat.cancelDirectRequestPreparation", "blue.catbird.chat.cancelLeafRecovery", "blue.catbird.chat.cancelLeave", "blue.catbird.chat.closeConversation", "blue.catbird.chat.createConversation", "blue.catbird.chat.enrollDevice", "blue.catbird.chat.getConversationState", "blue.catbird.chat.getConversations", "blue.catbird.chat.getDeviceKey", "blue.catbird.chat.getDevices", "blue.catbird.chat.getDirectRequestOutcome", "blue.catbird.chat.getEntries", "blue.catbird.chat.getLeafRecoveryInbox", "blue.catbird.chat.getOwnDevices", "blue.catbird.chat.getPendingWelcomes", "blue.catbird.chat.getSubscriptionTicket", "blue.catbird.chat.prepareDirectRequest", "blue.catbird.chat.publishDirectRequest", "blue.catbird.chat.publishDirectRequestKeys", "blue.catbird.chat.publishTyping", "blue.catbird.chat.registerPushGateway", "blue.catbird.chat.rejectWelcome", "blue.catbird.chat.relaySpaceCredential", "blue.catbird.chat.relaySpaceRead", "blue.catbird.chat.replenishKeyPackages", "blue.catbird.chat.requestLeafRecovery", "blue.catbird.chat.requestLeave", "blue.catbird.chat.requestReset", "blue.catbird.chat.revokeDevice", "blue.catbird.chat.sendMessage", "blue.catbird.chat.submitTransition"]], inheritAud: true),
+            LexiconPermission(resource: "repo", parameters: ["action": ["create"], "collection": ["blue.catbird.chat.device", "blue.catbird.labyrinth.mailboxKeys"]], inheritAud: false)
+        ]
+    )
+
 }

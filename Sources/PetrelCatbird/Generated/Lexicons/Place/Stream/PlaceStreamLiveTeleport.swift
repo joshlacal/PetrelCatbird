@@ -4,80 +4,121 @@ import Petrel
 
 // lexicon: 1, id: place.stream.live.teleport
 
+/// Record defining a 'teleport', that is active during a certain time.
 public struct PlaceStreamLiveTeleport: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "place.stream.live.teleport"
-    public let streamer: DID
-    public let startsAt: ATProtocolDate
-    public let durationSeconds: Int?
 
-    public init(streamer: DID, startsAt: ATProtocolDate, durationSeconds: Int? = nil) {
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "tid")
+
+    /// The DID of the streamer to teleport to.
+    public let streamer: DID
+    /// The time the teleport becomes active.
+    public let startsAt: ATProtocolDate
+    /// The time limit in seconds for the teleport. If not set, the teleport is permanent. Must be at least 60 seconds, and no more than 32,400 seconds (9 hours).
+    public let durationSeconds: Int?
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
+
+    public init(
+        streamer: DID,
+        startsAt: ATProtocolDate,
+        durationSeconds: Int? = nil,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.streamer = streamer
         self.startsAt = startsAt
         self.durationSeconds = durationSeconds
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         self.streamer = try container.decode(DID.self, forKey: .streamer)
         self.startsAt = try container.decode(ATProtocolDate.self, forKey: .startsAt)
         do {
-            self.durationSeconds = try container.decodeIfPresent(Int.self, forKey: .durationSeconds)
+            self.durationSeconds = try container.decodeIfPresent(Int.self, forKey: .durationSeconds, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'durationSeconds' — degrading to nil: \(error)")
             self.durationSeconds = nil
+            malformedFields.insert("durationSeconds")
         }
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(streamer, forKey: .streamer)
-        try container.encode(startsAt, forKey: .startsAt)
-        try container.encodeIfPresent(durationSeconds, forKey: .durationSeconds)
+        try container.encode(self.streamer, forKey: .streamer)
+        try container.encode(self.startsAt, forKey: .startsAt)
+        try container.encodeIfPresent(self.durationSeconds, forKey: .durationSeconds)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.streamer)
+        hasher.combine(self.startsAt)
+        if let value = self.durationSeconds {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.streamer != other.streamer {
+            return false
+        }
+        if self.startsAt != other.startsAt {
+            return false
+        }
+        if self.durationSeconds != other.durationSeconds {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if streamer != other.streamer {
-            return false
-        }
-        if startsAt != other.startsAt {
-            return false
-        }
-        if durationSeconds != other.durationSeconds {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(streamer)
-        hasher.combine(startsAt)
-        if let value = durationSeconds {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let streamerValue = try streamer.toCBORValue()
+        let streamerValue = try self.streamer.toCBORValue()
         map = map.adding(key: "streamer", value: streamerValue)
-        let startsAtValue = try startsAt.toCBORValue()
+        let startsAtValue = try self.startsAt.toCBORValue()
         map = map.adding(key: "startsAt", value: startsAtValue)
-        if let value = durationSeconds {
+        if let value = self.durationSeconds {
             let durationSecondsValue = try value.toCBORValue()
             map = map.adding(key: "durationSeconds", value: durationSecondsValue)
         }
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "streamer", "startsAt", "durationSeconds"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "streamer": return true
+        case "startsAt": return true
+        case "durationSeconds": return self.durationSeconds != nil
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

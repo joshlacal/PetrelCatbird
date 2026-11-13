@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.mlsDS.fetchKeyPackage
 
+/// Return and consume a key package for a local user, requested by a remote DS. Fetch and atomically consume one key package for a user in the context of a conversation.
 public struct BlueCatbirdMlsDSFetchKeyPackage {
 
     public static let typeIdentifier = "blue.catbird.mlsDS.fetchKeyPackage"
+
     public struct Parameters: Parametrizable {
         public let recipientDid: String
         public let convoId: String
@@ -23,64 +25,44 @@ public struct BlueCatbirdMlsDSFetchKeyPackage {
 
     public struct Output: ATProtocolCodable {
 
+        /// MLS key package
         public let keyPackage: Bytes
-
+        /// Hash of the key package
         public let keyPackageHash: String
 
-        // Standard public initializer
         public init(
-
             keyPackage: Bytes,
-
             keyPackageHash: String
-
         ) {
-
             self.keyPackage = keyPackage
-
             self.keyPackageHash = keyPackageHash
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.keyPackage = try container.decode(Bytes.self, forKey: .keyPackage)
-
             self.keyPackageHash = try container.decode(String.self, forKey: .keyPackageHash)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(keyPackage, forKey: .keyPackage)
-
-            try container.encode(keyPackageHash, forKey: .keyPackageHash)
-
+            try container.encode(self.keyPackage, forKey: .keyPackage)
+            try container.encode(self.keyPackageHash, forKey: .keyPackageHash)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let keyPackageValue = try keyPackage.toCBORValue()
+            let keyPackageValue = try self.keyPackage.toCBORValue()
             map = map.adding(key: "keyPackage", value: keyPackageValue)
-
-            let keyPackageHashValue = try keyPackageHash.toCBORValue()
+            let keyPackageHashValue = try self.keyPackageHash.toCBORValue()
             map = map.adding(key: "keyPackageHash", value: keyPackageHashValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case keyPackage
             case keyPackageHash
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -103,9 +85,8 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
     /// Return and consume a key package for a local user, requested by a remote DS. Fetch and atomically consume one key package for a user in the context of a conversation.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdMlsDSFetchKeyPackage.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func fetchKeyPackage(input: BlueCatbirdMlsDSFetchKeyPackage.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsDSFetchKeyPackage.Output?) {
         let endpoint = "blue.catbird.mlsDS.fetchKeyPackage"
 
@@ -125,42 +106,24 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSFetchKeyPackage.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.fetchKeyPackage: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdMlsDSFetchKeyPackage.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdMlsDSFetchKeyPackage.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdMlsDSFetchKeyPackage.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

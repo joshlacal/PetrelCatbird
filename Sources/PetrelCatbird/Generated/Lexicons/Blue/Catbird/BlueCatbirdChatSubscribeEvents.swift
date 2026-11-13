@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.subscribeEvents
 
+/// The direct WebSocket upgrade authenticates only with the one-use short-lived getSubscriptionTicket token. cursor must byte-equal the cursor bound into the DID/device/authGeneration/path-bound ticket, which is consumed atomically before upgrade; mismatch, reuse, or expiry rejects. Streams durable entitlement-filtered envelopes plus uncursored best-effort typing variants. For durable envelopes previousCursor is the immediately preceding visible audience cursor and the first continues the ticket cursor. Typing events never alter this chain.
 public struct BlueCatbirdChatSubscribeEvents {
 
     public static let typeIdentifier = "blue.catbird.chat.subscribeEvents"
+
     public struct Parameters: Parametrizable {
         public let ticket: String
         public let cursor: String
@@ -20,6 +22,7 @@ public struct BlueCatbirdChatSubscribeEvents {
 
         }
     }
+
     public typealias Message = BlueCatbirdChatDefs.SubscriptionMessage
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {

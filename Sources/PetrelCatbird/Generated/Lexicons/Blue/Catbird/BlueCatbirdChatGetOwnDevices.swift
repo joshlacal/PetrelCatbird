@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.getOwnDevices
 
+/// Authoritative fenced inventory of the authenticated bare DID's active and revoked/package-ineligible devices. Every page is evaluated as of one retained fence and uses a distinct principal-bound cursor domain.
 public struct BlueCatbirdChatGetOwnDevices {
 
     public static let typeIdentifier = "blue.catbird.chat.getOwnDevices"
+
     public struct Parameters: Parametrizable {
         public let actorDeviceId: String
         public let pageCursor: String?
@@ -15,7 +17,7 @@ public struct BlueCatbirdChatGetOwnDevices {
         public init(
             actorDeviceId: String,
             pageCursor: String? = nil,
-            limit: Int? = nil
+            limit: Int? = 50
         ) {
             self.actorDeviceId = actorDeviceId
             self.pageCursor = pageCursor
@@ -27,92 +29,61 @@ public struct BlueCatbirdChatGetOwnDevices {
     public struct Output: ATProtocolCodable {
 
         public let items: [BlueCatbirdChatDefs.OwnDeviceView]
-
         public let nextPageCursor: String?
-
         public let hasMore: Bool
-
         public let snapshotExpiresAt: BlueCatbirdChatDefs.CanonicalDatetime
 
-        // Standard public initializer
         public init(
-
             items: [BlueCatbirdChatDefs.OwnDeviceView],
-
             nextPageCursor: String? = nil,
-
             hasMore: Bool,
-
             snapshotExpiresAt: BlueCatbirdChatDefs.CanonicalDatetime
-
         ) {
-
             self.items = items
-
             self.nextPageCursor = nextPageCursor
-
             self.hasMore = hasMore
-
             self.snapshotExpiresAt = snapshotExpiresAt
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
+            let strict = decoder.isATProtoStrictDecoding
             self.items = try container.decode([BlueCatbirdChatDefs.OwnDeviceView].self, forKey: .items)
-
             do {
-                self.nextPageCursor = try container.decodeIfPresent(String.self, forKey: .nextPageCursor)
+                self.nextPageCursor = try container.decodeIfPresent(String.self, forKey: .nextPageCursor, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'nextPageCursor' — degrading to nil: \(error)")
                 self.nextPageCursor = nil
             }
-
             self.hasMore = try container.decode(Bool.self, forKey: .hasMore)
-
             self.snapshotExpiresAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .snapshotExpiresAt)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(items, forKey: .items)
-
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(nextPageCursor, forKey: .nextPageCursor)
-
-            try container.encode(hasMore, forKey: .hasMore)
-
-            try container.encode(snapshotExpiresAt, forKey: .snapshotExpiresAt)
-
+            try container.encode(self.items, forKey: .items)
+            try container.encodeIfPresent(self.nextPageCursor, forKey: .nextPageCursor)
+            try container.encode(self.hasMore, forKey: .hasMore)
+            try container.encode(self.snapshotExpiresAt, forKey: .snapshotExpiresAt)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let itemsValue = try items.toCBORValue()
+            let itemsValue = try self.items.toCBORValue()
             map = map.adding(key: "items", value: itemsValue)
-
-            if let value = nextPageCursor {
-                // Encode optional property even if it's an empty array for CBOR
+            if let value = self.nextPageCursor {
                 let nextPageCursorValue = try value.toCBORValue()
                 map = map.adding(key: "nextPageCursor", value: nextPageCursorValue)
             }
-
-            let hasMoreValue = try hasMore.toCBORValue()
+            let hasMoreValue = try self.hasMore.toCBORValue()
             map = map.adding(key: "hasMore", value: hasMoreValue)
-
-            let snapshotExpiresAtValue = try snapshotExpiresAt.toCBORValue()
+            let snapshotExpiresAtValue = try self.snapshotExpiresAt.toCBORValue()
             map = map.adding(key: "snapshotExpiresAt", value: snapshotExpiresAtValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -121,7 +92,6 @@ public struct BlueCatbirdChatGetOwnDevices {
             case hasMore
             case snapshotExpiresAt
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -151,9 +121,8 @@ extension ATProtoClient.Blue.Catbird.Chat {
     /// Authoritative fenced inventory of the authenticated bare DID's active and revoked/package-ineligible devices. Every page is evaluated as of one retained fence and uses a distinct principal-bound cursor domain.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdChatGetOwnDevices.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getOwnDevices(input: BlueCatbirdChatGetOwnDevices.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdChatGetOwnDevices.Output?) {
         let endpoint = "blue.catbird.chat.getOwnDevices"
 
@@ -173,42 +142,24 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatGetOwnDevices.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.getOwnDevices: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdChatGetOwnDevices.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdChatGetOwnDevices.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdChatGetOwnDevices.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

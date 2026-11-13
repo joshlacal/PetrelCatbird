@@ -25,7 +25,9 @@ object BlueCatbirdLabyrinthEpochDefs {
         val `public`: BlueCatbirdLabyrinthDefsEpochPublic,/** encrypt(epochDataStorageKey, 'epoch_data_metadata', decimal(prev seq)). Absent for epoch 0. */        @SerialName("encryptedPreviousEpochNumber")
         val encryptedPreviousEpochNumber: Bytes? = null,/** encrypt(epochDataStorageKey, 'epoch_data_metadata', prev root). Absent for epoch 0. */        @SerialName("encryptedPreviousEpochRootKey")
         val encryptedPreviousEpochRootKey: Bytes? = null,/** deviceKeyPubkey of the device that opened the epoch (its epochStorageAuthKey authenticates the entropy). */        @SerialName("openedBy")
-        val openedBy: Bytes,        @SerialName("createdAt")
+        val openedBy: Bytes,/** Canonical sorted deviceKeyPubkey entries evicted up to and including this epoch. */        @SerialName("revocations")
+        val revocations: List<JsonElement>? = null,/** XEdDSA signature by openedBy over the epoch head and sorted revocations list. */        @SerialName("revocationsSig")
+        val revocationsSig: Bytes? = null,        @SerialName("createdAt")
         val createdAt: ATProtocolDate    ) {
         companion object {
             const val TYPE_IDENTIFIER = ""

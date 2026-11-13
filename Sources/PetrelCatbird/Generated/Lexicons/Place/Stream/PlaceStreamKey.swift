@@ -4,80 +4,121 @@ import Petrel
 
 // lexicon: 1, id: place.stream.key
 
+/// Record linking an atproto identity with a stream signing key
 public struct PlaceStreamKey: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "place.stream.key"
-    public let signingKey: String
-    public let createdAt: ATProtocolDate
-    public let createdBy: String?
 
-    public init(signingKey: String, createdAt: ATProtocolDate, createdBy: String? = nil) {
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "tid")
+
+    /// The did:key signing key for the stream.
+    public let signingKey: String
+    /// Client-declared timestamp when this key was created.
+    public let createdAt: ATProtocolDate
+    /// The name of the client that created this key.
+    public let createdBy: String?
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
+
+    public init(
+        signingKey: String,
+        createdAt: ATProtocolDate,
+        createdBy: String? = nil,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.signingKey = signingKey
         self.createdAt = createdAt
         self.createdBy = createdBy
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         self.signingKey = try container.decode(String.self, forKey: .signingKey)
         self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            self.createdBy = try container.decodeIfPresent(String.self, forKey: .createdBy)
+            self.createdBy = try container.decodeIfPresent(String.self, forKey: .createdBy, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'createdBy' — degrading to nil: \(error)")
             self.createdBy = nil
+            malformedFields.insert("createdBy")
         }
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(signingKey, forKey: .signingKey)
-        try container.encode(createdAt, forKey: .createdAt)
-        try container.encodeIfPresent(createdBy, forKey: .createdBy)
+        try container.encode(self.signingKey, forKey: .signingKey)
+        try container.encode(self.createdAt, forKey: .createdAt)
+        try container.encodeIfPresent(self.createdBy, forKey: .createdBy)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.signingKey)
+        hasher.combine(self.createdAt)
+        if let value = self.createdBy {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.signingKey != other.signingKey {
+            return false
+        }
+        if self.createdAt != other.createdAt {
+            return false
+        }
+        if self.createdBy != other.createdBy {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if signingKey != other.signingKey {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        if createdBy != other.createdBy {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(signingKey)
-        hasher.combine(createdAt)
-        if let value = createdBy {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let signingKeyValue = try signingKey.toCBORValue()
+        let signingKeyValue = try self.signingKey.toCBORValue()
         map = map.adding(key: "signingKey", value: signingKeyValue)
-        let createdAtValue = try createdAt.toCBORValue()
+        let createdAtValue = try self.createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
-        if let value = createdBy {
+        if let value = self.createdBy {
             let createdByValue = try value.toCBORValue()
             map = map.adding(key: "createdBy", value: createdByValue)
         }
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "signingKey", "createdAt", "createdBy"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "signingKey": return true
+        case "createdAt": return true
+        case "createdBy": return self.createdBy != nil
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

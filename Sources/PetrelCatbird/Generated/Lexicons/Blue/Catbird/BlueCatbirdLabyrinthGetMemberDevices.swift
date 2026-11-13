@@ -4,91 +4,98 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.getMemberDevices
 
+/// The DID's device leaves in one conversation with the chat seqs of the commits that added and removed them (chat.member_devices). Readers bound a key's vouching by them ([CB-27]). Directory endpoint: any authenticated chat device may call it. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
 public struct BlueCatbirdLabyrinthGetMemberDevices {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.getMemberDevices"
 
     public struct MemberDevice: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.labyrinth.getMemberDevices#memberDevice"
+
+        /// chat.device_keys key id.
         public let keyId: String
+        /// Ed25519 key.
         public let signingPublicKey: Bytes
+        /// Seq of the commit that added the leaf.
         public let joinedSeq: Int
+        /// Seq of the commit that removed it.
         public let removedSeq: Int?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            keyId: String, signingPublicKey: Bytes, joinedSeq: Int, removedSeq: Int? = nil
+            keyId: String,
+            signingPublicKey: Bytes,
+            joinedSeq: Int,
+            removedSeq: Int? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.keyId = keyId
             self.signingPublicKey = signingPublicKey
             self.joinedSeq = joinedSeq
             self.removedSeq = removedSeq
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.keyId = try container.decode(String.self, forKey: .keyId)
+            self.signingPublicKey = try container.decode(Bytes.self, forKey: .signingPublicKey)
+            self.joinedSeq = try container.decode(Int.self, forKey: .joinedSeq)
             do {
-                self.keyId = try container.decode(String.self, forKey: .keyId)
+                self.removedSeq = try container.decodeIfPresent(Int.self, forKey: .removedSeq, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'keyId': \(error)")
-                throw error
-            }
-            do {
-                self.signingPublicKey = try container.decode(Bytes.self, forKey: .signingPublicKey)
-            } catch {
-                LogManager.logError("Decoding error for required property 'signingPublicKey': \(error)")
-                throw error
-            }
-            do {
-                self.joinedSeq = try container.decode(Int.self, forKey: .joinedSeq)
-            } catch {
-                LogManager.logError("Decoding error for required property 'joinedSeq': \(error)")
-                throw error
-            }
-            do {
-                self.removedSeq = try container.decodeIfPresent(Int.self, forKey: .removedSeq)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'removedSeq' — degrading to nil: \(error)")
                 self.removedSeq = nil
+                malformedFields.insert("removedSeq")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(keyId, forKey: .keyId)
-            try container.encode(signingPublicKey, forKey: .signingPublicKey)
-            try container.encode(joinedSeq, forKey: .joinedSeq)
-            try container.encodeIfPresent(removedSeq, forKey: .removedSeq)
+            try container.encode(self.keyId, forKey: .keyId)
+            try container.encode(self.signingPublicKey, forKey: .signingPublicKey)
+            try container.encode(self.joinedSeq, forKey: .joinedSeq)
+            try container.encodeIfPresent(self.removedSeq, forKey: .removedSeq)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(keyId)
-            hasher.combine(signingPublicKey)
-            hasher.combine(joinedSeq)
-            if let value = removedSeq {
+            hasher.combine(self.keyId)
+            hasher.combine(self.signingPublicKey)
+            hasher.combine(self.joinedSeq)
+            if let value = self.removedSeq {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if keyId != other.keyId {
+            if self.keyId != other.keyId {
                 return false
             }
-            if signingPublicKey != other.signingPublicKey {
+            if self.signingPublicKey != other.signingPublicKey {
                 return false
             }
-            if joinedSeq != other.joinedSeq {
+            if self.joinedSeq != other.joinedSeq {
                 return false
             }
-            if removedSeq != other.removedSeq {
+            if self.removedSeq != other.removedSeq {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -97,22 +104,34 @@ public struct BlueCatbirdLabyrinthGetMemberDevices {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let keyIdValue = try keyId.toCBORValue()
+            let keyIdValue = try self.keyId.toCBORValue()
             map = map.adding(key: "keyId", value: keyIdValue)
-            let signingPublicKeyValue = try signingPublicKey.toCBORValue()
+            let signingPublicKeyValue = try self.signingPublicKey.toCBORValue()
             map = map.adding(key: "signingPublicKey", value: signingPublicKeyValue)
-            let joinedSeqValue = try joinedSeq.toCBORValue()
+            let joinedSeqValue = try self.joinedSeq.toCBORValue()
             map = map.adding(key: "joinedSeq", value: joinedSeqValue)
-            if let value = removedSeq {
+            if let value = self.removedSeq {
                 let removedSeqValue = try value.toCBORValue()
                 map = map.adding(key: "removedSeq", value: removedSeqValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "keyId", "signingPublicKey", "joinedSeq", "removedSeq"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "keyId": return true
+            case "signingPublicKey": return true
+            case "joinedSeq": return true
+            case "removedSeq": return self.removedSeq != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case keyId
             case signingPublicKey
             case joinedSeq
@@ -142,73 +161,54 @@ public struct BlueCatbirdLabyrinthGetMemberDevices {
     public struct Output: ATProtocolCodable {
 
         public let items: [MemberDevice]
-
+        /// Opaque cursor from the previous page.
         public let cursor: String?
 
-        // Standard public initializer
         public init(
-
             items: [MemberDevice],
-
             cursor: String? = nil
-
         ) {
-
             self.items = items
-
             self.cursor = cursor
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
+            let strict = decoder.isATProtoStrictDecoding
             self.items = try container.decode([MemberDevice].self, forKey: .items)
-
             do {
-                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor)
+                self.cursor = try container.decodeIfPresent(String.self, forKey: .cursor, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'cursor' — degrading to nil: \(error)")
                 self.cursor = nil
             }
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(items, forKey: .items)
-
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(cursor, forKey: .cursor)
-
+            try container.encode(self.items, forKey: .items)
+            try container.encodeIfPresent(self.cursor, forKey: .cursor)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let itemsValue = try items.toCBORValue()
+            let itemsValue = try self.items.toCBORValue()
             map = map.adding(key: "items", value: itemsValue)
-
-            if let value = cursor {
-                // Encode optional property even if it's an empty array for CBOR
+            if let value = self.cursor {
                 let cursorValue = try value.toCBORValue()
                 map = map.adding(key: "cursor", value: cursorValue)
             }
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case items
             case cursor
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -229,9 +229,8 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
     /// The DID's device leaves in one conversation with the chat seqs of the commits that added and removed them (chat.member_devices). Readers bound a key's vouching by them ([CB-27]). Directory endpoint: any authenticated chat device may call it. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdLabyrinthGetMemberDevices.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getMemberDevices(input: BlueCatbirdLabyrinthGetMemberDevices.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetMemberDevices.Output?) {
         let endpoint = "blue.catbird.labyrinth.getMemberDevices"
 
@@ -251,42 +250,32 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdLabyrinthGetMemberDevices.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.getMemberDevices: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdLabyrinthGetMemberDevices.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdLabyrinthGetMemberDevices.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdLabyrinthGetMemberDevices.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }
+
+extension BlueCatbirdLabyrinthGetMemberDevices.Parameters: XRPCCursorPaginatedParameters {
+    public func withCursor(_ cursor: String?) -> Self {
+        Self(threadId: threadId, did: did, cursor: cursor, limit: limit)
+    }
+}
+
+extension BlueCatbirdLabyrinthGetMemberDevices.Output: XRPCCursorPaginatedOutput {}

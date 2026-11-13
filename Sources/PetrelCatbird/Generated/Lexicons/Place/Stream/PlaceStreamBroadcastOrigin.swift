@@ -4,134 +4,194 @@ import Petrel
 
 // lexicon: 1, id: place.stream.broadcast.origin
 
+/// Record indicating a livestream is published and available for replication at a given address. By convention, the record key is streamer::server
 public struct PlaceStreamBroadcastOrigin: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "place.stream.broadcast.origin"
-    public let streamer: DID
-    public let server: DID
-    public let broadcaster: DID?
-    public let updatedAt: ATProtocolDate
-    public let irohTicket: String?
-    public let websocketURL: URI?
 
-    public init(streamer: DID, server: DID, broadcaster: DID? = nil, updatedAt: ATProtocolDate, irohTicket: String? = nil, websocketURL: URI? = nil) {
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "any")
+
+    /// DID of the streamer whose livestream is being published
+    public let streamer: DID
+    /// did of the server that's currently rebroadcasting the livestream
+    public let server: DID
+    /// did of the broadcaster that operates the server syndicating the livestream
+    public let broadcaster: DID?
+    /// Periodically updated timestamp when this origin last saw a livestream
+    public let updatedAt: ATProtocolDate
+    /// Iroh ticket that can be used to access the livestream from the server
+    public let irohTicket: String?
+    /// URL of the websocket endpoint for the livestream
+    public let websocketURL: URI?
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
+
+    public init(
+        streamer: DID,
+        server: DID,
+        broadcaster: DID? = nil,
+        updatedAt: ATProtocolDate,
+        irohTicket: String? = nil,
+        websocketURL: URI? = nil,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.streamer = streamer
         self.server = server
         self.broadcaster = broadcaster
         self.updatedAt = updatedAt
         self.irohTicket = irohTicket
         self.websocketURL = websocketURL
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         self.streamer = try container.decode(DID.self, forKey: .streamer)
         self.server = try container.decode(DID.self, forKey: .server)
         do {
-            self.broadcaster = try container.decodeIfPresent(DID.self, forKey: .broadcaster)
+            self.broadcaster = try container.decodeIfPresent(DID.self, forKey: .broadcaster, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'broadcaster' — degrading to nil: \(error)")
             self.broadcaster = nil
+            malformedFields.insert("broadcaster")
         }
         self.updatedAt = try container.decode(ATProtocolDate.self, forKey: .updatedAt)
         do {
-            self.irohTicket = try container.decodeIfPresent(String.self, forKey: .irohTicket)
+            self.irohTicket = try container.decodeIfPresent(String.self, forKey: .irohTicket, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'irohTicket' — degrading to nil: \(error)")
             self.irohTicket = nil
+            malformedFields.insert("irohTicket")
         }
         do {
-            self.websocketURL = try container.decodeIfPresent(URI.self, forKey: .websocketURL)
+            self.websocketURL = try container.decodeIfPresent(URI.self, forKey: .websocketURL, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'websocketURL' — degrading to nil: \(error)")
             self.websocketURL = nil
+            malformedFields.insert("websocketURL")
         }
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(streamer, forKey: .streamer)
-        try container.encode(server, forKey: .server)
-        try container.encodeIfPresent(broadcaster, forKey: .broadcaster)
-        try container.encode(updatedAt, forKey: .updatedAt)
-        try container.encodeIfPresent(irohTicket, forKey: .irohTicket)
-        try container.encodeIfPresent(websocketURL, forKey: .websocketURL)
+        try container.encode(self.streamer, forKey: .streamer)
+        try container.encode(self.server, forKey: .server)
+        try container.encodeIfPresent(self.broadcaster, forKey: .broadcaster)
+        try container.encode(self.updatedAt, forKey: .updatedAt)
+        try container.encodeIfPresent(self.irohTicket, forKey: .irohTicket)
+        try container.encodeIfPresent(self.websocketURL, forKey: .websocketURL)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.streamer)
+        hasher.combine(self.server)
+        if let value = self.broadcaster {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(self.updatedAt)
+        if let value = self.irohTicket {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        if let value = self.websocketURL {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.streamer != other.streamer {
+            return false
+        }
+        if self.server != other.server {
+            return false
+        }
+        if self.broadcaster != other.broadcaster {
+            return false
+        }
+        if self.updatedAt != other.updatedAt {
+            return false
+        }
+        if self.irohTicket != other.irohTicket {
+            return false
+        }
+        if self.websocketURL != other.websocketURL {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if streamer != other.streamer {
-            return false
-        }
-        if server != other.server {
-            return false
-        }
-        if broadcaster != other.broadcaster {
-            return false
-        }
-        if updatedAt != other.updatedAt {
-            return false
-        }
-        if irohTicket != other.irohTicket {
-            return false
-        }
-        if websocketURL != other.websocketURL {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(streamer)
-        hasher.combine(server)
-        if let value = broadcaster {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        hasher.combine(updatedAt)
-        if let value = irohTicket {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        if let value = websocketURL {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let streamerValue = try streamer.toCBORValue()
+        let streamerValue = try self.streamer.toCBORValue()
         map = map.adding(key: "streamer", value: streamerValue)
-        let serverValue = try server.toCBORValue()
+        let serverValue = try self.server.toCBORValue()
         map = map.adding(key: "server", value: serverValue)
-        if let value = broadcaster {
+        if let value = self.broadcaster {
             let broadcasterValue = try value.toCBORValue()
             map = map.adding(key: "broadcaster", value: broadcasterValue)
         }
-        let updatedAtValue = try updatedAt.toCBORValue()
+        let updatedAtValue = try self.updatedAt.toCBORValue()
         map = map.adding(key: "updatedAt", value: updatedAtValue)
-        if let value = irohTicket {
+        if let value = self.irohTicket {
             let irohTicketValue = try value.toCBORValue()
             map = map.adding(key: "irohTicket", value: irohTicketValue)
         }
-        if let value = websocketURL {
+        if let value = self.websocketURL {
             let websocketURLValue = try value.toCBORValue()
             map = map.adding(key: "websocketURL", value: websocketURLValue)
         }
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "streamer", "server", "broadcaster", "updatedAt", "irohTicket", "websocketURL"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "streamer": return true
+        case "server": return true
+        case "broadcaster": return self.broadcaster != nil
+        case "updatedAt": return true
+        case "irohTicket": return self.irohTicket != nil
+        case "websocketURL": return self.websocketURL != nil
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

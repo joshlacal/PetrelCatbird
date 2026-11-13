@@ -13,7 +13,8 @@
           "properties": {
             "enabled": { "type": "boolean" },
             "protocolRevision": { "type": "string" },
-            "supportsImages": { "type": "boolean" }
+            "supportsImages": { "type": "boolean" },
+            "supportsEncryptedPosts": { "type": "boolean", "description": "Whether this service accepts and serves encrypted Circle posts." }
           }
         }
       },

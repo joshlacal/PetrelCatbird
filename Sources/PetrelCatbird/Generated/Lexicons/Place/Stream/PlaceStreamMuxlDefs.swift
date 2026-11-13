@@ -8,17 +8,34 @@ public struct PlaceStreamMuxlDefs {
 
     public static let typeIdentifier = "place.stream.muxl.defs"
 
+    /// A track within a multiplexed stream
     public struct Track: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.muxl.defs#track"
+
+        /// Track identifier
         public let id: Int
+        /// Codec used for this track
         public let codec: String
+        /// Width in pixels (video tracks)
         public let width: Int?
+        /// Height in pixels (video tracks)
         public let height: Int?
+        /// Sample rate (audio tracks)
         public let rate: Int?
+        /// Number of audio channels
         public let channels: Int?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            id: Int, codec: String, width: Int? = nil, height: Int? = nil, rate: Int? = nil, channels: Int? = nil
+            id: Int,
+            codec: String,
+            width: Int? = nil,
+            height: Int? = nil,
+            rate: Int? = nil,
+            channels: Int? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.id = id
             self.codec = codec
@@ -26,113 +43,124 @@ public struct PlaceStreamMuxlDefs {
             self.height = height
             self.rate = rate
             self.channels = channels
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.id = try container.decode(Int.self, forKey: .id)
+            self.codec = try container.decode(String.self, forKey: .codec)
             do {
-                self.id = try container.decode(Int.self, forKey: .id)
+                self.width = try container.decodeIfPresent(Int.self, forKey: .width, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'id': \(error)")
-                throw error
-            }
-            do {
-                self.codec = try container.decode(String.self, forKey: .codec)
-            } catch {
-                LogManager.logError("Decoding error for required property 'codec': \(error)")
-                throw error
-            }
-            do {
-                self.width = try container.decodeIfPresent(Int.self, forKey: .width)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'width' — degrading to nil: \(error)")
                 self.width = nil
+                malformedFields.insert("width")
             }
             do {
-                self.height = try container.decodeIfPresent(Int.self, forKey: .height)
+                self.height = try container.decodeIfPresent(Int.self, forKey: .height, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'height' — degrading to nil: \(error)")
                 self.height = nil
+                malformedFields.insert("height")
             }
             do {
-                self.rate = try container.decodeIfPresent(Int.self, forKey: .rate)
+                self.rate = try container.decodeIfPresent(Int.self, forKey: .rate, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'rate' — degrading to nil: \(error)")
                 self.rate = nil
+                malformedFields.insert("rate")
             }
             do {
-                self.channels = try container.decodeIfPresent(Int.self, forKey: .channels)
+                self.channels = try container.decodeIfPresent(Int.self, forKey: .channels, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'channels' — degrading to nil: \(error)")
                 self.channels = nil
+                malformedFields.insert("channels")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(id, forKey: .id)
-            try container.encode(codec, forKey: .codec)
-            try container.encodeIfPresent(width, forKey: .width)
-            try container.encodeIfPresent(height, forKey: .height)
-            try container.encodeIfPresent(rate, forKey: .rate)
-            try container.encodeIfPresent(channels, forKey: .channels)
+            try container.encode(self.id, forKey: .id)
+            try container.encode(self.codec, forKey: .codec)
+            try container.encodeIfPresent(self.width, forKey: .width)
+            try container.encodeIfPresent(self.height, forKey: .height)
+            try container.encodeIfPresent(self.rate, forKey: .rate)
+            try container.encodeIfPresent(self.channels, forKey: .channels)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(id)
-            hasher.combine(codec)
-            if let value = width {
+            hasher.combine(self.id)
+            hasher.combine(self.codec)
+            if let value = self.width {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = height {
+            if let value = self.height {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = rate {
+            if let value = self.rate {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
-            if let value = channels {
+            if let value = self.channels {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if id != other.id {
+            if self.id != other.id {
                 return false
             }
-            if codec != other.codec {
+            if self.codec != other.codec {
                 return false
             }
-            if width != other.width {
+            if self.width != other.width {
                 return false
             }
-            if height != other.height {
+            if self.height != other.height {
                 return false
             }
-            if rate != other.rate {
+            if self.rate != other.rate {
                 return false
             }
-            if channels != other.channels {
+            if self.channels != other.channels {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -141,32 +169,46 @@ public struct PlaceStreamMuxlDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let idValue = try id.toCBORValue()
+            let idValue = try self.id.toCBORValue()
             map = map.adding(key: "id", value: idValue)
-            let codecValue = try codec.toCBORValue()
+            let codecValue = try self.codec.toCBORValue()
             map = map.adding(key: "codec", value: codecValue)
-            if let value = width {
+            if let value = self.width {
                 let widthValue = try value.toCBORValue()
                 map = map.adding(key: "width", value: widthValue)
             }
-            if let value = height {
+            if let value = self.height {
                 let heightValue = try value.toCBORValue()
                 map = map.adding(key: "height", value: heightValue)
             }
-            if let value = rate {
+            if let value = self.rate {
                 let rateValue = try value.toCBORValue()
                 map = map.adding(key: "rate", value: rateValue)
             }
-            if let value = channels {
+            if let value = self.channels {
                 let channelsValue = try value.toCBORValue()
                 map = map.adding(key: "channels", value: channelsValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "id", "codec", "width", "height", "rate", "channels"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "id": return true
+            case "codec": return true
+            case "width": return self.width != nil
+            case "height": return self.height != nil
+            case "rate": return self.rate != nil
+            case "channels": return self.channels != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case id
             case codec
             case width

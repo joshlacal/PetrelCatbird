@@ -25,13 +25,26 @@ enum class BlueCatbirdCircleReportRecordInputReason {
     @SerialName("other")
     value_other}
 
+    @Serializable
+    data class BlueCatbirdCircleReportRecordDisclosedMedia(
+        @SerialName("cid")
+        val cid: String,        @SerialName("key")
+        val key: Bytes,        @SerialName("iv")
+        val iv: Bytes    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdCircleReportRecordDisclosedMedia"
+        }
+    }
+
 @Serializable
     data class BlueCatbirdCircleReportRecordInput(
         @SerialName("space")
         val space: SpaceRef,        @SerialName("uri")
         val uri: ATProtocolURI,        @SerialName("reason")
         val reason: BlueCatbirdCircleReportRecordInputReason,        @SerialName("details")
-        val details: String? = null    )
+        val details: String? = null,// Per-post key voluntarily disclosed by the reporter so moderators can read an encrypted post.        @SerialName("disclosedPostKey")
+        val disclosedPostKey: Bytes? = null,// Decryption material for attachments the reporter chooses to disclose.        @SerialName("disclosedMedia")
+        val disclosedMedia: List<BlueCatbirdCircleReportRecordDisclosedMedia>? = null    )
 
     @Serializable
     data class BlueCatbirdCircleReportRecordOutput(

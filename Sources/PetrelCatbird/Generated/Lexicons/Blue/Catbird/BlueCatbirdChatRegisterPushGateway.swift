@@ -4,22 +4,36 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.registerPushGateway
 
+/// Registers or clears a device-signed opaque Push Gateway binding (D2, M-F06) for one authenticated MLS device on the user's home mls-ds. mls-ds never sees raw APNs/FCM tokens and never sends push wakes for remote federated users.
 public struct BlueCatbirdChatRegisterPushGateway {
 
     public static let typeIdentifier = "blue.catbird.chat.registerPushGateway"
+
     public struct Input: ATProtocolCodable {
+
         public let deviceId: BlueCatbirdChatDefs.DeviceId
         public let keyId: BlueCatbirdChatDefs.KeyId
         public let authGeneration: Int
+        /// HTTPS endpoint ending in /xrpc/blue.catbird.push.deliver (DNS-pinned SSRF-validated on port 443).
         public let gatewayUrl: URI
         public let appId: String
+        /// Opaque CSPRNG base64url push routing key issued by the Push Gateway (empty when enabled is false).
         public let pushKey: String
         public let enabled: Bool?
         public let signedAt: BlueCatbirdChatDefs.CanonicalDatetime
         public let signature: Bytes
 
-        /// Standard public initializer
-        public init(deviceId: BlueCatbirdChatDefs.DeviceId, keyId: BlueCatbirdChatDefs.KeyId, authGeneration: Int, gatewayUrl: URI, appId: String, pushKey: String, enabled: Bool? = nil, signedAt: BlueCatbirdChatDefs.CanonicalDatetime, signature: Bytes) {
+        public init(
+            deviceId: BlueCatbirdChatDefs.DeviceId,
+            keyId: BlueCatbirdChatDefs.KeyId,
+            authGeneration: Int,
+            gatewayUrl: URI,
+            appId: String,
+            pushKey: String,
+            enabled: Bool? = nil,
+            signedAt: BlueCatbirdChatDefs.CanonicalDatetime,
+            signature: Bytes
+        ) {
             self.deviceId = deviceId
             self.keyId = keyId
             self.authGeneration = authGeneration
@@ -33,51 +47,52 @@ public struct BlueCatbirdChatRegisterPushGateway {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
             self.deviceId = try container.decode(BlueCatbirdChatDefs.DeviceId.self, forKey: .deviceId)
             self.keyId = try container.decode(BlueCatbirdChatDefs.KeyId.self, forKey: .keyId)
             self.authGeneration = try container.decode(Int.self, forKey: .authGeneration)
             self.gatewayUrl = try container.decode(URI.self, forKey: .gatewayUrl)
             self.appId = try container.decode(String.self, forKey: .appId)
             self.pushKey = try container.decode(String.self, forKey: .pushKey)
-            self.enabled = try container.decodeIfPresent(Bool.self, forKey: .enabled)
+            self.enabled = try container.decodeIfPresent(Bool.self, forKey: .enabled, rejectingNull: strict)
             self.signedAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .signedAt)
             self.signature = try container.decode(Bytes.self, forKey: .signature)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(deviceId, forKey: .deviceId)
-            try container.encode(keyId, forKey: .keyId)
-            try container.encode(authGeneration, forKey: .authGeneration)
-            try container.encode(gatewayUrl, forKey: .gatewayUrl)
-            try container.encode(appId, forKey: .appId)
-            try container.encode(pushKey, forKey: .pushKey)
-            try container.encodeIfPresent(enabled, forKey: .enabled)
-            try container.encode(signedAt, forKey: .signedAt)
-            try container.encode(signature, forKey: .signature)
+            try container.encode(self.deviceId, forKey: .deviceId)
+            try container.encode(self.keyId, forKey: .keyId)
+            try container.encode(self.authGeneration, forKey: .authGeneration)
+            try container.encode(self.gatewayUrl, forKey: .gatewayUrl)
+            try container.encode(self.appId, forKey: .appId)
+            try container.encode(self.pushKey, forKey: .pushKey)
+            try container.encodeIfPresent(self.enabled, forKey: .enabled)
+            try container.encode(self.signedAt, forKey: .signedAt)
+            try container.encode(self.signature, forKey: .signature)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let deviceIdValue = try deviceId.toCBORValue()
+            let deviceIdValue = try self.deviceId.toCBORValue()
             map = map.adding(key: "deviceId", value: deviceIdValue)
-            let keyIdValue = try keyId.toCBORValue()
+            let keyIdValue = try self.keyId.toCBORValue()
             map = map.adding(key: "keyId", value: keyIdValue)
-            let authGenerationValue = try authGeneration.toCBORValue()
+            let authGenerationValue = try self.authGeneration.toCBORValue()
             map = map.adding(key: "authGeneration", value: authGenerationValue)
-            let gatewayUrlValue = try gatewayUrl.toCBORValue()
+            let gatewayUrlValue = try self.gatewayUrl.toCBORValue()
             map = map.adding(key: "gatewayUrl", value: gatewayUrlValue)
-            let appIdValue = try appId.toCBORValue()
+            let appIdValue = try self.appId.toCBORValue()
             map = map.adding(key: "appId", value: appIdValue)
-            let pushKeyValue = try pushKey.toCBORValue()
+            let pushKeyValue = try self.pushKey.toCBORValue()
             map = map.adding(key: "pushKey", value: pushKeyValue)
-            if let value = enabled {
+            if let value = self.enabled {
                 let enabledValue = try value.toCBORValue()
                 map = map.adding(key: "enabled", value: enabledValue)
             }
-            let signedAtValue = try signedAt.toCBORValue()
+            let signedAtValue = try self.signedAt.toCBORValue()
             map = map.adding(key: "signedAt", value: signedAtValue)
-            let signatureValue = try signature.toCBORValue()
+            let signatureValue = try self.signature.toCBORValue()
             map = map.adding(key: "signature", value: signatureValue)
             return map
         }
@@ -99,48 +114,32 @@ public struct BlueCatbirdChatRegisterPushGateway {
 
         public let registeredAt: BlueCatbirdChatDefs.CanonicalDatetime
 
-        // Standard public initializer
         public init(
-
             registeredAt: BlueCatbirdChatDefs.CanonicalDatetime
-
         ) {
-
             self.registeredAt = registeredAt
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.registeredAt = try container.decode(BlueCatbirdChatDefs.CanonicalDatetime.self, forKey: .registeredAt)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(registeredAt, forKey: .registeredAt)
-
+            try container.encode(self.registeredAt, forKey: .registeredAt)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let registeredAtValue = try registeredAt.toCBORValue()
+            let registeredAtValue = try self.registeredAt.toCBORValue()
             map = map.adding(key: "registeredAt", value: registeredAtValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case registeredAt
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -169,11 +168,10 @@ extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - registerPushGateway
     /// Registers or clears a device-signed opaque Push Gateway binding (D2, M-F06) for one authenticated MLS device on the user's home mls-ds. mls-ds never sees raw APNs/FCM tokens and never sends push wakes for remote federated users.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdChatRegisterPushGateway.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func registerPushGateway(
 
         input: BlueCatbirdChatRegisterPushGateway.Input
@@ -205,44 +203,24 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdChatRegisterPushGateway.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatRegisterPushGateway.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.registerPushGateway: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdChatRegisterPushGateway.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdChatRegisterPushGateway.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

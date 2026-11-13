@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.intel.getCommunity
 
+/// Fetch full role-classified member DIDs, sample post AT-URI skeletons, and harmonious neighbor communities for one community.
 public struct BlueCatbirdIntelGetCommunity {
 
     public static let typeIdentifier = "blue.catbird.intel.getCommunity"
+
     public struct Parameters: Parametrizable {
         public let communityId: Int
 
@@ -21,95 +23,56 @@ public struct BlueCatbirdIntelGetCommunity {
     public struct Output: ATProtocolCodable {
 
         public let catalogVersion: String
-
         public let community: BlueCatbirdIntelDefs.CommunitySummary
-
         public let members: [BlueCatbirdIntelDefs.CommunityMemberRef]
-
         public let samplePosts: [BlueCatbirdIntelDefs.PostSkeletonItem]
-
         public let neighborCommunities: [BlueCatbirdIntelDefs.CommunitySummary]
 
-        // Standard public initializer
         public init(
-
             catalogVersion: String,
-
             community: BlueCatbirdIntelDefs.CommunitySummary,
-
             members: [BlueCatbirdIntelDefs.CommunityMemberRef],
-
             samplePosts: [BlueCatbirdIntelDefs.PostSkeletonItem],
-
             neighborCommunities: [BlueCatbirdIntelDefs.CommunitySummary]
-
         ) {
-
             self.catalogVersion = catalogVersion
-
             self.community = community
-
             self.members = members
-
             self.samplePosts = samplePosts
-
             self.neighborCommunities = neighborCommunities
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.catalogVersion = try container.decode(String.self, forKey: .catalogVersion)
-
             self.community = try container.decode(BlueCatbirdIntelDefs.CommunitySummary.self, forKey: .community)
-
             self.members = try container.decode([BlueCatbirdIntelDefs.CommunityMemberRef].self, forKey: .members)
-
             self.samplePosts = try container.decode([BlueCatbirdIntelDefs.PostSkeletonItem].self, forKey: .samplePosts)
-
             self.neighborCommunities = try container.decode([BlueCatbirdIntelDefs.CommunitySummary].self, forKey: .neighborCommunities)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(catalogVersion, forKey: .catalogVersion)
-
-            try container.encode(community, forKey: .community)
-
-            try container.encode(members, forKey: .members)
-
-            try container.encode(samplePosts, forKey: .samplePosts)
-
-            try container.encode(neighborCommunities, forKey: .neighborCommunities)
-
+            try container.encode(self.catalogVersion, forKey: .catalogVersion)
+            try container.encode(self.community, forKey: .community)
+            try container.encode(self.members, forKey: .members)
+            try container.encode(self.samplePosts, forKey: .samplePosts)
+            try container.encode(self.neighborCommunities, forKey: .neighborCommunities)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let catalogVersionValue = try catalogVersion.toCBORValue()
+            let catalogVersionValue = try self.catalogVersion.toCBORValue()
             map = map.adding(key: "catalogVersion", value: catalogVersionValue)
-
-            let communityValue = try community.toCBORValue()
+            let communityValue = try self.community.toCBORValue()
             map = map.adding(key: "community", value: communityValue)
-
-            let membersValue = try members.toCBORValue()
+            let membersValue = try self.members.toCBORValue()
             map = map.adding(key: "members", value: membersValue)
-
-            let samplePostsValue = try samplePosts.toCBORValue()
+            let samplePostsValue = try self.samplePosts.toCBORValue()
             map = map.adding(key: "samplePosts", value: samplePostsValue)
-
-            let neighborCommunitiesValue = try neighborCommunities.toCBORValue()
+            let neighborCommunitiesValue = try self.neighborCommunities.toCBORValue()
             map = map.adding(key: "neighborCommunities", value: neighborCommunitiesValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -119,7 +82,6 @@ public struct BlueCatbirdIntelGetCommunity {
             case samplePosts
             case neighborCommunities
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -142,9 +104,8 @@ extension ATProtoClient.Blue.Catbird.Intel {
     /// Fetch full role-classified member DIDs, sample post AT-URI skeletons, and harmonious neighbor communities for one community.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdIntelGetCommunity.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getCommunity(input: BlueCatbirdIntelGetCommunity.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdIntelGetCommunity.Output?) {
         let endpoint = "blue.catbird.intel.getCommunity"
 
@@ -164,42 +125,24 @@ extension ATProtoClient.Blue.Catbird.Intel {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdIntelGetCommunity.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.intel.getCommunity: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdIntelGetCommunity.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdIntelGetCommunity.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdIntelGetCommunity.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

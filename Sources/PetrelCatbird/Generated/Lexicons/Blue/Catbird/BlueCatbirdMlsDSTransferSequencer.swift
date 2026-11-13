@@ -4,16 +4,25 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.mlsDS.transferSequencer
 
+/// Accept a sequencer role transfer from the current sequencer DS. Transfer sequencer responsibility for a conversation to this DS.
 public struct BlueCatbirdMlsDSTransferSequencer {
 
     public static let typeIdentifier = "blue.catbird.mlsDS.transferSequencer"
+
     public struct Input: ATProtocolCodable {
+
+        /// Conversation ID
         public let convoId: String
+        /// Current epoch at time of transfer (informational)
         public let currentEpoch: Int?
+        /// New sequencer term to establish
         public let newSequencerTerm: Int
 
-        /// Standard public initializer
-        public init(convoId: String, currentEpoch: Int? = nil, newSequencerTerm: Int) {
+        public init(
+            convoId: String,
+            currentEpoch: Int? = nil,
+            newSequencerTerm: Int
+        ) {
             self.convoId = convoId
             self.currentEpoch = currentEpoch
             self.newSequencerTerm = newSequencerTerm
@@ -21,27 +30,28 @@ public struct BlueCatbirdMlsDSTransferSequencer {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
             self.convoId = try container.decode(String.self, forKey: .convoId)
-            self.currentEpoch = try container.decodeIfPresent(Int.self, forKey: .currentEpoch)
+            self.currentEpoch = try container.decodeIfPresent(Int.self, forKey: .currentEpoch, rejectingNull: strict)
             self.newSequencerTerm = try container.decode(Int.self, forKey: .newSequencerTerm)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(convoId, forKey: .convoId)
-            try container.encodeIfPresent(currentEpoch, forKey: .currentEpoch)
-            try container.encode(newSequencerTerm, forKey: .newSequencerTerm)
+            try container.encode(self.convoId, forKey: .convoId)
+            try container.encodeIfPresent(self.currentEpoch, forKey: .currentEpoch)
+            try container.encode(self.newSequencerTerm, forKey: .newSequencerTerm)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let convoIdValue = try convoId.toCBORValue()
+            let convoIdValue = try self.convoId.toCBORValue()
             map = map.adding(key: "convoId", value: convoIdValue)
-            if let value = currentEpoch {
+            if let value = self.currentEpoch {
                 let currentEpochValue = try value.toCBORValue()
                 map = map.adding(key: "currentEpoch", value: currentEpochValue)
             }
-            let newSequencerTermValue = try newSequencerTerm.toCBORValue()
+            let newSequencerTermValue = try self.newSequencerTerm.toCBORValue()
             map = map.adding(key: "newSequencerTerm", value: newSequencerTermValue)
             return map
         }
@@ -55,64 +65,44 @@ public struct BlueCatbirdMlsDSTransferSequencer {
 
     public struct Output: ATProtocolCodable {
 
+        /// Whether the transfer was accepted
         public let accepted: Bool
-
+        /// Confirmed new sequencer term
         public let newSequencerTerm: Int
 
-        // Standard public initializer
         public init(
-
             accepted: Bool,
-
             newSequencerTerm: Int
-
         ) {
-
             self.accepted = accepted
-
             self.newSequencerTerm = newSequencerTerm
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.accepted = try container.decode(Bool.self, forKey: .accepted)
-
             self.newSequencerTerm = try container.decode(Int.self, forKey: .newSequencerTerm)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(accepted, forKey: .accepted)
-
-            try container.encode(newSequencerTerm, forKey: .newSequencerTerm)
-
+            try container.encode(self.accepted, forKey: .accepted)
+            try container.encode(self.newSequencerTerm, forKey: .newSequencerTerm)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let acceptedValue = try accepted.toCBORValue()
+            let acceptedValue = try self.accepted.toCBORValue()
             map = map.adding(key: "accepted", value: acceptedValue)
-
-            let newSequencerTermValue = try newSequencerTerm.toCBORValue()
+            let newSequencerTermValue = try self.newSequencerTerm.toCBORValue()
             map = map.adding(key: "newSequencerTerm", value: newSequencerTermValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case accepted
             case newSequencerTerm
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -135,11 +125,10 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
     // MARK: - transferSequencer
     /// Accept a sequencer role transfer from the current sequencer DS. Transfer sequencer responsibility for a conversation to this DS.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdMlsDSTransferSequencer.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func transferSequencer(
 
         input: BlueCatbirdMlsDSTransferSequencer.Input
@@ -171,44 +160,24 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdMlsDSTransferSequencer.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSTransferSequencer.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.transferSequencer: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdMlsDSTransferSequencer.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdMlsDSTransferSequencer.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

@@ -4,22 +4,45 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.relaySpaceRead
 
+/// Stateless zero-persistence home-mls-ds relay (3A) forwarding client-signed RFC 9421 Space read requests (listWriters, getSpace, listRecords, getRecord, listRepoOps, getLatestCommit, getRepo, getBlob) to a remote Space host or writer PDS, returning raw bytes and preserving Atproto-Space-Commit / Atproto-Space-Record / Signature-Input / Signature headers.
 public struct BlueCatbirdChatRelaySpaceRead {
 
     public static let typeIdentifier = "blue.catbird.chat.relaySpaceRead"
-    public struct Input: ATProtocolCodable {
-        public let actorDeviceId: BlueCatbirdChatDefs.DeviceId
-        public let targetDid: DID
-        public let nsid: String
-        public let query: String?
-        public let credential: String
-        public let spaceAudience: String
-        public let wantMac: String?
-        public let signatureInput: String
-        public let signature: String
 
-        /// Standard public initializer
-        public init(actorDeviceId: BlueCatbirdChatDefs.DeviceId, targetDid: DID, nsid: String, query: String? = nil, credential: String, spaceAudience: String, wantMac: String? = nil, signatureInput: String, signature: String) {
+    public struct Input: ATProtocolCodable {
+
+        public let actorDeviceId: BlueCatbirdChatDefs.DeviceId
+        /// DID whose #atproto_pds or #atproto_mls endpoint serves the requested com.atproto.space.* read endpoint.
+        public let targetDid: DID
+        /// Read-only com.atproto.space.* NSID (listWriters, getSpace, listRecords, getRecord, listRepoOps, getLatestCommit, getRepo, getBlob).
+        public let nsid: String
+        /// Raw URL-encoded query string without leading '?'.
+        public let query: String?
+        /// Space credential JWT forwarded in Authorization / Atproto-Space-Credential.
+        public let credential: String
+        /// Atproto-Space-Audience header value.
+        public let spaceAudience: String
+        /// Optional Atproto-Space-Want-Mac (#atproto_kem did:key share).
+        public let wantMac: String?
+        /// RFC 9421 Signature-Input header covering ('authorization' 'atproto-space-audience').
+        public let signatureInput: String
+        /// RFC 9421 Signature header produced by the client's ephemeral PoP key.
+        public let signature: String
+        /// Optional RFC 9421 Accept-Signature header requesting Atproto-Space-Commit or Atproto-Space-Record MAC authentication (#atproto_kem did:key share in keyid).
+        public let acceptSignature: String?
+
+        public init(
+            actorDeviceId: BlueCatbirdChatDefs.DeviceId,
+            targetDid: DID,
+            nsid: String,
+            query: String? = nil,
+            credential: String,
+            spaceAudience: String,
+            wantMac: String? = nil,
+            signatureInput: String,
+            signature: String,
+            acceptSignature: String? = nil
+        ) {
             self.actorDeviceId = actorDeviceId
             self.targetDid = targetDid
             self.nsid = nsid
@@ -29,58 +52,66 @@ public struct BlueCatbirdChatRelaySpaceRead {
             self.wantMac = wantMac
             self.signatureInput = signatureInput
             self.signature = signature
+            self.acceptSignature = acceptSignature
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
             self.actorDeviceId = try container.decode(BlueCatbirdChatDefs.DeviceId.self, forKey: .actorDeviceId)
             self.targetDid = try container.decode(DID.self, forKey: .targetDid)
             self.nsid = try container.decode(String.self, forKey: .nsid)
-            self.query = try container.decodeIfPresent(String.self, forKey: .query)
+            self.query = try container.decodeIfPresent(String.self, forKey: .query, rejectingNull: strict)
             self.credential = try container.decode(String.self, forKey: .credential)
             self.spaceAudience = try container.decode(String.self, forKey: .spaceAudience)
-            self.wantMac = try container.decodeIfPresent(String.self, forKey: .wantMac)
+            self.wantMac = try container.decodeIfPresent(String.self, forKey: .wantMac, rejectingNull: strict)
             self.signatureInput = try container.decode(String.self, forKey: .signatureInput)
             self.signature = try container.decode(String.self, forKey: .signature)
+            self.acceptSignature = try container.decodeIfPresent(String.self, forKey: .acceptSignature, rejectingNull: strict)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(actorDeviceId, forKey: .actorDeviceId)
-            try container.encode(targetDid, forKey: .targetDid)
-            try container.encode(nsid, forKey: .nsid)
-            try container.encodeIfPresent(query, forKey: .query)
-            try container.encode(credential, forKey: .credential)
-            try container.encode(spaceAudience, forKey: .spaceAudience)
-            try container.encodeIfPresent(wantMac, forKey: .wantMac)
-            try container.encode(signatureInput, forKey: .signatureInput)
-            try container.encode(signature, forKey: .signature)
+            try container.encode(self.actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(self.targetDid, forKey: .targetDid)
+            try container.encode(self.nsid, forKey: .nsid)
+            try container.encodeIfPresent(self.query, forKey: .query)
+            try container.encode(self.credential, forKey: .credential)
+            try container.encode(self.spaceAudience, forKey: .spaceAudience)
+            try container.encodeIfPresent(self.wantMac, forKey: .wantMac)
+            try container.encode(self.signatureInput, forKey: .signatureInput)
+            try container.encode(self.signature, forKey: .signature)
+            try container.encodeIfPresent(self.acceptSignature, forKey: .acceptSignature)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            let actorDeviceIdValue = try self.actorDeviceId.toCBORValue()
             map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
-            let targetDidValue = try targetDid.toCBORValue()
+            let targetDidValue = try self.targetDid.toCBORValue()
             map = map.adding(key: "targetDid", value: targetDidValue)
-            let nsidValue = try nsid.toCBORValue()
+            let nsidValue = try self.nsid.toCBORValue()
             map = map.adding(key: "nsid", value: nsidValue)
-            if let value = query {
+            if let value = self.query {
                 let queryValue = try value.toCBORValue()
                 map = map.adding(key: "query", value: queryValue)
             }
-            let credentialValue = try credential.toCBORValue()
+            let credentialValue = try self.credential.toCBORValue()
             map = map.adding(key: "credential", value: credentialValue)
-            let spaceAudienceValue = try spaceAudience.toCBORValue()
+            let spaceAudienceValue = try self.spaceAudience.toCBORValue()
             map = map.adding(key: "spaceAudience", value: spaceAudienceValue)
-            if let value = wantMac {
+            if let value = self.wantMac {
                 let wantMacValue = try value.toCBORValue()
                 map = map.adding(key: "wantMac", value: wantMacValue)
             }
-            let signatureInputValue = try signatureInput.toCBORValue()
+            let signatureInputValue = try self.signatureInput.toCBORValue()
             map = map.adding(key: "signatureInput", value: signatureInputValue)
-            let signatureValue = try signature.toCBORValue()
+            let signatureValue = try self.signature.toCBORValue()
             map = map.adding(key: "signature", value: signatureValue)
+            if let value = self.acceptSignature {
+                let acceptSignatureValue = try value.toCBORValue()
+                map = map.adding(key: "acceptSignature", value: acceptSignatureValue)
+            }
             return map
         }
 
@@ -94,55 +125,34 @@ public struct BlueCatbirdChatRelaySpaceRead {
             case wantMac
             case signatureInput
             case signature
+            case acceptSignature
         }
     }
 
     public struct Output: ATProtocolCodable {
-
         public let data: Data
 
-        // Standard public initializer
-        public init(
-
-            data: Data
-
-        ) {
-
+        public init(data: Data) {
             self.data = data
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.data = try container.decode(Data.self, forKey: .data)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
             try container.encode(data, forKey: .data)
-
         }
 
         public func toCBORValue() throws -> Any {
-
-            var map = OrderedCBORMap()
-
-            let dataValue = try data.toCBORValue()
-            map = map.adding(key: "data", value: dataValue)
-
-            return map
-
+            return data
         }
 
         private enum CodingKeys: String, CodingKey {
             case data
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -169,13 +179,12 @@ public struct BlueCatbirdChatRelaySpaceRead {
 
 extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - relaySpaceRead
-    /// Stateless zero-persistence home-mls-ds relay (3A) forwarding client-signed RFC 9421 Space read requests (listRepos, getSpace, listRecords, getRecord, listRepoOps, getLatestCommit, getRepo, getBlob) to a remote Space host or writer PDS, returning raw bytes and preserving the Atproto-Space-Mac header.
+    /// Stateless zero-persistence home-mls-ds relay (3A) forwarding client-signed RFC 9421 Space read requests (listWriters, getSpace, listRecords, getRecord, listRepoOps, getLatestCommit, getRepo, getBlob) to a remote Space host or writer PDS, returning raw bytes and preserving Atproto-Space-Commit / Atproto-Space-Record / Signature-Input / Signature headers.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdChatRelaySpaceRead.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func relaySpaceRead(
 
         input: BlueCatbirdChatRelaySpaceRead.Input
@@ -207,43 +216,19 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/octet-stream", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/octet-stream") {
-                throw NetworkError.invalidContentType(expected: "application/octet-stream", actual: contentType)
-            }
-
-            do {
-
-                let decodedData = BlueCatbirdChatRelaySpaceRead.Output(data: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.relaySpaceRead: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdChatRelaySpaceRead.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdChatRelaySpaceRead.Error.self)
         }
 
-    }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/octet-stream", actual: "nil")
+        }
 
+        if !contentType.lowercased().contains("application/octet-stream") {
+            throw NetworkError.invalidContentType(expected: "application/octet-stream", actual: contentType)
+        }
+
+        return (responseCode, BlueCatbirdChatRelaySpaceRead.Output(data: responseData))
+
+    }
 }

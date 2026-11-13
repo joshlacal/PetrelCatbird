@@ -4,18 +4,28 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.appendSpaceBatch
 
+/// Validate a sender batch under the current device and membership locks, then store only its immutable Space record reference and server ordering. The source record CID, conversation and storage generation must match before stamping. The DS does not retain the sender ciphertext.
 public struct BlueCatbirdLabyrinthAppendSpaceBatch {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.appendSpaceBatch"
+
     public struct Input: ATProtocolCodable {
+
         public let record: BlueCatbirdLabyrinthBatch
+        /// Immutable UUID identifying this conversation storage lifecycle. A recreated Space requires a new generation.
         public let generation: String
+        /// Conversation Space reference, bound to the storage generation.
         public let space: SpaceRef
         public let rkey: RecordKey
-        public let cid: CID
+        public let cid: CIDString
 
-        /// Standard public initializer
-        public init(record: BlueCatbirdLabyrinthBatch, generation: String, space: SpaceRef, rkey: RecordKey, cid: CID) {
+        public init(
+            record: BlueCatbirdLabyrinthBatch,
+            generation: String,
+            space: SpaceRef,
+            rkey: RecordKey,
+            cid: CIDString
+        ) {
             self.record = record
             self.generation = generation
             self.space = space
@@ -29,29 +39,29 @@ public struct BlueCatbirdLabyrinthAppendSpaceBatch {
             self.generation = try container.decode(String.self, forKey: .generation)
             self.space = try container.decode(SpaceRef.self, forKey: .space)
             self.rkey = try container.decode(RecordKey.self, forKey: .rkey)
-            self.cid = try container.decode(CID.self, forKey: .cid)
+            self.cid = try container.decode(CIDString.self, forKey: .cid)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(record, forKey: .record)
-            try container.encode(generation, forKey: .generation)
-            try container.encode(space, forKey: .space)
-            try container.encode(rkey, forKey: .rkey)
-            try container.encode(cid, forKey: .cid)
+            try container.encode(self.record, forKey: .record)
+            try container.encode(self.generation, forKey: .generation)
+            try container.encode(self.space, forKey: .space)
+            try container.encode(self.rkey, forKey: .rkey)
+            try container.encode(self.cid, forKey: .cid)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let recordValue = try record.toCBORValue()
+            let recordValue = try self.record.toCBORValue()
             map = map.adding(key: "record", value: recordValue)
-            let generationValue = try generation.toCBORValue()
+            let generationValue = try self.generation.toCBORValue()
             map = map.adding(key: "generation", value: generationValue)
-            let spaceValue = try space.toCBORValue()
+            let spaceValue = try self.space.toCBORValue()
             map = map.adding(key: "space", value: spaceValue)
-            let rkeyValue = try rkey.toCBORValue()
+            let rkeyValue = try self.rkey.toCBORValue()
             map = map.adding(key: "rkey", value: rkeyValue)
-            let cidValue = try cid.toCBORValue()
+            let cidValue = try self.cid.toCBORValue()
             map = map.adding(key: "cid", value: cidValue)
             return map
         }
@@ -67,64 +77,43 @@ public struct BlueCatbirdLabyrinthAppendSpaceBatch {
 
     public struct Output: ATProtocolCodable {
 
+        /// Immutable source Space record key; deterministic keys may use a 64-character digest.
         public let rkey: RecordKey
-
         public let order: BlueCatbirdLabyrinthDefs.ServerOrder
 
-        // Standard public initializer
         public init(
-
             rkey: RecordKey,
-
             order: BlueCatbirdLabyrinthDefs.ServerOrder
-
         ) {
-
             self.rkey = rkey
-
             self.order = order
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.rkey = try container.decode(RecordKey.self, forKey: .rkey)
-
             self.order = try container.decode(BlueCatbirdLabyrinthDefs.ServerOrder.self, forKey: .order)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(rkey, forKey: .rkey)
-
-            try container.encode(order, forKey: .order)
-
+            try container.encode(self.rkey, forKey: .rkey)
+            try container.encode(self.order, forKey: .order)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let rkeyValue = try rkey.toCBORValue()
+            let rkeyValue = try self.rkey.toCBORValue()
             map = map.adding(key: "rkey", value: rkeyValue)
-
-            let orderValue = try order.toCBORValue()
+            let orderValue = try self.order.toCBORValue()
             map = map.adding(key: "order", value: orderValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case rkey
             case order
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -151,11 +140,10 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - appendSpaceBatch
     /// Validate a sender batch under the current device and membership locks, then store only its immutable Space record reference and server ordering. The source record CID, conversation and storage generation must match before stamping. The DS does not retain the sender ciphertext.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdLabyrinthAppendSpaceBatch.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func appendSpaceBatch(
 
         input: BlueCatbirdLabyrinthAppendSpaceBatch.Input
@@ -187,44 +175,24 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdLabyrinthAppendSpaceBatch.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdLabyrinthAppendSpaceBatch.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.appendSpaceBatch: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdLabyrinthAppendSpaceBatch.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdLabyrinthAppendSpaceBatch.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

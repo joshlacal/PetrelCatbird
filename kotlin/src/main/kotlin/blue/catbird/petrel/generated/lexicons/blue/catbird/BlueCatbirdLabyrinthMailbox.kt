@@ -18,12 +18,14 @@ object BlueCatbirdLabyrinthMailboxDefs {
     data class SpaceDeclarationDescriptor(
         val nsid: String,
         val keyType: String,
-        val name: String,
+        val title: String?,
+        val titleLang: Map<String, String>,
         val collections: List<String>,
     )
 
     val spaceDeclaration = SpaceDeclarationDescriptor(
         nsid = "blue.catbird.labyrinth.mailbox", keyType = "literal:self",
-        name = "Catbird message backup", collections = listOf("blue.catbird.labyrinth.device", "blue.catbird.labyrinth.virtualDevice", "blue.catbird.labyrinth.epoch", "blue.catbird.labyrinth.epochMember", "blue.catbird.labyrinth.otcSession", "blue.catbird.labyrinth.ownerBatch", "blue.catbird.labyrinth.attachmentManifest"),
+        title = "Catbird message backup", titleLang = mapOf(),
+        collections = listOf("blue.catbird.labyrinth.device", "blue.catbird.labyrinth.virtualDevice", "blue.catbird.labyrinth.epoch", "blue.catbird.labyrinth.epochMember", "blue.catbird.labyrinth.otcSession", "blue.catbird.labyrinth.ownerBatch", "blue.catbird.labyrinth.attachmentManifest", "blue.catbird.labyrinth.readState", "blue.catbird.labyrinth.circleOwnerState"),
     )
 }

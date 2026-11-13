@@ -4,55 +4,168 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.relaySpaceCredential
 
+/// Stateless home-mls-ds relay (3A) exchanging an active registered device's single-use PDS delegation token with a remote Space authority or remote Space host without exposing the client's IP address to third-party servers.
 public struct BlueCatbirdChatRelaySpaceCredential {
 
     public static let typeIdentifier = "blue.catbird.chat.relaySpaceCredential"
-    public struct Input: ATProtocolCodable {
-        public let actorDeviceId: BlueCatbirdChatDefs.DeviceId
-        public let authorityDid: DID
-        public let space: SpaceRef
-        public let delegationToken: String
-        public let cnfKey: String
 
-        /// Standard public initializer
-        public init(actorDeviceId: BlueCatbirdChatDefs.DeviceId, authorityDid: DID, space: SpaceRef, delegationToken: String, cnfKey: String) {
+    public struct NotifyTarget: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.relaySpaceCredential#notifyTarget"
+
+        public let endpoint: URI
+        public let token: String
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
+
+        public init(
+            endpoint: URI,
+            token: String,
+            extraFields: [String: ATProtocolValueContainer] = [:]
+        ) {
+            self.endpoint = endpoint
+            self.token = token
+            self.extraFields = extraFields
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.endpoint = try container.decode(URI.self, forKey: .endpoint)
+            self.token = try container.decode(String.self, forKey: .token)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(self.endpoint, forKey: .endpoint)
+            try container.encode(self.token, forKey: .token)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(self.endpoint)
+            hasher.combine(self.token)
+            hasher.combine(extraFields)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if self.endpoint != other.endpoint {
+                return false
+            }
+            if self.token != other.token {
+                return false
+            }
+            return self.extraFields == other.extraFields
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            let endpointValue = try self.endpoint.toCBORValue()
+            map = map.adding(key: "endpoint", value: endpointValue)
+            let tokenValue = try self.token.toCBORValue()
+            map = map.adding(key: "token", value: tokenValue)
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "endpoint", "token"]
+
+        private enum CodingKeys: String, CodingKey {
+            case endpoint
+            case token
+        }
+    }
+
+    public struct Input: ATProtocolCodable {
+
+        public let actorDeviceId: BlueCatbirdChatDefs.DeviceId
+        /// DID of the Space authority serving com.atproto.space.authorizeSpaceSync; it must be the authority named in space.
+        public let authorityDid: DID
+        /// Exactly at://{authorityDid}/space/{spaceType}/{skey}. Other schemes, including at-space://, and Space record URIs are rejected. The returned credential's sub equals this string.
+        public let space: SpaceRef
+        /// Single-use delegation JWT minted by the user's PDS (com.atproto.space.getDelegationToken): sub is exactly space, aud is {authorityDid}#atproto_pds, it carries no cnf claim, and it lives at most 60 seconds. The home forwards it to the authority in a POST body without reading it.
+        public let delegationToken: String
+        /// Client ephemeral P-256 did:key for RFC 9421 proof-of-possession. The authority binds the credential's cnf.kid to it, and the home rejects a credential bound to any other key.
+        public let cnfKey: String
+        /// Optional OAuth client attestation JWT forwarded to com.atproto.space.authorizeSpaceSync.
+        public let clientAttestation: String?
+        public let notify: NotifyTarget?
+        /// Optional known Space revision forwarded to com.atproto.space.authorizeSpaceSync.
+        public let spaceRev: TID?
+
+        public init(
+            actorDeviceId: BlueCatbirdChatDefs.DeviceId,
+            authorityDid: DID,
+            space: SpaceRef,
+            delegationToken: String,
+            cnfKey: String,
+            clientAttestation: String? = nil,
+            notify: NotifyTarget? = nil,
+            spaceRev: TID? = nil
+        ) {
             self.actorDeviceId = actorDeviceId
             self.authorityDid = authorityDid
             self.space = space
             self.delegationToken = delegationToken
             self.cnfKey = cnfKey
+            self.clientAttestation = clientAttestation
+            self.notify = notify
+            self.spaceRev = spaceRev
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
             self.actorDeviceId = try container.decode(BlueCatbirdChatDefs.DeviceId.self, forKey: .actorDeviceId)
             self.authorityDid = try container.decode(DID.self, forKey: .authorityDid)
             self.space = try container.decode(SpaceRef.self, forKey: .space)
             self.delegationToken = try container.decode(String.self, forKey: .delegationToken)
             self.cnfKey = try container.decode(String.self, forKey: .cnfKey)
+            self.clientAttestation = try container.decodeIfPresent(String.self, forKey: .clientAttestation, rejectingNull: strict)
+            self.notify = try container.decodeIfPresent(NotifyTarget.self, forKey: .notify, rejectingNull: strict)
+            self.spaceRev = try container.decodeIfPresent(TID.self, forKey: .spaceRev, rejectingNull: strict)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(actorDeviceId, forKey: .actorDeviceId)
-            try container.encode(authorityDid, forKey: .authorityDid)
-            try container.encode(space, forKey: .space)
-            try container.encode(delegationToken, forKey: .delegationToken)
-            try container.encode(cnfKey, forKey: .cnfKey)
+            try container.encode(self.actorDeviceId, forKey: .actorDeviceId)
+            try container.encode(self.authorityDid, forKey: .authorityDid)
+            try container.encode(self.space, forKey: .space)
+            try container.encode(self.delegationToken, forKey: .delegationToken)
+            try container.encode(self.cnfKey, forKey: .cnfKey)
+            try container.encodeIfPresent(self.clientAttestation, forKey: .clientAttestation)
+            try container.encodeIfPresent(self.notify, forKey: .notify)
+            try container.encodeIfPresent(self.spaceRev, forKey: .spaceRev)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let actorDeviceIdValue = try actorDeviceId.toCBORValue()
+            let actorDeviceIdValue = try self.actorDeviceId.toCBORValue()
             map = map.adding(key: "actorDeviceId", value: actorDeviceIdValue)
-            let authorityDidValue = try authorityDid.toCBORValue()
+            let authorityDidValue = try self.authorityDid.toCBORValue()
             map = map.adding(key: "authorityDid", value: authorityDidValue)
-            let spaceValue = try space.toCBORValue()
+            let spaceValue = try self.space.toCBORValue()
             map = map.adding(key: "space", value: spaceValue)
-            let delegationTokenValue = try delegationToken.toCBORValue()
+            let delegationTokenValue = try self.delegationToken.toCBORValue()
             map = map.adding(key: "delegationToken", value: delegationTokenValue)
-            let cnfKeyValue = try cnfKey.toCBORValue()
+            let cnfKeyValue = try self.cnfKey.toCBORValue()
             map = map.adding(key: "cnfKey", value: cnfKeyValue)
+            if let value = self.clientAttestation {
+                let clientAttestationValue = try value.toCBORValue()
+                map = map.adding(key: "clientAttestation", value: clientAttestationValue)
+            }
+            if let value = self.notify {
+                let notifyValue = try value.toCBORValue()
+                map = map.adding(key: "notify", value: notifyValue)
+            }
+            if let value = self.spaceRev {
+                let spaceRevValue = try value.toCBORValue()
+                map = map.adding(key: "spaceRev", value: spaceRevValue)
+            }
             return map
         }
 
@@ -62,69 +175,70 @@ public struct BlueCatbirdChatRelaySpaceCredential {
             case space
             case delegationToken
             case cnfKey
+            case clientAttestation
+            case notify
+            case spaceRev
         }
     }
 
     public struct Output: ATProtocolCodable {
 
         public let credential: String
-
         public let expiresAt: ATProtocolDate
+        public let spaceRev: TID?
 
-        // Standard public initializer
         public init(
-
             credential: String,
-
-            expiresAt: ATProtocolDate
-
+            expiresAt: ATProtocolDate,
+            spaceRev: TID? = nil
         ) {
-
             self.credential = credential
-
             self.expiresAt = expiresAt
-
+            self.spaceRev = spaceRev
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
+            let strict = decoder.isATProtoStrictDecoding
             self.credential = try container.decode(String.self, forKey: .credential)
-
             self.expiresAt = try container.decode(ATProtocolDate.self, forKey: .expiresAt)
-
+            do {
+                self.spaceRev = try container.decodeIfPresent(TID.self, forKey: .spaceRev, rejectingNull: strict)
+            } catch {
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
+                LogManager.logWarning("Decoding error for optional property 'spaceRev' — degrading to nil: \(error)")
+                self.spaceRev = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(credential, forKey: .credential)
-
-            try container.encode(expiresAt, forKey: .expiresAt)
-
+            try container.encode(self.credential, forKey: .credential)
+            try container.encode(self.expiresAt, forKey: .expiresAt)
+            try container.encodeIfPresent(self.spaceRev, forKey: .spaceRev)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let credentialValue = try credential.toCBORValue()
+            let credentialValue = try self.credential.toCBORValue()
             map = map.adding(key: "credential", value: credentialValue)
-
-            let expiresAtValue = try expiresAt.toCBORValue()
+            let expiresAtValue = try self.expiresAt.toCBORValue()
             map = map.adding(key: "expiresAt", value: expiresAtValue)
-
+            if let value = self.spaceRev {
+                let spaceRevValue = try value.toCBORValue()
+                map = map.adding(key: "spaceRev", value: spaceRevValue)
+            }
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case credential
             case expiresAt
+            case spaceRev
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -153,11 +267,10 @@ extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - relaySpaceCredential
     /// Stateless home-mls-ds relay (3A) exchanging an active registered device's single-use PDS delegation token with a remote Space authority or remote Space host without exposing the client's IP address to third-party servers.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdChatRelaySpaceCredential.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func relaySpaceCredential(
 
         input: BlueCatbirdChatRelaySpaceCredential.Input
@@ -189,44 +302,24 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdChatRelaySpaceCredential.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatRelaySpaceCredential.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.relaySpaceCredential: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdChatRelaySpaceCredential.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdChatRelaySpaceCredential.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

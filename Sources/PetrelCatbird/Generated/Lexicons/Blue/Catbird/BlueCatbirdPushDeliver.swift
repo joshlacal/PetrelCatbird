@@ -4,21 +4,33 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.push.deliver
 
+/// Delivers a structured, anti-phishing MLS push wake from a recipient's authorized home mls-ds to Catbird's Push Gateway (nest, D2, I12). Unknown or mismatched caller_ds_did pushKeys return uniform 202 Accepted; display strings in payload are strictly forbidden.
 public struct BlueCatbirdPushDeliver {
 
     public static let typeIdentifier = "blue.catbird.push.deliver"
 
     public struct WakePayload: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.push.deliver#wakePayload"
+
         public let wakeKind: WakePayloadWakeKind
         public let conversationId: String
         public let generation: Int
         public let seq: Int
         public let epoch: Int
+        /// Optional inline MLS PrivateMessage ciphertext when <= 2,200 bytes (I12); omitted for larger frames so NSE fetches via getEntries.
         public let ciphertext: Bytes?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            wakeKind: WakePayloadWakeKind, conversationId: String, generation: Int, seq: Int, epoch: Int, ciphertext: Bytes? = nil
+            wakeKind: WakePayloadWakeKind,
+            conversationId: String,
+            generation: Int,
+            seq: Int,
+            epoch: Int,
+            ciphertext: Bytes? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.wakeKind = wakeKind
             self.conversationId = conversationId
@@ -26,95 +38,79 @@ public struct BlueCatbirdPushDeliver {
             self.seq = seq
             self.epoch = epoch
             self.ciphertext = ciphertext
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.wakeKind = try container.decode(WakePayloadWakeKind.self, forKey: .wakeKind)
+            self.conversationId = try container.decode(String.self, forKey: .conversationId)
+            self.generation = try container.decode(Int.self, forKey: .generation)
+            self.seq = try container.decode(Int.self, forKey: .seq)
+            self.epoch = try container.decode(Int.self, forKey: .epoch)
             do {
-                self.wakeKind = try container.decode(WakePayloadWakeKind.self, forKey: .wakeKind)
+                self.ciphertext = try container.decodeIfPresent(Bytes.self, forKey: .ciphertext, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'wakeKind': \(error)")
-                throw error
-            }
-            do {
-                self.conversationId = try container.decode(String.self, forKey: .conversationId)
-            } catch {
-                LogManager.logError("Decoding error for required property 'conversationId': \(error)")
-                throw error
-            }
-            do {
-                self.generation = try container.decode(Int.self, forKey: .generation)
-            } catch {
-                LogManager.logError("Decoding error for required property 'generation': \(error)")
-                throw error
-            }
-            do {
-                self.seq = try container.decode(Int.self, forKey: .seq)
-            } catch {
-                LogManager.logError("Decoding error for required property 'seq': \(error)")
-                throw error
-            }
-            do {
-                self.epoch = try container.decode(Int.self, forKey: .epoch)
-            } catch {
-                LogManager.logError("Decoding error for required property 'epoch': \(error)")
-                throw error
-            }
-            do {
-                self.ciphertext = try container.decodeIfPresent(Bytes.self, forKey: .ciphertext)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'ciphertext' — degrading to nil: \(error)")
                 self.ciphertext = nil
+                malformedFields.insert("ciphertext")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(wakeKind, forKey: .wakeKind)
-            try container.encode(conversationId, forKey: .conversationId)
-            try container.encode(generation, forKey: .generation)
-            try container.encode(seq, forKey: .seq)
-            try container.encode(epoch, forKey: .epoch)
-            try container.encodeIfPresent(ciphertext, forKey: .ciphertext)
+            try container.encode(self.wakeKind, forKey: .wakeKind)
+            try container.encode(self.conversationId, forKey: .conversationId)
+            try container.encode(self.generation, forKey: .generation)
+            try container.encode(self.seq, forKey: .seq)
+            try container.encode(self.epoch, forKey: .epoch)
+            try container.encodeIfPresent(self.ciphertext, forKey: .ciphertext)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(wakeKind)
-            hasher.combine(conversationId)
-            hasher.combine(generation)
-            hasher.combine(seq)
-            hasher.combine(epoch)
-            if let value = ciphertext {
+            hasher.combine(self.wakeKind)
+            hasher.combine(self.conversationId)
+            hasher.combine(self.generation)
+            hasher.combine(self.seq)
+            hasher.combine(self.epoch)
+            if let value = self.ciphertext {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if wakeKind != other.wakeKind {
+            if self.wakeKind != other.wakeKind {
                 return false
             }
-            if conversationId != other.conversationId {
+            if self.conversationId != other.conversationId {
                 return false
             }
-            if generation != other.generation {
+            if self.generation != other.generation {
                 return false
             }
-            if seq != other.seq {
+            if self.seq != other.seq {
                 return false
             }
-            if epoch != other.epoch {
+            if self.epoch != other.epoch {
                 return false
             }
-            if ciphertext != other.ciphertext {
+            if self.ciphertext != other.ciphertext {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -123,26 +119,40 @@ public struct BlueCatbirdPushDeliver {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let wakeKindValue = try wakeKind.toCBORValue()
+            let wakeKindValue = try self.wakeKind.toCBORValue()
             map = map.adding(key: "wakeKind", value: wakeKindValue)
-            let conversationIdValue = try conversationId.toCBORValue()
+            let conversationIdValue = try self.conversationId.toCBORValue()
             map = map.adding(key: "conversationId", value: conversationIdValue)
-            let generationValue = try generation.toCBORValue()
+            let generationValue = try self.generation.toCBORValue()
             map = map.adding(key: "generation", value: generationValue)
-            let seqValue = try seq.toCBORValue()
+            let seqValue = try self.seq.toCBORValue()
             map = map.adding(key: "seq", value: seqValue)
-            let epochValue = try epoch.toCBORValue()
+            let epochValue = try self.epoch.toCBORValue()
             map = map.adding(key: "epoch", value: epochValue)
-            if let value = ciphertext {
+            if let value = self.ciphertext {
                 let ciphertextValue = try value.toCBORValue()
                 map = map.adding(key: "ciphertext", value: ciphertextValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "wakeKind", "conversationId", "generation", "seq", "epoch", "ciphertext"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "wakeKind": return true
+            case "conversationId": return true
+            case "generation": return true
+            case "seq": return true
+            case "epoch": return true
+            case "ciphertext": return self.ciphertext != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case wakeKind
             case conversationId
             case generation
@@ -151,13 +161,18 @@ public struct BlueCatbirdPushDeliver {
             case ciphertext
         }
     }
+
     public struct Input: ATProtocolCodable {
+
         public let pushKey: String
         public let appId: String
         public let payload: WakePayload
 
-        /// Standard public initializer
-        public init(pushKey: String, appId: String, payload: WakePayload) {
+        public init(
+            pushKey: String,
+            appId: String,
+            payload: WakePayload
+        ) {
             self.pushKey = pushKey
             self.appId = appId
             self.payload = payload
@@ -172,18 +187,18 @@ public struct BlueCatbirdPushDeliver {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(pushKey, forKey: .pushKey)
-            try container.encode(appId, forKey: .appId)
-            try container.encode(payload, forKey: .payload)
+            try container.encode(self.pushKey, forKey: .pushKey)
+            try container.encode(self.appId, forKey: .appId)
+            try container.encode(self.payload, forKey: .payload)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let pushKeyValue = try pushKey.toCBORValue()
+            let pushKeyValue = try self.pushKey.toCBORValue()
             map = map.adding(key: "pushKey", value: pushKeyValue)
-            let appIdValue = try appId.toCBORValue()
+            let appIdValue = try self.appId.toCBORValue()
             map = map.adding(key: "appId", value: appIdValue)
-            let payloadValue = try payload.toCBORValue()
+            let payloadValue = try self.payload.toCBORValue()
             map = map.adding(key: "payload", value: payloadValue)
             return map
         }
@@ -199,48 +214,32 @@ public struct BlueCatbirdPushDeliver {
 
         public let accepted: Bool
 
-        // Standard public initializer
         public init(
-
             accepted: Bool
-
         ) {
-
             self.accepted = accepted
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.accepted = try container.decode(Bool.self, forKey: .accepted)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(accepted, forKey: .accepted)
-
+            try container.encode(self.accepted, forKey: .accepted)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let acceptedValue = try accepted.toCBORValue()
+            let acceptedValue = try self.accepted.toCBORValue()
             map = map.adding(key: "accepted", value: acceptedValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case accepted
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -279,11 +278,10 @@ extension ATProtoClient.Blue.Catbird.Push {
     // MARK: - deliver
     /// Delivers a structured, anti-phishing MLS push wake from a recipient's authorized home mls-ds to Catbird's Push Gateway (nest, D2, I12). Unknown or mismatched caller_ds_did pushKeys return uniform 202 Accepted; display strings in payload are strictly forbidden.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdPushDeliver.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func deliver(
 
         input: BlueCatbirdPushDeliver.Input
@@ -315,44 +313,24 @@ extension ATProtoClient.Blue.Catbird.Push {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdPushDeliver.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdPushDeliver.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.push.deliver: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdPushDeliver.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdPushDeliver.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

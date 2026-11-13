@@ -45,6 +45,7 @@ sealed class BlueCatbirdChatCreateConversationError(val name: String, val descri
         object NotAuthorized: BlueCatbirdChatCreateConversationError("NotAuthorized", null)
         object NotFollowedByRecipient: BlueCatbirdChatCreateConversationError("NotFollowedByRecipient", null)
         object RelationshipPolicyUnavailable: BlueCatbirdChatCreateConversationError("RelationshipPolicyUnavailable", null)
+        object SignedOperationExpired: BlueCatbirdChatCreateConversationError("SignedOperationExpired", null)
         object UnsupportedMlsProfile: BlueCatbirdChatCreateConversationError("UnsupportedMlsProfile", null)
         object AccountSessionExpired: BlueCatbirdChatCreateConversationError("AccountSessionExpired", null)
         object DeviceBindingMismatch: BlueCatbirdChatCreateConversationError("DeviceBindingMismatch", null)

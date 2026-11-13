@@ -16,6 +16,90 @@ object BlueCatbirdCircleDefsDefs {
     const val TYPE_IDENTIFIER = "blue.catbird.circle.defs"
 }
 
+@Serializable(with = BlueCatbirdCircleDefsFeedItemPostUnionSerializer::class)
+sealed interface BlueCatbirdCircleDefsFeedItemPostUnion {
+    @Serializable
+    data class FeedViewPost(val value: blue.catbird.petrel.generated.AppBskyFeedDefsFeedViewPost) : BlueCatbirdCircleDefsFeedItemPostUnion
+
+    @Serializable
+    data class EncryptedPostView(val value: blue.catbird.petrel.generated.BlueCatbirdCircleDefsEncryptedPostView) : BlueCatbirdCircleDefsFeedItemPostUnion
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdCircleDefsFeedItemPostUnion
+}
+
+object BlueCatbirdCircleDefsFeedItemPostUnionSerializer : kotlinx.serialization.KSerializer<BlueCatbirdCircleDefsFeedItemPostUnion> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdCircleDefsFeedItemPostUnion")
+
+    private val TYPE_FeedViewPost = kotlinx.serialization.json.JsonPrimitive("app.bsky.feed.defs#feedViewPost")
+    private val TYPE_EncryptedPostView = kotlinx.serialization.json.JsonPrimitive("blue.catbird.circle.defs#encryptedPostView")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdCircleDefsFeedItemPostUnion) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdCircleDefsFeedItemPostUnion.FeedViewPost -> {
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.AppBskyFeedDefsFeedViewPost.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_FeedViewPost
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_FeedViewPost)
+                }
+                obj
+            }
+            is BlueCatbirdCircleDefsFeedItemPostUnion.EncryptedPostView -> {
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdCircleDefsEncryptedPostView.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_EncryptedPostView
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_EncryptedPostView)
+                }
+                obj
+            }
+            is BlueCatbirdCircleDefsFeedItemPostUnion.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdCircleDefsFeedItemPostUnion {
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdCircleDefsFeedItemPostUnion can only be deserialized from JSON")
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdCircleDefsFeedItemPostUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdCircleDefsFeedItemPostUnion.Unexpected(element)
+
+        return when (type) {
+            "app.bsky.feed.defs#feedViewPost" -> BlueCatbirdCircleDefsFeedItemPostUnion.FeedViewPost(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.AppBskyFeedDefsFeedViewPost.serializer(), element)
+            )
+            "blue.catbird.circle.defs#encryptedPostView" -> BlueCatbirdCircleDefsFeedItemPostUnion.EncryptedPostView(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdCircleDefsEncryptedPostView.serializer(), element)
+            )
+            else -> BlueCatbirdCircleDefsFeedItemPostUnion.Unexpected(element)
+        }
+    }
+}
+
 @Serializable
 enum class BlueCatbirdCircleDefsNotificationReason {
     @SerialName("reply")
@@ -33,7 +117,8 @@ enum class BlueCatbirdCircleDefsNotificationReason {
         val name: String,        @SerialName("owner")
         val owner: DID,/** Number of members on the owner's PDS member list. The member list itself is owner-only and is read from the owner's PDS, not from this service. */        @SerialName("memberCount")
         val memberCount: Int? = null,        @SerialName("muted")
-        val muted: Boolean? = null    ) {
+        val muted: Boolean? = null,/** Latest content-key version known for an encrypted Circle; absent for plaintext Circles. */        @SerialName("latestKeyVersion")
+        val latestKeyVersion: Int? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdCircleDefsCircleSummary"
         }
@@ -42,7 +127,7 @@ enum class BlueCatbirdCircleDefsNotificationReason {
     @Serializable
     data class BlueCatbirdCircleDefsFeedItem(
         @SerialName("post")
-        val post: AppBskyFeedDefsFeedViewPost,        @SerialName("circle")
+        val post: BlueCatbirdCircleDefsFeedItemPostUnion,        @SerialName("circle")
         val circle: BlueCatbirdCircleDefsCircleSummary    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdCircleDefsFeedItem"
@@ -60,5 +145,21 @@ enum class BlueCatbirdCircleDefsNotificationReason {
         val circle: BlueCatbirdCircleDefsCircleSummary    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdCircleDefsNotification"
+        }
+    }
+
+    @Serializable
+    data class BlueCatbirdCircleDefsEncryptedPostView(
+        @SerialName("uri")
+        val uri: ATProtocolURI,        @SerialName("cid")
+        val cid: CID,        @SerialName("author")
+        val author: AppBskyActorDefsProfileViewBasic,        @SerialName("record")
+        val record: BlueCatbirdCirclePost,        @SerialName("indexedAt")
+        val indexedAt: ATProtocolDate,        @SerialName("likeCount")
+        val likeCount: Int? = null,        @SerialName("replyCount")
+        val replyCount: Int? = null,        @SerialName("viewer")
+        val viewer: AppBskyFeedDefsViewerState? = null    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdCircleDefsEncryptedPostView"
         }
     }

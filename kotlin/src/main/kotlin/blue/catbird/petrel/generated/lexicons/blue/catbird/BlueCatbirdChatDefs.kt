@@ -1108,6 +1108,69 @@ object BlueCatbirdChatDefsSignedDeviceRevocationBodyUnionSerializer : kotlinx.se
     }
 }
 
+@Serializable(with = BlueCatbirdChatDefsSignedDeviceApprovalBodyUnionSerializer::class)
+sealed interface BlueCatbirdChatDefsSignedDeviceApprovalBodyUnion {
+    @Serializable
+    data class DeviceApprovalBody(val value: blue.catbird.petrel.generated.BlueCatbirdChatDefsDeviceApprovalBody) : BlueCatbirdChatDefsSignedDeviceApprovalBodyUnion
+
+    @Serializable
+    data class Unexpected(val value: JsonElement) : BlueCatbirdChatDefsSignedDeviceApprovalBodyUnion
+}
+
+object BlueCatbirdChatDefsSignedDeviceApprovalBodyUnionSerializer : kotlinx.serialization.KSerializer<BlueCatbirdChatDefsSignedDeviceApprovalBodyUnion> {
+    override val descriptor: kotlinx.serialization.descriptors.SerialDescriptor =
+        kotlinx.serialization.descriptors.buildClassSerialDescriptor("BlueCatbirdChatDefsSignedDeviceApprovalBodyUnion")
+
+    private val TYPE_DeviceApprovalBody = kotlinx.serialization.json.JsonPrimitive("blue.catbird.chat.defs#deviceApprovalBody")
+
+    override fun serialize(encoder: kotlinx.serialization.encoding.Encoder, value: BlueCatbirdChatDefsSignedDeviceApprovalBodyUnion) {
+        val jsonEncoder = encoder as kotlinx.serialization.json.JsonEncoder
+        val element = when (value) {
+            is BlueCatbirdChatDefsSignedDeviceApprovalBodyUnion.DeviceApprovalBody -> {
+                val obj = (jsonEncoder.json.encodeToJsonElement(
+                    blue.catbird.petrel.generated.BlueCatbirdChatDefsDeviceApprovalBody.serializer(),
+                    value.value
+                ) as? kotlinx.serialization.json.JsonObject)?.let { original ->
+                    val map = java.util.LinkedHashMap<String, kotlinx.serialization.json.JsonElement>(original.size + 1)
+                    map["\$type"] = TYPE_DeviceApprovalBody
+                    map.putAll(original)
+                    kotlinx.serialization.json.JsonObject(map)
+                } ?: kotlinx.serialization.json.buildJsonObject {
+                    put("\$type", TYPE_DeviceApprovalBody)
+                }
+                obj
+            }
+            is BlueCatbirdChatDefsSignedDeviceApprovalBodyUnion.Unexpected -> value.value
+            // Synthetic variants (e.g. <Union>Error / <Union>Unexpected added by
+            // subscription codegen) are runtime-only sentinels; JSON round-trip
+            // serialises them as an empty object tagged with the variant class
+            // name. Consumers should filter these before JSON serialisation.
+            else -> kotlinx.serialization.json.buildJsonObject {
+                put("\$type", kotlinx.serialization.json.JsonPrimitive(value::class.simpleName ?: "Unknown"))
+            }
+        }
+        jsonEncoder.encodeJsonElement(element)
+    }
+
+    override fun deserialize(decoder: kotlinx.serialization.encoding.Decoder): BlueCatbirdChatDefsSignedDeviceApprovalBodyUnion {
+        val jsonDecoder = decoder as? kotlinx.serialization.json.JsonDecoder
+            ?: throw kotlinx.serialization.SerializationException("BlueCatbirdChatDefsSignedDeviceApprovalBodyUnion can only be deserialized from JSON")
+        val element = jsonDecoder.decodeJsonElement()
+        val jsonObject = element as? kotlinx.serialization.json.JsonObject
+            ?: return BlueCatbirdChatDefsSignedDeviceApprovalBodyUnion.Unexpected(element)
+        val primitive = jsonObject["\$type"] as? kotlinx.serialization.json.JsonPrimitive
+        val type = if (primitive != null && primitive.isString) primitive.content else null
+            ?: return BlueCatbirdChatDefsSignedDeviceApprovalBodyUnion.Unexpected(element)
+
+        return when (type) {
+            "blue.catbird.chat.defs#deviceApprovalBody" -> BlueCatbirdChatDefsSignedDeviceApprovalBodyUnion.DeviceApprovalBody(
+                jsonDecoder.json.decodeFromJsonElement(blue.catbird.petrel.generated.BlueCatbirdChatDefsDeviceApprovalBody.serializer(), element)
+            )
+            else -> BlueCatbirdChatDefsSignedDeviceApprovalBodyUnion.Unexpected(element)
+        }
+    }
+}
+
 @Serializable(with = BlueCatbirdChatDefsSignedBlobUploadPreparationBodyUnionSerializer::class)
 sealed interface BlueCatbirdChatDefsSignedBlobUploadPreparationBodyUnion {
     @Serializable
@@ -4458,6 +4521,8 @@ enum class BlueCatbirdChatDefsDefsIncomingConsentPolicy {
 enum class BlueCatbirdChatDefsDefsDeviceStatus {
     @SerialName("active")
     value_active,
+    @SerialName("pending_approval")
+    value_pending_u5f_approval,
     @SerialName("revoked")
     value_revoked}
 
@@ -4908,7 +4973,10 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val createdAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("updatedAt")
         val updatedAt: BlueCatbirdChatDefsCanonicalDatetime,        @SerialName("availablePackageCount")
         val availablePackageCount: Int,        @SerialName("reservedPackageCount")
-        val reservedPackageCount: Int    ) {
+        val reservedPackageCount: Int,        @SerialName("deviceName")
+        val deviceName: String? = null,        @SerialName("lastActiveAt")
+        val lastActiveAt: BlueCatbirdChatDefsCanonicalDatetime? = null,        @SerialName("dormantAt")
+        val dormantAt: BlueCatbirdChatDefsCanonicalDatetime? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDeviceView"
         }
@@ -5378,6 +5446,25 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDeviceRevocationBody"
+        }
+    }
+
+    @Serializable
+    data class BlueCatbirdChatDefsDeviceApprovalBody(
+        @SerialName("signatureDomain")
+        val signatureDomain: String,        @SerialName("actorDid")
+        val actorDid: BlueCatbirdChatDefsBareDid,        @SerialName("actorDeviceId")
+        val actorDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("keyId")
+        val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("authGeneration")
+        val authGeneration: Long,        @SerialName("targetDeviceId")
+        val targetDeviceId: BlueCatbirdChatDefsDeviceId,        @SerialName("targetKeyId")
+        val targetKeyId: BlueCatbirdChatDefsKeyId,        @SerialName("targetSignaturePublicKey")
+        val targetSignaturePublicKey: Bytes,        @SerialName("targetAuthGeneration")
+        val targetAuthGeneration: Long,        @SerialName("idempotencyKey")
+        val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
+        val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsDeviceApprovalBody"
         }
     }
 
@@ -6505,6 +6592,16 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val signature: Bytes    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsSignedDeviceRevocation"
+        }
+    }
+
+    @Serializable
+    data class BlueCatbirdChatDefsSignedDeviceApproval(
+        @SerialName("body")
+        val body: BlueCatbirdChatDefsSignedDeviceApprovalBodyUnion,        @SerialName("signature")
+        val signature: Bytes    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsSignedDeviceApproval"
         }
     }
 

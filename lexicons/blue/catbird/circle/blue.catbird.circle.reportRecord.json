@@ -14,7 +14,14 @@
             "space": { "type": "string", "format": "space-ref" },
             "uri": { "type": "string", "format": "at-uri" },
             "reason": { "type": "string", "enum": ["spam", "abuse", "other"] },
-            "details": { "type": "string", "maxLength": 500 }
+            "details": { "type": "string", "maxLength": 500 },
+            "disclosedPostKey": { "type": "bytes", "minLength": 32, "maxLength": 32, "description": "Per-post key voluntarily disclosed by the reporter so moderators can read an encrypted post." },
+            "disclosedMedia": {
+              "type": "array",
+              "maxLength": 32,
+              "items": { "type": "ref", "ref": "#disclosedMedia" },
+              "description": "Decryption material for attachments the reporter chooses to disclose."
+            }
           }
         }
       },
@@ -35,6 +42,15 @@
         { "name": "ProtocolRevisionMismatch" },
         { "name": "UpstreamUnavailable" }
       ]
+    },
+    "disclosedMedia": {
+      "type": "object",
+      "required": ["cid", "key", "iv"],
+      "properties": {
+        "cid": { "type": "string", "maxLength": 128 },
+        "key": { "type": "bytes", "maxLength": 64 },
+        "iv": { "type": "bytes", "maxLength": 32 }
+      }
     }
   }
 }

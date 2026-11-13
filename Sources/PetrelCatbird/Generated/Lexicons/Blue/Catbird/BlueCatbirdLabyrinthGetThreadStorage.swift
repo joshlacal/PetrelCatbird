@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.getThreadStorage
 
+/// Resolve the authenticated current chat device's conversation-history placement. A Space placement requires the returned immutable generation and Space reference on every subsequent operation. This endpoint does not grant Spaces or MLS device authorization.
 public struct BlueCatbirdLabyrinthGetThreadStorage {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.getThreadStorage"
+
     public struct Parameters: Parametrizable {
         public let threadId: String
         public let actorDeviceId: String
@@ -24,79 +26,56 @@ public struct BlueCatbirdLabyrinthGetThreadStorage {
     public struct Output: ATProtocolCodable {
 
         public let placement: String
-
+        /// Immutable UUID identifying this conversation storage lifecycle. A recreated Space requires a new generation.
         public let generation: String
-
+        /// Required when placement is space; absent for mlsds.
         public let space: SpaceRef?
 
-        // Standard public initializer
         public init(
-
             placement: String,
-
             generation: String,
-
             space: SpaceRef? = nil
-
         ) {
-
             self.placement = placement
-
             self.generation = generation
-
             self.space = space
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
+            let strict = decoder.isATProtoStrictDecoding
             self.placement = try container.decode(String.self, forKey: .placement)
-
             self.generation = try container.decode(String.self, forKey: .generation)
-
             do {
-                self.space = try container.decodeIfPresent(SpaceRef.self, forKey: .space)
+                self.space = try container.decodeIfPresent(SpaceRef.self, forKey: .space, rejectingNull: strict)
             } catch {
-                // Forward compatibility: a malformed optional field must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'space' — degrading to nil: \(error)")
                 self.space = nil
             }
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(placement, forKey: .placement)
-
-            try container.encode(generation, forKey: .generation)
-
-            // Encode optional property even if it's an empty array
-            try container.encodeIfPresent(space, forKey: .space)
-
+            try container.encode(self.placement, forKey: .placement)
+            try container.encode(self.generation, forKey: .generation)
+            try container.encodeIfPresent(self.space, forKey: .space)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let placementValue = try placement.toCBORValue()
+            let placementValue = try self.placement.toCBORValue()
             map = map.adding(key: "placement", value: placementValue)
-
-            let generationValue = try generation.toCBORValue()
+            let generationValue = try self.generation.toCBORValue()
             map = map.adding(key: "generation", value: generationValue)
-
-            if let value = space {
-                // Encode optional property even if it's an empty array for CBOR
+            if let value = self.space {
                 let spaceValue = try value.toCBORValue()
                 map = map.adding(key: "space", value: spaceValue)
             }
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -104,7 +83,6 @@ public struct BlueCatbirdLabyrinthGetThreadStorage {
             case generation
             case space
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -128,9 +106,8 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
     /// Resolve the authenticated current chat device's conversation-history placement. A Space placement requires the returned immutable generation and Space reference on every subsequent operation. This endpoint does not grant Spaces or MLS device authorization.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdLabyrinthGetThreadStorage.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getThreadStorage(input: BlueCatbirdLabyrinthGetThreadStorage.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetThreadStorage.Output?) {
         let endpoint = "blue.catbird.labyrinth.getThreadStorage"
 
@@ -150,42 +127,24 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdLabyrinthGetThreadStorage.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.labyrinth.getThreadStorage: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdLabyrinthGetThreadStorage.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdLabyrinthGetThreadStorage.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdLabyrinthGetThreadStorage.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

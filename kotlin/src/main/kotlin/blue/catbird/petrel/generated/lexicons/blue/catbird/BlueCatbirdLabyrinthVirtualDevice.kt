@@ -34,7 +34,8 @@ object BlueCatbirdLabyrinthVirtualDeviceDefs {
         val mechanism: String,/** [CB-13] Recovery code sealed under a WebAuthn PRF-derived key. Present iff passkeyCredentialId is. */        @SerialName("passkeyWrappedCode")
         val passkeyWrappedCode: Bytes? = null,/** WebAuthn credential id for the PRF wrap. */        @SerialName("passkeyCredentialId")
         val passkeyCredentialId: Bytes? = null,        @SerialName("createdAt")
-        val createdAt: ATProtocolDate,/** [CB-39] Last successful restore or keep-alive, stamped by the server from its own clock (clients never write it). Keychain and passkey bundles expire 180 days after max(createdAt, lastUsedAt). */        @SerialName("lastUsedAt")
+        val createdAt: ATProtocolDate,/** XEdDSA signature by deviceKey over the account DID, vdeviceId, mechanism, and createdAt. */        @SerialName("metadataSig")
+        val metadataSig: Bytes? = null,/** [CB-39] Last successful restore or keep-alive, stamped by the server from its own clock (clients never write it). Keychain and passkey bundles expire 180 days after max(createdAt, lastUsedAt). */        @SerialName("lastUsedAt")
         val lastUsedAt: ATProtocolDate? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = ""

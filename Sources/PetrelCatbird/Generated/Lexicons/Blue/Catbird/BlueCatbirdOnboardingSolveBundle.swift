@@ -4,10 +4,13 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.onboarding.solveBundle
 
+/// Solve a role-balanced, pace-calibrated, hostility-guarded starting lineup of recommended accounts, community feeds, and inspectable starter packs.
 public struct BlueCatbirdOnboardingSolveBundle {
 
     public static let typeIdentifier = "blue.catbird.onboarding.solveBundle"
+
     public struct Input: ATProtocolCodable {
+
         public let selections: [BlueCatbirdOnboardingDefs.CommunitySelection]
         public let swipes: [BlueCatbirdOnboardingDefs.CalibrationSwipeAnswer]?
         public let controls: BlueCatbirdOnboardingDefs.BundleControls?
@@ -16,8 +19,15 @@ public struct BlueCatbirdOnboardingSolveBundle {
         public let excludedDids: [DID]?
         public let seedFollowDids: [DID]?
 
-        /// Standard public initializer
-        public init(selections: [BlueCatbirdOnboardingDefs.CommunitySelection], swipes: [BlueCatbirdOnboardingDefs.CalibrationSwipeAnswer]? = nil, controls: BlueCatbirdOnboardingDefs.BundleControls? = nil, targetSize: Int? = nil, pinnedDids: [DID]? = nil, excludedDids: [DID]? = nil, seedFollowDids: [DID]? = nil) {
+        public init(
+            selections: [BlueCatbirdOnboardingDefs.CommunitySelection],
+            swipes: [BlueCatbirdOnboardingDefs.CalibrationSwipeAnswer]? = nil,
+            controls: BlueCatbirdOnboardingDefs.BundleControls? = nil,
+            targetSize: Int? = nil,
+            pinnedDids: [DID]? = nil,
+            excludedDids: [DID]? = nil,
+            seedFollowDids: [DID]? = nil
+        ) {
             self.selections = selections
             self.swipes = swipes
             self.controls = controls
@@ -29,51 +39,52 @@ public struct BlueCatbirdOnboardingSolveBundle {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
             self.selections = try container.decode([BlueCatbirdOnboardingDefs.CommunitySelection].self, forKey: .selections)
-            self.swipes = try container.decodeIfPresent([BlueCatbirdOnboardingDefs.CalibrationSwipeAnswer].self, forKey: .swipes)
-            self.controls = try container.decodeIfPresent(BlueCatbirdOnboardingDefs.BundleControls.self, forKey: .controls)
-            self.targetSize = try container.decodeIfPresent(Int.self, forKey: .targetSize)
-            self.pinnedDids = try container.decodeIfPresent([DID].self, forKey: .pinnedDids)
-            self.excludedDids = try container.decodeIfPresent([DID].self, forKey: .excludedDids)
-            self.seedFollowDids = try container.decodeIfPresent([DID].self, forKey: .seedFollowDids)
+            self.swipes = try container.decodeIfPresent([BlueCatbirdOnboardingDefs.CalibrationSwipeAnswer].self, forKey: .swipes, rejectingNull: strict)
+            self.controls = try container.decodeIfPresent(BlueCatbirdOnboardingDefs.BundleControls.self, forKey: .controls, rejectingNull: strict)
+            self.targetSize = try container.decodeIfPresent(Int.self, forKey: .targetSize, rejectingNull: strict)
+            self.pinnedDids = try container.decodeIfPresent([DID].self, forKey: .pinnedDids, rejectingNull: strict)
+            self.excludedDids = try container.decodeIfPresent([DID].self, forKey: .excludedDids, rejectingNull: strict)
+            self.seedFollowDids = try container.decodeIfPresent([DID].self, forKey: .seedFollowDids, rejectingNull: strict)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(selections, forKey: .selections)
-            try container.encodeIfPresent(swipes, forKey: .swipes)
-            try container.encodeIfPresent(controls, forKey: .controls)
-            try container.encodeIfPresent(targetSize, forKey: .targetSize)
-            try container.encodeIfPresent(pinnedDids, forKey: .pinnedDids)
-            try container.encodeIfPresent(excludedDids, forKey: .excludedDids)
-            try container.encodeIfPresent(seedFollowDids, forKey: .seedFollowDids)
+            try container.encode(self.selections, forKey: .selections)
+            try container.encodeIfPresent(self.swipes, forKey: .swipes)
+            try container.encodeIfPresent(self.controls, forKey: .controls)
+            try container.encodeIfPresent(self.targetSize, forKey: .targetSize)
+            try container.encodeIfPresent(self.pinnedDids, forKey: .pinnedDids)
+            try container.encodeIfPresent(self.excludedDids, forKey: .excludedDids)
+            try container.encodeIfPresent(self.seedFollowDids, forKey: .seedFollowDids)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let selectionsValue = try selections.toCBORValue()
+            let selectionsValue = try self.selections.toCBORValue()
             map = map.adding(key: "selections", value: selectionsValue)
-            if let value = swipes {
+            if let value = self.swipes {
                 let swipesValue = try value.toCBORValue()
                 map = map.adding(key: "swipes", value: swipesValue)
             }
-            if let value = controls {
+            if let value = self.controls {
                 let controlsValue = try value.toCBORValue()
                 map = map.adding(key: "controls", value: controlsValue)
             }
-            if let value = targetSize {
+            if let value = self.targetSize {
                 let targetSizeValue = try value.toCBORValue()
                 map = map.adding(key: "targetSize", value: targetSizeValue)
             }
-            if let value = pinnedDids {
+            if let value = self.pinnedDids {
                 let pinnedDidsValue = try value.toCBORValue()
                 map = map.adding(key: "pinnedDids", value: pinnedDidsValue)
             }
-            if let value = excludedDids {
+            if let value = self.excludedDids {
                 let excludedDidsValue = try value.toCBORValue()
                 map = map.adding(key: "excludedDids", value: excludedDidsValue)
             }
-            if let value = seedFollowDids {
+            if let value = self.seedFollowDids {
                 let seedFollowDidsValue = try value.toCBORValue()
                 map = map.adding(key: "seedFollowDids", value: seedFollowDidsValue)
             }
@@ -94,134 +105,77 @@ public struct BlueCatbirdOnboardingSolveBundle {
     public struct Output: ATProtocolCodable {
 
         public let sessionId: String
-
         public let catalogVersion: String
-
         public let solveMs: Int
-
         public let summary: BlueCatbirdOnboardingDefs.BundleSummary
-
         public let follows: [BlueCatbirdOnboardingDefs.RecommendedFollow]
-
         public let feeds: [BlueCatbirdOnboardingDefs.RecommendedFeed]
-
         public let starterPacks: [BlueCatbirdOnboardingDefs.RecommendedStarterPack]
-
         public let harmoniousNeighbors: [BlueCatbirdIntelDefs.CommunitySummary]
 
-        // Standard public initializer
         public init(
-
             sessionId: String,
-
             catalogVersion: String,
-
             solveMs: Int,
-
             summary: BlueCatbirdOnboardingDefs.BundleSummary,
-
             follows: [BlueCatbirdOnboardingDefs.RecommendedFollow],
-
             feeds: [BlueCatbirdOnboardingDefs.RecommendedFeed],
-
             starterPacks: [BlueCatbirdOnboardingDefs.RecommendedStarterPack],
-
             harmoniousNeighbors: [BlueCatbirdIntelDefs.CommunitySummary]
-
         ) {
-
             self.sessionId = sessionId
-
             self.catalogVersion = catalogVersion
-
             self.solveMs = solveMs
-
             self.summary = summary
-
             self.follows = follows
-
             self.feeds = feeds
-
             self.starterPacks = starterPacks
-
             self.harmoniousNeighbors = harmoniousNeighbors
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.sessionId = try container.decode(String.self, forKey: .sessionId)
-
             self.catalogVersion = try container.decode(String.self, forKey: .catalogVersion)
-
             self.solveMs = try container.decode(Int.self, forKey: .solveMs)
-
             self.summary = try container.decode(BlueCatbirdOnboardingDefs.BundleSummary.self, forKey: .summary)
-
             self.follows = try container.decode([BlueCatbirdOnboardingDefs.RecommendedFollow].self, forKey: .follows)
-
             self.feeds = try container.decode([BlueCatbirdOnboardingDefs.RecommendedFeed].self, forKey: .feeds)
-
             self.starterPacks = try container.decode([BlueCatbirdOnboardingDefs.RecommendedStarterPack].self, forKey: .starterPacks)
-
             self.harmoniousNeighbors = try container.decode([BlueCatbirdIntelDefs.CommunitySummary].self, forKey: .harmoniousNeighbors)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(sessionId, forKey: .sessionId)
-
-            try container.encode(catalogVersion, forKey: .catalogVersion)
-
-            try container.encode(solveMs, forKey: .solveMs)
-
-            try container.encode(summary, forKey: .summary)
-
-            try container.encode(follows, forKey: .follows)
-
-            try container.encode(feeds, forKey: .feeds)
-
-            try container.encode(starterPacks, forKey: .starterPacks)
-
-            try container.encode(harmoniousNeighbors, forKey: .harmoniousNeighbors)
-
+            try container.encode(self.sessionId, forKey: .sessionId)
+            try container.encode(self.catalogVersion, forKey: .catalogVersion)
+            try container.encode(self.solveMs, forKey: .solveMs)
+            try container.encode(self.summary, forKey: .summary)
+            try container.encode(self.follows, forKey: .follows)
+            try container.encode(self.feeds, forKey: .feeds)
+            try container.encode(self.starterPacks, forKey: .starterPacks)
+            try container.encode(self.harmoniousNeighbors, forKey: .harmoniousNeighbors)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let sessionIdValue = try sessionId.toCBORValue()
+            let sessionIdValue = try self.sessionId.toCBORValue()
             map = map.adding(key: "sessionId", value: sessionIdValue)
-
-            let catalogVersionValue = try catalogVersion.toCBORValue()
+            let catalogVersionValue = try self.catalogVersion.toCBORValue()
             map = map.adding(key: "catalogVersion", value: catalogVersionValue)
-
-            let solveMsValue = try solveMs.toCBORValue()
+            let solveMsValue = try self.solveMs.toCBORValue()
             map = map.adding(key: "solveMs", value: solveMsValue)
-
-            let summaryValue = try summary.toCBORValue()
+            let summaryValue = try self.summary.toCBORValue()
             map = map.adding(key: "summary", value: summaryValue)
-
-            let followsValue = try follows.toCBORValue()
+            let followsValue = try self.follows.toCBORValue()
             map = map.adding(key: "follows", value: followsValue)
-
-            let feedsValue = try feeds.toCBORValue()
+            let feedsValue = try self.feeds.toCBORValue()
             map = map.adding(key: "feeds", value: feedsValue)
-
-            let starterPacksValue = try starterPacks.toCBORValue()
+            let starterPacksValue = try self.starterPacks.toCBORValue()
             map = map.adding(key: "starterPacks", value: starterPacksValue)
-
-            let harmoniousNeighborsValue = try harmoniousNeighbors.toCBORValue()
+            let harmoniousNeighborsValue = try self.harmoniousNeighbors.toCBORValue()
             map = map.adding(key: "harmoniousNeighbors", value: harmoniousNeighborsValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -234,7 +188,6 @@ public struct BlueCatbirdOnboardingSolveBundle {
             case starterPacks
             case harmoniousNeighbors
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -256,11 +209,10 @@ extension ATProtoClient.Blue.Catbird.Onboarding {
     // MARK: - solveBundle
     /// Solve a role-balanced, pace-calibrated, hostility-guarded starting lineup of recommended accounts, community feeds, and inspectable starter packs.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdOnboardingSolveBundle.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func solveBundle(
 
         input: BlueCatbirdOnboardingSolveBundle.Input
@@ -292,44 +244,24 @@ extension ATProtoClient.Blue.Catbird.Onboarding {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdOnboardingSolveBundle.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdOnboardingSolveBundle.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.onboarding.solveBundle: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdOnboardingSolveBundle.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdOnboardingSolveBundle.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

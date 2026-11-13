@@ -4,17 +4,24 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.onboarding.previewTimeline
 
+/// Generate a viewer-safe post AT-URI skeleton preview of what the user's timeline will feel like before committing any follows.
 public struct BlueCatbirdOnboardingPreviewTimeline {
 
     public static let typeIdentifier = "blue.catbird.onboarding.previewTimeline"
+
     public struct Input: ATProtocolCodable {
+
         public let selections: [BlueCatbirdOnboardingDefs.CommunitySelection]
         public let swipes: [BlueCatbirdOnboardingDefs.CalibrationSwipeAnswer]?
         public let controls: BlueCatbirdOnboardingDefs.BundleControls?
         public let limit: Int?
 
-        /// Standard public initializer
-        public init(selections: [BlueCatbirdOnboardingDefs.CommunitySelection], swipes: [BlueCatbirdOnboardingDefs.CalibrationSwipeAnswer]? = nil, controls: BlueCatbirdOnboardingDefs.BundleControls? = nil, limit: Int? = nil) {
+        public init(
+            selections: [BlueCatbirdOnboardingDefs.CommunitySelection],
+            swipes: [BlueCatbirdOnboardingDefs.CalibrationSwipeAnswer]? = nil,
+            controls: BlueCatbirdOnboardingDefs.BundleControls? = nil,
+            limit: Int? = nil
+        ) {
             self.selections = selections
             self.swipes = swipes
             self.controls = controls
@@ -23,33 +30,34 @@ public struct BlueCatbirdOnboardingPreviewTimeline {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
             self.selections = try container.decode([BlueCatbirdOnboardingDefs.CommunitySelection].self, forKey: .selections)
-            self.swipes = try container.decodeIfPresent([BlueCatbirdOnboardingDefs.CalibrationSwipeAnswer].self, forKey: .swipes)
-            self.controls = try container.decodeIfPresent(BlueCatbirdOnboardingDefs.BundleControls.self, forKey: .controls)
-            self.limit = try container.decodeIfPresent(Int.self, forKey: .limit)
+            self.swipes = try container.decodeIfPresent([BlueCatbirdOnboardingDefs.CalibrationSwipeAnswer].self, forKey: .swipes, rejectingNull: strict)
+            self.controls = try container.decodeIfPresent(BlueCatbirdOnboardingDefs.BundleControls.self, forKey: .controls, rejectingNull: strict)
+            self.limit = try container.decodeIfPresent(Int.self, forKey: .limit, rejectingNull: strict)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(selections, forKey: .selections)
-            try container.encodeIfPresent(swipes, forKey: .swipes)
-            try container.encodeIfPresent(controls, forKey: .controls)
-            try container.encodeIfPresent(limit, forKey: .limit)
+            try container.encode(self.selections, forKey: .selections)
+            try container.encodeIfPresent(self.swipes, forKey: .swipes)
+            try container.encodeIfPresent(self.controls, forKey: .controls)
+            try container.encodeIfPresent(self.limit, forKey: .limit)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let selectionsValue = try selections.toCBORValue()
+            let selectionsValue = try self.selections.toCBORValue()
             map = map.adding(key: "selections", value: selectionsValue)
-            if let value = swipes {
+            if let value = self.swipes {
                 let swipesValue = try value.toCBORValue()
                 map = map.adding(key: "swipes", value: swipesValue)
             }
-            if let value = controls {
+            if let value = self.controls {
                 let controlsValue = try value.toCBORValue()
                 map = map.adding(key: "controls", value: controlsValue)
             }
-            if let value = limit {
+            if let value = self.limit {
                 let limitValue = try value.toCBORValue()
                 map = map.adding(key: "limit", value: limitValue)
             }
@@ -67,69 +75,42 @@ public struct BlueCatbirdOnboardingPreviewTimeline {
     public struct Output: ATProtocolCodable {
 
         public let catalogVersion: String
-
         public let items: [BlueCatbirdIntelDefs.PostSkeletonItem]
-
         public let estimatedDailyPosts: Int
 
-        // Standard public initializer
         public init(
-
             catalogVersion: String,
-
             items: [BlueCatbirdIntelDefs.PostSkeletonItem],
-
             estimatedDailyPosts: Int
-
         ) {
-
             self.catalogVersion = catalogVersion
-
             self.items = items
-
             self.estimatedDailyPosts = estimatedDailyPosts
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.catalogVersion = try container.decode(String.self, forKey: .catalogVersion)
-
             self.items = try container.decode([BlueCatbirdIntelDefs.PostSkeletonItem].self, forKey: .items)
-
             self.estimatedDailyPosts = try container.decode(Int.self, forKey: .estimatedDailyPosts)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(catalogVersion, forKey: .catalogVersion)
-
-            try container.encode(items, forKey: .items)
-
-            try container.encode(estimatedDailyPosts, forKey: .estimatedDailyPosts)
-
+            try container.encode(self.catalogVersion, forKey: .catalogVersion)
+            try container.encode(self.items, forKey: .items)
+            try container.encode(self.estimatedDailyPosts, forKey: .estimatedDailyPosts)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let catalogVersionValue = try catalogVersion.toCBORValue()
+            let catalogVersionValue = try self.catalogVersion.toCBORValue()
             map = map.adding(key: "catalogVersion", value: catalogVersionValue)
-
-            let itemsValue = try items.toCBORValue()
+            let itemsValue = try self.items.toCBORValue()
             map = map.adding(key: "items", value: itemsValue)
-
-            let estimatedDailyPostsValue = try estimatedDailyPosts.toCBORValue()
+            let estimatedDailyPostsValue = try self.estimatedDailyPosts.toCBORValue()
             map = map.adding(key: "estimatedDailyPosts", value: estimatedDailyPostsValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -137,7 +118,6 @@ public struct BlueCatbirdOnboardingPreviewTimeline {
             case items
             case estimatedDailyPosts
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -159,11 +139,10 @@ extension ATProtoClient.Blue.Catbird.Onboarding {
     // MARK: - previewTimeline
     /// Generate a viewer-safe post AT-URI skeleton preview of what the user's timeline will feel like before committing any follows.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdOnboardingPreviewTimeline.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func previewTimeline(
 
         input: BlueCatbirdOnboardingPreviewTimeline.Input
@@ -195,44 +174,24 @@ extension ATProtoClient.Blue.Catbird.Onboarding {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdOnboardingPreviewTimeline.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdOnboardingPreviewTimeline.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.onboarding.previewTimeline: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdOnboardingPreviewTimeline.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdOnboardingPreviewTimeline.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

@@ -4,17 +4,24 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.push.registerKey
 
+/// Registers a client's native APNs/FCM push token with Catbird's authenticated Push Gateway (nest, D2), binding a fresh 256-bit CSPRNG pushKey to (account_did, device_id, app_id, allowed_mls_service_did) resolved from the user's #atproto_mls DID document service.
 public struct BlueCatbirdPushRegisterKey {
 
     public static let typeIdentifier = "blue.catbird.push.registerKey"
+
     public struct Input: ATProtocolCodable {
+
         public let deviceId: String
         public let appId: String
         public let platform: InputPlatform
         public let nativeToken: String
 
-        /// Standard public initializer
-        public init(deviceId: String, appId: String, platform: InputPlatform, nativeToken: String) {
+        public init(
+            deviceId: String,
+            appId: String,
+            platform: InputPlatform,
+            nativeToken: String
+        ) {
             self.deviceId = deviceId
             self.appId = appId
             self.platform = platform
@@ -31,21 +38,21 @@ public struct BlueCatbirdPushRegisterKey {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(deviceId, forKey: .deviceId)
-            try container.encode(appId, forKey: .appId)
-            try container.encode(platform, forKey: .platform)
-            try container.encode(nativeToken, forKey: .nativeToken)
+            try container.encode(self.deviceId, forKey: .deviceId)
+            try container.encode(self.appId, forKey: .appId)
+            try container.encode(self.platform, forKey: .platform)
+            try container.encode(self.nativeToken, forKey: .nativeToken)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let deviceIdValue = try deviceId.toCBORValue()
+            let deviceIdValue = try self.deviceId.toCBORValue()
             map = map.adding(key: "deviceId", value: deviceIdValue)
-            let appIdValue = try appId.toCBORValue()
+            let appIdValue = try self.appId.toCBORValue()
             map = map.adding(key: "appId", value: appIdValue)
-            let platformValue = try platform.toCBORValue()
+            let platformValue = try self.platform.toCBORValue()
             map = map.adding(key: "platform", value: platformValue)
-            let nativeTokenValue = try nativeToken.toCBORValue()
+            let nativeTokenValue = try self.nativeToken.toCBORValue()
             map = map.adding(key: "nativeToken", value: nativeTokenValue)
             return map
         }
@@ -61,69 +68,42 @@ public struct BlueCatbirdPushRegisterKey {
     public struct Output: ATProtocolCodable {
 
         public let gatewayUrl: URI
-
         public let appId: String
-
         public let pushKey: String
 
-        // Standard public initializer
         public init(
-
             gatewayUrl: URI,
-
             appId: String,
-
             pushKey: String
-
         ) {
-
             self.gatewayUrl = gatewayUrl
-
             self.appId = appId
-
             self.pushKey = pushKey
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.gatewayUrl = try container.decode(URI.self, forKey: .gatewayUrl)
-
             self.appId = try container.decode(String.self, forKey: .appId)
-
             self.pushKey = try container.decode(String.self, forKey: .pushKey)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(gatewayUrl, forKey: .gatewayUrl)
-
-            try container.encode(appId, forKey: .appId)
-
-            try container.encode(pushKey, forKey: .pushKey)
-
+            try container.encode(self.gatewayUrl, forKey: .gatewayUrl)
+            try container.encode(self.appId, forKey: .appId)
+            try container.encode(self.pushKey, forKey: .pushKey)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let gatewayUrlValue = try gatewayUrl.toCBORValue()
+            let gatewayUrlValue = try self.gatewayUrl.toCBORValue()
             map = map.adding(key: "gatewayUrl", value: gatewayUrlValue)
-
-            let appIdValue = try appId.toCBORValue()
+            let appIdValue = try self.appId.toCBORValue()
             map = map.adding(key: "appId", value: appIdValue)
-
-            let pushKeyValue = try pushKey.toCBORValue()
+            let pushKeyValue = try self.pushKey.toCBORValue()
             map = map.adding(key: "pushKey", value: pushKeyValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -131,7 +111,6 @@ public struct BlueCatbirdPushRegisterKey {
             case appId
             case pushKey
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -169,11 +148,10 @@ extension ATProtoClient.Blue.Catbird.Push {
     // MARK: - registerKey
     /// Registers a client's native APNs/FCM push token with Catbird's authenticated Push Gateway (nest, D2), binding a fresh 256-bit CSPRNG pushKey to (account_did, device_id, app_id, allowed_mls_service_did) resolved from the user's #atproto_mls DID document service.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdPushRegisterKey.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func registerKey(
 
         input: BlueCatbirdPushRegisterKey.Input
@@ -205,44 +183,24 @@ extension ATProtoClient.Blue.Catbird.Push {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdPushRegisterKey.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdPushRegisterKey.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.push.registerKey: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdPushRegisterKey.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdPushRegisterKey.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

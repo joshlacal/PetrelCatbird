@@ -8,87 +8,93 @@ public struct PlaceStreamBadgeDefs {
 
     public static let typeIdentifier = "place.stream.badge.defs"
 
+    /// View of a badge record, with fields resolved for display. If the DID in issuer is not the current streamplace node, the signature field shall be required.
     public struct BadgeView: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "place.stream.badge.defs#badgeView"
+
         public let badgeType: String
+        /// DID of the badge issuer.
         public let issuer: DID
+        /// DID of the badge recipient.
         public let recipient: DID
+        /// TODO: Cryptographic signature of the badge (of a place.stream.key).
         public let signature: String?
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
 
         public init(
-            badgeType: String, issuer: DID, recipient: DID, signature: String? = nil
+            badgeType: String,
+            issuer: DID,
+            recipient: DID,
+            signature: String? = nil,
+            extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.badgeType = badgeType
             self.issuer = issuer
             self.recipient = recipient
             self.signature = signature
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
+            self.badgeType = try container.decode(String.self, forKey: .badgeType)
+            self.issuer = try container.decode(DID.self, forKey: .issuer)
+            self.recipient = try container.decode(DID.self, forKey: .recipient)
             do {
-                self.badgeType = try container.decode(String.self, forKey: .badgeType)
+                self.signature = try container.decodeIfPresent(String.self, forKey: .signature, rejectingNull: strict)
             } catch {
-                LogManager.logError("Decoding error for required property 'badgeType': \(error)")
-                throw error
-            }
-            do {
-                self.issuer = try container.decode(DID.self, forKey: .issuer)
-            } catch {
-                LogManager.logError("Decoding error for required property 'issuer': \(error)")
-                throw error
-            }
-            do {
-                self.recipient = try container.decode(DID.self, forKey: .recipient)
-            } catch {
-                LogManager.logError("Decoding error for required property 'recipient': \(error)")
-                throw error
-            }
-            do {
-                self.signature = try container.decodeIfPresent(String.self, forKey: .signature)
-            } catch {
-                // Forward compatibility: a malformed or unknown-shaped optional field
-                // must not fail the whole response.
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
                 LogManager.logWarning("Decoding error for optional property 'signature' — degrading to nil: \(error)")
                 self.signature = nil
+                malformedFields.insert("signature")
             }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-            try container.encode(badgeType, forKey: .badgeType)
-            try container.encode(issuer, forKey: .issuer)
-            try container.encode(recipient, forKey: .recipient)
-            try container.encodeIfPresent(signature, forKey: .signature)
+            try container.encode(self.badgeType, forKey: .badgeType)
+            try container.encode(self.issuer, forKey: .issuer)
+            try container.encode(self.recipient, forKey: .recipient)
+            try container.encodeIfPresent(self.signature, forKey: .signature)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(badgeType)
-            hasher.combine(issuer)
-            hasher.combine(recipient)
-            if let value = signature {
+            hasher.combine(self.badgeType)
+            hasher.combine(self.issuer)
+            hasher.combine(self.recipient)
+            if let value = self.signature {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
             }
+            hasher.combine(extraFields)
         }
 
         public func isEqual(to other: any ATProtocolValue) -> Bool {
             guard let other = other as? Self else { return false }
-            if badgeType != other.badgeType {
+            if self.badgeType != other.badgeType {
                 return false
             }
-            if issuer != other.issuer {
+            if self.issuer != other.issuer {
                 return false
             }
-            if recipient != other.recipient {
+            if self.recipient != other.recipient {
                 return false
             }
-            if signature != other.signature {
+            if self.signature != other.signature {
                 return false
             }
-            return true
+            return self.extraFields == other.extraFields
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -97,27 +103,48 @@ public struct PlaceStreamBadgeDefs {
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            map = map.adding(key: "$type", value: Self.typeIdentifier)
-            let badgeTypeValue = try badgeType.toCBORValue()
+            let badgeTypeValue = try self.badgeType.toCBORValue()
             map = map.adding(key: "badgeType", value: badgeTypeValue)
-            let issuerValue = try issuer.toCBORValue()
+            let issuerValue = try self.issuer.toCBORValue()
             map = map.adding(key: "issuer", value: issuerValue)
-            let recipientValue = try recipient.toCBORValue()
+            let recipientValue = try self.recipient.toCBORValue()
             map = map.adding(key: "recipient", value: recipientValue)
-            if let value = signature {
+            if let value = self.signature {
                 let signatureValue = try value.toCBORValue()
                 map = map.adding(key: "signature", value: signatureValue)
             }
-            return map
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "badgeType", "issuer", "recipient", "signature"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "badgeType": return true
+            case "issuer": return true
+            case "recipient": return true
+            case "signature": return self.signature != nil
+            default: return false
+            }
         }
 
         private enum CodingKeys: String, CodingKey {
-            case typeIdentifier = "$type"
             case badgeType
             case issuer
             case recipient
             case signature
         }
     }
+
+    /// This user is a moderator. Displayed with a sword icon.
+    public static let mod = "place.stream.badge.defs#mod"
+
+    /// This user is the streamer. Displayed with a star icon.
+    public static let streamer = "place.stream.badge.defs#streamer"
+
+    /// This user is a very important person.
+    public static let vip = "place.stream.badge.defs#vip"
 
 }

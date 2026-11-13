@@ -4,124 +4,180 @@ import Petrel
 
 // lexicon: 1, id: place.stream.video
 
+/// Record representing a video on Streamplace
 public struct PlaceStreamVideo: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "place.stream.video"
+
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "tid")
+
+    /// The title of the video.
     public let title: String
+    /// The duration of the video in nanoseconds.
     public let duration: Int?
+    /// Client-declared timestamp when this video was created.
     public let createdAt: ATProtocolDate
     public let thumb: Blob?
+    /// Optional description of the video.
     public let description: String?
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
 
-    public init(title: String, duration: Int? = nil, createdAt: ATProtocolDate, thumb: Blob? = nil, description: String? = nil) {
+    public init(
+        title: String,
+        duration: Int? = nil,
+        createdAt: ATProtocolDate,
+        thumb: Blob? = nil,
+        description: String? = nil,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.title = title
         self.duration = duration
         self.createdAt = createdAt
         self.thumb = thumb
         self.description = description
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         self.title = try container.decode(String.self, forKey: .title)
         do {
-            self.duration = try container.decodeIfPresent(Int.self, forKey: .duration)
+            self.duration = try container.decodeIfPresent(Int.self, forKey: .duration, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'duration' — degrading to nil: \(error)")
             self.duration = nil
+            malformedFields.insert("duration")
         }
         self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            self.thumb = try container.decodeIfPresent(Blob.self, forKey: .thumb)
+            self.thumb = try container.decodeIfPresent(Blob.self, forKey: .thumb, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'thumb' — degrading to nil: \(error)")
             self.thumb = nil
+            malformedFields.insert("thumb")
         }
         do {
-            self.description = try container.decodeIfPresent(String.self, forKey: .description)
+            self.description = try container.decodeIfPresent(String.self, forKey: .description, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'description' — degrading to nil: \(error)")
             self.description = nil
+            malformedFields.insert("description")
         }
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(title, forKey: .title)
-        try container.encodeIfPresent(duration, forKey: .duration)
-        try container.encode(createdAt, forKey: .createdAt)
-        try container.encodeIfPresent(thumb, forKey: .thumb)
-        try container.encodeIfPresent(description, forKey: .description)
+        try container.encode(self.title, forKey: .title)
+        try container.encodeIfPresent(self.duration, forKey: .duration)
+        try container.encode(self.createdAt, forKey: .createdAt)
+        try container.encodeIfPresent(self.thumb, forKey: .thumb)
+        try container.encodeIfPresent(self.description, forKey: .description)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.title)
+        if let value = self.duration {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(self.createdAt)
+        if let value = self.thumb {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        if let value = self.description {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.title != other.title {
+            return false
+        }
+        if self.duration != other.duration {
+            return false
+        }
+        if self.createdAt != other.createdAt {
+            return false
+        }
+        if self.thumb != other.thumb {
+            return false
+        }
+        if self.description != other.description {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if title != other.title {
-            return false
-        }
-        if duration != other.duration {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        if thumb != other.thumb {
-            return false
-        }
-        if description != other.description {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(title)
-        if let value = duration {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        hasher.combine(createdAt)
-        if let value = thumb {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        if let value = description {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let titleValue = try title.toCBORValue()
+        let titleValue = try self.title.toCBORValue()
         map = map.adding(key: "title", value: titleValue)
-        if let value = duration {
+        if let value = self.duration {
             let durationValue = try value.toCBORValue()
             map = map.adding(key: "duration", value: durationValue)
         }
-        let createdAtValue = try createdAt.toCBORValue()
+        let createdAtValue = try self.createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
-        if let value = thumb {
+        if let value = self.thumb {
             let thumbValue = try value.toCBORValue()
             map = map.adding(key: "thumb", value: thumbValue)
         }
-        if let value = description {
+        if let value = self.description {
             let descriptionValue = try value.toCBORValue()
             map = map.adding(key: "description", value: descriptionValue)
         }
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "title", "duration", "createdAt", "thumb", "description"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "title": return true
+        case "duration": return self.duration != nil
+        case "createdAt": return true
+        case "thumb": return self.thumb != nil
+        case "description": return self.description != nil
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

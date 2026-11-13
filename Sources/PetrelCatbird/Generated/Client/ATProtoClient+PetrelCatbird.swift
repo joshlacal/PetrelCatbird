@@ -114,56 +114,6 @@ public extension ATProtoClient {
                 self.networkService = networkService
             }
 
-            public var defs: Defs { Defs(networkService: networkService) }
-
-            public struct Defs: Sendable {
-                public let networkService: NetworkService
-                public init(networkService: NetworkService) {
-                    self.networkService = networkService
-                }
-
-            }
-
-            public var key: Key { Key(networkService: networkService) }
-
-            public struct Key: Sendable {
-                public let networkService: NetworkService
-                public init(networkService: NetworkService) {
-                    self.networkService = networkService
-                }
-
-            }
-
-            public var livestream: Livestream { Livestream(networkService: networkService) }
-
-            public struct Livestream: Sendable {
-                public let networkService: NetworkService
-                public init(networkService: NetworkService) {
-                    self.networkService = networkService
-                }
-
-            }
-
-            public var segment: Segment { Segment(networkService: networkService) }
-
-            public struct Segment: Sendable {
-                public let networkService: NetworkService
-                public init(networkService: NetworkService) {
-                    self.networkService = networkService
-                }
-
-            }
-
-            public var video: Video { Video(networkService: networkService) }
-
-            public struct Video: Sendable {
-                public let networkService: NetworkService
-                public init(networkService: NetworkService) {
-                    self.networkService = networkService
-                }
-
-            }
-
             public var badge: Badge { Badge(networkService: networkService) }
 
             public struct Badge: Sendable {

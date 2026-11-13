@@ -4,14 +4,18 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.activateReset
 
+/// An active registered device of an active admin DID authorizes an exact unexpired pending request; it need not be an old-generation leaf. Activation preserves immutable conversationKind plus every participant status/role/provenance, atomically supersedes the old generation, closes every old application interval at the reset seq, and installs the activator-only epoch-zero successor leaf. Every other participant has zero successor leaves: active participants recover through their own signed requests and pending participants remain pending. There is no reset reservation, bootstrap Commit, or Welcome. Metadata is either the same signed content/version/origin reencrypted with a fresh nonce or an activator-signed empty prior-version-plus-one snapshot.
 public struct BlueCatbirdChatActivateReset {
 
     public static let typeIdentifier = "blue.catbird.chat.activateReset"
+
     public struct Input: ATProtocolCodable {
+
         public let signedRequest: BlueCatbirdChatDefs.SignedResetActivation
 
-        /// Standard public initializer
-        public init(signedRequest: BlueCatbirdChatDefs.SignedResetActivation) {
+        public init(
+            signedRequest: BlueCatbirdChatDefs.SignedResetActivation
+        ) {
             self.signedRequest = signedRequest
         }
 
@@ -22,12 +26,12 @@ public struct BlueCatbirdChatActivateReset {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encode(self.signedRequest, forKey: .signedRequest)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let signedRequestValue = try signedRequest.toCBORValue()
+            let signedRequestValue = try self.signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
             return map
         }
@@ -40,69 +44,42 @@ public struct BlueCatbirdChatActivateReset {
     public struct Output: ATProtocolCodable {
 
         public let retiredCoordinates: BlueCatbirdChatDefs.ConversationCoordinates
-
         public let successorCoordinates: BlueCatbirdChatDefs.ConversationCoordinates
-
         public let entry: BlueCatbirdChatDefs.ResetActivationEntry
 
-        // Standard public initializer
         public init(
-
             retiredCoordinates: BlueCatbirdChatDefs.ConversationCoordinates,
-
             successorCoordinates: BlueCatbirdChatDefs.ConversationCoordinates,
-
             entry: BlueCatbirdChatDefs.ResetActivationEntry
-
         ) {
-
             self.retiredCoordinates = retiredCoordinates
-
             self.successorCoordinates = successorCoordinates
-
             self.entry = entry
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.retiredCoordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .retiredCoordinates)
-
             self.successorCoordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .successorCoordinates)
-
             self.entry = try container.decode(BlueCatbirdChatDefs.ResetActivationEntry.self, forKey: .entry)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(retiredCoordinates, forKey: .retiredCoordinates)
-
-            try container.encode(successorCoordinates, forKey: .successorCoordinates)
-
-            try container.encode(entry, forKey: .entry)
-
+            try container.encode(self.retiredCoordinates, forKey: .retiredCoordinates)
+            try container.encode(self.successorCoordinates, forKey: .successorCoordinates)
+            try container.encode(self.entry, forKey: .entry)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let retiredCoordinatesValue = try retiredCoordinates.toCBORValue()
+            let retiredCoordinatesValue = try self.retiredCoordinates.toCBORValue()
             map = map.adding(key: "retiredCoordinates", value: retiredCoordinatesValue)
-
-            let successorCoordinatesValue = try successorCoordinates.toCBORValue()
+            let successorCoordinatesValue = try self.successorCoordinates.toCBORValue()
             map = map.adding(key: "successorCoordinates", value: successorCoordinatesValue)
-
-            let entryValue = try entry.toCBORValue()
+            let entryValue = try self.entry.toCBORValue()
             map = map.adding(key: "entry", value: entryValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -110,7 +87,6 @@ public struct BlueCatbirdChatActivateReset {
             case successorCoordinates
             case entry
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -153,11 +129,10 @@ extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - activateReset
     /// An active registered device of an active admin DID authorizes an exact unexpired pending request; it need not be an old-generation leaf. Activation preserves immutable conversationKind plus every participant status/role/provenance, atomically supersedes the old generation, closes every old application interval at the reset seq, and installs the activator-only epoch-zero successor leaf. Every other participant has zero successor leaves: active participants recover through their own signed requests and pending participants remain pending. There is no reset reservation, bootstrap Commit, or Welcome. Metadata is either the same signed content/version/origin reencrypted with a fresh nonce or an activator-signed empty prior-version-plus-one snapshot.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdChatActivateReset.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func activateReset(
 
         input: BlueCatbirdChatActivateReset.Input
@@ -189,44 +164,24 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdChatActivateReset.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatActivateReset.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.activateReset: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdChatActivateReset.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdChatActivateReset.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

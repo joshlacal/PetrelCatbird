@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.onboarding.getCatalog
 
+/// Fetch the onboarding scene catalog, featured diverse communities, and optional warm-start orbit communities seeded from accounts the user already follows.
 public struct BlueCatbirdOnboardingGetCatalog {
 
     public static let typeIdentifier = "blue.catbird.onboarding.getCatalog"
+
     public struct Parameters: Parametrizable {
         public let seedFollowDids: [DID]?
         public let q: String?
@@ -17,7 +19,7 @@ public struct BlueCatbirdOnboardingGetCatalog {
             seedFollowDids: [DID]? = nil,
             q: String? = nil,
             macroCategory: String? = nil,
-            limit: Int? = nil
+            limit: Int? = 80
         ) {
             self.seedFollowDids = seedFollowDids
             self.q = q
@@ -30,95 +32,56 @@ public struct BlueCatbirdOnboardingGetCatalog {
     public struct Output: ATProtocolCodable {
 
         public let catalogVersion: String
-
         public let totalCommunities: Int
-
         public let scenes: [BlueCatbirdIntelDefs.SceneGroup]
-
         public let featuredCommunities: [BlueCatbirdIntelDefs.CommunitySummary]
-
         public let warmStartCommunities: [BlueCatbirdIntelDefs.CommunitySummary]
 
-        // Standard public initializer
         public init(
-
             catalogVersion: String,
-
             totalCommunities: Int,
-
             scenes: [BlueCatbirdIntelDefs.SceneGroup],
-
             featuredCommunities: [BlueCatbirdIntelDefs.CommunitySummary],
-
             warmStartCommunities: [BlueCatbirdIntelDefs.CommunitySummary]
-
         ) {
-
             self.catalogVersion = catalogVersion
-
             self.totalCommunities = totalCommunities
-
             self.scenes = scenes
-
             self.featuredCommunities = featuredCommunities
-
             self.warmStartCommunities = warmStartCommunities
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.catalogVersion = try container.decode(String.self, forKey: .catalogVersion)
-
             self.totalCommunities = try container.decode(Int.self, forKey: .totalCommunities)
-
             self.scenes = try container.decode([BlueCatbirdIntelDefs.SceneGroup].self, forKey: .scenes)
-
             self.featuredCommunities = try container.decode([BlueCatbirdIntelDefs.CommunitySummary].self, forKey: .featuredCommunities)
-
             self.warmStartCommunities = try container.decode([BlueCatbirdIntelDefs.CommunitySummary].self, forKey: .warmStartCommunities)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(catalogVersion, forKey: .catalogVersion)
-
-            try container.encode(totalCommunities, forKey: .totalCommunities)
-
-            try container.encode(scenes, forKey: .scenes)
-
-            try container.encode(featuredCommunities, forKey: .featuredCommunities)
-
-            try container.encode(warmStartCommunities, forKey: .warmStartCommunities)
-
+            try container.encode(self.catalogVersion, forKey: .catalogVersion)
+            try container.encode(self.totalCommunities, forKey: .totalCommunities)
+            try container.encode(self.scenes, forKey: .scenes)
+            try container.encode(self.featuredCommunities, forKey: .featuredCommunities)
+            try container.encode(self.warmStartCommunities, forKey: .warmStartCommunities)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let catalogVersionValue = try catalogVersion.toCBORValue()
+            let catalogVersionValue = try self.catalogVersion.toCBORValue()
             map = map.adding(key: "catalogVersion", value: catalogVersionValue)
-
-            let totalCommunitiesValue = try totalCommunities.toCBORValue()
+            let totalCommunitiesValue = try self.totalCommunities.toCBORValue()
             map = map.adding(key: "totalCommunities", value: totalCommunitiesValue)
-
-            let scenesValue = try scenes.toCBORValue()
+            let scenesValue = try self.scenes.toCBORValue()
             map = map.adding(key: "scenes", value: scenesValue)
-
-            let featuredCommunitiesValue = try featuredCommunities.toCBORValue()
+            let featuredCommunitiesValue = try self.featuredCommunities.toCBORValue()
             map = map.adding(key: "featuredCommunities", value: featuredCommunitiesValue)
-
-            let warmStartCommunitiesValue = try warmStartCommunities.toCBORValue()
+            let warmStartCommunitiesValue = try self.warmStartCommunities.toCBORValue()
             map = map.adding(key: "warmStartCommunities", value: warmStartCommunitiesValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -128,7 +91,6 @@ public struct BlueCatbirdOnboardingGetCatalog {
             case featuredCommunities
             case warmStartCommunities
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -151,9 +113,8 @@ extension ATProtoClient.Blue.Catbird.Onboarding {
     /// Fetch the onboarding scene catalog, featured diverse communities, and optional warm-start orbit communities seeded from accounts the user already follows.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdOnboardingGetCatalog.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getCatalog(input: BlueCatbirdOnboardingGetCatalog.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdOnboardingGetCatalog.Output?) {
         let endpoint = "blue.catbird.onboarding.getCatalog"
 
@@ -173,42 +134,24 @@ extension ATProtoClient.Blue.Catbird.Onboarding {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdOnboardingGetCatalog.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.onboarding.getCatalog: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdOnboardingGetCatalog.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdOnboardingGetCatalog.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdOnboardingGetCatalog.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

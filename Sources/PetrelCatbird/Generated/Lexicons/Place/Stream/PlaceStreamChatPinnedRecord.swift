@@ -4,102 +4,151 @@ import Petrel
 
 // lexicon: 1, id: place.stream.chat.pinnedRecord
 
+/// Record pinning a chat message for prominent display.
 public struct PlaceStreamChatPinnedRecord: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "place.stream.chat.pinnedRecord"
-    public let pinnedMessage: ATProtocolURI
-    public let pinnedBy: DID?
-    public let createdAt: ATProtocolDate
-    public let expiresAt: ATProtocolDate?
 
-    public init(pinnedMessage: ATProtocolURI, pinnedBy: DID? = nil, createdAt: ATProtocolDate, expiresAt: ATProtocolDate? = nil) {
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "tid")
+
+    /// AT-URI of the pinned chat message.
+    public let pinnedMessage: ATProtocolURI
+    /// DID of the user who pinned the message.
+    public let pinnedBy: DID?
+    /// When this pin was created.
+    public let createdAt: ATProtocolDate
+    /// Optional expiration time. If set, the pin is considered inactive after this time.
+    public let expiresAt: ATProtocolDate?
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
+
+    public init(
+        pinnedMessage: ATProtocolURI,
+        pinnedBy: DID? = nil,
+        createdAt: ATProtocolDate,
+        expiresAt: ATProtocolDate? = nil,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.pinnedMessage = pinnedMessage
         self.pinnedBy = pinnedBy
         self.createdAt = createdAt
         self.expiresAt = expiresAt
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         self.pinnedMessage = try container.decode(ATProtocolURI.self, forKey: .pinnedMessage)
         do {
-            self.pinnedBy = try container.decodeIfPresent(DID.self, forKey: .pinnedBy)
+            self.pinnedBy = try container.decodeIfPresent(DID.self, forKey: .pinnedBy, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'pinnedBy' — degrading to nil: \(error)")
             self.pinnedBy = nil
+            malformedFields.insert("pinnedBy")
         }
         self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            self.expiresAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expiresAt)
+            self.expiresAt = try container.decodeIfPresent(ATProtocolDate.self, forKey: .expiresAt, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'expiresAt' — degrading to nil: \(error)")
             self.expiresAt = nil
+            malformedFields.insert("expiresAt")
         }
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(pinnedMessage, forKey: .pinnedMessage)
-        try container.encodeIfPresent(pinnedBy, forKey: .pinnedBy)
-        try container.encode(createdAt, forKey: .createdAt)
-        try container.encodeIfPresent(expiresAt, forKey: .expiresAt)
+        try container.encode(self.pinnedMessage, forKey: .pinnedMessage)
+        try container.encodeIfPresent(self.pinnedBy, forKey: .pinnedBy)
+        try container.encode(self.createdAt, forKey: .createdAt)
+        try container.encodeIfPresent(self.expiresAt, forKey: .expiresAt)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.pinnedMessage)
+        if let value = self.pinnedBy {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(self.createdAt)
+        if let value = self.expiresAt {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.pinnedMessage != other.pinnedMessage {
+            return false
+        }
+        if self.pinnedBy != other.pinnedBy {
+            return false
+        }
+        if self.createdAt != other.createdAt {
+            return false
+        }
+        if self.expiresAt != other.expiresAt {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if pinnedMessage != other.pinnedMessage {
-            return false
-        }
-        if pinnedBy != other.pinnedBy {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        if expiresAt != other.expiresAt {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(pinnedMessage)
-        if let value = pinnedBy {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        hasher.combine(createdAt)
-        if let value = expiresAt {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let pinnedMessageValue = try pinnedMessage.toCBORValue()
+        let pinnedMessageValue = try self.pinnedMessage.toCBORValue()
         map = map.adding(key: "pinnedMessage", value: pinnedMessageValue)
-        if let value = pinnedBy {
+        if let value = self.pinnedBy {
             let pinnedByValue = try value.toCBORValue()
             map = map.adding(key: "pinnedBy", value: pinnedByValue)
         }
-        let createdAtValue = try createdAt.toCBORValue()
+        let createdAtValue = try self.createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
-        if let value = expiresAt {
+        if let value = self.expiresAt {
             let expiresAtValue = try value.toCBORValue()
             map = map.adding(key: "expiresAt", value: expiresAtValue)
         }
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "pinnedMessage", "pinnedBy", "createdAt", "expiresAt"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "pinnedMessage": return true
+        case "pinnedBy": return self.pinnedBy != nil
+        case "createdAt": return true
+        case "expiresAt": return self.expiresAt != nil
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

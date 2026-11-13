@@ -4,14 +4,18 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.circle.activateCircle
 
+/// Ask this service to begin indexing a Circle Space. The service verifies the Space independently against the owner's PDS; it does not trust the caller's claim that the Space exists. Idempotent: activating an already-active Circle returns its current summary.
 public struct BlueCatbirdCircleActivateCircle {
 
     public static let typeIdentifier = "blue.catbird.circle.activateCircle"
+
     public struct Input: ATProtocolCodable {
+
         public let space: SpaceRef
 
-        /// Standard public initializer
-        public init(space: SpaceRef) {
+        public init(
+            space: SpaceRef
+        ) {
             self.space = space
         }
 
@@ -22,12 +26,12 @@ public struct BlueCatbirdCircleActivateCircle {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(space, forKey: .space)
+            try container.encode(self.space, forKey: .space)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let spaceValue = try space.toCBORValue()
+            let spaceValue = try self.space.toCBORValue()
             map = map.adding(key: "space", value: spaceValue)
             return map
         }
@@ -41,48 +45,32 @@ public struct BlueCatbirdCircleActivateCircle {
 
         public let circle: BlueCatbirdCircleDefs.CircleSummary
 
-        // Standard public initializer
         public init(
-
             circle: BlueCatbirdCircleDefs.CircleSummary
-
         ) {
-
             self.circle = circle
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.circle = try container.decode(BlueCatbirdCircleDefs.CircleSummary.self, forKey: .circle)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(circle, forKey: .circle)
-
+            try container.encode(self.circle, forKey: .circle)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let circleValue = try circle.toCBORValue()
+            let circleValue = try self.circle.toCBORValue()
             map = map.adding(key: "circle", value: circleValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case circle
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -111,11 +99,10 @@ extension ATProtoClient.Blue.Catbird.Circle {
     // MARK: - activateCircle
     /// Ask this service to begin indexing a Circle Space. The service verifies the Space independently against the owner's PDS; it does not trust the caller's claim that the Space exists. Idempotent: activating an already-active Circle returns its current summary.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdCircleActivateCircle.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func activateCircle(
 
         input: BlueCatbirdCircleActivateCircle.Input
@@ -147,44 +134,24 @@ extension ATProtoClient.Blue.Catbird.Circle {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdCircleActivateCircle.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdCircleActivateCircle.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.circle.activateCircle: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdCircleActivateCircle.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdCircleActivateCircle.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

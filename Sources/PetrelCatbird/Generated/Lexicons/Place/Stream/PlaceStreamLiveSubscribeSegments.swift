@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: place.stream.live.subscribeSegments
 
+/// Subscribe to a stream's new segments as they come in!
 public struct PlaceStreamLiveSubscribeSegments {
 
     public static let typeIdentifier = "place.stream.live.subscribeSegments"
+
     public struct Parameters: Parametrizable {
         public let streamer: String
 
@@ -17,9 +19,18 @@ public struct PlaceStreamLiveSubscribeSegments {
 
         }
     }
-    public enum Message: Codable, Sendable {
+
+    public enum Message: Codable, Sendable, XRPCSubscriptionMessage {
 
         case bytes(Bytes)
+
+        /// The message types this subscription's Lexicon declares. Frames of any other
+        /// type are skipped by the transport, as the event-stream specification asks.
+        public static let knownMessageTypes: Swift.Set<String> = [
+
+            "place.stream.live.subscribeSegments#segment",
+
+        ]
 
         enum CodingKeys: String, CodingKey {
             case type = "$type"

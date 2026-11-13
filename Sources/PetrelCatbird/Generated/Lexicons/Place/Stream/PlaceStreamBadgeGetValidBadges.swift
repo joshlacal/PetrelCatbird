@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: place.stream.badge.getValidBadges
 
+/// Get valid badges for the authenticated user, optionally in the context of a specific streamer's chat
 public struct PlaceStreamBadgeGetValidBadges {
 
     public static let typeIdentifier = "place.stream.badge.getValidBadges"
+
     public struct Parameters: Parametrizable {
         public let streamer: DID?
 
@@ -22,48 +24,32 @@ public struct PlaceStreamBadgeGetValidBadges {
 
         public let badges: [PlaceStreamBadgeDefs.BadgeView]
 
-        // Standard public initializer
         public init(
-
             badges: [PlaceStreamBadgeDefs.BadgeView]
-
         ) {
-
             self.badges = badges
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.badges = try container.decode([PlaceStreamBadgeDefs.BadgeView].self, forKey: .badges)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(badges, forKey: .badges)
-
+            try container.encode(self.badges, forKey: .badges)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let badgesValue = try badges.toCBORValue()
+            let badgesValue = try self.badges.toCBORValue()
             map = map.adding(key: "badges", value: badgesValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case badges
         }
-
     }
 
 }
@@ -73,9 +59,8 @@ extension ATProtoClient.Place.Stream.Badge {
     /// Get valid badges for the authenticated user, optionally in the context of a specific streamer's chat
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoXRPCError` for a non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getValidBadges(input: PlaceStreamBadgeGetValidBadges.Parameters) async throws -> (responseCode: Int, data: PlaceStreamBadgeGetValidBadges.Output?) {
         let endpoint = "place.stream.badge.getValidBadges"
 
@@ -92,37 +77,27 @@ extension ATProtoClient.Place.Stream.Badge {
         // Determine service DID for this endpoint
         let serviceDID = await networkService.getServiceDID(for: "place.stream.badge.getValidBadges")
         let proxyHeaders = serviceDID.map { ["atproto-proxy": $0] }
-        let (responseData, response) = try await networkService.performRequest(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
+        let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(PlaceStreamBadgeGetValidBadges.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.badge.getValidBadges: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(PlaceStreamBadgeGetValidBadges.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

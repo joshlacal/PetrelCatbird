@@ -1,0 +1,64 @@
+{
+  "lexicon": 1,
+  "id": "blue.catbird.circle.getKeys",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List wrapped content-key records for an encrypted Circle Space. Results ascend by keyVersion starting after sinceVersion (exclusive). The server returns at most limit entries and may return fewer. latestKeyVersion is authoritative: clients MUST keep paging until the last returned keyVersion equals it.",
+      "parameters": {
+        "type": "params",
+        "required": ["space"],
+        "properties": {
+          "space": { "type": "string", "format": "space-ref" },
+          "sinceVersion": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Return only keys with a keyVersion greater than this."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 64,
+            "default": 64
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["keys", "latestKeyVersion"],
+          "properties": {
+            "keys": {
+              "type": "array",
+              "items": { "type": "ref", "ref": "#keyEntry" }
+            },
+            "latestKeyVersion": { "type": "integer", "minimum": 0 },
+            "skipped": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of stored key records the server could not serve on this page. Greater than 0 means the page is incomplete."
+            }
+          }
+        }
+      },
+      "errors": [
+        { "name": "AuthRequired" },
+        { "name": "AccessRemoved" },
+        { "name": "UnsupportedPDS" },
+        { "name": "ProtocolRevisionMismatch" },
+        { "name": "UpstreamUnavailable" }
+      ]
+    },
+    "keyEntry": {
+      "type": "object",
+      "required": ["uri", "cid", "keyVersion", "record"],
+      "properties": {
+        "uri": { "type": "string", "format": "at-uri" },
+        "cid": { "type": "string", "format": "cid" },
+        "keyVersion": { "type": "integer", "minimum": 1 },
+        "record": { "type": "ref", "ref": "blue.catbird.circle.key" }
+      }
+    }
+  }
+}

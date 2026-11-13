@@ -2,17 +2,13 @@
 import Foundation
 import Petrel
 
-#if canImport(UIKit)
-    import UIKit
-#elseif canImport(AppKit)
-    import AppKit
-#endif
-
 // lexicon: 1, id: place.stream.playback.whep
 
+/// Play a stream over WebRTC using WHEP.
 public struct PlaceStreamPlaybackWhep {
 
     public static let typeIdentifier = "place.stream.playback.whep"
+
     public struct Parameters: Parametrizable {
         public let streamer: String
         public let rendition: String
@@ -27,9 +23,40 @@ public struct PlaceStreamPlaybackWhep {
         }
     }
     public struct Input: ATProtocolCodable {
+
         public let data: Data
 
-        /// Standard public initializer
+        public init(
+            data: Data
+        ) {
+            self.data = data
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.data = try container.decode(Data.self, forKey: .data)
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(self.data, forKey: .data)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            let dataValue = try self.data.toCBORValue()
+            map = map.adding(key: "data", value: dataValue)
+            return map
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case data
+        }
+    }
+
+    public struct Output: ATProtocolCodable {
+        public let data: Data
+
         public init(data: Data) {
             self.data = data
         }
@@ -45,63 +72,12 @@ public struct PlaceStreamPlaybackWhep {
         }
 
         public func toCBORValue() throws -> Any {
-            var map = OrderedCBORMap()
-            let dataValue = try data.toCBORValue()
-            map = map.adding(key: "data", value: dataValue)
-            return map
+            return data
         }
 
         private enum CodingKeys: String, CodingKey {
             case data
         }
-    }
-
-    public struct Output: ATProtocolCodable {
-
-        public let data: Data
-
-        // Standard public initializer
-        public init(
-
-            data: Data
-
-        ) {
-
-            self.data = data
-
-        }
-
-        public init(from decoder: Decoder) throws {
-
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-
-            self.data = try container.decode(Data.self, forKey: .data)
-
-        }
-
-        public func encode(to encoder: Encoder) throws {
-
-            var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(data, forKey: .data)
-
-        }
-
-        public func toCBORValue() throws -> Any {
-
-            var map = OrderedCBORMap()
-
-            let dataValue = try data.toCBORValue()
-            map = map.adding(key: "data", value: dataValue)
-
-            return map
-
-        }
-
-        private enum CodingKeys: String, CodingKey {
-            case data
-        }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -122,14 +98,19 @@ extension ATProtoClient.Place.Stream.Playback {
     // MARK: - whep
     /// Play a stream over WebRTC using WHEP.
     ///
-    /// - Parameters:
-    ///   - data: The binary data to upload
-    ///   - mimeType: The MIME type of the data being uploaded
-    ///   - stripMetadata: Whether to strip metadata from images (default: true)
-    ///   - params: The query parameters for the request
+    /// Image metadata (EXIF, GPS position, XMP, comments) is removed before the upload
+    /// unless `stripMetadata` is false: a photo's metadata can say where it was taken.
+    /// Stripping keeps the image format and never re-encodes pixels. A body whose
+    /// `mimeType` is not `image/*` is sent exactly as given. An image that cannot be
+    /// stripped is not uploaded: the call throws `NetworkError.metadataStrippingFailed`.
     ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - data: The request body bytes
+    ///   - mimeType: The MIME type of `data`, sent as `Content-Type`
+    ///   - stripMetadata: Pass `false` to send `data` byte for byte
+    ///   - params: The query parameters for the request
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<PlaceStreamPlaybackWhep.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func whep(
 
         data: Data,
@@ -140,19 +121,18 @@ extension ATProtoClient.Place.Stream.Playback {
     ) async throws -> (responseCode: Int, data: PlaceStreamPlaybackWhep.Output?) {
         let endpoint = "place.stream.playback.whep"
 
-        var dataToUpload = data
+        var body = data
         if stripMetadata {
-            guard let strippedData = ImageMetadataStripper.stripMetadata(from: dataToUpload) else {
+            do {
+                body = try ImageMetadataStripper.stripMetadata(from: data, mimeType: mimeType)
+            } catch {
+                // Fail closed: an image whose metadata cannot be removed is not sent.
                 throw NetworkError.metadataStrippingFailed
             }
-            dataToUpload = strippedData
-        }
-        if mimeType.starts(with: "image/"), let compressedData = compressImage(dataToUpload) {
-            dataToUpload = compressedData
         }
         var headers: [String: String] = [
             "Content-Type": mimeType,
-            "Content-Length": "\(dataToUpload.count)"
+            "Content-Length": "\(body.count)"
         ]
 
         headers["Accept"] = "*/*"
@@ -163,7 +143,7 @@ extension ATProtoClient.Place.Stream.Playback {
             endpoint: endpoint,
             method: "POST",
             headers: headers,
-            body: dataToUpload,
+            body: body,
             queryItems: queryItems
         )
 
@@ -173,70 +153,13 @@ extension ATProtoClient.Place.Stream.Playback {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
-
-            // Wildcard encoding ("*/*") — accept any Content-Type, including a missing one.
-
-            do {
-
-                let decodedData = PlaceStreamPlaybackWhep.Output(data: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for place.stream.playback.whep: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: PlaceStreamPlaybackWhep.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: PlaceStreamPlaybackWhep.Error.self)
         }
 
-    }
+        // Wildcard encoding ("*/*") — accept any Content-Type, including a missing one.
 
-    /// Compresses an image while maintaining reasonable quality
-    /// - Parameters:
-    ///   - imageData: The original image data
-    ///   - maxSizeInBytes: The maximum target size in bytes (default: 1MB)
-    /// - Returns: Compressed image data, or nil if compression failed
-    private func compressImage(_ imageData: Data, maxSizeInBytes: Int = 1000000) -> Data? {
-        #if canImport(UIKit)
-            guard let image = UIImage(data: imageData) else { return nil }
-            var compression: CGFloat = 1.0
-            var compressedData = image.jpegData(compressionQuality: compression)
-            while (compressedData?.count ?? 0) > maxSizeInBytes && compression > 0.1 {
-                compression -= 0.1
-                compressedData = image.jpegData(compressionQuality: compression)
-            }
-            return compressedData
-        #elseif canImport(AppKit)
-            guard let image = NSImage(data: imageData) else { return nil }
-            var compression: CGFloat = 1.0
-            var compressedData: Data?
-            repeat {
-                if let tiffRepresentation = image.tiffRepresentation,
-                   let bitmapImage = NSBitmapImageRep(data: tiffRepresentation) {
-                    compressedData = bitmapImage.representation(using: .jpeg, properties: [.compressionFactor: compression])
-                }
-                compression -= 0.1
-            } while (compressedData?.count ?? 0) > maxSizeInBytes && compression > 0.1
-            return compressedData
-        #else
-            LogManager.logError("Image compression not supported on this platform")
-            return nil
-        #endif
-    }
+        return (responseCode, PlaceStreamPlaybackWhep.Output(data: responseData))
 
+    }
 }

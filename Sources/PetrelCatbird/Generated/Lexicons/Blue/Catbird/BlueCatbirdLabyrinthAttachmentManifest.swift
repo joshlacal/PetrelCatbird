@@ -4,100 +4,146 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.attachmentManifest
 
+/// Ciphertext-only attachment manifest written into a conversation Space or personal mailbox Space BEFORE sending an MLS message referencing the blob (Gate 5). Committing this record with a standard ATProto blob ref promotes the uploaded encrypted blob from .staged to .space on the writer's PDS so com.atproto.sync.getBlob returns 404 while Space credential holders can read com.atproto.space.getBlob.
 public struct BlueCatbirdLabyrinthAttachmentManifest: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.attachmentManifest"
+
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "any")
+
+    /// Opaque AES-256-GCM encrypted attachment blob reference.
     public let blob: Blob
+    /// Raw SHA-256 digest of the encrypted blob bytes.
     public let sha256: Bytes
+    /// Exact byte length of the encrypted blob.
     public let ciphertextSize: Int
+    /// Optional non-sensitive category hint (default application/octet-stream).
     public let mimeTypeHint: String?
     public let createdAt: ATProtocolDate
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
 
-    public init(blob: Blob, sha256: Bytes, ciphertextSize: Int, mimeTypeHint: String? = nil, createdAt: ATProtocolDate) {
+    public init(
+        blob: Blob,
+        sha256: Bytes,
+        ciphertextSize: Int,
+        mimeTypeHint: String? = nil,
+        createdAt: ATProtocolDate,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.blob = blob
         self.sha256 = sha256
         self.ciphertextSize = ciphertextSize
         self.mimeTypeHint = mimeTypeHint
         self.createdAt = createdAt
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         self.blob = try container.decode(Blob.self, forKey: .blob)
         self.sha256 = try container.decode(Bytes.self, forKey: .sha256)
         self.ciphertextSize = try container.decode(Int.self, forKey: .ciphertextSize)
         do {
-            self.mimeTypeHint = try container.decodeIfPresent(String.self, forKey: .mimeTypeHint)
+            self.mimeTypeHint = try container.decodeIfPresent(String.self, forKey: .mimeTypeHint, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'mimeTypeHint' — degrading to nil: \(error)")
             self.mimeTypeHint = nil
+            malformedFields.insert("mimeTypeHint")
         }
         self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(blob, forKey: .blob)
-        try container.encode(sha256, forKey: .sha256)
-        try container.encode(ciphertextSize, forKey: .ciphertextSize)
-        try container.encodeIfPresent(mimeTypeHint, forKey: .mimeTypeHint)
-        try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(self.blob, forKey: .blob)
+        try container.encode(self.sha256, forKey: .sha256)
+        try container.encode(self.ciphertextSize, forKey: .ciphertextSize)
+        try container.encodeIfPresent(self.mimeTypeHint, forKey: .mimeTypeHint)
+        try container.encode(self.createdAt, forKey: .createdAt)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.blob)
+        hasher.combine(self.sha256)
+        hasher.combine(self.ciphertextSize)
+        if let value = self.mimeTypeHint {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(self.createdAt)
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.blob != other.blob {
+            return false
+        }
+        if self.sha256 != other.sha256 {
+            return false
+        }
+        if self.ciphertextSize != other.ciphertextSize {
+            return false
+        }
+        if self.mimeTypeHint != other.mimeTypeHint {
+            return false
+        }
+        if self.createdAt != other.createdAt {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if blob != other.blob {
-            return false
-        }
-        if sha256 != other.sha256 {
-            return false
-        }
-        if ciphertextSize != other.ciphertextSize {
-            return false
-        }
-        if mimeTypeHint != other.mimeTypeHint {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(blob)
-        hasher.combine(sha256)
-        hasher.combine(ciphertextSize)
-        if let value = mimeTypeHint {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        hasher.combine(createdAt)
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let blobValue = try blob.toCBORValue()
+        let blobValue = try self.blob.toCBORValue()
         map = map.adding(key: "blob", value: blobValue)
-        let sha256Value = try sha256.toCBORValue()
+        let sha256Value = try self.sha256.toCBORValue()
         map = map.adding(key: "sha256", value: sha256Value)
-        let ciphertextSizeValue = try ciphertextSize.toCBORValue()
+        let ciphertextSizeValue = try self.ciphertextSize.toCBORValue()
         map = map.adding(key: "ciphertextSize", value: ciphertextSizeValue)
-        if let value = mimeTypeHint {
+        if let value = self.mimeTypeHint {
             let mimeTypeHintValue = try value.toCBORValue()
             map = map.adding(key: "mimeTypeHint", value: mimeTypeHintValue)
         }
-        let createdAtValue = try createdAt.toCBORValue()
+        let createdAtValue = try self.createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "blob", "sha256", "ciphertextSize", "mimeTypeHint", "createdAt"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "blob": return true
+        case "sha256": return true
+        case "ciphertextSize": return true
+        case "mimeTypeHint": return self.mimeTypeHint != nil
+        case "createdAt": return true
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: place.stream.branding.getBlob
 
+/// Get a specific branding asset blob by key.
 public struct PlaceStreamBrandingGetBlob {
 
     public static let typeIdentifier = "place.stream.branding.getBlob"
+
     public struct Parameters: Parametrizable {
         public let key: String
         public let broadcaster: DID?
@@ -22,51 +24,29 @@ public struct PlaceStreamBrandingGetBlob {
     }
 
     public struct Output: ATProtocolCodable {
-
         public let data: Data
 
-        // Standard public initializer
-        public init(
-
-            data: Data
-
-        ) {
-
+        public init(data: Data) {
             self.data = data
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.data = try container.decode(Data.self, forKey: .data)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
             try container.encode(data, forKey: .data)
-
         }
 
         public func toCBORValue() throws -> Any {
-
-            var map = OrderedCBORMap()
-
-            let dataValue = try data.toCBORValue()
-            map = map.adding(key: "data", value: dataValue)
-
-            return map
-
+            return data
         }
 
         private enum CodingKeys: String, CodingKey {
             case data
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -88,9 +68,8 @@ extension ATProtoClient.Place.Stream.Branding {
     /// Get a specific branding asset blob by key.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<PlaceStreamBrandingGetBlob.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getBlob(input: PlaceStreamBrandingGetBlob.Parameters) async throws -> (responseCode: Int, data: PlaceStreamBrandingGetBlob.Output?) {
         let endpoint = "place.stream.branding.getBlob"
 
@@ -110,28 +89,13 @@ extension ATProtoClient.Place.Stream.Branding {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            // Wildcard encoding ("*/*") — accept any Content-Type, including a missing one.
-
-            let decodedData = PlaceStreamBrandingGetBlob.Output(data: responseData)
-            return (responseCode, decodedData)
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: PlaceStreamBrandingGetBlob.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: PlaceStreamBrandingGetBlob.Error.self)
         }
+
+        // Wildcard encoding ("*/*") — accept any Content-Type, including a missing one.
+
+        return (responseCode, PlaceStreamBrandingGetBlob.Output(data: responseData))
+
     }
 }

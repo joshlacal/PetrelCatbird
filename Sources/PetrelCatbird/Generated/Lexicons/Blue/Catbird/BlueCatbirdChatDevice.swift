@@ -4,17 +4,34 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.device
 
+/// Per-device MLS signature key published to the user's repo. Used to verify that key packages served by the delivery service belong to an authorized device.
 public struct BlueCatbirdChatDevice: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "blue.catbird.chat.device"
-    public let mlsSignaturePublicKey: Bytes
-    public let algorithm: String
-    public let createdAt: ATProtocolDate
 
-    public init(mlsSignaturePublicKey: Bytes, algorithm: String, createdAt: ATProtocolDate) {
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "any")
+
+    /// The MLS credential signature public key for this device
+    public let mlsSignaturePublicKey: Bytes
+    /// Signature algorithm: 'ed25519' or 'p256'
+    public let algorithm: String
+    /// Timestamp when this device record was created.
+    public let createdAt: ATProtocolDate
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
+
+    public init(
+        mlsSignaturePublicKey: Bytes,
+        algorithm: String,
+        createdAt: ATProtocolDate,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.mlsSignaturePublicKey = mlsSignaturePublicKey
         self.algorithm = algorithm
         self.createdAt = createdAt
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
@@ -22,51 +39,56 @@ public struct BlueCatbirdChatDevice: ATProtocolCodable, ATProtocolValue {
         self.mlsSignaturePublicKey = try container.decode(Bytes.self, forKey: .mlsSignaturePublicKey)
         self.algorithm = try container.decode(String.self, forKey: .algorithm)
         self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(mlsSignaturePublicKey, forKey: .mlsSignaturePublicKey)
-        try container.encode(algorithm, forKey: .algorithm)
-        try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(self.mlsSignaturePublicKey, forKey: .mlsSignaturePublicKey)
+        try container.encode(self.algorithm, forKey: .algorithm)
+        try container.encode(self.createdAt, forKey: .createdAt)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.mlsSignaturePublicKey)
+        hasher.combine(self.algorithm)
+        hasher.combine(self.createdAt)
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.mlsSignaturePublicKey != other.mlsSignaturePublicKey {
+            return false
+        }
+        if self.algorithm != other.algorithm {
+            return false
+        }
+        if self.createdAt != other.createdAt {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if mlsSignaturePublicKey != other.mlsSignaturePublicKey {
-            return false
-        }
-        if algorithm != other.algorithm {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(mlsSignaturePublicKey)
-        hasher.combine(algorithm)
-        hasher.combine(createdAt)
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let mlsSignaturePublicKeyValue = try mlsSignaturePublicKey.toCBORValue()
+        let mlsSignaturePublicKeyValue = try self.mlsSignaturePublicKey.toCBORValue()
         map = map.adding(key: "mlsSignaturePublicKey", value: mlsSignaturePublicKeyValue)
-        let algorithmValue = try algorithm.toCBORValue()
+        let algorithmValue = try self.algorithm.toCBORValue()
         map = map.adding(key: "algorithm", value: algorithmValue)
-        let createdAtValue = try createdAt.toCBORValue()
+        let createdAtValue = try self.createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
     }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "mlsSignaturePublicKey", "algorithm", "createdAt"]
 
     private enum CodingKeys: String, CodingKey {
         case typeIdentifier = "$type"

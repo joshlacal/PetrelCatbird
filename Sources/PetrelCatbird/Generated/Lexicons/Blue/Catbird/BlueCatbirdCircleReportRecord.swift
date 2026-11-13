@@ -4,50 +4,161 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.circle.reportRecord
 
+/// Report a record in a Circle Space
 public struct BlueCatbirdCircleReportRecord {
 
     public static let typeIdentifier = "blue.catbird.circle.reportRecord"
-    public struct Input: ATProtocolCodable {
-        public let space: SpaceRef
-        public let uri: ATProtocolURI
-        public let reason: InputReason
-        public let details: String?
 
-        /// Standard public initializer
-        public init(space: SpaceRef, uri: ATProtocolURI, reason: InputReason, details: String? = nil) {
-            self.space = space
-            self.uri = uri
-            self.reason = reason
-            self.details = details
+    public struct DisclosedMedia: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.circle.reportRecord#disclosedMedia"
+
+        public let cid: String
+        public let key: Bytes
+        public let iv: Bytes
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
+
+        public init(
+            cid: String,
+            key: Bytes,
+            iv: Bytes,
+            extraFields: [String: ATProtocolValueContainer] = [:]
+        ) {
+            self.cid = cid
+            self.key = key
+            self.iv = iv
+            self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.space = try container.decode(SpaceRef.self, forKey: .space)
-            self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
-            self.reason = try container.decode(InputReason.self, forKey: .reason)
-            self.details = try container.decodeIfPresent(String.self, forKey: .details)
+            self.cid = try container.decode(String.self, forKey: .cid)
+            self.key = try container.decode(Bytes.self, forKey: .key)
+            self.iv = try container.decode(Bytes.self, forKey: .iv)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(space, forKey: .space)
-            try container.encode(uri, forKey: .uri)
-            try container.encode(reason, forKey: .reason)
-            try container.encodeIfPresent(details, forKey: .details)
+            try container.encode(self.cid, forKey: .cid)
+            try container.encode(self.key, forKey: .key)
+            try container.encode(self.iv, forKey: .iv)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(self.cid)
+            hasher.combine(self.key)
+            hasher.combine(self.iv)
+            hasher.combine(extraFields)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if self.cid != other.cid {
+                return false
+            }
+            if self.key != other.key {
+                return false
+            }
+            if self.iv != other.iv {
+                return false
+            }
+            return self.extraFields == other.extraFields
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let spaceValue = try space.toCBORValue()
+            let cidValue = try self.cid.toCBORValue()
+            map = map.adding(key: "cid", value: cidValue)
+            let keyValue = try self.key.toCBORValue()
+            map = map.adding(key: "key", value: keyValue)
+            let ivValue = try self.iv.toCBORValue()
+            map = map.adding(key: "iv", value: ivValue)
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "cid", "key", "iv"]
+
+        private enum CodingKeys: String, CodingKey {
+            case cid
+            case key
+            case iv
+        }
+    }
+
+    public struct Input: ATProtocolCodable {
+
+        public let space: SpaceRef
+        public let uri: ATProtocolURI
+        public let reason: InputReason
+        public let details: String?
+        /// Per-post key voluntarily disclosed by the reporter so moderators can read an encrypted post.
+        public let disclosedPostKey: Bytes?
+        /// Decryption material for attachments the reporter chooses to disclose.
+        public let disclosedMedia: [DisclosedMedia]?
+
+        public init(
+            space: SpaceRef,
+            uri: ATProtocolURI,
+            reason: InputReason,
+            details: String? = nil,
+            disclosedPostKey: Bytes? = nil,
+            disclosedMedia: [DisclosedMedia]? = nil
+        ) {
+            self.space = space
+            self.uri = uri
+            self.reason = reason
+            self.details = details
+            self.disclosedPostKey = disclosedPostKey
+            self.disclosedMedia = disclosedMedia
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            self.space = try container.decode(SpaceRef.self, forKey: .space)
+            self.uri = try container.decode(ATProtocolURI.self, forKey: .uri)
+            self.reason = try container.decode(InputReason.self, forKey: .reason)
+            self.details = try container.decodeIfPresent(String.self, forKey: .details, rejectingNull: strict)
+            self.disclosedPostKey = try container.decodeIfPresent(Bytes.self, forKey: .disclosedPostKey, rejectingNull: strict)
+            self.disclosedMedia = try container.decodeIfPresent([DisclosedMedia].self, forKey: .disclosedMedia, rejectingNull: strict)
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(self.space, forKey: .space)
+            try container.encode(self.uri, forKey: .uri)
+            try container.encode(self.reason, forKey: .reason)
+            try container.encodeIfPresent(self.details, forKey: .details)
+            try container.encodeIfPresent(self.disclosedPostKey, forKey: .disclosedPostKey)
+            try container.encodeIfPresent(self.disclosedMedia, forKey: .disclosedMedia)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            let spaceValue = try self.space.toCBORValue()
             map = map.adding(key: "space", value: spaceValue)
-            let uriValue = try uri.toCBORValue()
+            let uriValue = try self.uri.toCBORValue()
             map = map.adding(key: "uri", value: uriValue)
-            let reasonValue = try reason.toCBORValue()
+            let reasonValue = try self.reason.toCBORValue()
             map = map.adding(key: "reason", value: reasonValue)
-            if let value = details {
+            if let value = self.details {
                 let detailsValue = try value.toCBORValue()
                 map = map.adding(key: "details", value: detailsValue)
+            }
+            if let value = self.disclosedPostKey {
+                let disclosedPostKeyValue = try value.toCBORValue()
+                map = map.adding(key: "disclosedPostKey", value: disclosedPostKeyValue)
+            }
+            if let value = self.disclosedMedia {
+                let disclosedMediaValue = try value.toCBORValue()
+                map = map.adding(key: "disclosedMedia", value: disclosedMediaValue)
             }
             return map
         }
@@ -57,55 +168,42 @@ public struct BlueCatbirdCircleReportRecord {
             case uri
             case reason
             case details
+            case disclosedPostKey
+            case disclosedMedia
         }
     }
 
     public struct Output: ATProtocolCodable {
 
+        /// Canonical lowercase hyphenated RFC 4122 UUID.
         public let id: String
 
-        // Standard public initializer
         public init(
-
             id: String
-
         ) {
-
             self.id = id
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.id = try container.decode(String.self, forKey: .id)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(id, forKey: .id)
-
+            try container.encode(self.id, forKey: .id)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let idValue = try id.toCBORValue()
+            let idValue = try self.id.toCBORValue()
             map = map.adding(key: "id", value: idValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case id
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -144,11 +242,10 @@ extension ATProtoClient.Blue.Catbird.Circle {
     // MARK: - reportRecord
     /// Report a record in a Circle Space
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdCircleReportRecord.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func reportRecord(
 
         input: BlueCatbirdCircleReportRecord.Input
@@ -180,44 +277,24 @@ extension ATProtoClient.Blue.Catbird.Circle {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdCircleReportRecord.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdCircleReportRecord.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.circle.reportRecord: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdCircleReportRecord.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdCircleReportRecord.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

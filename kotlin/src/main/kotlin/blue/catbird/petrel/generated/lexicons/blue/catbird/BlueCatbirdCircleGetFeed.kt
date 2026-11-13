@@ -21,7 +21,8 @@ object BlueCatbirdCircleGetFeedDefs {
         @SerialName("space")
         val space: SpaceRef? = null,        @SerialName("limit")
         val limit: Int? = null,        @SerialName("cursor")
-        val cursor: String? = null    )
+        val cursor: String? = null,// When absent or false the server omits encrypted posts (and encrypted thread nodes). Clients that understand blue.catbird.circle.post envelopes send true.        @SerialName("includeEncrypted")
+        val includeEncrypted: Boolean? = null    )
 
     @Serializable
     data class BlueCatbirdCircleGetFeedOutput(

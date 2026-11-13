@@ -4,6 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.conversation
 
+/// Sender-written post-quantum encrypted MLS conversation history, MEKs, attachment manifests, and author redactions
 public struct BlueCatbirdLabyrinthConversation {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.conversation"
@@ -11,13 +12,15 @@ public struct BlueCatbirdLabyrinthConversation {
     public struct SpaceDeclarationDescriptor: Sendable, Equatable {
         public let nsid: String
         public let keyType: String
-        public let name: String
+        public let title: String?
+        public let titleLang: [String: String]
         public let collections: [String]
     }
 
     public static let spaceDeclaration = SpaceDeclarationDescriptor(
         nsid: "blue.catbird.labyrinth.conversation", keyType: "any",
-        name: "Catbird chat history", collections: ["blue.catbird.labyrinth.batch", "blue.catbird.labyrinth.mek", "blue.catbird.labyrinth.attachmentManifest"]
+        title: "Catbird chat history", titleLang: [:],
+        collections: ["blue.catbird.labyrinth.batch", "blue.catbird.labyrinth.mek", "blue.catbird.labyrinth.attachmentManifest", "blue.catbird.labyrinth.authorRedaction"]
     )
 
 }

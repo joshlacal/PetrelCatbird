@@ -26,8 +26,24 @@
             "type": "string",
             "format": "space-ref",
             "description": "The Space this Circle's content was migrated to, if any. Set when the Circle has moved and this Space is retained read-only."
+          },
+          "historyForNewMembers": {
+            "type": "boolean",
+            "description": "Whether members added later can decrypt posts made before they joined. Only meaningful for encrypted Circles."
+          },
+          "encryption": {
+            "type": "ref",
+            "ref": "#encryption",
+            "description": "Present only on encrypted Circles; absent on plaintext Circles."
           }
         }
+      }
+    },
+    "encryption": {
+      "type": "object",
+      "required": ["scheme"],
+      "properties": {
+        "scheme": { "type": "string", "enum": ["circle-v1"], "description": "Encryption scheme identifier." }
       }
     }
   }

@@ -151,4 +151,48 @@ class SequencerReceiptWireCompatibilityTest {
         val appUnion = assertIs<BlueCatbirdChatDefsConversationEntry.ApplicationEntry>(unionEntry)
         assertNull(appUnion.value.sequencerReceipt)
     }
+
+    @Test
+    fun wave1bMultiDeviceAndMailboxStateTypesRoundTrip() {
+        val deviceJson = """
+        {
+            "deviceId": "00000000-0000-4000-8000-000000000002",
+            "keyId": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "signaturePublicKey": {"${'$'}bytes": "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyA="},
+            "authGeneration": 1,
+            "status": "pending_approval",
+            "createdAt": "2026-11-13T12:00:00.000Z",
+            "updatedAt": "2026-11-13T12:00:00.000Z",
+            "availablePackageCount": 10,
+            "reservedPackageCount": 0,
+            "deviceName": "Josh Pixel 9",
+            "lastActiveAt": "2026-11-13T12:05:00.000Z",
+            "dormantAt": "2026-11-15T12:05:00.000Z"
+        }
+        """.trimIndent()
+        val deviceView = json.decodeFromString<BlueCatbirdChatDefsDeviceView>(deviceJson)
+        assertEquals("Josh Pixel 9", deviceView.deviceName)
+        assertNotNull(deviceView.lastActiveAt)
+        assertNotNull(deviceView.dormantAt)
+
+        val readStateJson = """
+        {
+            "ciphertext": {"${'$'}bytes": "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyA="},
+            "epoch": 5000000000,
+            "updatedAt": "2026-11-13T12:10:00Z"
+        }
+        """.trimIndent()
+        val readState = json.decodeFromString<BlueCatbirdLabyrinthReadState>(readStateJson)
+        assertEquals(5000000000L, readState.epoch)
+
+        val circleStateJson = """
+        {
+            "ciphertext": {"${'$'}bytes": "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyA="},
+            "epoch": 5000000001,
+            "updatedAt": "2026-11-13T12:15:00Z"
+        }
+        """.trimIndent()
+        val circleState = json.decodeFromString<BlueCatbirdLabyrinthCircleOwnerState>(circleStateJson)
+        assertEquals(5000000001L, circleState.epoch)
+    }
 }

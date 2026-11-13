@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.getAttachmentBlob
 
+/// Read an attachment blob with the ORF access token, for a restored device that has no application interval at the attachment's entry. The server recomputes the token MAC from blindedTokenSalt and the presented threadId and messageId, checks that the blob is still bound to that message and not deleted or expired, and that the message still exists for the caller: an unredacted thread item readable by the caller, or an item of the caller's own owner archive (whitepaper p.42). Blob/token visibility refusals read as NotFound. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded. For a thread backed by a conversation Space, a permanently deleted storage generation returns SpaceDeleted without returning data. This is terminal: do not retry by rebinding to another generation or falling back to another storage placement.
 public struct BlueCatbirdLabyrinthGetAttachmentBlob {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.getAttachmentBlob"
+
     public struct Parameters: Parametrizable {
         public let deviceKeyPubkey: String
         public let blindedIndex: String
@@ -31,51 +33,29 @@ public struct BlueCatbirdLabyrinthGetAttachmentBlob {
     }
 
     public struct Output: ATProtocolCodable {
-
         public let data: Data
 
-        // Standard public initializer
-        public init(
-
-            data: Data
-
-        ) {
-
+        public init(data: Data) {
             self.data = data
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.data = try container.decode(Data.self, forKey: .data)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
             try container.encode(data, forKey: .data)
-
         }
 
         public func toCBORValue() throws -> Any {
-
-            var map = OrderedCBORMap()
-
-            let dataValue = try data.toCBORValue()
-            map = map.adding(key: "data", value: dataValue)
-
-            return map
-
+            return data
         }
 
         private enum CodingKeys: String, CodingKey {
             case data
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -101,9 +81,8 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
     /// Read an attachment blob with the ORF access token, for a restored device that has no application interval at the attachment's entry. The server recomputes the token MAC from blindedTokenSalt and the presented threadId and messageId, checks that the blob is still bound to that message and not deleted or expired, and that the message still exists for the caller: an unredacted thread item readable by the caller, or an item of the caller's own owner archive (whitepaper p.42). Blob/token visibility refusals read as NotFound. ORF endpoint ([CB-17]): states are per device of the caller DID; the server never reveals one. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded. For a thread backed by a conversation Space, a permanently deleted storage generation returns SpaceDeleted without returning data. This is terminal: do not retry by rebinding to another generation or falling back to another storage placement.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdLabyrinthGetAttachmentBlob.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getAttachmentBlob(input: BlueCatbirdLabyrinthGetAttachmentBlob.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdLabyrinthGetAttachmentBlob.Output?) {
         let endpoint = "blue.catbird.labyrinth.getAttachmentBlob"
 
@@ -123,28 +102,13 @@ extension ATProtoClient.Blue.Catbird.Labyrinth {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            // Wildcard encoding ("*/*") — accept any Content-Type, including a missing one.
-
-            let decodedData = BlueCatbirdLabyrinthGetAttachmentBlob.Output(data: responseData)
-            return (responseCode, decodedData)
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdLabyrinthGetAttachmentBlob.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdLabyrinthGetAttachmentBlob.Error.self)
         }
+
+        // Wildcard encoding ("*/*") — accept any Content-Type, including a missing one.
+
+        return (responseCode, BlueCatbirdLabyrinthGetAttachmentBlob.Output(data: responseData))
+
     }
 }

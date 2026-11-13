@@ -4,104 +4,152 @@ import Petrel
 
 // lexicon: 1, id: place.stream.metadata.configuration
 
+/// Default metadata record for livestream including content warnings, rights, and distribution policy
 public struct PlaceStreamMetadataConfiguration: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "place.stream.metadata.configuration"
+
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "literal:self")
+
     public let contentWarnings: PlaceStreamMetadataContentWarnings?
     public let contentRights: PlaceStreamMetadataContentRights?
     public let distributionPolicy: PlaceStreamMetadataDistributionPolicy?
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
 
-    public init(contentWarnings: PlaceStreamMetadataContentWarnings? = nil, contentRights: PlaceStreamMetadataContentRights? = nil, distributionPolicy: PlaceStreamMetadataDistributionPolicy? = nil) {
+    public init(
+        contentWarnings: PlaceStreamMetadataContentWarnings? = nil,
+        contentRights: PlaceStreamMetadataContentRights? = nil,
+        distributionPolicy: PlaceStreamMetadataDistributionPolicy? = nil,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.contentWarnings = contentWarnings
         self.contentRights = contentRights
         self.distributionPolicy = distributionPolicy
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         do {
-            self.contentWarnings = try container.decodeIfPresent(PlaceStreamMetadataContentWarnings.self, forKey: .contentWarnings)
+            self.contentWarnings = try container.decodeIfPresent(PlaceStreamMetadataContentWarnings.self, forKey: .contentWarnings, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'contentWarnings' — degrading to nil: \(error)")
             self.contentWarnings = nil
+            malformedFields.insert("contentWarnings")
         }
         do {
-            self.contentRights = try container.decodeIfPresent(PlaceStreamMetadataContentRights.self, forKey: .contentRights)
+            self.contentRights = try container.decodeIfPresent(PlaceStreamMetadataContentRights.self, forKey: .contentRights, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'contentRights' — degrading to nil: \(error)")
             self.contentRights = nil
+            malformedFields.insert("contentRights")
         }
         do {
-            self.distributionPolicy = try container.decodeIfPresent(PlaceStreamMetadataDistributionPolicy.self, forKey: .distributionPolicy)
+            self.distributionPolicy = try container.decodeIfPresent(PlaceStreamMetadataDistributionPolicy.self, forKey: .distributionPolicy, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'distributionPolicy' — degrading to nil: \(error)")
             self.distributionPolicy = nil
+            malformedFields.insert("distributionPolicy")
         }
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encodeIfPresent(contentWarnings, forKey: .contentWarnings)
-        try container.encodeIfPresent(contentRights, forKey: .contentRights)
-        try container.encodeIfPresent(distributionPolicy, forKey: .distributionPolicy)
+        try container.encodeIfPresent(self.contentWarnings, forKey: .contentWarnings)
+        try container.encodeIfPresent(self.contentRights, forKey: .contentRights)
+        try container.encodeIfPresent(self.distributionPolicy, forKey: .distributionPolicy)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        if let value = self.contentWarnings {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        if let value = self.contentRights {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        if let value = self.distributionPolicy {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.contentWarnings != other.contentWarnings {
+            return false
+        }
+        if self.contentRights != other.contentRights {
+            return false
+        }
+        if self.distributionPolicy != other.distributionPolicy {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if contentWarnings != other.contentWarnings {
-            return false
-        }
-        if contentRights != other.contentRights {
-            return false
-        }
-        if distributionPolicy != other.distributionPolicy {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        if let value = contentWarnings {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        if let value = contentRights {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-        if let value = distributionPolicy {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        if let value = contentWarnings {
+        if let value = self.contentWarnings {
             let contentWarningsValue = try value.toCBORValue()
             map = map.adding(key: "contentWarnings", value: contentWarningsValue)
         }
-        if let value = contentRights {
+        if let value = self.contentRights {
             let contentRightsValue = try value.toCBORValue()
             map = map.adding(key: "contentRights", value: contentRightsValue)
         }
-        if let value = distributionPolicy {
+        if let value = self.distributionPolicy {
             let distributionPolicyValue = try value.toCBORValue()
             map = map.adding(key: "distributionPolicy", value: distributionPolicyValue)
         }
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "contentWarnings", "contentRights", "distributionPolicy"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "contentWarnings": return self.contentWarnings != nil
+        case "contentRights": return self.contentRights != nil
+        case "distributionPolicy": return self.distributionPolicy != nil
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

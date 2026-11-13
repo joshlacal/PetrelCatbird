@@ -4,9 +4,11 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.mlsDS.getConvoDigest
 
+/// Get a cryptographic digest of all messages in a conversation for reconciliation. Compute and return a SHA-256 digest over all messages in a conversation, along with sequencer state.
 public struct BlueCatbirdMlsDSGetConvoDigest {
 
     public static let typeIdentifier = "blue.catbird.mlsDS.getConvoDigest"
+
     public struct Parameters: Parametrizable {
         public let convoId: String
 
@@ -20,135 +22,86 @@ public struct BlueCatbirdMlsDSGetConvoDigest {
 
     public struct Output: ATProtocolCodable {
 
+        /// Conversation ID
         public let convoId: String
-
+        /// DID of the current sequencer DS
         public let sequencerDsDid: String
-
+        /// Current sequencer term
         public let sequencerTerm: Int
-
+        /// Current MLS epoch
         public let epoch: Int
-
+        /// Highest sequence number
         public let lastSeq: Int
-
+        /// Total number of events/messages
         public let eventCount: Int
-
+        /// Hex-encoded SHA-256 digest over all messages
         public let digestSha256: String
-
+        /// Timestamp when the digest was generated
         public let generatedAt: ATProtocolDate
 
-        // Standard public initializer
         public init(
-
             convoId: String,
-
             sequencerDsDid: String,
-
             sequencerTerm: Int,
-
             epoch: Int,
-
             lastSeq: Int,
-
             eventCount: Int,
-
             digestSha256: String,
-
             generatedAt: ATProtocolDate
-
         ) {
-
             self.convoId = convoId
-
             self.sequencerDsDid = sequencerDsDid
-
             self.sequencerTerm = sequencerTerm
-
             self.epoch = epoch
-
             self.lastSeq = lastSeq
-
             self.eventCount = eventCount
-
             self.digestSha256 = digestSha256
-
             self.generatedAt = generatedAt
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.convoId = try container.decode(String.self, forKey: .convoId)
-
             self.sequencerDsDid = try container.decode(String.self, forKey: .sequencerDsDid)
-
             self.sequencerTerm = try container.decode(Int.self, forKey: .sequencerTerm)
-
             self.epoch = try container.decode(Int.self, forKey: .epoch)
-
             self.lastSeq = try container.decode(Int.self, forKey: .lastSeq)
-
             self.eventCount = try container.decode(Int.self, forKey: .eventCount)
-
             self.digestSha256 = try container.decode(String.self, forKey: .digestSha256)
-
             self.generatedAt = try container.decode(ATProtocolDate.self, forKey: .generatedAt)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(convoId, forKey: .convoId)
-
-            try container.encode(sequencerDsDid, forKey: .sequencerDsDid)
-
-            try container.encode(sequencerTerm, forKey: .sequencerTerm)
-
-            try container.encode(epoch, forKey: .epoch)
-
-            try container.encode(lastSeq, forKey: .lastSeq)
-
-            try container.encode(eventCount, forKey: .eventCount)
-
-            try container.encode(digestSha256, forKey: .digestSha256)
-
-            try container.encode(generatedAt, forKey: .generatedAt)
-
+            try container.encode(self.convoId, forKey: .convoId)
+            try container.encode(self.sequencerDsDid, forKey: .sequencerDsDid)
+            try container.encode(self.sequencerTerm, forKey: .sequencerTerm)
+            try container.encode(self.epoch, forKey: .epoch)
+            try container.encode(self.lastSeq, forKey: .lastSeq)
+            try container.encode(self.eventCount, forKey: .eventCount)
+            try container.encode(self.digestSha256, forKey: .digestSha256)
+            try container.encode(self.generatedAt, forKey: .generatedAt)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let convoIdValue = try convoId.toCBORValue()
+            let convoIdValue = try self.convoId.toCBORValue()
             map = map.adding(key: "convoId", value: convoIdValue)
-
-            let sequencerDsDidValue = try sequencerDsDid.toCBORValue()
+            let sequencerDsDidValue = try self.sequencerDsDid.toCBORValue()
             map = map.adding(key: "sequencerDsDid", value: sequencerDsDidValue)
-
-            let sequencerTermValue = try sequencerTerm.toCBORValue()
+            let sequencerTermValue = try self.sequencerTerm.toCBORValue()
             map = map.adding(key: "sequencerTerm", value: sequencerTermValue)
-
-            let epochValue = try epoch.toCBORValue()
+            let epochValue = try self.epoch.toCBORValue()
             map = map.adding(key: "epoch", value: epochValue)
-
-            let lastSeqValue = try lastSeq.toCBORValue()
+            let lastSeqValue = try self.lastSeq.toCBORValue()
             map = map.adding(key: "lastSeq", value: lastSeqValue)
-
-            let eventCountValue = try eventCount.toCBORValue()
+            let eventCountValue = try self.eventCount.toCBORValue()
             map = map.adding(key: "eventCount", value: eventCountValue)
-
-            let digestSha256Value = try digestSha256.toCBORValue()
+            let digestSha256Value = try self.digestSha256.toCBORValue()
             map = map.adding(key: "digestSha256", value: digestSha256Value)
-
-            let generatedAtValue = try generatedAt.toCBORValue()
+            let generatedAtValue = try self.generatedAt.toCBORValue()
             map = map.adding(key: "generatedAt", value: generatedAtValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -161,7 +114,6 @@ public struct BlueCatbirdMlsDSGetConvoDigest {
             case digestSha256
             case generatedAt
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -183,9 +135,8 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
     /// Get a cryptographic digest of all messages in a conversation for reconciliation. Compute and return a SHA-256 digest over all messages in a conversation, along with sequencer state.
     ///
     /// - Parameter input: The input parameters for the request
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdMlsDSGetConvoDigest.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getConvoDigest(input: BlueCatbirdMlsDSGetConvoDigest.Parameters) async throws -> (responseCode: Int, data: BlueCatbirdMlsDSGetConvoDigest.Output?) {
         let endpoint = "blue.catbird.mlsDS.getConvoDigest"
 
@@ -205,42 +156,24 @@ extension ATProtoClient.Blue.Catbird.MlsDS {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled via the status code / structured error parser below.
-        if (200...299).contains(responseCode) {
-
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
-
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdMlsDSGetConvoDigest.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.mlsDS.getConvoDigest: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdMlsDSGetConvoDigest.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // If we can't parse a structured error, return the response code
-            // (maintains backward compatibility for endpoints without defined errors)
-            return (responseCode, nil)
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdMlsDSGetConvoDigest.Error.self)
         }
+
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
+
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
+
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdMlsDSGetConvoDigest.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
+        }
+
     }
 }

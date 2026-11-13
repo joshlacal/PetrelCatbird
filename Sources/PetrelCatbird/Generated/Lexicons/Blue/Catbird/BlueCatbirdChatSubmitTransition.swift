@@ -4,14 +4,18 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.chat.submitTransition
 
+/// Submits exactly one closed signed transition: ordinary public Commit, group-only policy change, leaf-recovery fulfillment, metadata update, or group leave fulfillment. Generic signedCommitTransition has zero Add proposals and zero membership changes; only signedLeafRecoveryFulfillment may contain exactly one target-device-signed request-bound Add, fulfilled by a different current leaf with one Welcome. No admin/current leaf can reserve and Add another device. Direct participant and role mutations are forbidden. Group invitation changes recheck consent, pending limits, and every-pair block policy; recovery selection and final Add consume a fresh complete exact-scope policy projection under lock. Self-exit fulfillment is never denied by relationship state. Epoch-changing forms carry a fresh-nonce final-epoch metadata snapshot. The server validates and merges the public Commit in disposable OpenMLS storage before atomically replacing its digest-bound deterministic PublicGroup snapshot. External commits, standalone proposals, post-GroupInfo artifacts, and committer self-removal are forbidden.
 public struct BlueCatbirdChatSubmitTransition {
 
     public static let typeIdentifier = "blue.catbird.chat.submitTransition"
+
     public struct Input: ATProtocolCodable {
+
         public let signedRequest: BlueCatbirdChatDefs.SignedTransition
 
-        /// Standard public initializer
-        public init(signedRequest: BlueCatbirdChatDefs.SignedTransition) {
+        public init(
+            signedRequest: BlueCatbirdChatDefs.SignedTransition
+        ) {
             self.signedRequest = signedRequest
         }
 
@@ -22,12 +26,12 @@ public struct BlueCatbirdChatSubmitTransition {
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(signedRequest, forKey: .signedRequest)
+            try container.encode(self.signedRequest, forKey: .signedRequest)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let signedRequestValue = try signedRequest.toCBORValue()
+            let signedRequestValue = try self.signedRequest.toCBORValue()
             map = map.adding(key: "signedRequest", value: signedRequestValue)
             return map
         }
@@ -40,69 +44,42 @@ public struct BlueCatbirdChatSubmitTransition {
     public struct Output: ATProtocolCodable {
 
         public let coordinates: BlueCatbirdChatDefs.ConversationCoordinates
-
         public let entry: BlueCatbirdChatDefs.ConversationEntry
-
         public let welcomes: [BlueCatbirdChatDefs.WelcomeView]
 
-        // Standard public initializer
         public init(
-
             coordinates: BlueCatbirdChatDefs.ConversationCoordinates,
-
             entry: BlueCatbirdChatDefs.ConversationEntry,
-
             welcomes: [BlueCatbirdChatDefs.WelcomeView]
-
         ) {
-
             self.coordinates = coordinates
-
             self.entry = entry
-
             self.welcomes = welcomes
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.coordinates = try container.decode(BlueCatbirdChatDefs.ConversationCoordinates.self, forKey: .coordinates)
-
             self.entry = try container.decode(BlueCatbirdChatDefs.ConversationEntry.self, forKey: .entry)
-
             self.welcomes = try container.decode([BlueCatbirdChatDefs.WelcomeView].self, forKey: .welcomes)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(coordinates, forKey: .coordinates)
-
-            try container.encode(entry, forKey: .entry)
-
-            try container.encode(welcomes, forKey: .welcomes)
-
+            try container.encode(self.coordinates, forKey: .coordinates)
+            try container.encode(self.entry, forKey: .entry)
+            try container.encode(self.welcomes, forKey: .welcomes)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let coordinatesValue = try coordinates.toCBORValue()
+            let coordinatesValue = try self.coordinates.toCBORValue()
             map = map.adding(key: "coordinates", value: coordinatesValue)
-
-            let entryValue = try entry.toCBORValue()
+            let entryValue = try self.entry.toCBORValue()
             map = map.adding(key: "entry", value: entryValue)
-
-            let welcomesValue = try welcomes.toCBORValue()
+            let welcomesValue = try self.welcomes.toCBORValue()
             map = map.adding(key: "welcomes", value: welcomesValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -110,7 +87,6 @@ public struct BlueCatbirdChatSubmitTransition {
             case entry
             case welcomes
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -177,11 +153,10 @@ extension ATProtoClient.Blue.Catbird.Chat {
     // MARK: - submitTransition
     /// Submits exactly one closed signed transition: ordinary public Commit, group-only policy change, leaf-recovery fulfillment, metadata update, or group leave fulfillment. Generic signedCommitTransition has zero Add proposals and zero membership changes; only signedLeafRecoveryFulfillment may contain exactly one target-device-signed request-bound Add, fulfilled by a different current leaf with one Welcome. No admin/current leaf can reserve and Add another device. Direct participant and role mutations are forbidden. Group invitation changes recheck consent, pending limits, and every-pair block policy; recovery selection and final Add consume a fresh complete exact-scope policy projection under lock. Self-exit fulfillment is never denied by relationship state. Epoch-changing forms carry a fresh-nonce final-epoch metadata snapshot. The server validates and merges the public Commit in disposable OpenMLS storage before atomically replacing its digest-bound deterministic PublicGroup snapshot. External commits, standalone proposals, post-GroupInfo artifacts, and committer self-removal are forbidden.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdChatSubmitTransition.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func submitTransition(
 
         input: BlueCatbirdChatSubmitTransition.Input
@@ -213,44 +188,24 @@ extension ATProtoClient.Blue.Catbird.Chat {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdChatSubmitTransition.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdChatSubmitTransition.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.chat.submitTransition: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdChatSubmitTransition.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdChatSubmitTransition.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

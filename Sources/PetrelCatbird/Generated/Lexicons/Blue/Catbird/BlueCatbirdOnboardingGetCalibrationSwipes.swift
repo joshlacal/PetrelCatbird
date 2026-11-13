@@ -4,16 +4,22 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.onboarding.getCalibrationSwipes
 
+/// Build dynamic contrastive Taste Duel cards tailored to the user's selected communities and potential ambiguity traps.
 public struct BlueCatbirdOnboardingGetCalibrationSwipes {
 
     public static let typeIdentifier = "blue.catbird.onboarding.getCalibrationSwipes"
+
     public struct Input: ATProtocolCodable {
+
         public let selections: [BlueCatbirdOnboardingDefs.CommunitySelection]
         public let seedFollowDids: [DID]?
         public let maxSwipes: Int?
 
-        /// Standard public initializer
-        public init(selections: [BlueCatbirdOnboardingDefs.CommunitySelection], seedFollowDids: [DID]? = nil, maxSwipes: Int? = nil) {
+        public init(
+            selections: [BlueCatbirdOnboardingDefs.CommunitySelection],
+            seedFollowDids: [DID]? = nil,
+            maxSwipes: Int? = nil
+        ) {
             self.selections = selections
             self.seedFollowDids = seedFollowDids
             self.maxSwipes = maxSwipes
@@ -21,27 +27,28 @@ public struct BlueCatbirdOnboardingGetCalibrationSwipes {
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
             self.selections = try container.decode([BlueCatbirdOnboardingDefs.CommunitySelection].self, forKey: .selections)
-            self.seedFollowDids = try container.decodeIfPresent([DID].self, forKey: .seedFollowDids)
-            self.maxSwipes = try container.decodeIfPresent(Int.self, forKey: .maxSwipes)
+            self.seedFollowDids = try container.decodeIfPresent([DID].self, forKey: .seedFollowDids, rejectingNull: strict)
+            self.maxSwipes = try container.decodeIfPresent(Int.self, forKey: .maxSwipes, rejectingNull: strict)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(selections, forKey: .selections)
-            try container.encodeIfPresent(seedFollowDids, forKey: .seedFollowDids)
-            try container.encodeIfPresent(maxSwipes, forKey: .maxSwipes)
+            try container.encode(self.selections, forKey: .selections)
+            try container.encodeIfPresent(self.seedFollowDids, forKey: .seedFollowDids)
+            try container.encodeIfPresent(self.maxSwipes, forKey: .maxSwipes)
         }
 
         public func toCBORValue() throws -> Any {
             var map = OrderedCBORMap()
-            let selectionsValue = try selections.toCBORValue()
+            let selectionsValue = try self.selections.toCBORValue()
             map = map.adding(key: "selections", value: selectionsValue)
-            if let value = seedFollowDids {
+            if let value = self.seedFollowDids {
                 let seedFollowDidsValue = try value.toCBORValue()
                 map = map.adding(key: "seedFollowDids", value: seedFollowDidsValue)
             }
-            if let value = maxSwipes {
+            if let value = self.maxSwipes {
                 let maxSwipesValue = try value.toCBORValue()
                 map = map.adding(key: "maxSwipes", value: maxSwipesValue)
             }
@@ -58,63 +65,41 @@ public struct BlueCatbirdOnboardingGetCalibrationSwipes {
     public struct Output: ATProtocolCodable {
 
         public let catalogVersion: String
-
         public let swipes: [BlueCatbirdOnboardingDefs.CalibrationSwipeCard]
 
-        // Standard public initializer
         public init(
-
             catalogVersion: String,
-
             swipes: [BlueCatbirdOnboardingDefs.CalibrationSwipeCard]
-
         ) {
-
             self.catalogVersion = catalogVersion
-
             self.swipes = swipes
-
         }
 
         public init(from decoder: Decoder) throws {
-
             let container = try decoder.container(keyedBy: CodingKeys.self)
-
             self.catalogVersion = try container.decode(String.self, forKey: .catalogVersion)
-
             self.swipes = try container.decode([BlueCatbirdOnboardingDefs.CalibrationSwipeCard].self, forKey: .swipes)
-
         }
 
         public func encode(to encoder: Encoder) throws {
-
             var container = encoder.container(keyedBy: CodingKeys.self)
-
-            try container.encode(catalogVersion, forKey: .catalogVersion)
-
-            try container.encode(swipes, forKey: .swipes)
-
+            try container.encode(self.catalogVersion, forKey: .catalogVersion)
+            try container.encode(self.swipes, forKey: .swipes)
         }
 
         public func toCBORValue() throws -> Any {
-
             var map = OrderedCBORMap()
-
-            let catalogVersionValue = try catalogVersion.toCBORValue()
+            let catalogVersionValue = try self.catalogVersion.toCBORValue()
             map = map.adding(key: "catalogVersion", value: catalogVersionValue)
-
-            let swipesValue = try swipes.toCBORValue()
+            let swipesValue = try self.swipes.toCBORValue()
             map = map.adding(key: "swipes", value: swipesValue)
-
             return map
-
         }
 
         private enum CodingKeys: String, CodingKey {
             case catalogVersion
             case swipes
         }
-
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
@@ -136,11 +121,10 @@ extension ATProtoClient.Blue.Catbird.Onboarding {
     // MARK: - getCalibrationSwipes
     /// Build dynamic contrastive Taste Duel cards tailored to the user's selected communities and potential ambiguity traps.
     ///
-    /// - Parameter input: The input parameters for the request
-
-    ///
-    /// - Returns: A tuple containing the HTTP response code and the decoded response data
-    /// - Throws: NetworkError if the request fails or the response cannot be processed
+    /// - Parameters:
+    ///   - input: The request body
+    /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
+    /// - Throws: `ATProtoError<BlueCatbirdOnboardingGetCalibrationSwipes.Error>` when the server answers with an error this Lexicon declares, `ATProtoXRPCError` for any other non-2xx response (its `error` and `message` are the server's `{error, message}` body), `XRPCResponseDecodingError` when a 2xx body does not match the output schema, and `NetworkError` for transport failures.
     public func getCalibrationSwipes(
 
         input: BlueCatbirdOnboardingGetCalibrationSwipes.Input
@@ -172,44 +156,24 @@ extension ATProtoClient.Blue.Catbird.Onboarding {
         let (responseData, response) = try await networkService.performRequestReturningHTTPErrorResponses(urlRequest, skipTokenRefresh: false, additionalHeaders: proxyHeaders)
         let responseCode = response.statusCode
 
-        // Only validate Content-Type and decode on success. Error responses
-        // (4xx/5xx) may have missing or different Content-Type headers and
-        // are handled by the caller via the status code.
-        if (200...299).contains(responseCode) {
+        guard (200...299).contains(responseCode) else {
+            throw ATProtoErrorParser.xrpcError(data: responseData, response: response, declaredErrors: BlueCatbirdOnboardingGetCalibrationSwipes.Error.self)
+        }
 
-            guard let contentType = response.allHeaderFields["Content-Type"] as? String else {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
-            }
+        guard let contentType = response.value(forHTTPHeaderField: "Content-Type") else {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: "nil")
+        }
 
-            if !contentType.lowercased().contains("application/json") {
-                throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
-            }
+        if !contentType.lowercased().contains("application/json") {
+            throw NetworkError.invalidContentType(expected: "application/json", actual: contentType)
+        }
 
-            do {
-
-                let decoder = JSONDecoder()
-                let decodedData = try decoder.decode(BlueCatbirdOnboardingGetCalibrationSwipes.Output.self, from: responseData)
-
-                return (responseCode, decodedData)
-            } catch {
-                // Log the decoding error for debugging but still return the response code
-                LogManager.logError("Failed to decode successful response for blue.catbird.onboarding.getCalibrationSwipes: \(error)")
-                return (responseCode, nil)
-            }
-        } else {
-            // Try to parse a declared structured error response
-            if let atprotoError = ATProtoErrorParser.parse(
-                data: responseData,
-                statusCode: responseCode,
-                errorType: BlueCatbirdOnboardingGetCalibrationSwipes.Error.self
-            ) {
-                throw atprotoError
-            }
-
-            // Don't try to decode unknown or malformed error responses as success types
-            return (responseCode, nil)
+        do {
+            let decodedData = try JSONDecoder().decode(BlueCatbirdOnboardingGetCalibrationSwipes.Output.self, from: responseData)
+            return (responseCode, decodedData)
+        } catch {
+            throw XRPCResponseDecodingError(endpoint: endpoint, statusCode: responseCode, underlying: error)
         }
 
     }
-
 }

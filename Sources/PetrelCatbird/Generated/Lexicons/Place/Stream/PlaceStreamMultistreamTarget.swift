@@ -4,90 +4,134 @@ import Petrel
 
 // lexicon: 1, id: place.stream.multistream.target
 
+/// An external server for rebroadcasting a Streamplace stream
 public struct PlaceStreamMultistreamTarget: ATProtocolCodable, ATProtocolValue {
 
     public static let typeIdentifier = "place.stream.multistream.target"
-    public let url: URI
-    public let active: Bool
-    public let createdAt: ATProtocolDate
-    public let name: String?
 
-    public init(url: URI, active: Bool, createdAt: ATProtocolDate, name: String? = nil) {
+    /// The record key type this collection declares (`key` in the Lexicon).
+    public static let recordKeyType = LexiconRecordKeyType(lexiconValue: "tid")
+
+    /// The rtmp:// or rtmps:// url of the target server.
+    public let url: URI
+    /// Whether this target is currently active.
+    public let active: Bool
+    /// When this target was created.
+    public let createdAt: ATProtocolDate
+    /// A user-friendly name for this target.
+    public let name: String?
+    /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+    /// written back on encode, so re-serializing data never drops them.
+    public let extraFields: [String: ATProtocolValueContainer]
+
+    public init(
+        url: URI,
+        active: Bool,
+        createdAt: ATProtocolDate,
+        name: String? = nil,
+        extraFields: [String: ATProtocolValueContainer] = [:]
+    ) {
         self.url = url
         self.active = active
         self.createdAt = createdAt
         self.name = name
+        self.extraFields = extraFields
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let strict = decoder.isATProtoStrictDecoding
+        var malformedFields: Swift.Set<String> = []
         self.url = try container.decode(URI.self, forKey: .url)
         self.active = try container.decode(Bool.self, forKey: .active)
         self.createdAt = try container.decode(ATProtocolDate.self, forKey: .createdAt)
         do {
-            self.name = try container.decodeIfPresent(String.self, forKey: .name)
+            self.name = try container.decodeIfPresent(String.self, forKey: .name, rejectingNull: strict)
         } catch {
-            // Forward compatibility: a malformed optional field must not fail the whole record.
+            // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+            // fail here. The default keeps reading what the network actually serves and
+            // reads only the malformed optional field as nil. Its raw value is kept in
+            // the extra fields, so writing this value back does not lose it.
+            guard !strict else { throw error }
             LogManager.logWarning("Decoding error for optional property 'name' — degrading to nil: \(error)")
             self.name = nil
+            malformedFields.insert("name")
         }
+        self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.typeIdentifier, forKey: .typeIdentifier)
-        try container.encode(url, forKey: .url)
-        try container.encode(active, forKey: .active)
-        try container.encode(createdAt, forKey: .createdAt)
-        try container.encodeIfPresent(name, forKey: .name)
+        try container.encode(self.url, forKey: .url)
+        try container.encode(self.active, forKey: .active)
+        try container.encode(self.createdAt, forKey: .createdAt)
+        try container.encodeIfPresent(self.name, forKey: .name)
+        try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.url)
+        hasher.combine(self.active)
+        hasher.combine(self.createdAt)
+        if let value = self.name {
+            hasher.combine(value)
+        } else {
+            hasher.combine(nil as Int?)
+        }
+        hasher.combine(extraFields)
+    }
+
+    public func isEqual(to other: any ATProtocolValue) -> Bool {
+        guard let other = other as? Self else { return false }
+        if self.url != other.url {
+            return false
+        }
+        if self.active != other.active {
+            return false
+        }
+        if self.createdAt != other.createdAt {
+            return false
+        }
+        if self.name != other.name {
+            return false
+        }
+        return self.extraFields == other.extraFields
     }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.isEqual(to: rhs)
     }
 
-    public func isEqual(to other: any ATProtocolValue) -> Bool {
-        guard let other = other as? Self else { return false }
-        if url != other.url {
-            return false
-        }
-        if active != other.active {
-            return false
-        }
-        if createdAt != other.createdAt {
-            return false
-        }
-        if name != other.name {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(url)
-        hasher.combine(active)
-        hasher.combine(createdAt)
-        if let value = name {
-            hasher.combine(value)
-        } else {
-            hasher.combine(nil as Int?)
-        }
-    }
-
     public func toCBORValue() throws -> Any {
         var map = OrderedCBORMap()
         map = map.adding(key: "$type", value: Self.typeIdentifier)
-        let urlValue = try url.toCBORValue()
+        let urlValue = try self.url.toCBORValue()
         map = map.adding(key: "url", value: urlValue)
-        let activeValue = try active.toCBORValue()
+        let activeValue = try self.active.toCBORValue()
         map = map.adding(key: "active", value: activeValue)
-        let createdAtValue = try createdAt.toCBORValue()
+        let createdAtValue = try self.createdAt.toCBORValue()
         map = map.adding(key: "createdAt", value: createdAtValue)
-        if let value = name {
+        if let value = self.name {
             let nameValue = try value.toCBORValue()
             map = map.adding(key: "name", value: nameValue)
         }
-        return map
+        return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
+    }
+
+    private static let knownFieldKeys: Swift.Set<String> = ["$type", "url", "active", "createdAt", "name"]
+
+    /// Whether this value writes the wire field `name` itself. An extra field of the
+    /// same name (a malformed value kept from decoding) is written only when it is not.
+    private func hasValue(forField name: String) -> Bool {
+        switch name {
+        case "$type": return true
+        case "url": return true
+        case "active": return true
+        case "createdAt": return true
+        case "name": return self.name != nil
+        default: return false
+        }
     }
 
     private enum CodingKeys: String, CodingKey {

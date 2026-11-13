@@ -19,6 +19,39 @@ The aggregate hashes path-sorted lines of each file's SHA-256, two spaces, its
 path relative to `lexicons`, and LF. `Package.swift` pins a published Petrel
 revision so package resolution does not depend on the neighboring checkout.
 
+## Wave 1 Spaces Nov-12 + Petrel 2.0 + Encrypted Circles convergence (2026-11-13)
+
+This projection pins `Package.swift` to published `Petrel` `2912970ccda2579da71c3f7673a8da733b1ac83b`
+(Petrel 2.0 + November 12, 2026 ATProto Spaces `d4def6e9` / `471`-file core lexicon corpus,
+aggregate SHA-256 `8bf4f0e4ada9249cfbdcd2175d334af8da3b0f047b90d5f3073c7e2b086246d7`),
+merges the encrypted-Circle schemas (`blue.catbird.circle.encrypted`, `blue.catbird.circle.key`,
+`blue.catbird.circle.post`, `blue.catbird.circle.getKeys`, and encrypted feed/capability fields),
+renames `name` to `title` on all four Space declarations (`blue.catbird.circle`,
+`blue.catbird.circle.encrypted`, `blue.catbird.labyrinth.mailbox`, and
+`blue.catbird.labyrinth.conversation`), adds `blue.catbird.labyrinth.authorRedaction` and
+`blue.catbird.labyrinth.defs#originalSenderArchiveAttestation`, reconciles
+`blue.catbird.chat.authFull` (`81e4bb8fbe28c3325488a376a4642253156493f94a086a5e832ba84c43a641e3`)
+to the exact 35 live `blue.catbird.chat.*` RPC endpoints plus create-only repository permissions on
+`blue.catbird.chat.device` and `blue.catbird.labyrinth.mailboxKeys`, declares `SignedOperationExpired`
+on `blue.catbird.chat.createConversation` (`57b9564be2fc2039481a9cf68d4e680c3ad6f7ca014e289be2f58e4de16b085a`),
+and adds optional November 12
+`authorizeSpaceSync` / `listWriters` / RFC 9421 `acceptSignature` parameters to
+`blue.catbird.chat.relaySpaceCredential` and `blue.catbird.chat.relaySpaceRead`.
+
+The canonical `blue.catbird.chat.defs.json` remains SHA-256
+`b0fe4af17f657647a8e1ceedb7a34765a0c72d514420ce3b153d6ecd11d240ff`.
+The 208-file overlay aggregate is
+`9a92f47aad03ec507338619f3bfcef2ccf827fbd3cf76facd66b0fab2be88a60`.
+The Kotlin generator applies `887b522a18949dda322ef9c3f0119ab52b95c2eb`
+(`generator/kotlin_type_converter.py` SHA-256
+`574296a73ede89d3fc3dc35db015101649f730361aeeb13da05386181119ec4c`) so all
+64-bit (`maximum > 2147483647`), `*Ms`, and `authGeneration` fields emit Kotlin `Long`.
+The generated projections (formatted with SwiftFormat **0.61.1**) contain
+210 Swift files (aggregate `1a684ad826739ed061c2fc889e9b14293d02648ecbb279b15a65a0e584364222`),
+209 Kotlin files (aggregate `787f97b6897bc238478f4fa70ff2f8916f00c870dbadd7a54fe2666602fa9c15`),
+and 707 Rust files in `catbird-atproto` (aggregate
+`783f72db31c17a9883c68b9f334aa8aa4392f098abe5a790f7113dccfb3d4392`).
+
 ## Task 5 receipt projection (2026-11-11)
 
 This projection removes the unsupported optional `sequencerReceipt` from
