@@ -19,11 +19,13 @@ object BlueCatbirdCircleDefs {
 data class SpaceDeclarationDescriptor(
     val nsid: String,
     val keyType: String,
-    val name: String,
+    val title: String?,
+    val titleLang: Map<String, String>,
     val collections: List<String>,
 )
 
 val spaceDeclaration = SpaceDeclarationDescriptor(
     nsid = "blue.catbird.circle", keyType = "tid",
-    name = "Catbird Circle", collections = listOf("blue.catbird.circle.metadata", "app.bsky.feed.post", "app.bsky.feed.like"),
+    title = "Catbird Circle", titleLang = mapOf(),
+    collections = listOf("blue.catbird.circle.metadata", "app.bsky.feed.post", "app.bsky.feed.like"),
 )

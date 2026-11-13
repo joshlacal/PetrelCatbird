@@ -5,7 +5,7 @@
     "main": {
       "type": "space",
       "key": "tid",
-      "name": "Catbird Circle",
+      "title": "Catbird Circle",
       "description": "An author-owned private posting audience",
       "collections": [
         "blue.catbird.circle.metadata",
