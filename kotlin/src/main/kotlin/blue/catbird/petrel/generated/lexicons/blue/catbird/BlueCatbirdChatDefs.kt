@@ -5326,7 +5326,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("blobId")
         val blobId: BlueCatbirdChatDefsOperationId,        @SerialName("ciphertextSha256")
         val ciphertextSha256: BlueCatbirdChatDefsArtifactHash,        @SerialName("ciphertextSize")
-        val ciphertextSize: Int,        @SerialName("purpose")
+        val ciphertextSize: Long,        @SerialName("purpose")
         val purpose: BlueCatbirdChatDefsDefsBlobPurpose    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsUploadedBlobBinding"
@@ -5341,7 +5341,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("blobId")
         val blobId: BlueCatbirdChatDefsOperationId,        @SerialName("ciphertextSha256")
         val ciphertextSha256: BlueCatbirdChatDefsArtifactHash,        @SerialName("ciphertextSize")
-        val ciphertextSize: Int,        @SerialName("purpose")
+        val ciphertextSize: Long,        @SerialName("purpose")
         val purpose: String    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsApplicationAttachmentBinding"
@@ -5356,7 +5356,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("blobId")
         val blobId: BlueCatbirdChatDefsOperationId,        @SerialName("ciphertextSha256")
         val ciphertextSha256: BlueCatbirdChatDefsArtifactHash,        @SerialName("ciphertextSize")
-        val ciphertextSize: Int,        @SerialName("purpose")
+        val ciphertextSize: Long,        @SerialName("purpose")
         val purpose: String    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsMetadataAvatarBinding"
@@ -5369,7 +5369,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val blobId: BlueCatbirdChatDefsOperationId,        @SerialName("uploadTicket")
         val uploadTicket: String,        @SerialName("ciphertextSha256")
         val ciphertextSha256: BlueCatbirdChatDefsArtifactHash,        @SerialName("ciphertextSize")
-        val ciphertextSize: Int,        @SerialName("purpose")
+        val ciphertextSize: Long,        @SerialName("purpose")
         val purpose: BlueCatbirdChatDefsDefsBlobPurpose,        @SerialName("expiresAt")
         val expiresAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
         companion object {
@@ -5382,7 +5382,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("usedBytes")
         val usedBytes: Long,        @SerialName("reservedBytes")
         val reservedBytes: Long,        @SerialName("quotaBytes")
-        val quotaBytes: Int,        @SerialName("blobCount")
+        val quotaBytes: Long,        @SerialName("blobCount")
         val blobCount: Long,        @SerialName("liveUnboundCount")
         val liveUnboundCount: Int    ) {
         companion object {
@@ -5402,7 +5402,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val deviceName: String,        @SerialName("keyId")
         val keyId: BlueCatbirdChatDefsKeyId,        @SerialName("signaturePublicKey")
         val signaturePublicKey: Bytes,        @SerialName("expectedAuthGeneration")
-        val expectedAuthGeneration: Int,        @SerialName("capability")
+        val expectedAuthGeneration: Long,        @SerialName("capability")
         val capability: BlueCatbirdChatDefsDeviceCapability,        @SerialName("keyPackages")
         val keyPackages: List<BlueCatbirdChatDefsKeyPackageArtifact>,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
@@ -5617,8 +5617,8 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val key: Bytes,        @SerialName("nonce")
         val nonce: Bytes,        @SerialName("ciphertextSha256")
         val ciphertextSha256: BlueCatbirdChatDefsArtifactHash,        @SerialName("ciphertextSize")
-        val ciphertextSize: Int,        @SerialName("plaintextSize")
-        val plaintextSize: Int,        @SerialName("mimeType")
+        val ciphertextSize: Long,        @SerialName("plaintextSize")
+        val plaintextSize: Long,        @SerialName("mimeType")
         val mimeType: BlueCatbirdChatDefsEncryptedImageEmbedMimeType,        @SerialName("width")
         val width: Int,        @SerialName("height")
         val height: Int,        @SerialName("altText")
@@ -5643,10 +5643,10 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val key: Bytes,        @SerialName("nonce")
         val nonce: Bytes,        @SerialName("ciphertextSha256")
         val ciphertextSha256: BlueCatbirdChatDefsArtifactHash,        @SerialName("ciphertextSize")
-        val ciphertextSize: Int,        @SerialName("plaintextSize")
-        val plaintextSize: Int,        @SerialName("mimeType")
+        val ciphertextSize: Long,        @SerialName("plaintextSize")
+        val plaintextSize: Long,        @SerialName("mimeType")
         val mimeType: BlueCatbirdChatDefsEncryptedAudioEmbedMimeType,        @SerialName("durationMillis")
-        val durationMillis: Int,        @SerialName("waveform")
+        val durationMillis: Long,        @SerialName("waveform")
         val waveform: Bytes,        @SerialName("transcript")
         val transcript: String? = null,        @SerialName("setterDid")
         val setterDid: BlueCatbirdChatDefsBareDid? = null,        @SerialName("spaceBlobCid")
@@ -5859,7 +5859,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val blobId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("purpose")
         val purpose: String,        @SerialName("mediaType")
         val mediaType: String,        @SerialName("plaintextSize")
-        val plaintextSize: Int    ) {
+        val plaintextSize: Long    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsBlobAad"
         }
@@ -5877,8 +5877,8 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val key: Bytes,        @SerialName("nonce")
         val nonce: Bytes,        @SerialName("ciphertextSha256")
         val ciphertextSha256: BlueCatbirdChatDefsArtifactHash,        @SerialName("ciphertextSize")
-        val ciphertextSize: Int,        @SerialName("plaintextSize")
-        val plaintextSize: Int,        @SerialName("mimeType")
+        val ciphertextSize: Long,        @SerialName("plaintextSize")
+        val plaintextSize: Long,        @SerialName("mimeType")
         val mimeType: BlueCatbirdChatDefsMetadataAvatarEmbedMimeType,        @SerialName("width")
         val width: Int,        @SerialName("height")
         val height: Int,        @SerialName("altText")
@@ -5906,7 +5906,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val blobId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("purpose")
         val purpose: String,        @SerialName("mediaType")
         val mediaType: String,        @SerialName("plaintextSize")
-        val plaintextSize: Int    ) {
+        val plaintextSize: Long    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsMetadataAvatarBlobAad"
         }
@@ -5935,7 +5935,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         @SerialName("blobId")
         val blobId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("ciphertextSha256")
         val ciphertextSha256: BlueCatbirdChatDefsArtifactHash,        @SerialName("ciphertextSize")
-        val ciphertextSize: Int,        @SerialName("purpose")
+        val ciphertextSize: Long,        @SerialName("purpose")
         val purpose: String    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsMetadataAadAvatarBinding"
@@ -5953,7 +5953,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val coordinate: BlueCatbirdChatDefsMetadataCryptoContext,        @SerialName("metadataVersion")
         val metadataVersion: Long,        @SerialName("originTransitionId")
         val originTransitionId: BlueCatbirdChatDefsIdentifierBytes,        @SerialName("ciphertextSize")
-        val ciphertextSize: Int,        @SerialName("avatarBinding")
+        val ciphertextSize: Long,        @SerialName("avatarBinding")
         val avatarBinding: BlueCatbirdChatDefsMetadataAadAvatarBinding? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsMetadataAad"
@@ -6023,7 +6023,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val nonce: Bytes,        @SerialName("ciphertext")
         val ciphertext: Bytes,        @SerialName("ciphertextSha256")
         val ciphertextSha256: BlueCatbirdChatDefsArtifactHash,        @SerialName("ciphertextSize")
-        val ciphertextSize: Int,        @SerialName("avatarBinding")
+        val ciphertextSize: Long,        @SerialName("avatarBinding")
         val avatarBinding: BlueCatbirdChatDefsMetadataAvatarBinding? = null,        @SerialName("authorProof")
         val authorProof: BlueCatbirdChatDefsMetadataAuthorProof    ) {
         companion object {
@@ -6102,9 +6102,9 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val authGeneration: Long,        @SerialName("prior")
         val prior: BlueCatbirdChatDefsConversationCoordinates,        @SerialName("ciphertextSha256")
         val ciphertextSha256: BlueCatbirdChatDefsArtifactHash,        @SerialName("ciphertextSize")
-        val ciphertextSize: Int,        @SerialName("mediaType")
+        val ciphertextSize: Long,        @SerialName("mediaType")
         val mediaType: String,        @SerialName("plaintextSize")
-        val plaintextSize: Int,        @SerialName("purpose")
+        val plaintextSize: Long,        @SerialName("purpose")
         val purpose: BlueCatbirdChatDefsDefsBlobPurpose,        @SerialName("idempotencyKey")
         val idempotencyKey: BlueCatbirdChatDefsOperationId,        @SerialName("signedAt")
         val signedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {

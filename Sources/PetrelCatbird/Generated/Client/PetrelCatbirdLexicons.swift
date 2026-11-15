@@ -222,6 +222,7 @@ public enum PetrelCatbirdLexicons {
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#signedPushRegistration", as: BlueCatbirdChatDefs.SignedPushRegistration.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#pushRegistrationBinding", as: BlueCatbirdChatDefs.PushRegistrationBinding.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.device", as: BlueCatbirdChatDevice.self)
+        ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.deviceRevocation", as: BlueCatbirdChatDeviceRevocation.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.relaySpaceCredential#notifyTarget", as: BlueCatbirdChatRelaySpaceCredential.NotifyTarget.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.circle.defs#circleSummary", as: BlueCatbirdCircleDefs.CircleSummary.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.circle.defs#feedItem", as: BlueCatbirdCircleDefs.FeedItem.self)

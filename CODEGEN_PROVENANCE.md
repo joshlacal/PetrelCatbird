@@ -19,6 +19,32 @@ The aggregate hashes path-sorted lines of each file's SHA-256, two spaces, its
 path relative to `lexicons`, and LF. `Package.swift` pins a published Petrel
 revision so package resolution does not depend on the neighboring checkout.
 
+## Wave 1b + B4/D3/D4 remediation (2026-11-15)
+
+This projection repins `Package.swift` to `Petrel` `87acd38094470f0629134dc98d602334d3e0f01f`
+(`471`-file core lexicon corpus, aggregate SHA-256
+`8bf4f0e4ada9249cfbdcd2175d334af8da3b0f047b90d5f3073c7e2b086246d7`;
+`generator/kotlin_type_converter.py` SHA-256
+`d9924c955df1d096cc3c33bc2d3b7a3eb6f11b67c3a2319ceb7e37d7e0a665ea`, completing
+64-bit Kotlin `Long` coverage across `maximum > 2147483647`, `minimum < -2147483648`,
+and protocol counters/timestamps/cursors/revisions/byte-sizes), adds the create-only
+signed `blue.catbird.chat.deviceRevocation` record lexicon
+(`7c6eaa28cf56826d4d858ae8faee63862d4481a9f801ac0a48cc6d18bcd5641e`), updates
+`blue.catbird.chat.authFull` (`4082c305fd4be83e6f9fce184274f84d2cc7be15f7ee5f5e89955cc0f032ff71`)
+to grant create-only repository permission on `blue.catbird.chat.deviceRevocation`,
+and aligns `SpaceRef(hedgedURIString:)` / `SpaceRef.hedgedURIString` with
+`atproto_spaces::SpaceUri`.
+
+The canonical `blue.catbird.chat.defs.json` remains SHA-256
+`b0fe4af17f657647a8e1ceedb7a34765a0c72d514420ce3b153d6ecd11d240ff`.
+The 212-file overlay aggregate is
+`e872a1ed969399c1fb18e9cc7b4c95be06b143276eb628c33e81eea493c5b6b8`.
+The generated projections (formatted with SwiftFormat **0.61.1**) contain
+214 Swift files (aggregate `7c049d1f710a52b3cfa5fcfb526849c4e3ff595f953050d796939a9b6367bf60`),
+213 Kotlin files (aggregate `878e39ffa23e015010b6eff8e3dba17fb341dfb0881c37f8445f08e9f95b7132`),
+and 711 Rust files in `catbird-atproto` (aggregate
+`9f8d49754929a0dd4e177731b9dfca9cf72b4122e9cf6e29215b84a078dc4c46`).
+
 ## Wave 1 Spaces Nov-12 + Petrel 2.0 + Encrypted Circles convergence (2026-11-13)
 
 This projection pins `Package.swift` to published `Petrel` `2912970ccda2579da71c3f7673a8da733b1ac83b`

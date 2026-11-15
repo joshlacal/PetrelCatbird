@@ -3,12 +3,39 @@ import Petrel
 
 public extension SpaceRef {
     /// Parses a canonical `at://{did}/space/{spaceType}/{skey}` reference or normalizes
-    /// legacy `at:space/{did}/{spaceType}/{skey}` and `at://space/{did}/{spaceType}/{skey}`
-    /// spellings on untrusted read boundaries before validating with `SpaceRef(uriString:)`.
+    /// legacy `at:space/{did}/{spaceType}/{skey}`, `at://space/{did}/{spaceType}/{skey}`,
+    /// and `at://{did}/com.atproto.space.space/{rkey}` spellings on untrusted read boundaries
+    /// before validating with `SpaceRef(uriString:)`.
     init?(hedgedURIString raw: String) {
         if let canonical = try? SpaceRef(uriString: raw) {
             self = canonical
             return
+        }
+
+        if raw.hasPrefix("at://") {
+            let atParts = raw.dropFirst("at://".count)
+                .split(separator: "/", omittingEmptySubsequences: false)
+            if atParts.count == 4, atParts[1] == "com.atproto.space.space" {
+                let rewritten = "at://\(atParts[0])/space/\(atParts[2])/\(atParts[3])"
+                if let normalized = try? SpaceRef(uriString: rewritten) {
+                    self = normalized
+                    return
+                }
+            } else if atParts.count == 3, atParts[1] == "com.atproto.space.space" {
+                let rkey = String(atParts[2])
+                if let colon = rkey.firstIndex(of: ":") {
+                    let st = String(rkey[..<colon])
+                    let sk = String(rkey[rkey.index(after: colon)...])
+                    if let normalized = try? SpaceRef(uriString: "at://\(atParts[0])/space/\(st)/\(sk)") {
+                        self = normalized
+                        return
+                    }
+                }
+                if let normalized = try? SpaceRef(uriString: "at://\(atParts[0])/space/com.atproto.space.space/\(rkey)") {
+                    self = normalized
+                    return
+                }
+            }
         }
 
         let remainder: Substring
@@ -29,6 +56,11 @@ public extension SpaceRef {
             return nil
         }
         self = normalized
+    }
+
+    /// Emits the hedged `at:space/{spaceDID}/{spaceType}/{skey}` spelling.
+    var hedgedURIString: String {
+        "at:space/\(spaceDID)/\(spaceType)/\(skey)"
     }
 }
 

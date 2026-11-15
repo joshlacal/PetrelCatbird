@@ -28,8 +28,8 @@ object BlueCatbirdLabyrinthGetSpaceMembershipDefs {
         val space: SpaceRef,        @SerialName("generation")
         val generation: String,        @SerialName("user")
         val user: DID,        @SerialName("chatGeneration")
-        val chatGeneration: Int,        @SerialName("chatSeq")
-        val chatSeq: Int    )
+        val chatGeneration: Long,        @SerialName("chatSeq")
+        val chatSeq: Long    )
 
 sealed class BlueCatbirdLabyrinthGetSpaceMembershipError(val name: String, val description: String?) {
         object NotParticipant: BlueCatbirdLabyrinthGetSpaceMembershipError("NotParticipant", null)

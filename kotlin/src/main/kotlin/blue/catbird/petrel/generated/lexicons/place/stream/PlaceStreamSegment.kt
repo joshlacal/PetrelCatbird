@@ -83,7 +83,7 @@ enum class PlaceStreamSegmentVideoCodec {
         val creator: DID,        @SerialName("video")
         val video: List<PlaceStreamSegmentVideo>? = null,        @SerialName("audio")
         val audio: List<PlaceStreamSegmentAudio>? = null,/** The size of the segment in bytes */        @SerialName("size")
-        val size: Int? = null,        @SerialName("contentWarnings")
+        val size: Long? = null,        @SerialName("contentWarnings")
         val contentWarnings: PlaceStreamMetadataContentWarnings? = null,        @SerialName("contentRights")
         val contentRights: PlaceStreamMetadataContentRights? = null,        @SerialName("distributionPolicy")
         val distributionPolicy: PlaceStreamMetadataDistributionPolicy? = null    ) {

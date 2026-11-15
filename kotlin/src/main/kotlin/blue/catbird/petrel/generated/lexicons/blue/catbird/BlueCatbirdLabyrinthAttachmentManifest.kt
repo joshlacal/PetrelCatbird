@@ -24,7 +24,7 @@ object BlueCatbirdLabyrinthAttachmentManifestDefs {
 /** Opaque AES-256-GCM encrypted attachment blob reference. */        @SerialName("blob")
         val blob: Blob,/** Raw SHA-256 digest of the encrypted blob bytes. */        @SerialName("sha256")
         val sha256: Bytes,/** Exact byte length of the encrypted blob. */        @SerialName("ciphertextSize")
-        val ciphertextSize: Int,/** Optional non-sensitive category hint (default application/octet-stream). */        @SerialName("mimeTypeHint")
+        val ciphertextSize: Long,/** Optional non-sensitive category hint (default application/octet-stream). */        @SerialName("mimeTypeHint")
         val mimeTypeHint: String? = null,        @SerialName("createdAt")
         val createdAt: ATProtocolDate    ) {
         companion object {

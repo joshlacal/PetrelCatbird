@@ -22,12 +22,12 @@ object BlueCatbirdMlsDSGetConvoEventsDefs {
     @Serializable
     data class BlueCatbirdMlsDSGetConvoEventsConvoEventEntry(
 /** Sequence number */        @SerialName("seq")
-        val seq: Int,/** MLS epoch */        @SerialName("epoch")
-        val epoch: Int,/** Message ID */        @SerialName("msgId")
+        val seq: Long,/** MLS epoch */        @SerialName("epoch")
+        val epoch: Long,/** Message ID */        @SerialName("msgId")
         val msgId: String,/** Message type (e.g., 'app') */        @SerialName("messageType")
         val messageType: String,/** Encrypted message payload */        @SerialName("ciphertext")
         val ciphertext: Bytes,/** Padded plaintext size */        @SerialName("paddedSize")
-        val paddedSize: Int,/** Creation timestamp */        @SerialName("createdAt")
+        val paddedSize: Long,/** Creation timestamp */        @SerialName("createdAt")
         val createdAt: ATProtocolDate,        @SerialName("entryId")
         val entryId: String? = null,        @SerialName("entryKind")
         val entryKind: String? = null,        @SerialName("acceptedPayloadSha256")
@@ -44,15 +44,15 @@ object BlueCatbirdMlsDSGetConvoEventsDefs {
     data class BlueCatbirdMlsDSGetConvoEventsParameters(
 // Conversation ID        @SerialName("convoId")
         val convoId: String,// Return events after this sequence number (exclusive). Defaults to 0.        @SerialName("afterSeq")
-        val afterSeq: Int? = null,// Maximum number of events to return (1-1000, default 200).        @SerialName("limit")
+        val afterSeq: Long? = null,// Maximum number of events to return (1-1000, default 200).        @SerialName("limit")
         val limit: Int? = null    )
 
     @Serializable
     data class BlueCatbirdMlsDSGetConvoEventsOutput(
 // Conversation ID        @SerialName("convoId")
         val convoId: String,// Lower bound sequence number (exclusive)        @SerialName("fromSeqExclusive")
-        val fromSeqExclusive: Int,// Upper bound sequence number (inclusive)        @SerialName("toSeqInclusive")
-        val toSeqInclusive: Int,// Ordered list of conversation events        @SerialName("events")
+        val fromSeqExclusive: Long,// Upper bound sequence number (inclusive)        @SerialName("toSeqInclusive")
+        val toSeqInclusive: Long,// Ordered list of conversation events        @SerialName("events")
         val events: List<BlueCatbirdMlsDSGetConvoEventsConvoEventEntry>    )
 
 sealed class BlueCatbirdMlsDSGetConvoEventsError(val name: String, val description: String?) {

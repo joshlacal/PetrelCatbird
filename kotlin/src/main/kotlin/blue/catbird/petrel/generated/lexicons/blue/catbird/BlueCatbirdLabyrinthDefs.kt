@@ -111,7 +111,7 @@ object BlueCatbirdLabyrinthDefsDefs {
 /** Chat message id. */        @SerialName("messageId")
         val messageId: String,/** Sequenced MLS entry seq from sequencerReceipt (I13). */        @SerialName("seq")
         val seq: Long? = null,/** Milliseconds since Unix epoch. */        @SerialName("timestamp")
-        val timestamp: Int,/** 12-byte MEK id. */        @SerialName("mekId")
+        val timestamp: Long,/** 12-byte MEK id. */        @SerialName("mekId")
         val mekId: Bytes,/** Sender chat device Ed25519 key. */        @SerialName("senderTransportPubkey")
         val senderTransportPubkey: Bytes,/** Ed25519 sig(64) || suite-tagged AEAD ciphertext of the padded (frameNonce || canonicalPayloadBytes) frame; empty once redacted. */        @SerialName("signedEncMessage")
         val signedEncMessage: Bytes,        @SerialName("sequencerReceipt")
@@ -131,7 +131,7 @@ object BlueCatbirdLabyrinthDefsDefs {
         val threadId: String,/** Message id. */        @SerialName("messageId")
         val messageId: String,/** Sequenced MLS entry seq when archived from a live conversation. */        @SerialName("seq")
         val seq: Long? = null,/** ms since Unix epoch. */        @SerialName("timestamp")
-        val timestamp: Int,/** Epoch whose root key derived the message key. */        @SerialName("epochNumber")
+        val timestamp: Long,/** Epoch whose root key derived the message key. */        @SerialName("epochNumber")
         val epochNumber: Long,/** Cipher version. Writers use 5 ([CB-37]: binds messageId and timestamp; content kind byte for delete-for-me tombstones); readers also accept 0, 2, 3 and 4 (SPEC §7.1). */        @SerialName("version")
         val version: Int,/** Suite-tagged AEAD ciphertext of the padded frame (carrying frameNonce inside ciphertext when sequencerReceipt is present). */        @SerialName("encrypted")
         val encrypted: Bytes,        @SerialName("sequencerReceipt")
@@ -189,7 +189,7 @@ object BlueCatbirdLabyrinthDefsDefs {
     data class BlueCatbirdLabyrinthDefsSpaceBatchRedaction(
         @SerialName("messageId")
         val messageId: String,        @SerialName("timestamp")
-        val timestamp: Int,        @SerialName("redaction")
+        val timestamp: Long,        @SerialName("redaction")
         val redaction: BlueCatbirdLabyrinthDefsRedaction    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthDefsSpaceBatchRedaction"

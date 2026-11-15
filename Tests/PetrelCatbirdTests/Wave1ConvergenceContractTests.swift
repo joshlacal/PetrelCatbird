@@ -40,6 +40,17 @@ struct Wave1ConvergenceContractTests {
             hedgedURIString: "at://space/did:web:ds.catbird.blue/blue.catbird.labyrinth.conversation/conv1-0"
         )
         #expect(atDoubleSlash?.uriString() == Self.sampleSpace)
+        #expect(atDoubleSlash?.hedgedURIString == "at:space/did:web:ds.catbird.blue/blue.catbird.labyrinth.conversation/conv1-0")
+
+        let recordForm = SpaceRef(
+            hedgedURIString: "at://did:web:ds.catbird.blue/com.atproto.space.space/blue.catbird.labyrinth.conversation:conv1-0"
+        )
+        #expect(recordForm?.uriString() == Self.sampleSpace)
+
+        let bareSpaceRecordForm = SpaceRef(
+            hedgedURIString: "at://did:web:ds.catbird.blue/com.atproto.space.space/conv1-0"
+        )
+        #expect(bareSpaceRecordForm?.uriString() == "at://did:web:ds.catbird.blue/space/com.atproto.space.space/conv1-0")
 
         #expect(SpaceRef(hedgedURIString: "at://did:plc:ewvi7nxzyoun6zhxrhs64oiz/app.bsky.feed.post/3l2aaaa") == nil)
         #expect(SpaceRef(hedgedURIString: "\(Self.sampleSpace)/\(Self.sampleRepo)/blue.catbird.labyrinth.batch/3l2aaaa") == nil)
@@ -143,9 +154,33 @@ struct Wave1ConvergenceContractTests {
         #expect(
             repoPerm["collection"] as? [String] == [
                 "blue.catbird.chat.device",
+                "blue.catbird.chat.deviceRevocation",
                 "blue.catbird.labyrinth.mailboxKeys",
             ]
         )
+    }
+
+    @Test func deviceRevocationRecordRoundTrips() throws {
+        let keyB64 = Data(repeating: 0x33, count: 32).base64EncodedString()
+        let sigB64 = Data(repeating: 0x44, count: 64).base64EncodedString()
+        let revocationJson = """
+        {
+            "$type": "blue.catbird.chat.deviceRevocation",
+            "targetDeviceId": "00000000-0000-4000-8000-000000000002",
+            "actorDeviceId": "00000000-0000-4000-8000-000000000001",
+            "signerPublicKey": {"$bytes": "\(keyB64)"},
+            "signature": {"$bytes": "\(sigB64)"},
+            "algorithm": "ed25519",
+            "reason": "revoked_by_sibling",
+            "createdAt": "2026-11-15T12:00:00Z"
+        }
+        """.data(using: .utf8)!
+        let rev = try JSONDecoder().decode(BlueCatbirdChatDeviceRevocation.self, from: revocationJson)
+        #expect(rev.targetDeviceId == "00000000-0000-4000-8000-000000000002")
+        #expect(rev.actorDeviceId == "00000000-0000-4000-8000-000000000001")
+        #expect(rev.signerPublicKey.data.count == 32)
+        #expect(rev.signature.data.count == 64)
+        #expect(rev.algorithm == "ed25519")
     }
 
     @Test func authorRedactionAndNov12RelayTypesDecode() throws {

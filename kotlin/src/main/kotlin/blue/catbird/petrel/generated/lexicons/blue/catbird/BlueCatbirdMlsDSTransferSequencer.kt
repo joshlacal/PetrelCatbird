@@ -20,14 +20,14 @@ object BlueCatbirdMlsDSTransferSequencerDefs {
     data class BlueCatbirdMlsDSTransferSequencerInput(
 // Conversation ID        @SerialName("convoId")
         val convoId: String,// Current epoch at time of transfer (informational)        @SerialName("currentEpoch")
-        val currentEpoch: Int? = null,// New sequencer term to establish        @SerialName("newSequencerTerm")
-        val newSequencerTerm: Int    )
+        val currentEpoch: Long? = null,// New sequencer term to establish        @SerialName("newSequencerTerm")
+        val newSequencerTerm: Long    )
 
     @Serializable
     data class BlueCatbirdMlsDSTransferSequencerOutput(
 // Whether the transfer was accepted        @SerialName("accepted")
         val accepted: Boolean,// Confirmed new sequencer term        @SerialName("newSequencerTerm")
-        val newSequencerTerm: Int    )
+        val newSequencerTerm: Long    )
 
 sealed class BlueCatbirdMlsDSTransferSequencerError(val name: String, val description: String?) {
         object ConversationNotFound: BlueCatbirdMlsDSTransferSequencerError("ConversationNotFound", null)

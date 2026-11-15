@@ -17,7 +17,7 @@ class BlobUploadPreparationContractTest {
 
     private fun body(
         mediaType: String = "image/png",
-        plaintextSize: Int = 16,
+        plaintextSize: Long = 16L,
     ): BlueCatbirdChatDefsBlobUploadPreparationBody {
         val bytes = Bytes(ByteArray(32) { 7 })
         return BlueCatbirdChatDefsBlobUploadPreparationBody(
@@ -30,16 +30,16 @@ class BlobUploadPreparationContractTest {
             authGeneration = 1,
             prior = BlueCatbirdChatDefsConversationCoordinates(
                 conversationId = "00000000-0000-4000-8000-000000000001",
-                generation = 1,
+                generation = 3_000_000_000L,
                 stateVersion = 2,
                 groupId = bytes,
-                epoch = 3,
+                epoch = 3_000_000_001L,
                 groupContextHash = bytes,
                 confirmationTag = bytes,
                 lifecycle = BlueCatbirdChatDefsDefsLifecycle.value_active,
             ),
             ciphertextSha256 = bytes,
-            ciphertextSize = plaintextSize + 16,
+            ciphertextSize = plaintextSize + 16L,
             mediaType = mediaType,
             plaintextSize = plaintextSize,
             purpose = BlueCatbirdChatDefsDefsBlobPurpose.value_attachment,
@@ -55,14 +55,30 @@ class BlobUploadPreparationContractTest {
         val decoded = json.decodeFromString<BlueCatbirdChatDefsBlobUploadPreparationBody>(encoded)
 
         assertEquals("image/png", decoded.mediaType)
-        assertEquals(16, decoded.plaintextSize)
+        assertEquals(16L, decoded.plaintextSize)
+        assertEquals(3_000_000_000L, decoded.prior.generation)
+        assertEquals(3_000_000_001L, decoded.prior.epoch)
         assertEquals(body, decoded)
         assertNotEquals(body, body(mediaType = "image/jpeg"))
-        assertNotEquals(body, body(plaintextSize = 17))
+        assertNotEquals(body, body(plaintextSize = 17L))
 
         val objectValue = json.parseToJsonElement(encoded).jsonObject
         assertEquals("image/png", objectValue.getValue("mediaType").jsonPrimitive.content)
-        assertEquals(16, objectValue.getValue("plaintextSize").jsonPrimitive.content.toInt())
+        assertEquals(16L, objectValue.getValue("plaintextSize").jsonPrimitive.content.toLong())
+    }
+
+    @Test
+    fun deviceRevocationRecordRoundTrips() {
+        val record = BlueCatbirdChatDeviceRevocation(
+            targetDeviceId = "00000000-0000-4000-8000-000000000010",
+            actorDeviceId = "00000000-0000-4000-8000-000000000011",
+            signerPublicKey = Bytes(ByteArray(32) { 1 }),
+            signature = Bytes(ByteArray(64) { 2 }),
+            createdAt = ATProtocolDate("2026-11-15T00:00:00Z"),
+        )
+        val encoded = json.encodeToString(record)
+        val decoded = json.decodeFromString<BlueCatbirdChatDeviceRevocation>(encoded)
+        assertEquals(record, decoded)
     }
 
     @Test
