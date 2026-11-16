@@ -26,7 +26,7 @@ object BlueCatbirdMlsDSGetConvoDigestDefs {
 // Conversation ID        @SerialName("convoId")
         val convoId: String,// DID of the current sequencer DS        @SerialName("sequencerDsDid")
         val sequencerDsDid: String,// Current sequencer term        @SerialName("sequencerTerm")
-        val sequencerTerm: Int,// Current MLS epoch        @SerialName("epoch")
+        val sequencerTerm: Long,// Current MLS epoch        @SerialName("epoch")
         val epoch: Long,// Highest sequence number        @SerialName("lastSeq")
         val lastSeq: Long,// Total number of events/messages        @SerialName("eventCount")
         val eventCount: Int,// Hex-encoded SHA-256 digest over all messages        @SerialName("digestSha256")
