@@ -26,7 +26,7 @@ object BlueCatbirdLabyrinthListRecoverySharesDefs {
         val mechanism: String,        @SerialName("createdAt")
         val createdAt: ATProtocolDate,/** Chat device that stored the share. */        @SerialName("createdByDeviceId")
         val createdByDeviceId: String? = null,        @SerialName("lastFetchedAt")
-        val lastFetchedAt: ATProtocolDate? = null,/** Successful restore fetches; verify reads are not counted. */        @SerialName("fetchCount")
+        val lastFetchedAt: ATProtocolDate? = null,/** Successful share reads other than the creator's first verify read within ten minutes of put; later purpose-verify reads are counted as fetches. */        @SerialName("fetchCount")
         val fetchCount: Long    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdLabyrinthListRecoverySharesShareView"

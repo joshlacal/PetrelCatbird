@@ -17,7 +17,7 @@ public struct BlueCatbirdLabyrinthGetRecoveryShare {
         public let fetchToken: Bytes
         /// Fresh single-use X25519 public key the share is sealed to.
         public let recipientPublicKey: Bytes
-        /// restore (the default) for a device recovering the account. verify is the storing device's read-back right after putRecoveryShare; the service honours it only for the active device that stored this share and records it as a verify event, otherwise it treats the call as restore.
+        /// restore (the default) for a device recovering the account. verify is the storing device's single uncounted read-back within ten minutes after putRecoveryShare; the service honours it only once for the active device that stored this share and records it as a verify event. Later or other-device reads are recorded and counted as restore fetches even when purpose is verify.
         public let purpose: String?
 
         public init(

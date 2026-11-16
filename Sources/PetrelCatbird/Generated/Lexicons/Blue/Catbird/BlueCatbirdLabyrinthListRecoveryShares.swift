@@ -21,7 +21,7 @@ public struct BlueCatbirdLabyrinthListRecoveryShares {
         /// Chat device that stored the share.
         public let createdByDeviceId: String?
         public let lastFetchedAt: ATProtocolDate?
-        /// Successful restore fetches; verify reads are not counted.
+        /// Successful share reads other than the creator's first verify read within ten minutes of put; later purpose-verify reads are counted as fetches.
         public let fetchCount: Int
         /// Wire fields this Lexicon revision does not declare. They are kept on decode and
         /// written back on encode, so re-serializing data never drops them.

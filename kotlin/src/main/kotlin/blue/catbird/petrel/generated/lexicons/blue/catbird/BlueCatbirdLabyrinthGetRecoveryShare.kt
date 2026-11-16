@@ -21,7 +21,7 @@ object BlueCatbirdLabyrinthGetRecoveryShareDefs {
 // Recovery bundle (virtual device) id: the 16-byte vid derived from the recovery code, equal to the bundle's record key in hex.        @SerialName("vdeviceId")
         val vdeviceId: Bytes,// The 32-byte fetch token derived from the recovery code. It is independent of the code-derived bundle key.        @SerialName("fetchToken")
         val fetchToken: Bytes,// Fresh single-use X25519 public key the share is sealed to.        @SerialName("recipientPublicKey")
-        val recipientPublicKey: Bytes,// restore (the default) for a device recovering the account. verify is the storing device's read-back right after putRecoveryShare; the service honours it only for the active device that stored this share and records it as a verify event, otherwise it treats the call as restore.        @SerialName("purpose")
+        val recipientPublicKey: Bytes,// restore (the default) for a device recovering the account. verify is the storing device's single uncounted read-back within ten minutes after putRecoveryShare; the service honours it only once for the active device that stored this share and records it as a verify event. Later or other-device reads are recorded and counted as restore fetches even when purpose is verify.        @SerialName("purpose")
         val purpose: String? = null    )
 
     @Serializable
