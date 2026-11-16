@@ -7147,9 +7147,24 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
         val sequencerDid: BlueCatbirdChatDefsBareDid,        @SerialName("sequencerAuthority")
         val sequencerAuthority: BlueCatbirdChatDefsAccountDeletionAuthority,        @SerialName("signature")
         val signature: Bytes? = null,        @SerialName("receivedAt")
-        val receivedAt: BlueCatbirdChatDefsCanonicalDatetime    ) {
+        val receivedAt: BlueCatbirdChatDefsCanonicalDatetime,/** Optional. Private Catbird surface (blue.catbird.*), not an ATProto or community-ratified lexicon. The deleting device's own signed deleteAccountData request, copied verbatim. It sits beside sequencerAuthority, whose transcript does not cover it. */        @SerialName("actorWrite")
+        val actorWrite: BlueCatbirdChatDefsAccountDeletionActorWrite? = null,/** Optional; present only together with actorWrite. Private Catbird surface (blue.catbird.*), not an ATProto or community-ratified lexicon. A CARv1 repository proof in the com.atproto.sync.getRecord shape: the signed repository commit of deletedDid, the MST path, and the record block for blue.catbird.chat.device/{actorDeviceId}, where actorDeviceId comes from actorWrite.writeBody. It verifies under the #atproto key of deletedDid's DID document, so a reader can check the signing device's key after deletedDid's repository is gone. It is captured before the repository is deleted and copied verbatim into every copy of the entry. */        @SerialName("keyProof")
+        val keyProof: Bytes? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsAccountDeletedEntry"
+        }
+    }
+
+    /**
+     * Private Catbird surface (blue.catbird.*), not an ATProto or community-ratified lexicon. The signed request with which a device of deletedDid called blue.catbird.labyrinth.deleteAccountData. writeBody is the exact labyrinthWriteBody JSON bytes the device sent, {operationId, actorDeviceId, endpointNsid, payloadSha256, signedAt}, never re-encoded. signature is the device's 64-byte Ed25519 signature over UTF8(CATBIRD-LABYRINTH-WRITE\0) followed by writeBody. endpointNsid is blue.catbird.labyrinth.deleteAccountData, actorDeviceId names the signing device of deletedDid, and signedAt is the device-signed deletion instant. Every direct, relayed and mirrored copy of the entry carries the same bytes.
+     */
+    @Serializable
+    data class BlueCatbirdChatDefsAccountDeletionActorWrite(
+        @SerialName("writeBody")
+        val writeBody: Bytes,        @SerialName("signature")
+        val signature: Bytes    ) {
+        companion object {
+            const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsAccountDeletionActorWrite"
         }
     }
 

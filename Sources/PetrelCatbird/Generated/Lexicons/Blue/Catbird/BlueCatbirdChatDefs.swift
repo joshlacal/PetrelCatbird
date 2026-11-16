@@ -19202,6 +19202,10 @@ public struct BlueCatbirdChatDefs {
         public let sequencerAuthority: AccountDeletionAuthority
         public let signature: Bytes?
         public let receivedAt: CanonicalDatetime
+        /// Optional. Private Catbird surface (blue.catbird.*), not an ATProto or community-ratified lexicon. The deleting device's own signed deleteAccountData request, copied verbatim. It sits beside sequencerAuthority, whose transcript does not cover it.
+        public let actorWrite: AccountDeletionActorWrite?
+        /// Optional; present only together with actorWrite. Private Catbird surface (blue.catbird.*), not an ATProto or community-ratified lexicon. A CARv1 repository proof in the com.atproto.sync.getRecord shape: the signed repository commit of deletedDid, the MST path, and the record block for blue.catbird.chat.device/{actorDeviceId}, where actorDeviceId comes from actorWrite.writeBody. It verifies under the #atproto key of deletedDid's DID document, so a reader can check the signing device's key after deletedDid's repository is gone. It is captured before the repository is deleted and copied verbatim into every copy of the entry.
+        public let keyProof: Bytes?
         /// Wire fields this Lexicon revision does not declare. They are kept on decode and
         /// written back on encode, so re-serializing data never drops them.
         public let extraFields: [String: ATProtocolValueContainer]
@@ -19215,6 +19219,8 @@ public struct BlueCatbirdChatDefs {
             sequencerAuthority: AccountDeletionAuthority,
             signature: Bytes? = nil,
             receivedAt: CanonicalDatetime,
+            actorWrite: AccountDeletionActorWrite? = nil,
+            keyProof: Bytes? = nil,
             extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.entryId = entryId
@@ -19225,6 +19231,8 @@ public struct BlueCatbirdChatDefs {
             self.sequencerAuthority = sequencerAuthority
             self.signature = signature
             self.receivedAt = receivedAt
+            self.actorWrite = actorWrite
+            self.keyProof = keyProof
             self.extraFields = extraFields
         }
 
@@ -19251,6 +19259,30 @@ public struct BlueCatbirdChatDefs {
                 malformedFields.insert("signature")
             }
             self.receivedAt = try container.decode(CanonicalDatetime.self, forKey: .receivedAt)
+            do {
+                self.actorWrite = try container.decodeIfPresent(AccountDeletionActorWrite.self, forKey: .actorWrite, rejectingNull: strict)
+            } catch {
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
+                LogManager.logWarning("Decoding error for optional property 'actorWrite' — degrading to nil: \(error)")
+                self.actorWrite = nil
+                malformedFields.insert("actorWrite")
+            }
+            do {
+                self.keyProof = try container.decodeIfPresent(Bytes.self, forKey: .keyProof, rejectingNull: strict)
+            } catch {
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
+                LogManager.logWarning("Decoding error for optional property 'keyProof' — degrading to nil: \(error)")
+                self.keyProof = nil
+                malformedFields.insert("keyProof")
+            }
             self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
@@ -19264,6 +19296,8 @@ public struct BlueCatbirdChatDefs {
             try container.encode(self.sequencerAuthority, forKey: .sequencerAuthority)
             try container.encodeIfPresent(self.signature, forKey: .signature)
             try container.encode(self.receivedAt, forKey: .receivedAt)
+            try container.encodeIfPresent(self.actorWrite, forKey: .actorWrite)
+            try container.encodeIfPresent(self.keyProof, forKey: .keyProof)
             try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
@@ -19280,6 +19314,16 @@ public struct BlueCatbirdChatDefs {
                 hasher.combine(nil as Int?)
             }
             hasher.combine(self.receivedAt)
+            if let value = self.actorWrite {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = self.keyProof {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(extraFields)
         }
 
@@ -19309,6 +19353,12 @@ public struct BlueCatbirdChatDefs {
             if self.receivedAt != other.receivedAt {
                 return false
             }
+            if self.actorWrite != other.actorWrite {
+                return false
+            }
+            if self.keyProof != other.keyProof {
+                return false
+            }
             return self.extraFields == other.extraFields
         }
 
@@ -19336,10 +19386,18 @@ public struct BlueCatbirdChatDefs {
             }
             let receivedAtValue = try self.receivedAt.toCBORValue()
             map = map.adding(key: "receivedAt", value: receivedAtValue)
+            if let value = self.actorWrite {
+                let actorWriteValue = try value.toCBORValue()
+                map = map.adding(key: "actorWrite", value: actorWriteValue)
+            }
+            if let value = self.keyProof {
+                let keyProofValue = try value.toCBORValue()
+                map = map.adding(key: "keyProof", value: keyProofValue)
+            }
             return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
         }
 
-        private static let knownFieldKeys: Swift.Set<String> = ["$type", "entryId", "conversationId", "seq", "deletedDid", "sequencerDid", "sequencerAuthority", "signature", "receivedAt"]
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "entryId", "conversationId", "seq", "deletedDid", "sequencerDid", "sequencerAuthority", "signature", "receivedAt", "actorWrite", "keyProof"]
 
         /// Whether this value writes the wire field `name` itself. An extra field of the
         /// same name (a malformed value kept from decoding) is written only when it is not.
@@ -19353,6 +19411,8 @@ public struct BlueCatbirdChatDefs {
             case "sequencerAuthority": return true
             case "signature": return self.signature != nil
             case "receivedAt": return true
+            case "actorWrite": return self.actorWrite != nil
+            case "keyProof": return self.keyProof != nil
             default: return false
             }
         }
@@ -19366,6 +19426,79 @@ public struct BlueCatbirdChatDefs {
             case sequencerAuthority
             case signature
             case receivedAt
+            case actorWrite
+            case keyProof
+        }
+    }
+    /// Private Catbird surface (blue.catbird.*), not an ATProto or community-ratified lexicon. The signed request with which a device of deletedDid called blue.catbird.labyrinth.deleteAccountData. writeBody is the exact labyrinthWriteBody JSON bytes the device sent, {operationId, actorDeviceId, endpointNsid, payloadSha256, signedAt}, never re-encoded. signature is the device's 64-byte Ed25519 signature over UTF8(CATBIRD-LABYRINTH-WRITE\0) followed by writeBody. endpointNsid is blue.catbird.labyrinth.deleteAccountData, actorDeviceId names the signing device of deletedDid, and signedAt is the device-signed deletion instant. Every direct, relayed and mirrored copy of the entry carries the same bytes.
+    public struct AccountDeletionActorWrite: ATProtocolCodable, ATProtocolValue {
+        public static let typeIdentifier = "blue.catbird.chat.defs#accountDeletionActorWrite"
+
+        public let writeBody: Bytes
+        public let signature: Bytes
+        /// Wire fields this Lexicon revision does not declare. They are kept on decode and
+        /// written back on encode, so re-serializing data never drops them.
+        public let extraFields: [String: ATProtocolValueContainer]
+
+        public init(
+            writeBody: Bytes,
+            signature: Bytes,
+            extraFields: [String: ATProtocolValueContainer] = [:]
+        ) {
+            self.writeBody = writeBody
+            self.signature = signature
+            self.extraFields = extraFields
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.writeBody = try container.decode(Bytes.self, forKey: .writeBody)
+            self.signature = try container.decode(Bytes.self, forKey: .signature)
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(self.writeBody, forKey: .writeBody)
+            try container.encode(self.signature, forKey: .signature)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(self.writeBody)
+            hasher.combine(self.signature)
+            hasher.combine(extraFields)
+        }
+
+        public func isEqual(to other: any ATProtocolValue) -> Bool {
+            guard let other = other as? Self else { return false }
+            if self.writeBody != other.writeBody {
+                return false
+            }
+            if self.signature != other.signature {
+                return false
+            }
+            return self.extraFields == other.extraFields
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            return lhs.isEqual(to: rhs)
+        }
+
+        public func toCBORValue() throws -> Any {
+            var map = OrderedCBORMap()
+            let writeBodyValue = try self.writeBody.toCBORValue()
+            map = map.adding(key: "writeBody", value: writeBodyValue)
+            let signatureValue = try self.signature.toCBORValue()
+            map = map.adding(key: "signature", value: signatureValue)
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
+        }
+
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "writeBody", "signature"]
+
+        private enum CodingKeys: String, CodingKey {
+            case writeBody
+            case signature
         }
     }
     public struct ConversationChangedEvent: ATProtocolCodable, ATProtocolValue {

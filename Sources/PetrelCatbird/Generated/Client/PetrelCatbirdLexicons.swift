@@ -160,6 +160,7 @@ public enum PetrelCatbirdLexicons {
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#leaveCommitFulfillmentEntry", as: BlueCatbirdChatDefs.LeaveCommitFulfillmentEntry.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#accountDeletionAuthority", as: BlueCatbirdChatDefs.AccountDeletionAuthority.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#accountDeletedEntry", as: BlueCatbirdChatDefs.AccountDeletedEntry.self)
+        ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#accountDeletionActorWrite", as: BlueCatbirdChatDefs.AccountDeletionActorWrite.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#conversationChangedEvent", as: BlueCatbirdChatDefs.ConversationChangedEvent.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#conversationClosedEvent", as: BlueCatbirdChatDefs.ConversationClosedEvent.self)
         ATProtocolValueContainer.registerDecoder(forType: "blue.catbird.chat.defs#messageAvailableEvent", as: BlueCatbirdChatDefs.MessageAvailableEvent.self)
