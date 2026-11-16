@@ -7156,13 +7156,14 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     }
 
     /**
-     * Private Catbird surface (blue.catbird.*), not an ATProto or community-ratified lexicon. The signed request with which a device of deletedDid called blue.catbird.labyrinth.deleteAccountData. writeBody is the exact labyrinthWriteBody JSON bytes the device sent, {operationId, actorDeviceId, endpointNsid, payloadSha256, signedAt}, never re-encoded. signature is the device's 64-byte Ed25519 signature over UTF8(CATBIRD-LABYRINTH-WRITE\0) followed by writeBody. endpointNsid is blue.catbird.labyrinth.deleteAccountData, actorDeviceId names the signing device of deletedDid, and signedAt is the device-signed deletion instant. Every direct, relayed and mirrored copy of the entry carries the same bytes.
+     * Private Catbird surface (blue.catbird.*), not an ATProto or community-ratified lexicon. The signed request with which a device of deletedDid called blue.catbird.labyrinth.deleteAccountData. writeBody is the exact labyrinthWriteBody JSON bytes the device sent, {operationId, actorDeviceId, endpointNsid, payloadSha256, signedAt}, never re-encoded. payloadBytes is the exact HTTP JSON body whose SHA-256 equals writeBody.payloadSha256; readers parse it as an empty object and do not trust only the hash. signature is the device's 64-byte Ed25519 signature over UTF8(CATBIRD-LABYRINTH-WRITE\0) followed by writeBody. endpointNsid is blue.catbird.labyrinth.deleteAccountData, actorDeviceId names the signing device of deletedDid, and signedAt is the device-signed deletion instant. Every direct, relayed and mirrored copy of the entry carries the same bytes. Historical entries without payloadBytes decode but do not meet the client deletion-proof gate.
      */
     @Serializable
     data class BlueCatbirdChatDefsAccountDeletionActorWrite(
         @SerialName("writeBody")
         val writeBody: Bytes,        @SerialName("signature")
-        val signature: Bytes    ) {
+        val signature: Bytes,/** Optional for historical decoding; required for client enforcement. Exact signed deleteAccountData HTTP request body bytes, copied before account data is removed. The reader verifies SHA-256 against writeBody.payloadSha256 and requires the parsed JSON object to have no members. */        @SerialName("payloadBytes")
+        val payloadBytes: Bytes? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdChatDefsAccountDeletionActorWrite"
         }

@@ -19430,12 +19430,14 @@ public struct BlueCatbirdChatDefs {
             case keyProof
         }
     }
-    /// Private Catbird surface (blue.catbird.*), not an ATProto or community-ratified lexicon. The signed request with which a device of deletedDid called blue.catbird.labyrinth.deleteAccountData. writeBody is the exact labyrinthWriteBody JSON bytes the device sent, {operationId, actorDeviceId, endpointNsid, payloadSha256, signedAt}, never re-encoded. signature is the device's 64-byte Ed25519 signature over UTF8(CATBIRD-LABYRINTH-WRITE\0) followed by writeBody. endpointNsid is blue.catbird.labyrinth.deleteAccountData, actorDeviceId names the signing device of deletedDid, and signedAt is the device-signed deletion instant. Every direct, relayed and mirrored copy of the entry carries the same bytes.
+    /// Private Catbird surface (blue.catbird.*), not an ATProto or community-ratified lexicon. The signed request with which a device of deletedDid called blue.catbird.labyrinth.deleteAccountData. writeBody is the exact labyrinthWriteBody JSON bytes the device sent, {operationId, actorDeviceId, endpointNsid, payloadSha256, signedAt}, never re-encoded. payloadBytes is the exact HTTP JSON body whose SHA-256 equals writeBody.payloadSha256; readers parse it as an empty object and do not trust only the hash. signature is the device's 64-byte Ed25519 signature over UTF8(CATBIRD-LABYRINTH-WRITE\0) followed by writeBody. endpointNsid is blue.catbird.labyrinth.deleteAccountData, actorDeviceId names the signing device of deletedDid, and signedAt is the device-signed deletion instant. Every direct, relayed and mirrored copy of the entry carries the same bytes. Historical entries without payloadBytes decode but do not meet the client deletion-proof gate.
     public struct AccountDeletionActorWrite: ATProtocolCodable, ATProtocolValue {
         public static let typeIdentifier = "blue.catbird.chat.defs#accountDeletionActorWrite"
 
         public let writeBody: Bytes
         public let signature: Bytes
+        /// Optional for historical decoding; required for client enforcement. Exact signed deleteAccountData HTTP request body bytes, copied before account data is removed. The reader verifies SHA-256 against writeBody.payloadSha256 and requires the parsed JSON object to have no members.
+        public let payloadBytes: Bytes?
         /// Wire fields this Lexicon revision does not declare. They are kept on decode and
         /// written back on encode, so re-serializing data never drops them.
         public let extraFields: [String: ATProtocolValueContainer]
@@ -19443,30 +19445,52 @@ public struct BlueCatbirdChatDefs {
         public init(
             writeBody: Bytes,
             signature: Bytes,
+            payloadBytes: Bytes? = nil,
             extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.writeBody = writeBody
             self.signature = signature
+            self.payloadBytes = payloadBytes
             self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
             self.writeBody = try container.decode(Bytes.self, forKey: .writeBody)
             self.signature = try container.decode(Bytes.self, forKey: .signature)
-            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
+            do {
+                self.payloadBytes = try container.decodeIfPresent(Bytes.self, forKey: .payloadBytes, rejectingNull: strict)
+            } catch {
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
+                LogManager.logWarning("Decoding error for optional property 'payloadBytes' — degrading to nil: \(error)")
+                self.payloadBytes = nil
+                malformedFields.insert("payloadBytes")
+            }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(self.writeBody, forKey: .writeBody)
             try container.encode(self.signature, forKey: .signature)
-            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
+            try container.encodeIfPresent(self.payloadBytes, forKey: .payloadBytes)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
             hasher.combine(self.writeBody)
             hasher.combine(self.signature)
+            if let value = self.payloadBytes {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(extraFields)
         }
 
@@ -19476,6 +19500,9 @@ public struct BlueCatbirdChatDefs {
                 return false
             }
             if self.signature != other.signature {
+                return false
+            }
+            if self.payloadBytes != other.payloadBytes {
                 return false
             }
             return self.extraFields == other.extraFields
@@ -19491,14 +19518,30 @@ public struct BlueCatbirdChatDefs {
             map = map.adding(key: "writeBody", value: writeBodyValue)
             let signatureValue = try self.signature.toCBORValue()
             map = map.adding(key: "signature", value: signatureValue)
-            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
+            if let value = self.payloadBytes {
+                let payloadBytesValue = try value.toCBORValue()
+                map = map.adding(key: "payloadBytes", value: payloadBytesValue)
+            }
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
         }
 
-        private static let knownFieldKeys: Swift.Set<String> = ["$type", "writeBody", "signature"]
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "writeBody", "signature", "payloadBytes"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "writeBody": return true
+            case "signature": return true
+            case "payloadBytes": return self.payloadBytes != nil
+            default: return false
+            }
+        }
 
         private enum CodingKeys: String, CodingKey {
             case writeBody
             case signature
+            case payloadBytes
         }
     }
     public struct ConversationChangedEvent: ATProtocolCodable, ATProtocolValue {
