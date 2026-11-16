@@ -11,7 +11,6 @@ func localPetrelPathIfAvailable() -> String? {
         return nil
     }
     let candidates = [
-        siblingRoot.appendingPathComponent("wave1-cohesive/Petrel", isDirectory: true),
         siblingRoot.appendingPathComponent("Petrel", isDirectory: true),
     ]
     for raw in candidates {
