@@ -4,7 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.listRecoveryShares
 
-/// Private Catbird surface (blue.catbird.labyrinth.*), not an ATProto or community-ratified lexicon. The erasable recovery shares this service holds for the caller's DID, without share bytes. Clients compare it with their recovery methods: a method whose share is missing cannot be restored, and a share whose method was proven removed can be deleted. Mailbox endpoint on the caller's home DS. Requires a bound Labyrinth device (a current, non-virtual device registered by the calling chat device). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge.
+/// Private Catbird surface (blue.catbird.labyrinth.*), not an ATProto or community-ratified lexicon. The erasable recovery shares this service holds for the caller's DID, without share bytes. Clients compare it with their recovery methods: a method whose share is missing cannot be restored, and a share whose method was proven removed can be deleted. Mailbox endpoint on the caller's home DS. Requires an active, non-revoked chat device of the caller DID, proven by the account-bound service JWT and a signed device request. A pending chat device may not store, delete or list shares; the clean-slate service has no Labyrinth-device binding table. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge.
 public struct BlueCatbirdLabyrinthListRecoveryShares {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.listRecoveryShares"
@@ -250,7 +250,7 @@ public struct BlueCatbirdLabyrinthListRecoveryShares {
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
+        case chatDeviceNotActive = "ChatDeviceNotActive"
         public var description: String {
             return self.rawValue
         }
@@ -264,7 +264,7 @@ public struct BlueCatbirdLabyrinthListRecoveryShares {
 
 extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - listRecoveryShares
-    /// Private Catbird surface (blue.catbird.labyrinth.*), not an ATProto or community-ratified lexicon. The erasable recovery shares this service holds for the caller's DID, without share bytes. Clients compare it with their recovery methods: a method whose share is missing cannot be restored, and a share whose method was proven removed can be deleted. Mailbox endpoint on the caller's home DS. Requires a bound Labyrinth device (a current, non-virtual device registered by the calling chat device). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge.
+    /// Private Catbird surface (blue.catbird.labyrinth.*), not an ATProto or community-ratified lexicon. The erasable recovery shares this service holds for the caller's DID, without share bytes. Clients compare it with their recovery methods: a method whose share is missing cannot be restored, and a share whose method was proven removed can be deleted. Mailbox endpoint on the caller's home DS. Requires an active, non-revoked chat device of the caller DID, proven by the account-bound service JWT and a signed device request. A pending chat device may not store, delete or list shares; the clean-slate service has no Labyrinth-device binding table. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge.
     ///
     /// - Parameter input: The input parameters for the request
     /// - Returns: The HTTP status code (always 2xx) and the decoded response body.

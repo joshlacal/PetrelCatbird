@@ -4,7 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.listRecoveryShareEvents
 
-/// Private Catbird surface (blue.catbird.labyrinth.*), not an ATProto or community-ratified lexicon. The log of recovery-share activity for the caller's DID, oldest first: stores, verify reads, restore fetches, refused fetches, deletions and account purges, each with the acting chat device where known. Active devices poll it to tell the user when a recovery code or passkey was used to fetch a share. Mailbox endpoint on the caller's home DS. Requires a bound Labyrinth device (a current, non-virtual device registered by the calling chat device). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge.
+/// Private Catbird surface (blue.catbird.labyrinth.*), not an ATProto or community-ratified lexicon. The log of recovery-share activity for the caller's DID, oldest first: stores, verify reads, restore fetches, refused fetches, deletions and account purges, each with the acting chat device where known. Active devices poll it to tell the user when a recovery code or passkey was used to fetch a share. Mailbox endpoint on the caller's home DS. Requires an active, non-revoked chat device of the caller DID, proven by the account-bound service JWT and a signed device request. A pending chat device may not store, delete or list shares; the clean-slate service has no Labyrinth-device binding table. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge.
 public struct BlueCatbirdLabyrinthListRecoveryShareEvents {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.listRecoveryShareEvents"
@@ -219,7 +219,7 @@ public struct BlueCatbirdLabyrinthListRecoveryShareEvents {
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
-        case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
+        case chatDeviceNotActive = "ChatDeviceNotActive"
         public var description: String {
             return self.rawValue
         }
@@ -233,7 +233,7 @@ public struct BlueCatbirdLabyrinthListRecoveryShareEvents {
 
 extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - listRecoveryShareEvents
-    /// Private Catbird surface (blue.catbird.labyrinth.*), not an ATProto or community-ratified lexicon. The log of recovery-share activity for the caller's DID, oldest first: stores, verify reads, restore fetches, refused fetches, deletions and account purges, each with the acting chat device where known. Active devices poll it to tell the user when a recovery code or passkey was used to fetch a share. Mailbox endpoint on the caller's home DS. Requires a bound Labyrinth device (a current, non-virtual device registered by the calling chat device). Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge.
+    /// Private Catbird surface (blue.catbird.labyrinth.*), not an ATProto or community-ratified lexicon. The log of recovery-share activity for the caller's DID, oldest first: stores, verify reads, restore fetches, refused fetches, deletions and account purges, each with the acting chat device where known. Active devices poll it to tell the user when a recovery code or passkey was used to fetch a share. Mailbox endpoint on the caller's home DS. Requires an active, non-revoked chat device of the caller DID, proven by the account-bound service JWT and a signed device request. A pending chat device may not store, delete or list shares; the clean-slate service has no Labyrinth-device binding table. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge.
     ///
     /// - Parameter input: The input parameters for the request
     /// - Returns: The HTTP status code (always 2xx) and the decoded response body.
