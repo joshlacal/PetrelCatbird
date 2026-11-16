@@ -4934,7 +4934,7 @@ enum class BlueCatbirdChatDefsPushRegistrationBodyProvider {
     }
 
     /**
-     * Protocol v1 exact capability profile: suite 0x004D, BasicCredential, by-value Add/Remove and ordinary sender Update path. KeyPackage, LeafNode, and GroupContext extensions are empty; GroupInfo has exactly [ratchet_tree, external_pub]. External commits remain forbidden by protocol policy. Version 2 with directRequestProfile advertises parser support only; admission additionally requires active revisioned exact-package DirectRequestGrant signatures.
+     * Protocol v1 exact capability profile: suite 0x004D, BasicCredential, by-value Add/Remove and ordinary sender Update path. KeyPackage, LeafNode, and GroupContext extensions are empty; GroupInfo has exactly [ratchet_tree, external_pub]. External commits remain forbidden by protocol policy. Version 2 with directRequestProfile advertises parser support only; admission additionally requires active revisioned exact-package DirectRequestGrant signatures. This exact profile, including the empty KeyPackage, LeafNode and GroupContext extension lists, is fixed for protocol versions 1 and 2. A later protocol version may define optional LeafNode extensions in the RFC 9420 private-use range; such leaves appear only in conversations of that version, which the service never returns to a session whose supportedProtocolVersions does not list it. GroupContext extensions, GroupContextExtensions proposals and RequiredCapabilities stay unused. Private Catbird surface (blue.catbird.*), not an ATProto or community-ratified lexicon.
      */
     @Serializable
     data class BlueCatbirdChatDefsDeviceCapability(
