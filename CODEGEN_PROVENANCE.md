@@ -161,3 +161,24 @@ The terminal-deletion contract also declares `SpaceDeleted` for `findMeks` and
 callers must not rebind or fall back to another placement. The overlay merges
 current main `3dc8b613abbab900f650f7e1a4e42884cc42b0e1` while retaining all 48
 main-only source changes plus the newer chat security definitions.
+
+## Account-deletion fields, recovery-share methods, deviceCapability text (Nov 16 2026)
+
+One lexicon pass added three private `blue.catbird.*` surfaces, each in its own
+lexicon commit followed by its own generated-output commit:
+
+- `blue.catbird.chat.defs#accountDeletedEntry` gains optional `actorWrite`
+  (new def `#accountDeletionActorWrite`) and `keyProof`.
+- Five new methods: `blue.catbird.labyrinth.putRecoveryShare`,
+  `getRecoveryShare`, `deleteRecoveryShare`, `listRecoveryShares`,
+  `listRecoveryShareEvents`.
+- `#deviceCapability` description only.
+
+After the pass, `blue.catbird.chat.defs.json` is SHA-256
+`81b7cc0835421b583d2449e7f0a8dfe5f647393a353b649a08fe6c1dba9b3cf5`.
+Output was generated with Petrel `28db948e` (the Kotlin generator now widens a
+bare 64-bit suffix name such as `sequencerTerm` and integer `...At` timestamps
+to `Long`, which also changed `BlueCatbirdMlsDSGetConvoDigest.kt`) and
+SwiftFormat 0.61.1. Before the pass, regenerating the unchanged tree produced
+an empty diff. The Rust projection in `catbird-atproto`, the catbird-mls chat
+schema artifact and the mls-ds lexicon mirror were not regenerated in this pass.
