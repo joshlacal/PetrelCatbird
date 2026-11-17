@@ -12,13 +12,16 @@ public struct BlueCatbirdChatGetConversationState {
     public struct Parameters: Parametrizable {
         public let actorDeviceId: String
         public let conversationId: String
+        public let deletionsAfter: Int?
 
         public init(
             actorDeviceId: String,
-            conversationId: String
+            conversationId: String,
+            deletionsAfter: Int? = nil
         ) {
             self.actorDeviceId = actorDeviceId
             self.conversationId = conversationId
+            self.deletionsAfter = deletionsAfter
 
         }
     }
@@ -28,23 +31,27 @@ public struct BlueCatbirdChatGetConversationState {
         public let state: BlueCatbirdChatDefs.ConversationState
         public let pendingResetRequests: [BlueCatbirdChatDefs.ResetRequestView]
         public let pendingLeaveRequests: [BlueCatbirdChatDefs.LeaveRequestView]
-        /// Every accountDeletedEntry of this conversation in ascending seq, each exactly as sequenced with its sequencerAuthority. The sequencer, a group mirror and a C33 transport home serve it to any authenticated device of a current member DID, including a device that is not yet an MLS member and holds no entry entitlement, and to no one else. It survives ciphertext pruning. Clients verify each sequencerAuthority with the sequencer's #mls-receipt-1 key before hiding deletedDid's restored history.
+        /// One page of this conversation's accountDeletedEntry records in strictly increasing sequence order, each exactly as sequenced with its sequencerAuthority. The sequencer, group mirror and C33 transport home serve the inventory to any authenticated device of a current member DID, including a device without entry entitlement. It survives ciphertext pruning. Restore requires a complete traversal and independent verification of deletion evidence.
         public let accountDeletions: [BlueCatbirdChatDefs.AccountDeletedEntry]
         /// Open unexpired leaf recoveries bound to the current coordinate, visible only to an active concrete device leaf that may fulfill them. Excludes the requesting exact device, but includes other devices of the same DID. Ordered oldest first; successful fulfillment changes the coordinate and stale requests must be renewed. Absent on older servers; empty for logical participants without a current concrete leaf. This is separate from the exact-target-device getLeafRecoveryInbox and grants no additional application history.
         public let pendingLeafRecoveryRequests: [BlueCatbirdChatDefs.LeafRecoveryView]?
+        /// Present only if more account deletions remain. Equal to the sequence of the last entry in accountDeletions. Pass this value as deletionsAfter to fetch the next page.
+        public let deletionsCursor: Int?
 
         public init(
             state: BlueCatbirdChatDefs.ConversationState,
             pendingResetRequests: [BlueCatbirdChatDefs.ResetRequestView],
             pendingLeaveRequests: [BlueCatbirdChatDefs.LeaveRequestView],
             accountDeletions: [BlueCatbirdChatDefs.AccountDeletedEntry],
-            pendingLeafRecoveryRequests: [BlueCatbirdChatDefs.LeafRecoveryView]? = nil
+            pendingLeafRecoveryRequests: [BlueCatbirdChatDefs.LeafRecoveryView]? = nil,
+            deletionsCursor: Int? = nil
         ) {
             self.state = state
             self.pendingResetRequests = pendingResetRequests
             self.pendingLeaveRequests = pendingLeaveRequests
             self.accountDeletions = accountDeletions
             self.pendingLeafRecoveryRequests = pendingLeafRecoveryRequests
+            self.deletionsCursor = deletionsCursor
         }
 
         public init(from decoder: Decoder) throws {
@@ -64,6 +71,16 @@ public struct BlueCatbirdChatGetConversationState {
                 LogManager.logWarning("Decoding error for optional property 'pendingLeafRecoveryRequests' — degrading to nil: \(error)")
                 self.pendingLeafRecoveryRequests = nil
             }
+            do {
+                self.deletionsCursor = try container.decodeIfPresent(Int.self, forKey: .deletionsCursor, rejectingNull: strict)
+            } catch {
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
+                LogManager.logWarning("Decoding error for optional property 'deletionsCursor' — degrading to nil: \(error)")
+                self.deletionsCursor = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -73,6 +90,7 @@ public struct BlueCatbirdChatGetConversationState {
             try container.encode(self.pendingLeaveRequests, forKey: .pendingLeaveRequests)
             try container.encode(self.accountDeletions, forKey: .accountDeletions)
             try container.encodeIfPresent(self.pendingLeafRecoveryRequests, forKey: .pendingLeafRecoveryRequests)
+            try container.encodeIfPresent(self.deletionsCursor, forKey: .deletionsCursor)
         }
 
         public func toCBORValue() throws -> Any {
@@ -89,6 +107,10 @@ public struct BlueCatbirdChatGetConversationState {
                 let pendingLeafRecoveryRequestsValue = try value.toCBORValue()
                 map = map.adding(key: "pendingLeafRecoveryRequests", value: pendingLeafRecoveryRequestsValue)
             }
+            if let value = self.deletionsCursor {
+                let deletionsCursorValue = try value.toCBORValue()
+                map = map.adding(key: "deletionsCursor", value: deletionsCursorValue)
+            }
             return map
         }
 
@@ -98,6 +120,7 @@ public struct BlueCatbirdChatGetConversationState {
             case pendingLeaveRequests
             case accountDeletions
             case pendingLeafRecoveryRequests
+            case deletionsCursor
         }
     }
 

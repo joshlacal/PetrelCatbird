@@ -20,16 +20,18 @@ object BlueCatbirdChatGetConversationStateDefs {
     data class BlueCatbirdChatGetConversationStateParameters(
 // Canonical lowercase hyphenated RFC 4122-variant UUIDv4 device ID; strict runtime validation rejects every other spelling, version, or variant.        @SerialName("actorDeviceId")
         val actorDeviceId: String,// Canonical lowercase hyphenated RFC 4122-variant UUIDv4 conversation ID; strict runtime validation rejects every other spelling/version/variant.        @SerialName("conversationId")
-        val conversationId: String    )
+        val conversationId: String,// Exclusive deletion sequence cursor. Supply 0 for the first page and follow deletionsCursor on successive responses until it is absent. Omitting this parameter requests a complete inventory in one response. If that would exceed 100 entries, the server returns ProtocolUpgradeRequired.        @SerialName("deletionsAfter")
+        val deletionsAfter: Long? = null    )
 
     @Serializable
     data class BlueCatbirdChatGetConversationStateOutput(
         @SerialName("state")
         val state: BlueCatbirdChatDefsConversationState,        @SerialName("pendingResetRequests")
         val pendingResetRequests: List<BlueCatbirdChatDefsResetRequestView>,        @SerialName("pendingLeaveRequests")
-        val pendingLeaveRequests: List<BlueCatbirdChatDefsLeaveRequestView>,// Every accountDeletedEntry of this conversation in ascending seq, each exactly as sequenced with its sequencerAuthority. The sequencer, a group mirror and a C33 transport home serve it to any authenticated device of a current member DID, including a device that is not yet an MLS member and holds no entry entitlement, and to no one else. It survives ciphertext pruning. Clients verify each sequencerAuthority with the sequencer's #mls-receipt-1 key before hiding deletedDid's restored history.        @SerialName("accountDeletions")
+        val pendingLeaveRequests: List<BlueCatbirdChatDefsLeaveRequestView>,// One page of this conversation's accountDeletedEntry records in strictly increasing sequence order, each exactly as sequenced with its sequencerAuthority. The sequencer, group mirror and C33 transport home serve the inventory to any authenticated device of a current member DID, including a device without entry entitlement. It survives ciphertext pruning. Restore requires a complete traversal and independent verification of deletion evidence.        @SerialName("accountDeletions")
         val accountDeletions: List<BlueCatbirdChatDefsAccountDeletedEntry>,// Open unexpired leaf recoveries bound to the current coordinate, visible only to an active concrete device leaf that may fulfill them. Excludes the requesting exact device, but includes other devices of the same DID. Ordered oldest first; successful fulfillment changes the coordinate and stale requests must be renewed. Absent on older servers; empty for logical participants without a current concrete leaf. This is separate from the exact-target-device getLeafRecoveryInbox and grants no additional application history.        @SerialName("pendingLeafRecoveryRequests")
-        val pendingLeafRecoveryRequests: List<BlueCatbirdChatDefsLeafRecoveryView>? = null    )
+        val pendingLeafRecoveryRequests: List<BlueCatbirdChatDefsLeafRecoveryView>? = null,// Present only if more account deletions remain. Equal to the sequence of the last entry in accountDeletions. Pass this value as deletionsAfter to fetch the next page.        @SerialName("deletionsCursor")
+        val deletionsCursor: Long? = null    )
 
 sealed class BlueCatbirdChatGetConversationStateError(val name: String, val description: String?) {
         object AccessOutsideMembershipInterval: BlueCatbirdChatGetConversationStateError("AccessOutsideMembershipInterval", null)
