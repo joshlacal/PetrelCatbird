@@ -19206,6 +19206,8 @@ public struct BlueCatbirdChatDefs {
         public let actorWrite: AccountDeletionActorWrite?
         /// Optional; present only together with actorWrite. Private Catbird surface (blue.catbird.*), not an ATProto or community-ratified lexicon. A CARv1 repository proof in the com.atproto.sync.getRecord shape: the signed repository commit of deletedDid, the MST path, and the record block for blue.catbird.chat.device/{actorDeviceId}, where actorDeviceId comes from actorWrite.writeBody. It verifies under the #atproto key of deletedDid's DID document, so a reader can check the signing device's key after deletedDid's repository is gone. It is captured before the repository is deleted and copied verbatim into every copy of the entry.
         public let keyProof: Bytes?
+        /// Optional; present only together with actorWrite. Private Catbird surface (blue.catbird.*), not an ATProto or community-ratified lexicon. A CARv1 repository proof in the com.atproto.sync.getRecord shape: the signed repository commit of deletedDid, the MST path, and the record block for the create-only blue.catbird.chat.deviceRevocation/{actorDeviceId} record where targetDeviceId == actorDeviceId, createdAt == actorWrite.signedAt, and reason == 'deleteAccountData:' || operationId. Because deviceRevocation is create-only, a valid CARv1 under deletedDid's #atproto key proves actorDeviceId had not been revoked prior to signing deletion even after deletedDid's repository is gone.
+        public let revocationProof: Bytes?
         /// Wire fields this Lexicon revision does not declare. They are kept on decode and
         /// written back on encode, so re-serializing data never drops them.
         public let extraFields: [String: ATProtocolValueContainer]
@@ -19221,6 +19223,7 @@ public struct BlueCatbirdChatDefs {
             receivedAt: CanonicalDatetime,
             actorWrite: AccountDeletionActorWrite? = nil,
             keyProof: Bytes? = nil,
+            revocationProof: Bytes? = nil,
             extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.entryId = entryId
@@ -19233,6 +19236,7 @@ public struct BlueCatbirdChatDefs {
             self.receivedAt = receivedAt
             self.actorWrite = actorWrite
             self.keyProof = keyProof
+            self.revocationProof = revocationProof
             self.extraFields = extraFields
         }
 
@@ -19283,6 +19287,18 @@ public struct BlueCatbirdChatDefs {
                 self.keyProof = nil
                 malformedFields.insert("keyProof")
             }
+            do {
+                self.revocationProof = try container.decodeIfPresent(Bytes.self, forKey: .revocationProof, rejectingNull: strict)
+            } catch {
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
+                LogManager.logWarning("Decoding error for optional property 'revocationProof' — degrading to nil: \(error)")
+                self.revocationProof = nil
+                malformedFields.insert("revocationProof")
+            }
             self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
@@ -19298,6 +19314,7 @@ public struct BlueCatbirdChatDefs {
             try container.encode(self.receivedAt, forKey: .receivedAt)
             try container.encodeIfPresent(self.actorWrite, forKey: .actorWrite)
             try container.encodeIfPresent(self.keyProof, forKey: .keyProof)
+            try container.encodeIfPresent(self.revocationProof, forKey: .revocationProof)
             try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
@@ -19320,6 +19337,11 @@ public struct BlueCatbirdChatDefs {
                 hasher.combine(nil as Int?)
             }
             if let value = self.keyProof {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = self.revocationProof {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
@@ -19359,6 +19381,9 @@ public struct BlueCatbirdChatDefs {
             if self.keyProof != other.keyProof {
                 return false
             }
+            if self.revocationProof != other.revocationProof {
+                return false
+            }
             return self.extraFields == other.extraFields
         }
 
@@ -19394,10 +19419,14 @@ public struct BlueCatbirdChatDefs {
                 let keyProofValue = try value.toCBORValue()
                 map = map.adding(key: "keyProof", value: keyProofValue)
             }
+            if let value = self.revocationProof {
+                let revocationProofValue = try value.toCBORValue()
+                map = map.adding(key: "revocationProof", value: revocationProofValue)
+            }
             return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
         }
 
-        private static let knownFieldKeys: Swift.Set<String> = ["$type", "entryId", "conversationId", "seq", "deletedDid", "sequencerDid", "sequencerAuthority", "signature", "receivedAt", "actorWrite", "keyProof"]
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "entryId", "conversationId", "seq", "deletedDid", "sequencerDid", "sequencerAuthority", "signature", "receivedAt", "actorWrite", "keyProof", "revocationProof"]
 
         /// Whether this value writes the wire field `name` itself. An extra field of the
         /// same name (a malformed value kept from decoding) is written only when it is not.
@@ -19413,6 +19442,7 @@ public struct BlueCatbirdChatDefs {
             case "receivedAt": return true
             case "actorWrite": return self.actorWrite != nil
             case "keyProof": return self.keyProof != nil
+            case "revocationProof": return self.revocationProof != nil
             default: return false
             }
         }
@@ -19428,6 +19458,7 @@ public struct BlueCatbirdChatDefs {
             case receivedAt
             case actorWrite
             case keyProof
+            case revocationProof
         }
     }
     /// Private Catbird surface (blue.catbird.*), not an ATProto or community-ratified lexicon. The signed request with which a device of deletedDid called blue.catbird.labyrinth.deleteAccountData. writeBody is the exact labyrinthWriteBody JSON bytes the device sent, {operationId, actorDeviceId, endpointNsid, payloadSha256, signedAt}, never re-encoded. payloadBytes is the exact HTTP JSON body whose SHA-256 equals writeBody.payloadSha256; readers parse it as an empty object and do not trust only the hash. signature is the device's 64-byte Ed25519 signature over UTF8(CATBIRD-LABYRINTH-WRITE\0) followed by writeBody. endpointNsid is blue.catbird.labyrinth.deleteAccountData, actorDeviceId names the signing device of deletedDid, and signedAt is the device-signed deletion instant. Every direct, relayed and mirrored copy of the entry carries the same bytes. Historical entries without payloadBytes decode but do not meet the client deletion-proof gate.
