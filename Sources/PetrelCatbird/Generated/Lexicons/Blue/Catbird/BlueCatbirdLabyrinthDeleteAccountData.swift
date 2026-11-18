@@ -4,7 +4,7 @@ import Petrel
 
 // lexicon: 1, id: blue.catbird.labyrinth.deleteAccountData
 
-/// Account deletion (decision J1). Requires a bound Labyrinth device. Locally, in one transaction: purge the mailbox exactly as purgeMailbox does (including every ORF state), redact every thread item the DID authored in conversations this DS sequences with a server redaction (defs#redaction variant 2: by, reason accountDeleted, redactedAt, and a DS signature), and queue a durable purgeAuthor job for the sequencer of every other conversation the DID takes or took part in; those are delivered with retries, so an unreachable DS neither blocks nor loses the deletion. Idempotency records are kept (they expire after 7 days), so a replayed pre-deletion write answers from its record instead of running again. MEK records stay, because other members' batches can be sealed under them. The exact signed JSON request body is limited to 1024 bytes so accountDeletedEntry.actorWrite can carry it verbatim. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+/// Account deletion (decision J1). Requires a bound Labyrinth device. Locally, in one transaction: purge the mailbox exactly as purgeMailbox does (including every ORF state), redact every thread item the DID authored in conversations this DS sequences with a server redaction (defs#redaction variant 2: by, reason accountDeleted, redactedAt, and a DS signature), and queue a durable purgeAuthor job for the sequencer of every other conversation the DID takes or took part in; those are delivered with retries, so an unreachable DS neither blocks nor loses the deletion. Idempotency records are kept (they expire after 7 days), so a replayed pre-deletion write answers from its record instead of running again. MEK records stay, because other members' batches can be sealed under them. The exact signed JSON request body is limited to 1024 bytes so accountDeletedEntry.actorWrite can carry it verbatim. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded. Hosted account shutdown requests completed peer erasure with Catbird-Require-Erasure-Completion: 1. The header leaves the signed JSON body unchanged. When requested, success requires durable evidence that every required peer completed erasure. A queued delivery, missing evidence or a legacy empty response leaves shutdown pending.
 public struct BlueCatbirdLabyrinthDeleteAccountData {
 
     public static let typeIdentifier = "blue.catbird.labyrinth.deleteAccountData"
@@ -34,29 +34,55 @@ public struct BlueCatbirdLabyrinthDeleteAccountData {
 
     public struct Output: ATProtocolCodable {
 
+        /// Present as confirmed only after the service verifies completion for the authenticated deletion operation at every required peer. Hosted callers require this exact value before proceeding with account shutdown.
+        public let erasureCompletion: String?
+
         public init(
+            erasureCompletion: String? = nil
         ) {
+            self.erasureCompletion = erasureCompletion
         }
 
         public init(from decoder: Decoder) throws {
-            _ = try decoder.container(keyedBy: CodingKeys.self)
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            do {
+                self.erasureCompletion = try container.decodeIfPresent(String.self, forKey: .erasureCompletion, rejectingNull: strict)
+            } catch {
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
+                LogManager.logWarning("Decoding error for optional property 'erasureCompletion' — degrading to nil: \(error)")
+                self.erasureCompletion = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
-            _ = encoder.container(keyedBy: CodingKeys.self)
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encodeIfPresent(self.erasureCompletion, forKey: .erasureCompletion)
         }
 
         public func toCBORValue() throws -> Any {
-            let map = OrderedCBORMap()
+            var map = OrderedCBORMap()
+            if let value = self.erasureCompletion {
+                let erasureCompletionValue = try value.toCBORValue()
+                map = map.adding(key: "erasureCompletion", value: erasureCompletionValue)
+            }
             return map
         }
 
-        private enum CodingKeys: CodingKey {
+        private enum CodingKeys: String, CodingKey {
+            case erasureCompletion
         }
     }
 
     public enum Error: String, Swift.Error, ATProtoErrorType, CustomStringConvertible {
         case labyrinthDeviceNotBound = "LabyrinthDeviceNotBound"
+        /// Peer erasure for the authenticated operation is still pending. Retry the same operation.
+        case peerErasurePending = "PeerErasurePending"
+        /// The service cannot verify complete peer erasure for the authenticated operation.
+        case peerErasureUnverified = "PeerErasureUnverified"
         public var description: String {
             return self.rawValue
         }
@@ -70,7 +96,7 @@ public struct BlueCatbirdLabyrinthDeleteAccountData {
 
 extension ATProtoClient.Blue.Catbird.Labyrinth {
     // MARK: - deleteAccountData
-    /// Account deletion (decision J1). Requires a bound Labyrinth device. Locally, in one transaction: purge the mailbox exactly as purgeMailbox does (including every ORF state), redact every thread item the DID authored in conversations this DS sequences with a server redaction (defs#redaction variant 2: by, reason accountDeleted, redactedAt, and a DS signature), and queue a durable purgeAuthor job for the sequencer of every other conversation the DID takes or took part in; those are delivered with retries, so an unreachable DS neither blocks nor loses the deletion. Idempotency records are kept (they expire after 7 days), so a replayed pre-deletion write answers from its record instead of running again. MEK records stay, because other members' batches can be sealed under them. The exact signed JSON request body is limited to 1024 bytes so accountDeletedEntry.actorWrite can carry it verbatim. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded.
+    /// Account deletion (decision J1). Requires a bound Labyrinth device. Locally, in one transaction: purge the mailbox exactly as purgeMailbox does (including every ORF state), redact every thread item the DID authored in conversations this DS sequences with a server redaction (defs#redaction variant 2: by, reason accountDeleted, redactedAt, and a DS signature), and queue a durable purgeAuthor job for the sequencer of every other conversation the DID takes or took part in; those are delivered with retries, so an unreachable DS neither blocks nor loses the deletion. Idempotency records are kept (they expire after 7 days), so a replayed pre-deletion write answers from its record instead of running again. MEK records stay, because other members' batches can be sealed under them. The exact signed JSON request body is limited to 1024 bytes so accountDeletedEntry.actorWrite can carry it verbatim. Common errors: NotAuthorized, AccountSessionExpired, DeviceRevoked, RateLimited, InvalidRequest, PayloadTooLarge, QuotaExceeded. Hosted account shutdown requests completed peer erasure with Catbird-Require-Erasure-Completion: 1. The header leaves the signed JSON body unchanged. When requested, success requires durable evidence that every required peer completed erasure. A queued delivery, missing evidence or a legacy empty response leaves shutdown pending.
     ///
     /// - Parameters:
     ///   - input: The request body

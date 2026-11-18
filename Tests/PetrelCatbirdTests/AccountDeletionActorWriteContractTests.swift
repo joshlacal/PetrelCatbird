@@ -68,4 +68,18 @@ final class AccountDeletionActorWriteContractTests: XCTestCase {
         XCTAssertEqual(entry.seq, 42)
         XCTAssertTrue(entry.extraFields.isEmpty)
     }
+
+    func testOnlyExplicitConfirmationDistinguishesCompletedErasureFromLegacySuccess() throws {
+        typealias Output = BlueCatbirdLabyrinthDeleteAccountData.Output
+        let decoder = JSONDecoder()
+        let legacy = try decoder.decode(Output.self, from: Data("{}".utf8))
+        let future = try decoder.decode(Output.self, from: Data(#"{"erasureCompletion":"queued"}"#.utf8))
+        let completed = try decoder.decode(Output.self, from: Data(#"{"erasureCompletion":"confirmed"}"#.utf8))
+
+        XCTAssertNil(legacy.erasureCompletion)
+        XCTAssertNotEqual(future.erasureCompletion, "confirmed")
+        XCTAssertEqual(completed.erasureCompletion, "confirmed")
+        XCTAssertEqual(BlueCatbirdLabyrinthDeleteAccountData.Error.peerErasurePending.rawValue, "PeerErasurePending")
+        XCTAssertEqual(BlueCatbirdLabyrinthDeleteAccountData.Error.peerErasureUnverified.rawValue, "PeerErasureUnverified")
+    }
 }
