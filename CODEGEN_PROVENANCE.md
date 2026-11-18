@@ -1,5 +1,17 @@
 # Private contract generation
 
+## Deletion inventory and retry contracts (2026-11-17)
+
+The qualified core and standalone Swift package revision is Petrel
+`74b89dfb58fca288ee2003177fe1b287dbaf7ee8`. The canonical chat definitions
+have SHA-256 `331dfccd668b27487571cb9453564f237fccc312d3c365852b5594daad1bcc2b`
+and the conversation-state schema has SHA-256
+`473a913f135de6fd3c858d6ec0222a930cc2dbbb128d57200e013da752dbb413`.
+Revision `322a3302ec5835e45109391c691c114c69bc858b` contains the generated Swift
+and Kotlin surfaces for this contract.
+
+## October reconciliation
+
 This package extends Petrel with Catbird's private API contracts. The October 23
 reconciliation preserves the newer chat security and recovery definitions while
 adding immutable conversation Space placement, authenticated history references,

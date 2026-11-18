@@ -31,10 +31,10 @@ let petrelDependency: Package.Dependency
 if let localPetrel = localPetrelPathIfAvailable() {
     petrelDependency = .package(path: localPetrel)
 } else {
-    // Published Petrel revision (complete 64-bit Kotlin Long coverage on top of 2912970c).
+    // Match the Petrel core used to qualify this overlay in the candidate workspace.
     petrelDependency = .package(
         url: "https://github.com/joshlacal/Petrel.git",
-        revision: "87acd38094470f0629134dc98d602334d3e0f01f"
+        revision: "74b89dfb58fca288ee2003177fe1b287dbaf7ee8"
     )
 }
 
