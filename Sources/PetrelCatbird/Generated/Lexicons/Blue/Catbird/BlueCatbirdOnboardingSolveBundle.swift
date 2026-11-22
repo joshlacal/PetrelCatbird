@@ -14,8 +14,11 @@ public struct BlueCatbirdOnboardingSolveBundle {
         public let selections: [BlueCatbirdOnboardingDefs.CommunitySelection]
         public let swipes: [BlueCatbirdOnboardingDefs.CalibrationSwipeAnswer]?
         public let controls: BlueCatbirdOnboardingDefs.BundleControls?
+        /// Total number of follows wanted. When left out, a server that supports per-community sizing follows a fixed number of accounts from each selected community instead.
         public let targetSize: Int?
+        /// Accounts the viewer chose to add. Each one is included in follows.
         public let pinnedDids: [DID]?
+        /// Accounts the viewer removed. None of them is returned; the next account in the same community takes the place.
         public let excludedDids: [DID]?
         public let seedFollowDids: [DID]?
 
@@ -112,6 +115,10 @@ public struct BlueCatbirdOnboardingSolveBundle {
         public let feeds: [BlueCatbirdOnboardingDefs.RecommendedFeed]
         public let starterPacks: [BlueCatbirdOnboardingDefs.RecommendedStarterPack]
         public let harmoniousNeighbors: [BlueCatbirdIntelDefs.CommunitySummary]
+        /// Alternate accounts per selected community, in order, for the client to use in place of a follow it cannot make, such as a blocked or muted account. Each entry names its community.
+        public let bench: [BlueCatbirdOnboardingDefs.RecommendedFollow]?
+        /// How many accounts in the selected communities the viewer already follows. Those accounts are left out of follows.
+        public let alreadyFollowingInScenes: Int?
 
         public init(
             sessionId: String,
@@ -121,7 +128,9 @@ public struct BlueCatbirdOnboardingSolveBundle {
             follows: [BlueCatbirdOnboardingDefs.RecommendedFollow],
             feeds: [BlueCatbirdOnboardingDefs.RecommendedFeed],
             starterPacks: [BlueCatbirdOnboardingDefs.RecommendedStarterPack],
-            harmoniousNeighbors: [BlueCatbirdIntelDefs.CommunitySummary]
+            harmoniousNeighbors: [BlueCatbirdIntelDefs.CommunitySummary],
+            bench: [BlueCatbirdOnboardingDefs.RecommendedFollow]? = nil,
+            alreadyFollowingInScenes: Int? = nil
         ) {
             self.sessionId = sessionId
             self.catalogVersion = catalogVersion
@@ -131,10 +140,13 @@ public struct BlueCatbirdOnboardingSolveBundle {
             self.feeds = feeds
             self.starterPacks = starterPacks
             self.harmoniousNeighbors = harmoniousNeighbors
+            self.bench = bench
+            self.alreadyFollowingInScenes = alreadyFollowingInScenes
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
             self.sessionId = try container.decode(String.self, forKey: .sessionId)
             self.catalogVersion = try container.decode(String.self, forKey: .catalogVersion)
             self.solveMs = try container.decode(Int.self, forKey: .solveMs)
@@ -143,6 +155,26 @@ public struct BlueCatbirdOnboardingSolveBundle {
             self.feeds = try container.decode([BlueCatbirdOnboardingDefs.RecommendedFeed].self, forKey: .feeds)
             self.starterPacks = try container.decode([BlueCatbirdOnboardingDefs.RecommendedStarterPack].self, forKey: .starterPacks)
             self.harmoniousNeighbors = try container.decode([BlueCatbirdIntelDefs.CommunitySummary].self, forKey: .harmoniousNeighbors)
+            do {
+                self.bench = try container.decodeIfPresent([BlueCatbirdOnboardingDefs.RecommendedFollow].self, forKey: .bench, rejectingNull: strict)
+            } catch {
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
+                LogManager.logWarning("Decoding error for optional property 'bench' — degrading to nil: \(error)")
+                self.bench = nil
+            }
+            do {
+                self.alreadyFollowingInScenes = try container.decodeIfPresent(Int.self, forKey: .alreadyFollowingInScenes, rejectingNull: strict)
+            } catch {
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
+                LogManager.logWarning("Decoding error for optional property 'alreadyFollowingInScenes' — degrading to nil: \(error)")
+                self.alreadyFollowingInScenes = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -155,6 +187,8 @@ public struct BlueCatbirdOnboardingSolveBundle {
             try container.encode(self.feeds, forKey: .feeds)
             try container.encode(self.starterPacks, forKey: .starterPacks)
             try container.encode(self.harmoniousNeighbors, forKey: .harmoniousNeighbors)
+            try container.encodeIfPresent(self.bench, forKey: .bench)
+            try container.encodeIfPresent(self.alreadyFollowingInScenes, forKey: .alreadyFollowingInScenes)
         }
 
         public func toCBORValue() throws -> Any {
@@ -175,6 +209,14 @@ public struct BlueCatbirdOnboardingSolveBundle {
             map = map.adding(key: "starterPacks", value: starterPacksValue)
             let harmoniousNeighborsValue = try self.harmoniousNeighbors.toCBORValue()
             map = map.adding(key: "harmoniousNeighbors", value: harmoniousNeighborsValue)
+            if let value = self.bench {
+                let benchValue = try value.toCBORValue()
+                map = map.adding(key: "bench", value: benchValue)
+            }
+            if let value = self.alreadyFollowingInScenes {
+                let alreadyFollowingInScenesValue = try value.toCBORValue()
+                map = map.adding(key: "alreadyFollowingInScenes", value: alreadyFollowingInScenesValue)
+            }
             return map
         }
 
@@ -187,6 +229,8 @@ public struct BlueCatbirdOnboardingSolveBundle {
             case feeds
             case starterPacks
             case harmoniousNeighbors
+            case bench
+            case alreadyFollowingInScenes
         }
     }
 

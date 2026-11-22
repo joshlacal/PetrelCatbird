@@ -172,6 +172,8 @@ public struct BlueCatbirdIntelDefs {
         public let sampleAccountDids: [DID]
         public let feedGeneratorUris: [ATProtocolURI]
         public let starterPackUris: [ATProtocolURI]
+        /// How many accounts in this community the viewer already follows. Present only when the server personalizes the community for the viewer; those accounts are left out of sampleAccountDids.
+        public let alreadyFollowingCount: Int?
         /// Wire fields this Lexicon revision does not declare. They are kept on decode and
         /// written back on encode, so re-serializing data never drops them.
         public let extraFields: [String: ATProtocolValueContainer]
@@ -194,6 +196,7 @@ public struct BlueCatbirdIntelDefs {
             sampleAccountDids: [DID],
             feedGeneratorUris: [ATProtocolURI],
             starterPackUris: [ATProtocolURI],
+            alreadyFollowingCount: Int? = nil,
             extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.communityId = communityId
@@ -213,11 +216,14 @@ public struct BlueCatbirdIntelDefs {
             self.sampleAccountDids = sampleAccountDids
             self.feedGeneratorUris = feedGeneratorUris
             self.starterPackUris = starterPackUris
+            self.alreadyFollowingCount = alreadyFollowingCount
             self.extraFields = extraFields
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
+            var malformedFields: Swift.Set<String> = []
             self.communityId = try container.decode(Int.self, forKey: .communityId)
             self.title = try container.decode(String.self, forKey: .title)
             self.description = try container.decode(String.self, forKey: .description)
@@ -235,7 +241,19 @@ public struct BlueCatbirdIntelDefs {
             self.sampleAccountDids = try container.decode([DID].self, forKey: .sampleAccountDids)
             self.feedGeneratorUris = try container.decode([ATProtocolURI].self, forKey: .feedGeneratorUris)
             self.starterPackUris = try container.decode([ATProtocolURI].self, forKey: .starterPackUris)
-            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys)
+            do {
+                self.alreadyFollowingCount = try container.decodeIfPresent(Int.self, forKey: .alreadyFollowingCount, rejectingNull: strict)
+            } catch {
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
+                LogManager.logWarning("Decoding error for optional property 'alreadyFollowingCount' — degrading to nil: \(error)")
+                self.alreadyFollowingCount = nil
+                malformedFields.insert("alreadyFollowingCount")
+            }
+            self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -257,7 +275,8 @@ public struct BlueCatbirdIntelDefs {
             try container.encode(self.sampleAccountDids, forKey: .sampleAccountDids)
             try container.encode(self.feedGeneratorUris, forKey: .feedGeneratorUris)
             try container.encode(self.starterPackUris, forKey: .starterPackUris)
-            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder)
+            try container.encodeIfPresent(self.alreadyFollowingCount, forKey: .alreadyFollowingCount)
+            try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
         public func hash(into hasher: inout Hasher) {
@@ -278,6 +297,11 @@ public struct BlueCatbirdIntelDefs {
             hasher.combine(self.sampleAccountDids)
             hasher.combine(self.feedGeneratorUris)
             hasher.combine(self.starterPackUris)
+            if let value = self.alreadyFollowingCount {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
             hasher.combine(extraFields)
         }
 
@@ -334,6 +358,9 @@ public struct BlueCatbirdIntelDefs {
             if self.starterPackUris != other.starterPackUris {
                 return false
             }
+            if self.alreadyFollowingCount != other.alreadyFollowingCount {
+                return false
+            }
             return self.extraFields == other.extraFields
         }
 
@@ -377,10 +404,40 @@ public struct BlueCatbirdIntelDefs {
             map = map.adding(key: "feedGeneratorUris", value: feedGeneratorUrisValue)
             let starterPackUrisValue = try self.starterPackUris.toCBORValue()
             map = map.adding(key: "starterPackUris", value: starterPackUrisValue)
-            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map)
+            if let value = self.alreadyFollowingCount {
+                let alreadyFollowingCountValue = try value.toCBORValue()
+                map = map.adding(key: "alreadyFollowingCount", value: alreadyFollowingCountValue)
+            }
+            return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
         }
 
-        private static let knownFieldKeys: Swift.Set<String> = ["$type", "communityId", "title", "description", "sceneId", "sceneSlug", "sceneTitle", "macroCategory", "symbolName", "eligibleCount", "postCoherenceBps", "socialCoherenceBps", "curatedListTags", "neighborCommunityIds", "samplePostUris", "sampleAccountDids", "feedGeneratorUris", "starterPackUris"]
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "communityId", "title", "description", "sceneId", "sceneSlug", "sceneTitle", "macroCategory", "symbolName", "eligibleCount", "postCoherenceBps", "socialCoherenceBps", "curatedListTags", "neighborCommunityIds", "samplePostUris", "sampleAccountDids", "feedGeneratorUris", "starterPackUris", "alreadyFollowingCount"]
+
+        /// Whether this value writes the wire field `name` itself. An extra field of the
+        /// same name (a malformed value kept from decoding) is written only when it is not.
+        private func hasValue(forField name: String) -> Bool {
+            switch name {
+            case "communityId": return true
+            case "title": return true
+            case "description": return true
+            case "sceneId": return true
+            case "sceneSlug": return true
+            case "sceneTitle": return true
+            case "macroCategory": return true
+            case "symbolName": return true
+            case "eligibleCount": return true
+            case "postCoherenceBps": return true
+            case "socialCoherenceBps": return true
+            case "curatedListTags": return true
+            case "neighborCommunityIds": return true
+            case "samplePostUris": return true
+            case "sampleAccountDids": return true
+            case "feedGeneratorUris": return true
+            case "starterPackUris": return true
+            case "alreadyFollowingCount": return self.alreadyFollowingCount != nil
+            default: return false
+            }
+        }
 
         private enum CodingKeys: String, CodingKey {
             case communityId
@@ -400,6 +457,7 @@ public struct BlueCatbirdIntelDefs {
             case sampleAccountDids
             case feedGeneratorUris
             case starterPackUris
+            case alreadyFollowingCount
         }
     }
     /// Account membership and role metadata within a community. Profile bios and display names must be hydrated by the client.
@@ -415,6 +473,8 @@ public struct BlueCatbirdIntelDefs {
         public let mediaShareBps: Int
         public let estimatedPostsPerWeek: Int
         public let samplePostUri: ATProtocolURI?
+        /// How established the account is within the community: a headliner is widely followed, core is a steady regular, rising is a smaller account gaining followers.
+        public let tier: String?
         /// Wire fields this Lexicon revision does not declare. They are kept on decode and
         /// written back on encode, so re-serializing data never drops them.
         public let extraFields: [String: ATProtocolValueContainer]
@@ -429,6 +489,7 @@ public struct BlueCatbirdIntelDefs {
             mediaShareBps: Int,
             estimatedPostsPerWeek: Int,
             samplePostUri: ATProtocolURI? = nil,
+            tier: String? = nil,
             extraFields: [String: ATProtocolValueContainer] = [:]
         ) {
             self.did = did
@@ -440,6 +501,7 @@ public struct BlueCatbirdIntelDefs {
             self.mediaShareBps = mediaShareBps
             self.estimatedPostsPerWeek = estimatedPostsPerWeek
             self.samplePostUri = samplePostUri
+            self.tier = tier
             self.extraFields = extraFields
         }
 
@@ -467,6 +529,18 @@ public struct BlueCatbirdIntelDefs {
                 self.samplePostUri = nil
                 malformedFields.insert("samplePostUri")
             }
+            do {
+                self.tier = try container.decodeIfPresent(String.self, forKey: .tier, rejectingNull: strict)
+            } catch {
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // reads only the malformed optional field as nil. Its raw value is kept in
+                // the extra fields, so writing this value back does not lose it.
+                guard !strict else { throw error }
+                LogManager.logWarning("Decoding error for optional property 'tier' — degrading to nil: \(error)")
+                self.tier = nil
+                malformedFields.insert("tier")
+            }
             self.extraFields = try ATProtocolValueContainer.decodeExtraFields(from: decoder, knownKeys: Self.knownFieldKeys, keepingMalformed: malformedFields)
         }
 
@@ -481,6 +555,7 @@ public struct BlueCatbirdIntelDefs {
             try container.encode(self.mediaShareBps, forKey: .mediaShareBps)
             try container.encode(self.estimatedPostsPerWeek, forKey: .estimatedPostsPerWeek)
             try container.encodeIfPresent(self.samplePostUri, forKey: .samplePostUri)
+            try container.encodeIfPresent(self.tier, forKey: .tier)
             try ATProtocolValueContainer.encodeExtraFields(extraFields, to: encoder, unlessSet: hasValue(forField:))
         }
 
@@ -494,6 +569,11 @@ public struct BlueCatbirdIntelDefs {
             hasher.combine(self.mediaShareBps)
             hasher.combine(self.estimatedPostsPerWeek)
             if let value = self.samplePostUri {
+                hasher.combine(value)
+            } else {
+                hasher.combine(nil as Int?)
+            }
+            if let value = self.tier {
                 hasher.combine(value)
             } else {
                 hasher.combine(nil as Int?)
@@ -530,6 +610,9 @@ public struct BlueCatbirdIntelDefs {
             if self.samplePostUri != other.samplePostUri {
                 return false
             }
+            if self.tier != other.tier {
+                return false
+            }
             return self.extraFields == other.extraFields
         }
 
@@ -559,10 +642,14 @@ public struct BlueCatbirdIntelDefs {
                 let samplePostUriValue = try value.toCBORValue()
                 map = map.adding(key: "samplePostUri", value: samplePostUriValue)
             }
+            if let value = self.tier {
+                let tierValue = try value.toCBORValue()
+                map = map.adding(key: "tier", value: tierValue)
+            }
             return try ATProtocolValueContainer.addingExtraFields(extraFields, to: map, unlessSet: hasValue(forField:))
         }
 
-        private static let knownFieldKeys: Swift.Set<String> = ["$type", "did", "role", "recommendedMode", "whyPicked", "rankScoreBps", "repostShareBps", "mediaShareBps", "estimatedPostsPerWeek", "samplePostUri"]
+        private static let knownFieldKeys: Swift.Set<String> = ["$type", "did", "role", "recommendedMode", "whyPicked", "rankScoreBps", "repostShareBps", "mediaShareBps", "estimatedPostsPerWeek", "samplePostUri", "tier"]
 
         /// Whether this value writes the wire field `name` itself. An extra field of the
         /// same name (a malformed value kept from decoding) is written only when it is not.
@@ -577,6 +664,7 @@ public struct BlueCatbirdIntelDefs {
             case "mediaShareBps": return true
             case "estimatedPostsPerWeek": return true
             case "samplePostUri": return self.samplePostUri != nil
+            case "tier": return self.tier != nil
             default: return false
             }
         }
@@ -591,6 +679,7 @@ public struct BlueCatbirdIntelDefs {
             case mediaShareBps
             case estimatedPostsPerWeek
             case samplePostUri
+            case tier
         }
     }
     /// Viewer-safe post AT-URI skeleton with community attribution.

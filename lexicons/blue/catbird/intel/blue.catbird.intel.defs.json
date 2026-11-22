@@ -102,6 +102,11 @@
         "starterPackUris": {
           "type": "array",
           "items": { "type": "string", "format": "at-uri" }
+        },
+        "alreadyFollowingCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many accounts in this community the viewer already follows. Present only when the server personalizes the community for the viewer; those accounts are left out of sampleAccountDids."
         }
       }
     },
@@ -139,7 +144,12 @@
         "repostShareBps": { "type": "integer", "minimum": 0, "maximum": 10000 },
         "mediaShareBps": { "type": "integer", "minimum": 0, "maximum": 10000 },
         "estimatedPostsPerWeek": { "type": "integer", "minimum": 0, "maximum": 1000 },
-        "samplePostUri": { "type": "string", "format": "at-uri" }
+        "samplePostUri": { "type": "string", "format": "at-uri" },
+        "tier": {
+          "type": "string",
+          "description": "How established the account is within the community: a headliner is widely followed, core is a steady regular, rising is a smaller account gaining followers.",
+          "knownValues": ["headliner", "core", "rising"]
+        }
       }
     },
     "postSkeletonItem": {

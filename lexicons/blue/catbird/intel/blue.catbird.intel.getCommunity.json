@@ -49,6 +49,16 @@
                 "type": "ref",
                 "ref": "blue.catbird.intel.defs#communitySummary"
               }
+            },
+            "defaultLineupCount": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "How many accounts from the start of members are followed when the viewer picks this community. Present only when members is the viewer's personal ordered list."
+            },
+            "boostedLineupCount": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "How many accounts from the start of members are followed when the viewer picks this community with extra weight. Present only when members is the viewer's personal ordered list."
             }
           }
         }

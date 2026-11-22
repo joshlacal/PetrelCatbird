@@ -28,7 +28,9 @@ object BlueCatbirdIntelGetCommunityDefs {
         val community: BlueCatbirdIntelDefsCommunitySummary,        @SerialName("members")
         val members: List<BlueCatbirdIntelDefsCommunityMemberRef>,        @SerialName("samplePosts")
         val samplePosts: List<BlueCatbirdIntelDefsPostSkeletonItem>,        @SerialName("neighborCommunities")
-        val neighborCommunities: List<BlueCatbirdIntelDefsCommunitySummary>    )
+        val neighborCommunities: List<BlueCatbirdIntelDefsCommunitySummary>,// How many accounts from the start of members are followed when the viewer picks this community. Present only when members is the viewer's personal ordered list.        @SerialName("defaultLineupCount")
+        val defaultLineupCount: Int? = null,// How many accounts from the start of members are followed when the viewer picks this community with extra weight. Present only when members is the viewer's personal ordered list.        @SerialName("boostedLineupCount")
+        val boostedLineupCount: Int? = null    )
 
 sealed class BlueCatbirdIntelGetCommunityError(val name: String, val description: String?) {
         object AuthRequired: BlueCatbirdIntelGetCommunityError("AuthRequired", null)

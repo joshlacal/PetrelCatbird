@@ -57,7 +57,8 @@ object BlueCatbirdIntelDefsDefs {
         val samplePostUris: List<ATProtocolURI>,        @SerialName("sampleAccountDids")
         val sampleAccountDids: List<DID>,        @SerialName("feedGeneratorUris")
         val feedGeneratorUris: List<ATProtocolURI>,        @SerialName("starterPackUris")
-        val starterPackUris: List<ATProtocolURI>    ) {
+        val starterPackUris: List<ATProtocolURI>,/** How many accounts in this community the viewer already follows. Present only when the server personalizes the community for the viewer; those accounts are left out of sampleAccountDids. */        @SerialName("alreadyFollowingCount")
+        val alreadyFollowingCount: Int? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdIntelDefsCommunitySummary"
         }
@@ -77,7 +78,8 @@ object BlueCatbirdIntelDefsDefs {
         val repostShareBps: Int,        @SerialName("mediaShareBps")
         val mediaShareBps: Int,        @SerialName("estimatedPostsPerWeek")
         val estimatedPostsPerWeek: Int,        @SerialName("samplePostUri")
-        val samplePostUri: ATProtocolURI? = null    ) {
+        val samplePostUri: ATProtocolURI? = null,/** How established the account is within the community: a headliner is widely followed, core is a steady regular, rising is a smaller account gaining followers. */        @SerialName("tier")
+        val tier: String? = null    ) {
         companion object {
             const val TYPE_IDENTIFIER = "#blueCatbirdIntelDefsCommunityMemberRef"
         }

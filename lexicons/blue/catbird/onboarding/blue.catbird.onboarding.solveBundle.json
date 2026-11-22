@@ -34,17 +34,20 @@
             "targetSize": {
               "type": "integer",
               "minimum": 8,
-              "maximum": 50,
-              "default": 24
+              "maximum": 200,
+              "default": 24,
+              "description": "Total number of follows wanted. When left out, a server that supports per-community sizing follows a fixed number of accounts from each selected community instead."
             },
             "pinnedDids": {
               "type": "array",
-              "maxLength": 30,
+              "maxLength": 200,
+              "description": "Accounts the viewer chose to add. Each one is included in follows.",
               "items": { "type": "string", "format": "did" }
             },
             "excludedDids": {
               "type": "array",
-              "maxLength": 100,
+              "maxLength": 500,
+              "description": "Accounts the viewer removed. None of them is returned; the next account in the same community takes the place.",
               "items": { "type": "string", "format": "did" }
             },
             "seedFollowDids": {
@@ -104,6 +107,19 @@
                 "type": "ref",
                 "ref": "blue.catbird.intel.defs#communitySummary"
               }
+            },
+            "bench": {
+              "type": "array",
+              "description": "Alternate accounts per selected community, in order, for the client to use in place of a follow it cannot make, such as a blocked or muted account. Each entry names its community.",
+              "items": {
+                "type": "ref",
+                "ref": "blue.catbird.onboarding.defs#recommendedFollow"
+              }
+            },
+            "alreadyFollowingInScenes": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "How many accounts in the selected communities the viewer already follows. Those accounts are left out of follows."
             }
           }
         }

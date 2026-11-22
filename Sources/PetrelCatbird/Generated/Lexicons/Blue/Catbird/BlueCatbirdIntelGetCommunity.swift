@@ -27,28 +27,57 @@ public struct BlueCatbirdIntelGetCommunity {
         public let members: [BlueCatbirdIntelDefs.CommunityMemberRef]
         public let samplePosts: [BlueCatbirdIntelDefs.PostSkeletonItem]
         public let neighborCommunities: [BlueCatbirdIntelDefs.CommunitySummary]
+        /// How many accounts from the start of members are followed when the viewer picks this community. Present only when members is the viewer's personal ordered list.
+        public let defaultLineupCount: Int?
+        /// How many accounts from the start of members are followed when the viewer picks this community with extra weight. Present only when members is the viewer's personal ordered list.
+        public let boostedLineupCount: Int?
 
         public init(
             catalogVersion: String,
             community: BlueCatbirdIntelDefs.CommunitySummary,
             members: [BlueCatbirdIntelDefs.CommunityMemberRef],
             samplePosts: [BlueCatbirdIntelDefs.PostSkeletonItem],
-            neighborCommunities: [BlueCatbirdIntelDefs.CommunitySummary]
+            neighborCommunities: [BlueCatbirdIntelDefs.CommunitySummary],
+            defaultLineupCount: Int? = nil,
+            boostedLineupCount: Int? = nil
         ) {
             self.catalogVersion = catalogVersion
             self.community = community
             self.members = members
             self.samplePosts = samplePosts
             self.neighborCommunities = neighborCommunities
+            self.defaultLineupCount = defaultLineupCount
+            self.boostedLineupCount = boostedLineupCount
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let strict = decoder.isATProtoStrictDecoding
             self.catalogVersion = try container.decode(String.self, forKey: .catalogVersion)
             self.community = try container.decode(BlueCatbirdIntelDefs.CommunitySummary.self, forKey: .community)
             self.members = try container.decode([BlueCatbirdIntelDefs.CommunityMemberRef].self, forKey: .members)
             self.samplePosts = try container.decode([BlueCatbirdIntelDefs.PostSkeletonItem].self, forKey: .samplePosts)
             self.neighborCommunities = try container.decode([BlueCatbirdIntelDefs.CommunitySummary].self, forKey: .neighborCommunities)
+            do {
+                self.defaultLineupCount = try container.decodeIfPresent(Int.self, forKey: .defaultLineupCount, rejectingNull: strict)
+            } catch {
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
+                LogManager.logWarning("Decoding error for optional property 'defaultLineupCount' — degrading to nil: \(error)")
+                self.defaultLineupCount = nil
+            }
+            do {
+                self.boostedLineupCount = try container.decodeIfPresent(Int.self, forKey: .boostedLineupCount, rejectingNull: strict)
+            } catch {
+                // Invalid data is invalid as a whole (Lexicon specification); strict decoders
+                // fail here. The default keeps reading what the network actually serves and
+                // drops only the malformed optional field.
+                guard !strict else { throw error }
+                LogManager.logWarning("Decoding error for optional property 'boostedLineupCount' — degrading to nil: \(error)")
+                self.boostedLineupCount = nil
+            }
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -58,6 +87,8 @@ public struct BlueCatbirdIntelGetCommunity {
             try container.encode(self.members, forKey: .members)
             try container.encode(self.samplePosts, forKey: .samplePosts)
             try container.encode(self.neighborCommunities, forKey: .neighborCommunities)
+            try container.encodeIfPresent(self.defaultLineupCount, forKey: .defaultLineupCount)
+            try container.encodeIfPresent(self.boostedLineupCount, forKey: .boostedLineupCount)
         }
 
         public func toCBORValue() throws -> Any {
@@ -72,6 +103,14 @@ public struct BlueCatbirdIntelGetCommunity {
             map = map.adding(key: "samplePosts", value: samplePostsValue)
             let neighborCommunitiesValue = try self.neighborCommunities.toCBORValue()
             map = map.adding(key: "neighborCommunities", value: neighborCommunitiesValue)
+            if let value = self.defaultLineupCount {
+                let defaultLineupCountValue = try value.toCBORValue()
+                map = map.adding(key: "defaultLineupCount", value: defaultLineupCountValue)
+            }
+            if let value = self.boostedLineupCount {
+                let boostedLineupCountValue = try value.toCBORValue()
+                map = map.adding(key: "boostedLineupCount", value: boostedLineupCountValue)
+            }
             return map
         }
 
@@ -81,6 +120,8 @@ public struct BlueCatbirdIntelGetCommunity {
             case members
             case samplePosts
             case neighborCommunities
+            case defaultLineupCount
+            case boostedLineupCount
         }
     }
 

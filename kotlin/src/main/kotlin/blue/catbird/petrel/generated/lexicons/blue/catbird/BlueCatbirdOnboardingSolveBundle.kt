@@ -21,9 +21,9 @@ object BlueCatbirdOnboardingSolveBundleDefs {
         @SerialName("selections")
         val selections: List<BlueCatbirdOnboardingDefsCommunitySelection>,        @SerialName("swipes")
         val swipes: List<BlueCatbirdOnboardingDefsCalibrationSwipeAnswer>? = null,        @SerialName("controls")
-        val controls: BlueCatbirdOnboardingDefsBundleControls? = null,        @SerialName("targetSize")
-        val targetSize: Int? = null,        @SerialName("pinnedDids")
-        val pinnedDids: List<DID>? = null,        @SerialName("excludedDids")
+        val controls: BlueCatbirdOnboardingDefsBundleControls? = null,// Total number of follows wanted. When left out, a server that supports per-community sizing follows a fixed number of accounts from each selected community instead.        @SerialName("targetSize")
+        val targetSize: Int? = null,// Accounts the viewer chose to add. Each one is included in follows.        @SerialName("pinnedDids")
+        val pinnedDids: List<DID>? = null,// Accounts the viewer removed. None of them is returned; the next account in the same community takes the place.        @SerialName("excludedDids")
         val excludedDids: List<DID>? = null,        @SerialName("seedFollowDids")
         val seedFollowDids: List<DID>? = null    )
 
@@ -37,7 +37,9 @@ object BlueCatbirdOnboardingSolveBundleDefs {
         val follows: List<BlueCatbirdOnboardingDefsRecommendedFollow>,        @SerialName("feeds")
         val feeds: List<BlueCatbirdOnboardingDefsRecommendedFeed>,        @SerialName("starterPacks")
         val starterPacks: List<BlueCatbirdOnboardingDefsRecommendedStarterPack>,        @SerialName("harmoniousNeighbors")
-        val harmoniousNeighbors: List<BlueCatbirdIntelDefsCommunitySummary>    )
+        val harmoniousNeighbors: List<BlueCatbirdIntelDefsCommunitySummary>,// Alternate accounts per selected community, in order, for the client to use in place of a follow it cannot make, such as a blocked or muted account. Each entry names its community.        @SerialName("bench")
+        val bench: List<BlueCatbirdOnboardingDefsRecommendedFollow>? = null,// How many accounts in the selected communities the viewer already follows. Those accounts are left out of follows.        @SerialName("alreadyFollowingInScenes")
+        val alreadyFollowingInScenes: Int? = null    )
 
 sealed class BlueCatbirdOnboardingSolveBundleError(val name: String, val description: String?) {
         object AuthRequired: BlueCatbirdOnboardingSolveBundleError("AuthRequired", null)
