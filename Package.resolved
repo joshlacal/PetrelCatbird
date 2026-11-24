@@ -1,6 +1,14 @@
 {
-  "originHash" : "f55b6ec89a566679d34f4992a8c83deef67e5094fc29c02e581203e19334eeb4",
+  "originHash" : "c4953d5db2ce5c7d27b5d004cb38167c7f92b58dd0a24963fb9211e6c99a3ae6",
   "pins" : [
+    {
+      "identity" : "petrel",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/joshlacal/Petrel.git",
+      "state" : {
+        "revision" : "74b89dfb58fca288ee2003177fe1b287dbaf7ee8"
+      }
+    },
     {
       "identity" : "swift-asn1",
       "kind" : "remoteSourceControl",
