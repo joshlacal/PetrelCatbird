@@ -1,0 +1,12 @@
+{
+  "nsid": "site.standard.document",
+  "case": "open_union_unknown_content",
+  "payload_file": "open_union_unknown_content.json",
+  "kind": "json",
+  "schema_ref": "site.standard.document#main",
+  "jacquard_rust_type": "catbird_atproto::generated::site_standard::document::Document",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/jacquard_0121_regressions.rs::open_union_preserves_unknown_type_and_payload"
+}

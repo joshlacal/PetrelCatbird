@@ -1,0 +1,12 @@
+{
+  "nsid": "blue.catbird.chat.defs",
+  "case": "direct_request_welcome_bundle",
+  "payload_file": "direct_request_welcome_bundle.json",
+  "kind": "json",
+  "schema_ref": "blue.catbird.chat.defs#directRequestWelcomeBundle",
+  "jacquard_rust_type": "catbird_atproto::generated::blue_catbird::chat::DirectRequestWelcomeBundle",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/named_bytes_contract.rs::direct_bytes_and_named_bytes_share_the_same_wire_codec"
+}

@@ -1,0 +1,12 @@
+{
+  "nsid": "blue.catbird.labyrinth.getSpaceMembership",
+  "case": "output_valid",
+  "payload_file": "output_valid.json",
+  "kind": "json",
+  "schema_ref": "blue.catbird.labyrinth.getSpaceMembership#output",
+  "jacquard_rust_type": "catbird_atproto::blue_catbird::labyrinth::get_space_membership::GetSpaceMembershipOutput",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/conversation_space_contract.rs::authority_membership_preserves_generation_and_current_chat_position"
+}

@@ -1,0 +1,12 @@
+{
+  "nsid": "app.bsky.labeler.getServices",
+  "case": "recorded_moderation_bsky_app",
+  "payload_file": "recorded_moderation_bsky_app.json",
+  "kind": "json",
+  "schema_ref": "app.bsky.labeler.getServices#output",
+  "jacquard_rust_type": "catbird_atproto::app_bsky::labeler::get_services::GetServicesOutput",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "28b2624ee",
+  "source_test": "Petrel/Tests/PetrelTests/Vectors/bsky-recorded/labeler-services.json"
+}

@@ -1,0 +1,13 @@
+{
+  "userDid": "did:plc:alice",
+  "role": "member",
+  "status": "active",
+  "leafCount": 1,
+  "labyrinthHead": {
+    "epochNumber": 3,
+    "epochHead": {
+      "$bytes": "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc="
+    },
+    "attestationKeyId": "key-1"
+  }
+}

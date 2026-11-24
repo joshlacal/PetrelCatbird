@@ -1,0 +1,12 @@
+{
+  "nsid": "com.atproto.space.listWriters",
+  "case": "params_opaque_cursor",
+  "payload_file": "params_opaque_cursor.json",
+  "kind": "json",
+  "schema_ref": "com.atproto.space.listWriters#params",
+  "jacquard_rust_type": "catbird_atproto::com_atproto::space::list_writers::ListWriters",
+  "expect": "roundtrip",
+  "cbor": false,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/com_atproto_space_surface.rs::list_writers_cursor_param_is_an_opaque_string"
+}

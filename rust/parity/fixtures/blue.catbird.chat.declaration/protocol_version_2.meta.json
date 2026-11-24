@@ -1,0 +1,12 @@
+{
+  "nsid": "blue.catbird.chat.declaration",
+  "case": "protocol_version_2",
+  "payload_file": "protocol_version_2.json",
+  "kind": "json",
+  "schema_ref": "blue.catbird.chat.declaration#main/protocolVersion",
+  "jacquard_rust_type": "catbird_atproto::generated::blue_catbird::chat::declaration::DeclarationProtocolVersion",
+  "expect": "roundtrip",
+  "cbor": false,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/blue_catbird_chat_surface.rs::declaration_protocol_version_two_is_known"
+}

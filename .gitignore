@@ -10,3 +10,5 @@ kotlin/build/
 kotlin/.gradle/
 kotlin/.kotlin/
 _site/
+rust/**/target/
+rust/**/Cargo.lock

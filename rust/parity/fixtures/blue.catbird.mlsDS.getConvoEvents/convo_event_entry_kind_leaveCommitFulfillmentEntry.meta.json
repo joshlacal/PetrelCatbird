@@ -1,0 +1,12 @@
+{
+  "nsid": "blue.catbird.mlsDS.getConvoEvents",
+  "case": "convo_event_entry_kind_leaveCommitFulfillmentEntry",
+  "payload_file": "convo_event_entry_kind_leaveCommitFulfillmentEntry.json",
+  "kind": "json",
+  "schema_ref": "blue.catbird.mlsDS.getConvoEvents#convoEventEntry",
+  "jacquard_rust_type": "catbird_atproto::generated::blue_catbird::mlsDS::get_convo_events::ConvoEventEntry",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/get_convo_events_contract.rs::convo_event_entry_kind_table_driven_mapping_and_round_trip"
+}

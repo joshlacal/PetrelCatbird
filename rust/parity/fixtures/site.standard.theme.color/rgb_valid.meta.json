@@ -1,0 +1,12 @@
+{
+  "nsid": "site.standard.theme.color",
+  "case": "rgb_valid",
+  "payload_file": "rgb_valid.json",
+  "kind": "json",
+  "schema_ref": "site.standard.theme.color#rgb",
+  "jacquard_rust_type": "catbird_atproto::site_standard::theme::color::Rgb",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/site_standard_surface.rs::site_standard_namespace_is_publicly_reachable"
+}

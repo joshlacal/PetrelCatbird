@@ -1,0 +1,12 @@
+{
+  "nsid": "com.atproto.space.getSpace",
+  "case": "output_managedspace",
+  "payload_file": "output_managedspace.json",
+  "kind": "json",
+  "schema_ref": "com.atproto.space.getSpace#output",
+  "jacquard_rust_type": "catbird_atproto::com_atproto::space::get_space::GetSpaceOutput",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/com_atproto_space_surface.rs::get_space_returns_space_and_policy"
+}

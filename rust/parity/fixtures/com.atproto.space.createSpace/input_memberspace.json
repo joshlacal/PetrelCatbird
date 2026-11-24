@@ -1,0 +1,10 @@
+{
+  "spaceType": "app.bsky.group",
+  "policy": {
+    "$type": "com.atproto.memberspace.policy",
+    "publicRead": true,
+    "allowedApps": [
+      "did:web:app.example#forum"
+    ]
+  }
+}

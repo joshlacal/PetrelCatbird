@@ -1,0 +1,12 @@
+{
+  "nsid": "blue.catbird.chat.defs",
+  "case": "blob_upload_prep_missing_mediaType",
+  "payload_file": "blob_upload_prep_missing_mediaType.json",
+  "kind": "json",
+  "schema_ref": "blue.catbird.chat.defs#blobUploadPreparationBody",
+  "jacquard_rust_type": "catbird_atproto::generated::blue_catbird::chat::BlobUploadPreparationBody",
+  "expect": "reject",
+  "cbor": false,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/blob_upload_contract.rs::blob_prepare_body_rejects_missing_media_metadata"
+}

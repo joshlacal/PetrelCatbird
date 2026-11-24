@@ -1,0 +1,8 @@
+{
+  "policy": {
+    "$type": "com.atproto.managedspace.policy",
+    "managingApp": "did:web:app.example#forum",
+    "publishPolicy": false
+  },
+  "spaceType": "app.bsky.group"
+}

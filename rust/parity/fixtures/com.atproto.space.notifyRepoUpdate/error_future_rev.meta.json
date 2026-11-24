@@ -1,0 +1,12 @@
+{
+  "nsid": "com.atproto.space.notifyRepoUpdate",
+  "case": "error_future_rev",
+  "payload_file": "error_future_rev.json",
+  "kind": "json",
+  "schema_ref": "com.atproto.space.notifyRepoUpdate#errors",
+  "jacquard_rust_type": "catbird_atproto::com_atproto::space::notify_repo_update::NotifyRepoUpdateError",
+  "expect": "roundtrip",
+  "cbor": false,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/com_atproto_space_surface.rs::notify_repo_update_declares_space_not_found_and_future_rev_errors"
+}

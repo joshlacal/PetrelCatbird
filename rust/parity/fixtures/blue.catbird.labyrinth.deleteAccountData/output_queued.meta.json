@@ -1,0 +1,12 @@
+{
+  "nsid": "blue.catbird.labyrinth.deleteAccountData",
+  "case": "output_queued",
+  "payload_file": "output_queued.json",
+  "kind": "json",
+  "schema_ref": "blue.catbird.labyrinth.deleteAccountData#output",
+  "jacquard_rust_type": "catbird_atproto::generated::blue_catbird::labyrinth::delete_account_data::DeleteAccountDataOutput",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/account_erasure_completion_contract.rs::only_an_explicit_confirmed_value_proves_completion"
+}

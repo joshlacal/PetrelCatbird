@@ -1,0 +1,15 @@
+{
+  "body": {
+    "actorDeviceId": "3b241101-e2bb-4255-8caf-4136c566a962",
+    "actorDid": "did:plc:ewvi7nxzyoun6zhxrhs64oiz",
+    "authGeneration": 1,
+    "blobId": "018f3f6a-7b2c-4d91-8a5e-0f123456789a",
+    "idempotencyKey": "8cb4f5d2-0d31-4b6f-a9c2-7e18f5403d61",
+    "keyId": "key-1",
+    "signatureDomain": "CATBIRD-CHAT-BLOB-DELETE",
+    "signedAt": "2026-08-19T00:00:00.000Z"
+  },
+  "signature": {
+    "$bytes": "AQIDBA=="
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "space": "at://did:plc:space/space/app.bsky.group/demo",
+  "policy": {
+    "$type": "com.atproto.managedspace.policy",
+    "managingApp": "did:web:app.example"
+  }
+}

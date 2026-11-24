@@ -1,0 +1,31 @@
+[package]
+name = "petrel-catbird"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.88"
+license = "MIT"
+description = "GENERATED Catbird private AT Protocol overlay types for Petrel (from manifests/petrel-catbird.json). Do not hand-edit src/generated."
+publish = false
+
+[features]
+default = []
+wasm = ["petrel-core/wasm", "petrel-api/wasm"]
+
+[dependencies]
+petrel-core = { path = "../../../Petrel/rust/petrel-core" }
+petrel-api = { path = "../../../Petrel/rust/petrel-api", features = ["app_bsky", "com_atproto"] }
+serde = { version = "1", features = ["derive"] }
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+large_enum_variant = "allow"
+too_many_arguments = "allow"
+struct_excessive_bools = "allow"
+doc_markdown = "allow"
+module_inception = "allow"
+upper_case_acronyms = "allow"
+struct_field_names = "allow"
+too_many_lines = "allow"

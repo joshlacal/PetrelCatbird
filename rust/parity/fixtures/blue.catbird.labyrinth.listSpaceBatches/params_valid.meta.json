@@ -1,0 +1,12 @@
+{
+  "nsid": "blue.catbird.labyrinth.listSpaceBatches",
+  "case": "params_valid",
+  "payload_file": "params_valid.json",
+  "kind": "json",
+  "schema_ref": "blue.catbird.labyrinth.listSpaceBatches#params",
+  "jacquard_rust_type": "catbird_atproto::blue_catbird::labyrinth::list_space_batches::ListSpaceBatches",
+  "expect": "roundtrip",
+  "cbor": false,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/conversation_space_contract.rs::reference_pages_require_the_selected_generation"
+}
