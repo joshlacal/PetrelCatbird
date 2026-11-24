@@ -38,6 +38,7 @@ sealed class BlueCatbirdChatCancelLeaveError(val name: String, val description: 
         object InvalidSignature: BlueCatbirdChatCancelLeaveError("InvalidSignature", null)
         object LeaveRequestNotFound: BlueCatbirdChatCancelLeaveError("LeaveRequestNotFound", null)
         object NotAuthorized: BlueCatbirdChatCancelLeaveError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatCancelLeaveError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object AccountSessionExpired: BlueCatbirdChatCancelLeaveError("AccountSessionExpired", null)
         object DeviceBindingMismatch: BlueCatbirdChatCancelLeaveError("DeviceBindingMismatch", null)
         object ProtocolUpgradeRequired: BlueCatbirdChatCancelLeaveError("ProtocolUpgradeRequired", null)

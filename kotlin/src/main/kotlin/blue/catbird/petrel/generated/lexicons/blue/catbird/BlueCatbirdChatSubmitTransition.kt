@@ -63,6 +63,7 @@ sealed class BlueCatbirdChatSubmitTransitionError(val name: String, val descript
         object MetadataVersionOverflow: BlueCatbirdChatSubmitTransitionError("MetadataVersionOverflow", null)
         object MissingMetadataSnapshot: BlueCatbirdChatSubmitTransitionError("MissingMetadataSnapshot", null)
         object NotAuthorized: BlueCatbirdChatSubmitTransitionError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatSubmitTransitionError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object NotFollowedByRecipient: BlueCatbirdChatSubmitTransitionError("NotFollowedByRecipient", null)
         object NotMember: BlueCatbirdChatSubmitTransitionError("NotMember", null)
         object ParticipantLeafLimitReached: BlueCatbirdChatSubmitTransitionError("ParticipantLeafLimitReached", null)

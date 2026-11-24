@@ -40,6 +40,7 @@ sealed class BlueCatbirdChatCloseConversationError(val name: String, val descrip
         object StaleCoordinates: BlueCatbirdChatCloseConversationError("StaleCoordinates", null)
         object AccountSessionExpired: BlueCatbirdChatCloseConversationError("AccountSessionExpired", null)
         object NotAuthorized: BlueCatbirdChatCloseConversationError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatCloseConversationError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object DeviceBindingMismatch: BlueCatbirdChatCloseConversationError("DeviceBindingMismatch", null)
         object ProtocolUpgradeRequired: BlueCatbirdChatCloseConversationError("ProtocolUpgradeRequired", null)
         object RateLimited: BlueCatbirdChatCloseConversationError("RateLimited", null)

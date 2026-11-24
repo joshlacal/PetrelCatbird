@@ -49,6 +49,7 @@ sealed class BlueCatbirdChatSendMessageError(val name: String, val description: 
         object UnsupportedMlsProfile: BlueCatbirdChatSendMessageError("UnsupportedMlsProfile", null)
         object AccountSessionExpired: BlueCatbirdChatSendMessageError("AccountSessionExpired", null)
         object NotAuthorized: BlueCatbirdChatSendMessageError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatSendMessageError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object DeviceBindingMismatch: BlueCatbirdChatSendMessageError("DeviceBindingMismatch", null)
         object ProtocolUpgradeRequired: BlueCatbirdChatSendMessageError("ProtocolUpgradeRequired", null)
         object RateLimited: BlueCatbirdChatSendMessageError("RateLimited", null)

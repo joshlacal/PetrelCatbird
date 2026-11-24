@@ -44,6 +44,7 @@ sealed class BlueCatbirdChatRegisterPushGatewayError(val name: String, val descr
         object InvalidRequest: BlueCatbirdChatRegisterPushGatewayError("InvalidRequest", null)
         object InvalidSignature: BlueCatbirdChatRegisterPushGatewayError("InvalidSignature", null)
         object NotAuthorized: BlueCatbirdChatRegisterPushGatewayError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatRegisterPushGatewayError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object ProtocolUpgradeRequired: BlueCatbirdChatRegisterPushGatewayError("ProtocolUpgradeRequired", null)
     }
 

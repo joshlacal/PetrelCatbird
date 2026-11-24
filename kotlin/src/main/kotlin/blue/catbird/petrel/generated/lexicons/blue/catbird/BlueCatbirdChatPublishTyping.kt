@@ -43,6 +43,7 @@ sealed class BlueCatbirdChatPublishTypingError(val name: String, val description
         object StaleCoordinates: BlueCatbirdChatPublishTypingError("StaleCoordinates", null)
         object AccountSessionExpired: BlueCatbirdChatPublishTypingError("AccountSessionExpired", null)
         object NotAuthorized: BlueCatbirdChatPublishTypingError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatPublishTypingError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object DeviceBindingMismatch: BlueCatbirdChatPublishTypingError("DeviceBindingMismatch", null)
         object ProtocolUpgradeRequired: BlueCatbirdChatPublishTypingError("ProtocolUpgradeRequired", null)
     }

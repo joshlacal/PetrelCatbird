@@ -93,6 +93,8 @@ public struct BlueCatbirdChatRejectWelcome {
         case welcomeSuperseded = "WelcomeSuperseded"
         case accountSessionExpired = "AccountSessionExpired"
         case notAuthorized = "NotAuthorized"
+        /// The operator has taken this account down. Only deleting the account's own data is still allowed.
+        case accountTakedown = "AccountTakedown"
         case deviceBindingMismatch = "DeviceBindingMismatch"
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"
         case rateLimited = "RateLimited"

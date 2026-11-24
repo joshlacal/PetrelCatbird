@@ -37,6 +37,7 @@ sealed class BlueCatbirdChatReplenishKeyPackagesError(val name: String, val desc
         object InvalidSignature: BlueCatbirdChatReplenishKeyPackagesError("InvalidSignature", null)
         object KeyPackageInventoryLimitReached: BlueCatbirdChatReplenishKeyPackagesError("KeyPackageInventoryLimitReached", null)
         object NotAuthorized: BlueCatbirdChatReplenishKeyPackagesError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatReplenishKeyPackagesError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object AccountSessionExpired: BlueCatbirdChatReplenishKeyPackagesError("AccountSessionExpired", null)
         object DeviceBindingMismatch: BlueCatbirdChatReplenishKeyPackagesError("DeviceBindingMismatch", null)
         object ProtocolUpgradeRequired: BlueCatbirdChatReplenishKeyPackagesError("ProtocolUpgradeRequired", null)

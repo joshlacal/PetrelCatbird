@@ -34,6 +34,7 @@ sealed class BlueCatbirdChatGetDevicesError(val name: String, val description: S
         object InvalidRequest: BlueCatbirdChatGetDevicesError("InvalidRequest", null)
         object AccountSessionExpired: BlueCatbirdChatGetDevicesError("AccountSessionExpired", null)
         object NotAuthorized: BlueCatbirdChatGetDevicesError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatGetDevicesError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object DeviceBindingMismatch: BlueCatbirdChatGetDevicesError("DeviceBindingMismatch", null)
         object ProtocolUpgradeRequired: BlueCatbirdChatGetDevicesError("ProtocolUpgradeRequired", null)
         object RateLimited: BlueCatbirdChatGetDevicesError("RateLimited", null)

@@ -45,6 +45,7 @@ sealed class BlueCatbirdChatAcknowledgeEntriesError(val name: String, val descri
         object InvalidRequest: BlueCatbirdChatAcknowledgeEntriesError("InvalidRequest", null)
         object InvalidSignature: BlueCatbirdChatAcknowledgeEntriesError("InvalidSignature", null)
         object NotAuthorized: BlueCatbirdChatAcknowledgeEntriesError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatAcknowledgeEntriesError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object ProtocolUpgradeRequired: BlueCatbirdChatAcknowledgeEntriesError("ProtocolUpgradeRequired", null)
     }
 

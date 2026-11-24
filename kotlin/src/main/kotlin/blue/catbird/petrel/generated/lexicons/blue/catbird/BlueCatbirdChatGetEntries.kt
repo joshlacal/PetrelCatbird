@@ -41,6 +41,7 @@ sealed class BlueCatbirdChatGetEntriesError(val name: String, val description: S
         object NotEntitled: BlueCatbirdChatGetEntriesError("NotEntitled", null)
         object AccountSessionExpired: BlueCatbirdChatGetEntriesError("AccountSessionExpired", null)
         object NotAuthorized: BlueCatbirdChatGetEntriesError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatGetEntriesError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object DeviceBindingMismatch: BlueCatbirdChatGetEntriesError("DeviceBindingMismatch", null)
         object ProtocolUpgradeRequired: BlueCatbirdChatGetEntriesError("ProtocolUpgradeRequired", null)
         object RateLimited: BlueCatbirdChatGetEntriesError("RateLimited", null)
