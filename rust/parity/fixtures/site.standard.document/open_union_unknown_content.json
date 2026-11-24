@@ -1,0 +1,18 @@
+{
+  "$type": "site.standard.document",
+  "content": {
+    "$type": "com.example.richText",
+    "body": {
+      "blocks": [
+        {
+          "text": "hello"
+        }
+      ],
+      "version": 2
+    },
+    "futureFlag": true
+  },
+  "publishedAt": "2026-07-16T12:00:00Z",
+  "site": "https://example.com",
+  "title": "Forward-compatible document"
+}

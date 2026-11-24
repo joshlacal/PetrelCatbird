@@ -1,0 +1,8 @@
+{
+  "ver": 1,
+  "repo": "did:plc:writer",
+  "space": "at://did:plc:space/space/app.bsky.group/demo",
+  "data": {
+    "$bytes": "QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkI="
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "error": "missing field `redactions` at line 13 column 1",
+  "expect": "reject",
+  "status": "deser_err"
+}

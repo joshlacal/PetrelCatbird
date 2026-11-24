@@ -1,0 +1,12 @@
+{
+  "nsid": "blue.catbird.circle.defs",
+  "case": "circle_summary_space_uri",
+  "payload_file": "circle_summary_space_uri.json",
+  "kind": "json",
+  "schema_ref": "blue.catbird.circle.defs#circleSummary",
+  "jacquard_rust_type": "catbird_atproto::blue_catbird::circle::CircleSummary",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/blue_catbird_circle_surface.rs::circle_summary_keeps_space_uri"
+}

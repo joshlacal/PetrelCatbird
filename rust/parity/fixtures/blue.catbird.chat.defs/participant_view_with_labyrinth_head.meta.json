@@ -1,0 +1,12 @@
+{
+  "nsid": "blue.catbird.chat.defs",
+  "case": "participant_view_with_labyrinth_head",
+  "payload_file": "participant_view_with_labyrinth_head.json",
+  "kind": "json",
+  "schema_ref": "blue.catbird.chat.defs#participantView",
+  "jacquard_rust_type": "catbird_atproto::generated::blue_catbird::chat::ParticipantView",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/blue_catbird_chat_surface.rs::participant_view_carries_optional_labyrinth_head"
+}

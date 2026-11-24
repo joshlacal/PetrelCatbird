@@ -1,0 +1,12 @@
+{
+  "nsid": "com.atproto.space.authorizeSpaceSync",
+  "case": "error_RegistrationNotConfirmed",
+  "payload_file": "error_RegistrationNotConfirmed.json",
+  "kind": "json",
+  "schema_ref": "com.atproto.space.authorizeSpaceSync#errors",
+  "jacquard_rust_type": "catbird_atproto::com_atproto::space::authorize_space_sync::AuthorizeSpaceSyncError",
+  "expect": "roundtrip",
+  "cbor": false,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/com_atproto_space_surface.rs::authorize_space_sync_keeps_its_error_names"
+}

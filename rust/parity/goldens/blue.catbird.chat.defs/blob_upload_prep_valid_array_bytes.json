@@ -1,0 +1,34 @@
+{
+  "actorDeviceId": "3b241101-e2bb-4255-8caf-4136c566a962",
+  "actorDid": "did:plc:ewvi7nxzyoun6zhxrhs64oiz",
+  "authGeneration": 1,
+  "blobId": "018f3f6a-7b2c-4d91-8a5e-0f123456789a",
+  "ciphertextSha256": {
+    "$bytes": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+  },
+  "ciphertextSize": 17,
+  "conversationId": "018f3f6a-7b2c-4d91-8a5e-0f123456789a",
+  "idempotencyKey": "8cb4f5d2-0d31-4b6f-a9c2-7e18f5403d61",
+  "keyId": "If4x36FUomFia_hUBG_SJxt77UtqvkWqWId-9H-XIbk",
+  "mediaType": "image/png",
+  "plaintextSize": 1,
+  "prior": {
+    "confirmationTag": {
+      "$bytes": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+    },
+    "conversationId": "018f3f6a-7b2c-4d91-8a5e-0f123456789a",
+    "epoch": 0,
+    "generation": 0,
+    "groupContextHash": {
+      "$bytes": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+    },
+    "groupId": {
+      "$bytes": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+    },
+    "lifecycle": "active",
+    "stateVersion": 0
+  },
+  "purpose": "attachment",
+  "signatureDomain": "CATBIRD-CHAT-BLOB-PREPARE\u0000",
+  "signedAt": "2026-07-22T14:05:09.123Z"
+}

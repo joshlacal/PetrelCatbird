@@ -1,0 +1,13 @@
+{
+  "author": "did:plc:author",
+  "rkey": "e33325af1ea2ff20a2e4adb3bc57a67e603222f4202931345c9c1ff47187fa90",
+  "space": "at://did:plc:authority/space/blue.catbird.labyrinth.thread/conversation",
+  "generation": "a4c334f4-1581-4f8c-9767-e6e7e23e70e2",
+  "itemCount": 1,
+  "cid": "bafyreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku",
+  "order": {
+    "seq": 9,
+    "chatSeq": 11,
+    "receivedAt": "2026-10-23T12:00:00Z"
+  }
+}

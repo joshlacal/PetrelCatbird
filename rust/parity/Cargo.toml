@@ -1,0 +1,15 @@
+[package]
+name = "petrel-catbird-parity"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.88"
+license = "MIT"
+description = "Dev-only B2 Jacquard 0.13 <-> Petrel parity corpus and diff harness"
+publish = false
+
+[dependencies]
+petrel-core = { path = "../../../Petrel/rust/petrel-core" }
+petrel-api = { path = "../../../Petrel/rust/petrel-api", features = ["app_bsky", "com_atproto", "site_standard"] }
+petrel-catbird = { path = "../petrel-catbird" }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["raw_value"] }

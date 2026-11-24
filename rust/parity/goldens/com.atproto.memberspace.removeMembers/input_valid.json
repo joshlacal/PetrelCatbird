@@ -1,0 +1,6 @@
+{
+  "dids": [
+    "did:plc:member"
+  ],
+  "space": "at://did:plc:space/space/app.bsky.group/demo"
+}

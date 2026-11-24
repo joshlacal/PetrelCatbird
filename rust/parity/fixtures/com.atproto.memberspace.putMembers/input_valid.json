@@ -1,0 +1,10 @@
+{
+  "space": "at://did:plc:space/space/app.bsky.group/demo",
+  "members": [
+    {
+      "did": "did:plc:member",
+      "read": true,
+      "write": false
+    }
+  ]
+}

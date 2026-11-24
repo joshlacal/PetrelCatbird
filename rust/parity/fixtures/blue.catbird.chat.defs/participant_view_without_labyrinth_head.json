@@ -1,0 +1,6 @@
+{
+  "userDid": "did:plc:alice",
+  "role": "member",
+  "status": "active",
+  "leafCount": 1
+}

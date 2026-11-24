@@ -1,0 +1,5 @@
+{
+  "cbor_hex": "a0",
+  "expect": "roundtrip",
+  "status": "ok"
+}

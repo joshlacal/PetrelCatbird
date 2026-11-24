@@ -1,0 +1,22 @@
+{
+  "acceptedPayloadSha256": {
+    "$bytes": "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyA="
+  },
+  "ciphertext": {
+    "$bytes": "AQ=="
+  },
+  "createdAt": "2026-08-21T12:00:00.000Z",
+  "entryId": "00112233-4455-4677-8899-aabbccddeeff",
+  "entryKind": "blue.catbird.chat.defs#zeroLeafLeaveEntry",
+  "epoch": 0,
+  "messageType": "app",
+  "msgId": "msg-1",
+  "outerFingerprint": {
+    "$bytes": "oaKjpKWmp6ipqqusra6vsLGys7S1tre4ubq7vL2+v8A="
+  },
+  "paddedSize": 1,
+  "seq": 1,
+  "signedRequest": {
+    "$bytes": "QUJDRA=="
+  }
+}

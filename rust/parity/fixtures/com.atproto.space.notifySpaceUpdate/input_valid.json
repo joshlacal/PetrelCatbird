@@ -1,0 +1,13 @@
+{
+  "space": "at://did:plc:space/space/app.bsky.group/demo",
+  "token": "opaque-token",
+  "update": {
+    "$type": "com.atproto.space.defs#repoWrite",
+    "repo": "did:plc:a",
+    "repoRev": "3jzfcijpj2m2a",
+    "data": {
+      "$bytes": "QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkI="
+    },
+    "spaceRev": "3jzfcijpj2m2b"
+  }
+}

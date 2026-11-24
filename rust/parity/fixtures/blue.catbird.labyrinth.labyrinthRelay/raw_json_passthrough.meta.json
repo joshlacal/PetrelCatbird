@@ -1,0 +1,12 @@
+{
+  "nsid": "blue.catbird.labyrinth.labyrinthRelay",
+  "case": "raw_json_passthrough",
+  "payload_file": "raw_json_passthrough.bin",
+  "kind": "raw",
+  "schema_ref": "blue.catbird.labyrinth.labyrinthRelay#output",
+  "jacquard_rust_type": "catbird_atproto::generated::blue_catbird::labyrinth::labyrinth_relay::LabyrinthRelayResponse",
+  "expect": "raw_passthrough",
+  "cbor": false,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/labyrinth_relay_contract.rs::relay_output_is_the_relayed_body_byte_for_byte"
+}

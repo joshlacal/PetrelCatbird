@@ -1,0 +1,7 @@
+{
+  "uri": "at://did:plc:owner/space/blue.catbird.circle/3abc",
+  "circleId": "3abcdefghijkl",
+  "name": "Family",
+  "owner": "did:plc:owner",
+  "memberCount": 5
+}
