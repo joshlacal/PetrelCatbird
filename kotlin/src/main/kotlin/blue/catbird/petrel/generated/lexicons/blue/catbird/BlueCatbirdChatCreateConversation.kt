@@ -43,6 +43,7 @@ sealed class BlueCatbirdChatCreateConversationError(val name: String, val descri
         object MessagesDisabled: BlueCatbirdChatCreateConversationError("MessagesDisabled", null)
         object MetadataNonceReuse: BlueCatbirdChatCreateConversationError("MetadataNonceReuse", null)
         object NotAuthorized: BlueCatbirdChatCreateConversationError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatCreateConversationError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object NotFollowedByRecipient: BlueCatbirdChatCreateConversationError("NotFollowedByRecipient", null)
         object RelationshipPolicyUnavailable: BlueCatbirdChatCreateConversationError("RelationshipPolicyUnavailable", null)
         object SignedOperationExpired: BlueCatbirdChatCreateConversationError("SignedOperationExpired", null)

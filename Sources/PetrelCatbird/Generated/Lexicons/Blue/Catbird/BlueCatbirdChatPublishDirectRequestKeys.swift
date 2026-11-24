@@ -103,6 +103,8 @@ public struct BlueCatbirdChatPublishDirectRequestKeys {
         case recipientAuthorityUnsupported = "RecipientAuthorityUnsupported"
         case accountSessionExpired = "AccountSessionExpired"
         case notAuthorized = "NotAuthorized"
+        /// The operator has taken this account down. Only deleting the account's own data is still allowed.
+        case accountTakedown = "AccountTakedown"
         case deviceBindingMismatch = "DeviceBindingMismatch"
         case deviceNotRegistered = "DeviceNotRegistered"
         case deviceRevoked = "DeviceRevoked"

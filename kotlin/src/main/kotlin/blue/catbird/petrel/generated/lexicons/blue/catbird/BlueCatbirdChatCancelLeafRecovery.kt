@@ -37,6 +37,7 @@ sealed class BlueCatbirdChatCancelLeafRecoveryError(val name: String, val descri
         object InvalidSignature: BlueCatbirdChatCancelLeafRecoveryError("InvalidSignature", null)
         object LeafRecoveryNotFound: BlueCatbirdChatCancelLeafRecoveryError("LeafRecoveryNotFound", null)
         object NotAuthorized: BlueCatbirdChatCancelLeafRecoveryError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatCancelLeafRecoveryError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object AccountSessionExpired: BlueCatbirdChatCancelLeafRecoveryError("AccountSessionExpired", null)
         object DeviceBindingMismatch: BlueCatbirdChatCancelLeafRecoveryError("DeviceBindingMismatch", null)
         object ProtocolUpgradeRequired: BlueCatbirdChatCancelLeafRecoveryError("ProtocolUpgradeRequired", null)

@@ -137,6 +137,7 @@ sealed class BlueCatbirdChatGetPendingWelcomesError(val name: String, val descri
         object InventorySessionMismatch: BlueCatbirdChatGetPendingWelcomesError("InventorySessionMismatch", null)
         object AccountSessionExpired: BlueCatbirdChatGetPendingWelcomesError("AccountSessionExpired", null)
         object NotAuthorized: BlueCatbirdChatGetPendingWelcomesError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatGetPendingWelcomesError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object DeviceBindingMismatch: BlueCatbirdChatGetPendingWelcomesError("DeviceBindingMismatch", null)
         object ProtocolUpgradeRequired: BlueCatbirdChatGetPendingWelcomesError("ProtocolUpgradeRequired", null)
         object RateLimited: BlueCatbirdChatGetPendingWelcomesError("RateLimited", null)

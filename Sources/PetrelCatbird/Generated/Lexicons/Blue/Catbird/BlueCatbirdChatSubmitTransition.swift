@@ -124,6 +124,8 @@ public struct BlueCatbirdChatSubmitTransition {
         case metadataVersionOverflow = "MetadataVersionOverflow"
         case missingMetadataSnapshot = "MissingMetadataSnapshot"
         case notAuthorized = "NotAuthorized"
+        /// The operator has taken this account down. Only deleting the account's own data is still allowed.
+        case accountTakedown = "AccountTakedown"
         case notFollowedByRecipient = "NotFollowedByRecipient"
         case notMember = "NotMember"
         case participantLeafLimitReached = "ParticipantLeafLimitReached"

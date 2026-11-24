@@ -90,6 +90,8 @@ public struct BlueCatbirdChatCreateConversation {
         case messagesDisabled = "MessagesDisabled"
         case metadataNonceReuse = "MetadataNonceReuse"
         case notAuthorized = "NotAuthorized"
+        /// The operator has taken this account down. Only deleting the account's own data is still allowed.
+        case accountTakedown = "AccountTakedown"
         case notFollowedByRecipient = "NotFollowedByRecipient"
         case relationshipPolicyUnavailable = "RelationshipPolicyUnavailable"
         case signedOperationExpired = "SignedOperationExpired"

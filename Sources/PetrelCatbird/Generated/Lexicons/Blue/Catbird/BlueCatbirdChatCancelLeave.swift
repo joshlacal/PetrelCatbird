@@ -92,6 +92,8 @@ public struct BlueCatbirdChatCancelLeave {
         case invalidSignature = "InvalidSignature"
         case leaveRequestNotFound = "LeaveRequestNotFound"
         case notAuthorized = "NotAuthorized"
+        /// The operator has taken this account down. Only deleting the account's own data is still allowed.
+        case accountTakedown = "AccountTakedown"
         case accountSessionExpired = "AccountSessionExpired"
         case deviceBindingMismatch = "DeviceBindingMismatch"
         case protocolUpgradeRequired = "ProtocolUpgradeRequired"

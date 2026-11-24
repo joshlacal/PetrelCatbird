@@ -32,6 +32,7 @@ sealed class BlueCatbirdChatSubscribeEventsError(val name: String, val descripti
         object InvalidTicket: BlueCatbirdChatSubscribeEventsError("InvalidTicket", null)
         object AccountSessionExpired: BlueCatbirdChatSubscribeEventsError("AccountSessionExpired", null)
         object NotAuthorized: BlueCatbirdChatSubscribeEventsError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatSubscribeEventsError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object DeviceBindingMismatch: BlueCatbirdChatSubscribeEventsError("DeviceBindingMismatch", null)
         object ProtocolUpgradeRequired: BlueCatbirdChatSubscribeEventsError("ProtocolUpgradeRequired", null)
         object RateLimited: BlueCatbirdChatSubscribeEventsError("RateLimited", null)

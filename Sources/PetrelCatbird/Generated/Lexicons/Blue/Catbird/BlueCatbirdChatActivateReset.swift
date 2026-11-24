@@ -105,6 +105,8 @@ public struct BlueCatbirdChatActivateReset {
         case invalidSignature = "InvalidSignature"
         case metadataNonceReuse = "MetadataNonceReuse"
         case notAuthorized = "NotAuthorized"
+        /// The operator has taken this account down. Only deleting the account's own data is still allowed.
+        case accountTakedown = "AccountTakedown"
         case notMember = "NotMember"
         case resetRequestNotFound = "ResetRequestNotFound"
         case resetRequestStale = "ResetRequestStale"

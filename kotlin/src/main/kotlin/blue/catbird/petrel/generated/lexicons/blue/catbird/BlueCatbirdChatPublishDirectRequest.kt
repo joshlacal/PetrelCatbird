@@ -48,6 +48,7 @@ sealed class BlueCatbirdChatPublishDirectRequestError(val name: String, val desc
         object RecipientAuthorityUnsupported: BlueCatbirdChatPublishDirectRequestError("RecipientAuthorityUnsupported", null)
         object AccountSessionExpired: BlueCatbirdChatPublishDirectRequestError("AccountSessionExpired", null)
         object NotAuthorized: BlueCatbirdChatPublishDirectRequestError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatPublishDirectRequestError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object DeviceBindingMismatch: BlueCatbirdChatPublishDirectRequestError("DeviceBindingMismatch", null)
         object DeviceNotRegistered: BlueCatbirdChatPublishDirectRequestError("DeviceNotRegistered", null)
         object DeviceRevoked: BlueCatbirdChatPublishDirectRequestError("DeviceRevoked", null)

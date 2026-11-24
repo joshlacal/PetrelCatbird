@@ -39,6 +39,7 @@ sealed class BlueCatbirdChatAcknowledgeWelcomeError(val name: String, val descri
         object WelcomeSuperseded: BlueCatbirdChatAcknowledgeWelcomeError("WelcomeSuperseded", null)
         object AccountSessionExpired: BlueCatbirdChatAcknowledgeWelcomeError("AccountSessionExpired", null)
         object NotAuthorized: BlueCatbirdChatAcknowledgeWelcomeError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatAcknowledgeWelcomeError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object DeviceBindingMismatch: BlueCatbirdChatAcknowledgeWelcomeError("DeviceBindingMismatch", null)
         object ProtocolUpgradeRequired: BlueCatbirdChatAcknowledgeWelcomeError("ProtocolUpgradeRequired", null)
         object RateLimited: BlueCatbirdChatAcknowledgeWelcomeError("RateLimited", null)

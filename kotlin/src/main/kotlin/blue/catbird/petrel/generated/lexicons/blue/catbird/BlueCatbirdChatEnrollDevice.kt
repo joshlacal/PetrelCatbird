@@ -38,6 +38,7 @@ sealed class BlueCatbirdChatEnrollDeviceError(val name: String, val description:
         object InvalidSignature: BlueCatbirdChatEnrollDeviceError("InvalidSignature", null)
         object KeyPackageInventoryLimitReached: BlueCatbirdChatEnrollDeviceError("KeyPackageInventoryLimitReached", null)
         object NotAuthorized: BlueCatbirdChatEnrollDeviceError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatEnrollDeviceError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object AccountSessionExpired: BlueCatbirdChatEnrollDeviceError("AccountSessionExpired", null)
         object DeviceBindingMismatch: BlueCatbirdChatEnrollDeviceError("DeviceBindingMismatch", null)
         object ProtocolUpgradeRequired: BlueCatbirdChatEnrollDeviceError("ProtocolUpgradeRequired", null)

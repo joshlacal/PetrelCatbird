@@ -48,6 +48,7 @@ sealed class BlueCatbirdChatCancelDirectRequestPreparationError(val name: String
         object RecipientAuthorityUnsupported: BlueCatbirdChatCancelDirectRequestPreparationError("RecipientAuthorityUnsupported", null)
         object AccountSessionExpired: BlueCatbirdChatCancelDirectRequestPreparationError("AccountSessionExpired", null)
         object NotAuthorized: BlueCatbirdChatCancelDirectRequestPreparationError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatCancelDirectRequestPreparationError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object DeviceBindingMismatch: BlueCatbirdChatCancelDirectRequestPreparationError("DeviceBindingMismatch", null)
         object DeviceNotRegistered: BlueCatbirdChatCancelDirectRequestPreparationError("DeviceNotRegistered", null)
         object DeviceRevoked: BlueCatbirdChatCancelDirectRequestPreparationError("DeviceRevoked", null)

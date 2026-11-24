@@ -44,6 +44,7 @@ sealed class BlueCatbirdChatActivateResetError(val name: String, val description
         object InvalidSignature: BlueCatbirdChatActivateResetError("InvalidSignature", null)
         object MetadataNonceReuse: BlueCatbirdChatActivateResetError("MetadataNonceReuse", null)
         object NotAuthorized: BlueCatbirdChatActivateResetError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatActivateResetError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object NotMember: BlueCatbirdChatActivateResetError("NotMember", null)
         object ResetRequestNotFound: BlueCatbirdChatActivateResetError("ResetRequestNotFound", null)
         object ResetRequestStale: BlueCatbirdChatActivateResetError("ResetRequestStale", null)

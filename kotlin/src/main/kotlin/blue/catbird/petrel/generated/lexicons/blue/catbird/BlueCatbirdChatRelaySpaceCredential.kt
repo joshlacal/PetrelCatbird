@@ -54,6 +54,7 @@ sealed class BlueCatbirdChatRelaySpaceCredentialError(val name: String, val desc
         object InvalidRequest: BlueCatbirdChatRelaySpaceCredentialError("InvalidRequest", null)
         object InvalidTargetEndpoint: BlueCatbirdChatRelaySpaceCredentialError("InvalidTargetEndpoint", null)
         object NotAuthorized: BlueCatbirdChatRelaySpaceCredentialError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatRelaySpaceCredentialError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object ProtocolUpgradeRequired: BlueCatbirdChatRelaySpaceCredentialError("ProtocolUpgradeRequired", null)
         object UpstreamError: BlueCatbirdChatRelaySpaceCredentialError("UpstreamError", null)
     }

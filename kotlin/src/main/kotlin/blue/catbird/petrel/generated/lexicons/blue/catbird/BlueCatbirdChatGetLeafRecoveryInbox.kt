@@ -53,6 +53,7 @@ sealed class BlueCatbirdChatGetLeafRecoveryInboxError(val name: String, val desc
         object InventorySessionMismatch: BlueCatbirdChatGetLeafRecoveryInboxError("InventorySessionMismatch", null)
         object AccountSessionExpired: BlueCatbirdChatGetLeafRecoveryInboxError("AccountSessionExpired", null)
         object NotAuthorized: BlueCatbirdChatGetLeafRecoveryInboxError("NotAuthorized", null)
+        object AccountTakedown: BlueCatbirdChatGetLeafRecoveryInboxError("AccountTakedown", "The operator has taken this account down. Only deleting the account's own data is still allowed.")
         object DeviceBindingMismatch: BlueCatbirdChatGetLeafRecoveryInboxError("DeviceBindingMismatch", null)
         object ProtocolUpgradeRequired: BlueCatbirdChatGetLeafRecoveryInboxError("ProtocolUpgradeRequired", null)
         object RateLimited: BlueCatbirdChatGetLeafRecoveryInboxError("RateLimited", null)
