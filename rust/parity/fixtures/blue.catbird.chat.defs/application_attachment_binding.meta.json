@@ -1,0 +1,12 @@
+{
+  "nsid": "blue.catbird.chat.defs",
+  "case": "application_attachment_binding",
+  "payload_file": "application_attachment_binding.json",
+  "kind": "json",
+  "schema_ref": "blue.catbird.chat.defs#applicationAttachmentBinding",
+  "jacquard_rust_type": "catbird_atproto::generated::blue_catbird::chat::ApplicationAttachmentBinding",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/named_bytes_contract.rs::named_bytes_decode_atproto_json_and_encode_real_dag_cbor_bytes"
+}

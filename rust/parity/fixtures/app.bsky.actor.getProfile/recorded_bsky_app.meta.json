@@ -1,0 +1,12 @@
+{
+  "nsid": "app.bsky.actor.getProfile",
+  "case": "recorded_bsky_app",
+  "payload_file": "recorded_bsky_app.json",
+  "kind": "json",
+  "schema_ref": "app.bsky.actor.defs#profileViewDetailed",
+  "jacquard_rust_type": "catbird_atproto::app_bsky::actor::ProfileViewDetailed",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "28b2624ee",
+  "source_test": "Petrel/Tests/PetrelTests/Vectors/bsky-recorded/profile.json"
+}

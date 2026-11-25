@@ -1,0 +1,18 @@
+{
+  "actorDeviceId": "00112233-4455-4677-8899-aabbccddeeff",
+  "actorDid": "did:plc:abcdefghijklmnopqrstuvwx",
+  "appId": "blue.catbird",
+  "authGeneration": 7,
+  "authorityDid": "did:web:chat.catbird.blue",
+  "enabled": true,
+  "keyId": "Vkdap1RjR0wChd9dvyvKtz2mUTWIOem3dIGy6rEHcIw",
+  "protocolVersion": "2",
+  "provider": "fcm",
+  "registrationId": "11223344-5566-4788-99aa-bbccddeeff00",
+  "signatureDomain": "CATBIRD-CHAT-PUSH-BINDING\u0000",
+  "signedAt": "2026-09-19T12:34:56.789Z",
+  "tokenGeneration": 3,
+  "tokenSha256": {
+    "$bytes": "g2dY8GQ8jAtWc2UGu7zzCYcy+dk4cWbNMFc8l9Ne4P8="
+  }
+}

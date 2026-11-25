@@ -1,0 +1,7 @@
+{
+  "cbor_hex": "a464726f6c65666d656d626572667374617475736661637469766567757365724469646d6469643a706c633a616c696365696c656166436f756e7401",
+  "cbor_roundtrip_equal": true,
+  "expect": "roundtrip",
+  "status": "ok",
+  "validate_error": null
+}

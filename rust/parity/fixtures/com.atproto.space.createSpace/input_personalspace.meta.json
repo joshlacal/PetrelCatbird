@@ -1,0 +1,12 @@
+{
+  "nsid": "com.atproto.space.createSpace",
+  "case": "input_personalspace",
+  "payload_file": "input_personalspace.json",
+  "kind": "json",
+  "schema_ref": "com.atproto.space.createSpace#input",
+  "jacquard_rust_type": "catbird_atproto::com_atproto::space::create_space::CreateSpace",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/com_atproto_space_surface.rs::space_policy_union_keeps_each_policy_type_tag"
+}

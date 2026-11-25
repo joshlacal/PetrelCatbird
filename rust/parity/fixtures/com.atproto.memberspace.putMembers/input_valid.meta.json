@@ -1,0 +1,12 @@
+{
+  "nsid": "com.atproto.memberspace.putMembers",
+  "case": "input_valid",
+  "payload_file": "input_valid.json",
+  "kind": "json",
+  "schema_ref": "com.atproto.memberspace.putMembers#input",
+  "jacquard_rust_type": "catbird_atproto::com_atproto::memberspace::put_members::PutMembers",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/com_atproto_space_surface.rs::member_batches_use_members_and_dids_arrays"
+}

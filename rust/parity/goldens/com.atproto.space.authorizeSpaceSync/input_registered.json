@@ -1,0 +1,10 @@
+{
+  "clientAttestation": "app-jwt",
+  "credentialKey": "did:key:zExample",
+  "delegationToken": "user-jwt",
+  "notify": {
+    "endpoint": "https://syncer.example/xrpc",
+    "token": "opaque-token"
+  },
+  "space": "at:space/did:plc:space/app.bsky.group/demo"
+}

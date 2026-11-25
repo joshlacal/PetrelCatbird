@@ -1,0 +1,12 @@
+{
+  "nsid": "com.atproto.space.listSpaces",
+  "case": "params_space_type",
+  "payload_file": "params_space_type.json",
+  "kind": "json",
+  "schema_ref": "com.atproto.space.listSpaces#params",
+  "jacquard_rust_type": "catbird_atproto::com_atproto::space::list_spaces::ListSpaces",
+  "expect": "roundtrip",
+  "cbor": false,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/com_atproto_space_surface.rs::list_spaces_filter_is_space_type"
+}

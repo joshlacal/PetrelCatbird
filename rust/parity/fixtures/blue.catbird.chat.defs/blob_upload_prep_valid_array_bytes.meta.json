@@ -1,0 +1,13 @@
+{
+  "nsid": "blue.catbird.chat.defs",
+  "case": "blob_upload_prep_valid_array_bytes",
+  "payload_file": "blob_upload_prep_valid_array_bytes.json",
+  "kind": "json",
+  "schema_ref": "blue.catbird.chat.defs#blobUploadPreparationBody",
+  "jacquard_rust_type": "catbird_atproto::generated::blue_catbird::chat::BlobUploadPreparationBody",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/blob_upload_contract.rs::valid_body",
+  "note": "Uses integer-array bytes [0;32] for ciphertextSha256; jacquard accepts array and re-encodes as $bytes"
+}

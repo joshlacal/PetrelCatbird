@@ -1,0 +1,12 @@
+{
+  "nsid": "com.atproto.space.createSpace",
+  "case": "input_legacy_type_reject",
+  "payload_file": "input_legacy_type_reject.json",
+  "kind": "json",
+  "schema_ref": "com.atproto.space.createSpace#input",
+  "jacquard_rust_type": "catbird_atproto::com_atproto::space::create_space::CreateSpace",
+  "expect": "reject",
+  "cbor": false,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/com_atproto_space_surface.rs::create_space_requires_space_type"
+}

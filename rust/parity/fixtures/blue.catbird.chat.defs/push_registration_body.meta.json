@@ -1,0 +1,12 @@
+{
+  "nsid": "blue.catbird.chat.defs",
+  "case": "push_registration_body",
+  "payload_file": "push_registration_body.json",
+  "kind": "json",
+  "schema_ref": "blue.catbird.chat.defs#pushRegistrationBody",
+  "jacquard_rust_type": "catbird_atproto::blue_catbird::chat::PushRegistrationBody",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/fixtures/push-registration.json#/body"
+}

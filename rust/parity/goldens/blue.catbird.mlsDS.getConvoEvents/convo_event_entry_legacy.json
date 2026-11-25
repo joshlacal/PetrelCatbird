@@ -1,0 +1,11 @@
+{
+  "ciphertext": {
+    "$bytes": "AQ=="
+  },
+  "createdAt": "2026-08-21T12:00:00.000Z",
+  "epoch": 0,
+  "messageType": "app",
+  "msgId": "msg-1",
+  "paddedSize": 1,
+  "seq": 1
+}

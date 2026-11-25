@@ -1,0 +1,5 @@
+{
+  "cursor": "not-a-tid",
+  "limit": 100,
+  "space": "at:space/did:plc:space/app.bsky.group/demo"
+}

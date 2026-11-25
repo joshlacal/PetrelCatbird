@@ -1,0 +1,12 @@
+{
+  "nsid": "blue.catbird.labyrinth.deleteSpaceGeneration",
+  "case": "output_valid",
+  "payload_file": "output_valid.json",
+  "kind": "json",
+  "schema_ref": "blue.catbird.labyrinth.deleteSpaceGeneration#output",
+  "jacquard_rust_type": "catbird_atproto::blue_catbird::labyrinth::delete_space_generation::DeleteSpaceGenerationOutput",
+  "expect": "roundtrip",
+  "cbor": true,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/conversation_space_contract.rs::permanent_deletion_is_bound_to_the_exact_space_generation"
+}
