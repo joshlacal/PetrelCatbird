@@ -115,6 +115,8 @@ pub enum Error {
     InvalidRequest,
     InvalidTargetEndpoint,
     NotAuthorized,
+    /// The operator has taken this account down. Only deleting the account's own data is still allowed.
+    AccountTakedown,
     ProtocolUpgradeRequired,
     UpstreamError,
     /// An error name not declared in the lexicon, kept verbatim.
@@ -132,6 +134,7 @@ impl petrel_core::DeclaredXrpcError for Error {
             "InvalidRequest" => Self::InvalidRequest,
             "InvalidTargetEndpoint" => Self::InvalidTargetEndpoint,
             "NotAuthorized" => Self::NotAuthorized,
+            "AccountTakedown" => Self::AccountTakedown,
             "ProtocolUpgradeRequired" => Self::ProtocolUpgradeRequired,
             "UpstreamError" => Self::UpstreamError,
             other => Self::Unknown(other.to_owned()),
@@ -148,6 +151,7 @@ impl petrel_core::DeclaredXrpcError for Error {
             Self::InvalidRequest => "InvalidRequest",
             Self::InvalidTargetEndpoint => "InvalidTargetEndpoint",
             Self::NotAuthorized => "NotAuthorized",
+            Self::AccountTakedown => "AccountTakedown",
             Self::ProtocolUpgradeRequired => "ProtocolUpgradeRequired",
             Self::UpstreamError => "UpstreamError",
             Self::Unknown(name) => name.as_str(),

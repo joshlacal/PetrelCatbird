@@ -134,6 +134,8 @@ pub enum Error {
     StaleCoordinates,
     AccountSessionExpired,
     NotAuthorized,
+    /// The operator has taken this account down. Only deleting the account's own data is still allowed.
+    AccountTakedown,
     DeviceBindingMismatch,
     ProtocolUpgradeRequired,
     /// An error name not declared in the lexicon, kept verbatim.
@@ -159,6 +161,7 @@ impl petrel_core::DeclaredXrpcError for Error {
             "StaleCoordinates" => Self::StaleCoordinates,
             "AccountSessionExpired" => Self::AccountSessionExpired,
             "NotAuthorized" => Self::NotAuthorized,
+            "AccountTakedown" => Self::AccountTakedown,
             "DeviceBindingMismatch" => Self::DeviceBindingMismatch,
             "ProtocolUpgradeRequired" => Self::ProtocolUpgradeRequired,
             other => Self::Unknown(other.to_owned()),
@@ -183,6 +186,7 @@ impl petrel_core::DeclaredXrpcError for Error {
             Self::StaleCoordinates => "StaleCoordinates",
             Self::AccountSessionExpired => "AccountSessionExpired",
             Self::NotAuthorized => "NotAuthorized",
+            Self::AccountTakedown => "AccountTakedown",
             Self::DeviceBindingMismatch => "DeviceBindingMismatch",
             Self::ProtocolUpgradeRequired => "ProtocolUpgradeRequired",
             Self::Unknown(name) => name.as_str(),

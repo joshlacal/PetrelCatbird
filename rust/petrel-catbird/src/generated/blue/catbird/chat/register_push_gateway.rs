@@ -161,6 +161,8 @@ pub enum Error {
     InvalidRequest,
     InvalidSignature,
     NotAuthorized,
+    /// The operator has taken this account down. Only deleting the account's own data is still allowed.
+    AccountTakedown,
     ProtocolUpgradeRequired,
     /// An error name not declared in the lexicon, kept verbatim.
     Unknown(String),
@@ -178,6 +180,7 @@ impl petrel_core::DeclaredXrpcError for Error {
             "InvalidRequest" => Self::InvalidRequest,
             "InvalidSignature" => Self::InvalidSignature,
             "NotAuthorized" => Self::NotAuthorized,
+            "AccountTakedown" => Self::AccountTakedown,
             "ProtocolUpgradeRequired" => Self::ProtocolUpgradeRequired,
             other => Self::Unknown(other.to_owned()),
         }
@@ -194,6 +197,7 @@ impl petrel_core::DeclaredXrpcError for Error {
             Self::InvalidRequest => "InvalidRequest",
             Self::InvalidSignature => "InvalidSignature",
             Self::NotAuthorized => "NotAuthorized",
+            Self::AccountTakedown => "AccountTakedown",
             Self::ProtocolUpgradeRequired => "ProtocolUpgradeRequired",
             Self::Unknown(name) => name.as_str(),
         }
