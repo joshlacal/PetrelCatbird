@@ -83,26 +83,37 @@ impl petrel_core::ToValue for Webhook {
     }
 }
 
-impl petrel_core::FromValue for Webhook {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Webhook {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             id: reader.required("id")?,
             url: reader.required("url")?,
             events: reader.required("events")?,
             active: reader.required("active")?,
-            prefix: reader.optional("prefix"),
-            suffix: reader.optional("suffix"),
-            rewrite: reader.optional("rewrite"),
+            prefix: reader.optional("prefix")?,
+            suffix: reader.optional("suffix")?,
+            rewrite: reader.optional("rewrite")?,
             created_at: reader.required("createdAt")?,
-            updated_at: reader.optional("updatedAt"),
-            name: reader.optional("name"),
-            description: reader.optional("description"),
-            last_triggered: reader.optional("lastTriggered"),
-            error_count: reader.optional("errorCount"),
-            mute_words: reader.optional("muteWords"),
+            updated_at: reader.optional("updatedAt")?,
+            name: reader.optional("name")?,
+            description: reader.optional("description")?,
+            last_triggered: reader.optional("lastTriggered")?,
+            error_count: reader.optional("errorCount")?,
+            mute_words: reader.optional("muteWords")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Webhook {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -161,14 +172,25 @@ impl petrel_core::ToValue for RewriteRule {
     }
 }
 
-impl petrel_core::FromValue for RewriteRule {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl RewriteRule {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             from: reader.required("from")?,
             to: reader.required("to")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for RewriteRule {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 

@@ -55,9 +55,10 @@ impl petrel_core::ToValue for Mek {
     }
 }
 
-impl petrel_core::FromValue for Mek {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Mek {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             thread_id: reader.required("threadId")?,
             mek_id: reader.required("mekId")?,
@@ -67,6 +68,16 @@ impl petrel_core::FromValue for Mek {
             created_at: reader.required("createdAt")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Mek {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -130,15 +141,26 @@ impl petrel_core::ToValue for LabyrinthSender {
     }
 }
 
-impl petrel_core::FromValue for LabyrinthSender {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl LabyrinthSender {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             did: reader.required("did")?,
             sender_epoch_head: reader.required("senderEpochHead")?,
             sender_epoch: reader.required("senderEpoch")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for LabyrinthSender {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -202,15 +224,26 @@ impl petrel_core::ToValue for TransportSender {
     }
 }
 
-impl petrel_core::FromValue for TransportSender {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl TransportSender {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             transport_pubkey: reader.required("transportPubkey")?,
             ephemeral_auth_pubkey: reader.required("ephemeralAuthPubkey")?,
             sig: reader.required("sig")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for TransportSender {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -253,13 +286,23 @@ impl petrel_core::ToValue for MekSender {
     }
 }
 
-impl petrel_core::FromValue for MekSender {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+impl MekSender {
+    fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.labyrinth.mek#labyrinthSender" => petrel_core::FromValue::from_value(value).map(Self::LabyrinthSender),
-            "blue.catbird.labyrinth.mek#transportSender" => petrel_core::FromValue::from_value(value).map(Self::TransportSender),
+            "blue.catbird.labyrinth.mek#labyrinthSender" => petrel_core::decode_value(value, strict).map(Self::LabyrinthSender),
+            "blue.catbird.labyrinth.mek#transportSender" => petrel_core::decode_value(value, strict).map(Self::TransportSender),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
+    }
+}
+
+impl petrel_core::FromValue for MekSender {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_member(value, false)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_member(value, true)
     }
 }
 

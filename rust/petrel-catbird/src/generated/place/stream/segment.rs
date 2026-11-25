@@ -71,23 +71,34 @@ impl petrel_core::ToValue for Segment {
     }
 }
 
-impl petrel_core::FromValue for Segment {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Segment {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             id: reader.required("id")?,
             signing_key: reader.required("signingKey")?,
             start_time: reader.required("startTime")?,
-            duration: reader.optional("duration"),
+            duration: reader.optional("duration")?,
             creator: reader.required("creator")?,
-            video: reader.optional("video"),
-            audio: reader.optional("audio"),
-            size: reader.optional("size"),
-            content_warnings: reader.optional("contentWarnings"),
-            content_rights: reader.optional("contentRights"),
-            distribution_policy: reader.optional("distributionPolicy"),
+            video: reader.optional("video")?,
+            audio: reader.optional("audio")?,
+            size: reader.optional("size")?,
+            content_warnings: reader.optional("contentWarnings")?,
+            content_rights: reader.optional("contentRights")?,
+            distribution_policy: reader.optional("distributionPolicy")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Segment {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -147,15 +158,26 @@ impl petrel_core::ToValue for Audio {
     }
 }
 
-impl petrel_core::FromValue for Audio {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Audio {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             codec: reader.required("codec")?,
             rate: reader.required("rate")?,
             channels: reader.required("channels")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Audio {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -221,17 +243,28 @@ impl petrel_core::ToValue for Video {
     }
 }
 
-impl petrel_core::FromValue for Video {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Video {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             codec: reader.required("codec")?,
             width: reader.required("width")?,
             height: reader.required("height")?,
-            framerate: reader.optional("framerate"),
-            bframes: reader.optional("bframes"),
+            framerate: reader.optional("framerate")?,
+            bframes: reader.optional("bframes")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Video {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -288,14 +321,25 @@ impl petrel_core::ToValue for Framerate {
     }
 }
 
-impl petrel_core::FromValue for Framerate {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Framerate {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             num: reader.required("num")?,
             den: reader.required("den")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Framerate {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -352,14 +396,25 @@ impl petrel_core::ToValue for SegmentView {
     }
 }
 
-impl petrel_core::FromValue for SegmentView {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl SegmentView {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             cid: reader.required("cid")?,
             record: reader.required("record")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for SegmentView {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 

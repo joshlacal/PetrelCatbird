@@ -75,23 +75,34 @@ impl petrel_core::ToValue for Livestream {
     }
 }
 
-impl petrel_core::FromValue for Livestream {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Livestream {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             title: reader.required("title")?,
-            url: reader.optional("url"),
+            url: reader.optional("url")?,
             created_at: reader.required("createdAt")?,
-            last_seen_at: reader.optional("lastSeenAt"),
-            ended_at: reader.optional("endedAt"),
-            idle_timeout_seconds: reader.optional("idleTimeoutSeconds"),
-            post: reader.optional("post"),
-            agent: reader.optional("agent"),
-            canonical_url: reader.optional("canonicalUrl"),
-            thumb: reader.optional("thumb"),
-            notification_settings: reader.optional("notificationSettings"),
+            last_seen_at: reader.optional("lastSeenAt")?,
+            ended_at: reader.optional("endedAt")?,
+            idle_timeout_seconds: reader.optional("idleTimeoutSeconds")?,
+            post: reader.optional("post")?,
+            agent: reader.optional("agent")?,
+            canonical_url: reader.optional("canonicalUrl")?,
+            thumb: reader.optional("thumb")?,
+            notification_settings: reader.optional("notificationSettings")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Livestream {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -152,13 +163,24 @@ impl petrel_core::ToValue for NotificationSettings {
     }
 }
 
-impl petrel_core::FromValue for NotificationSettings {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl NotificationSettings {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
-            push_notification: reader.optional("pushNotification"),
+            push_notification: reader.optional("pushNotification")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for NotificationSettings {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -228,18 +250,29 @@ impl petrel_core::ToValue for LivestreamView {
     }
 }
 
-impl petrel_core::FromValue for LivestreamView {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl LivestreamView {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             uri: reader.required("uri")?,
             cid: reader.required("cid")?,
             author: reader.required("author")?,
             record: reader.required("record")?,
             indexed_at: reader.required("indexedAt")?,
-            viewer_count: reader.optional("viewerCount"),
+            viewer_count: reader.optional("viewerCount")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for LivestreamView {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -293,13 +326,24 @@ impl petrel_core::ToValue for ViewerCount {
     }
 }
 
-impl petrel_core::FromValue for ViewerCount {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl ViewerCount {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             count: reader.required("count")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for ViewerCount {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -370,17 +414,28 @@ impl petrel_core::ToValue for TeleportArrival {
     }
 }
 
-impl petrel_core::FromValue for TeleportArrival {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl TeleportArrival {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             teleport_uri: reader.required("teleportUri")?,
             source: reader.required("source")?,
-            chat_profile: reader.optional("chatProfile"),
+            chat_profile: reader.optional("chatProfile")?,
             viewer_count: reader.required("viewerCount")?,
             starts_at: reader.required("startsAt")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for TeleportArrival {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -439,14 +494,25 @@ impl petrel_core::ToValue for TeleportCanceled {
     }
 }
 
-impl petrel_core::FromValue for TeleportCanceled {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl TeleportCanceled {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             teleport_uri: reader.required("teleportUri")?,
             reason: reader.required("reason")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for TeleportCanceled {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -500,13 +566,24 @@ impl petrel_core::ToValue for StreamplaceAnything {
     }
 }
 
-impl petrel_core::FromValue for StreamplaceAnything {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl StreamplaceAnything {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             livestream: reader.required("livestream")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for StreamplaceAnything {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -648,20 +725,30 @@ impl petrel_core::ToValue for StreamplaceAnythingLivestream {
     }
 }
 
-impl petrel_core::FromValue for StreamplaceAnythingLivestream {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+impl StreamplaceAnythingLivestream {
+    fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "place.stream.livestream#livestreamView" => petrel_core::FromValue::from_value(value).map(Self::LivestreamView),
-            "place.stream.livestream#viewerCount" => petrel_core::FromValue::from_value(value).map(Self::ViewerCount),
-            "place.stream.livestream#teleportArrival" => petrel_core::FromValue::from_value(value).map(Self::TeleportArrival),
-            "place.stream.livestream#teleportCanceled" => petrel_core::FromValue::from_value(value).map(Self::TeleportCanceled),
-            "place.stream.defs#blockView" => petrel_core::FromValue::from_value(value).map(Self::BlockView),
-            "place.stream.defs#renditions" => petrel_core::FromValue::from_value(value).map(Self::Renditions),
-            "place.stream.defs#rendition" => petrel_core::FromValue::from_value(value).map(Self::Rendition),
-            "place.stream.chat.defs#messageView" => petrel_core::FromValue::from_value(value).map(Self::MessageView),
-            "place.stream.chat.defs#pinnedRecordView" => petrel_core::FromValue::from_value(value).map(Self::PinnedRecordView),
+            "place.stream.livestream#livestreamView" => petrel_core::decode_value(value, strict).map(Self::LivestreamView),
+            "place.stream.livestream#viewerCount" => petrel_core::decode_value(value, strict).map(Self::ViewerCount),
+            "place.stream.livestream#teleportArrival" => petrel_core::decode_value(value, strict).map(Self::TeleportArrival),
+            "place.stream.livestream#teleportCanceled" => petrel_core::decode_value(value, strict).map(Self::TeleportCanceled),
+            "place.stream.defs#blockView" => petrel_core::decode_value(value, strict).map(Self::BlockView),
+            "place.stream.defs#renditions" => petrel_core::decode_value(value, strict).map(Self::Renditions),
+            "place.stream.defs#rendition" => petrel_core::decode_value(value, strict).map(Self::Rendition),
+            "place.stream.chat.defs#messageView" => petrel_core::decode_value(value, strict).map(Self::MessageView),
+            "place.stream.chat.defs#pinnedRecordView" => petrel_core::decode_value(value, strict).map(Self::PinnedRecordView),
             _ => Ok(Self::Unknown(value)),
         }
+    }
+}
+
+impl petrel_core::FromValue for StreamplaceAnythingLivestream {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_member(value, false)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_member(value, true)
     }
 }
 

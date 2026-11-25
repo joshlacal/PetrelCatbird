@@ -59,19 +59,30 @@ impl petrel_core::ToValue for Metadata {
     }
 }
 
-impl petrel_core::FromValue for Metadata {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Metadata {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             circle_id: reader.required("circleId")?,
             name: reader.required("name")?,
             created_at: reader.required("createdAt")?,
-            migrated_from: reader.optional("migratedFrom"),
-            migrated_to: reader.optional("migratedTo"),
-            history_for_new_members: reader.optional("historyForNewMembers"),
-            encryption: reader.optional("encryption"),
+            migrated_from: reader.optional("migratedFrom")?,
+            migrated_to: reader.optional("migratedTo")?,
+            history_for_new_members: reader.optional("historyForNewMembers")?,
+            encryption: reader.optional("encryption")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Metadata {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -126,13 +137,24 @@ impl petrel_core::ToValue for Encryption {
     }
 }
 
-impl petrel_core::FromValue for Encryption {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Encryption {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             scheme: reader.required("scheme")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Encryption {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 

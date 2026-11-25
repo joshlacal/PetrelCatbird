@@ -55,9 +55,10 @@ impl petrel_core::ToValue for EnvelopeHeaderV1 {
     }
 }
 
-impl petrel_core::FromValue for EnvelopeHeaderV1 {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl EnvelopeHeaderV1 {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             protocol_version: reader.required("protocolVersion")?,
             delivery_id: reader.required("deliveryId")?,
@@ -70,6 +71,16 @@ impl petrel_core::FromValue for EnvelopeHeaderV1 {
             payload_sha256: reader.required("payloadSha256")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for EnvelopeHeaderV1 {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -132,9 +143,10 @@ impl petrel_core::ToValue for EntryLocatorV1 {
     }
 }
 
-impl petrel_core::FromValue for EntryLocatorV1 {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl EntryLocatorV1 {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             entry_id: reader.required("entryId")?,
             seq: reader.required("seq")?,
@@ -142,6 +154,16 @@ impl petrel_core::FromValue for EntryLocatorV1 {
             outer_entry_fingerprint: reader.required("outerEntryFingerprint")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for EntryLocatorV1 {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -231,9 +253,10 @@ impl petrel_core::ToValue for FederationReceiptV1 {
     }
 }
 
-impl petrel_core::FromValue for FederationReceiptV1 {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl FederationReceiptV1 {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             protocol_version: reader.required("protocolVersion")?,
             endpoint: reader.required("endpoint")?,
@@ -250,6 +273,16 @@ impl petrel_core::FromValue for FederationReceiptV1 {
             signature: reader.required("signature")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for FederationReceiptV1 {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 

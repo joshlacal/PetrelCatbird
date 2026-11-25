@@ -63,21 +63,29 @@ impl petrel_core::ToValue for Input {
     }
 }
 
-impl petrel_core::FromValue for Input {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Input {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             actor_device_id: reader.required("actorDeviceId")?,
             target_did: reader.required("targetDid")?,
             nsid: reader.required("nsid")?,
-            query: reader.optional_strict("query")?,
+            query: reader.optional("query")?,
             credential: reader.required("credential")?,
             space_audience: reader.required("spaceAudience")?,
-            want_mac: reader.optional_strict("wantMac")?,
+            want_mac: reader.optional("wantMac")?,
             signature_input: reader.required("signatureInput")?,
             signature: reader.required("signature")?,
-            accept_signature: reader.optional_strict("acceptSignature")?,
+            accept_signature: reader.optional("acceptSignature")?,
         })
+    }
+}
+
+impl petrel_core::FromValue for Input {
+    // An XRPC input: strict however it is reached.
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 

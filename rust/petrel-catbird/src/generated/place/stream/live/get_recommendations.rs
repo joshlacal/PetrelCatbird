@@ -52,13 +52,24 @@ impl petrel_core::ToValue for Output {
     }
 }
 
-impl petrel_core::FromValue for Output {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Output {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             recommendations: reader.required("recommendations")?,
-            user_did: reader.optional("userDID"),
+            user_did: reader.optional("userDID")?,
         })
+    }
+}
+
+impl petrel_core::FromValue for Output {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -131,14 +142,25 @@ impl petrel_core::ToValue for LivestreamRecommendation {
     }
 }
 
-impl petrel_core::FromValue for LivestreamRecommendation {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl LivestreamRecommendation {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             did: reader.required("did")?,
             source: reader.required("source")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for LivestreamRecommendation {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -181,12 +203,22 @@ impl petrel_core::ToValue for OutputRecommendations {
     }
 }
 
-impl petrel_core::FromValue for OutputRecommendations {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+impl OutputRecommendations {
+    fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "place.stream.live.getRecommendations#livestreamRecommendation" => petrel_core::FromValue::from_value(value).map(Self::LivestreamRecommendation),
+            "place.stream.live.getRecommendations#livestreamRecommendation" => petrel_core::decode_value(value, strict).map(Self::LivestreamRecommendation),
             _ => Ok(Self::Unknown(value)),
         }
+    }
+}
+
+impl petrel_core::FromValue for OutputRecommendations {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_member(value, false)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_member(value, true)
     }
 }
 

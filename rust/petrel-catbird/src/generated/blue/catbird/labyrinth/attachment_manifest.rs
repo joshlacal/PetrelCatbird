@@ -52,17 +52,28 @@ impl petrel_core::ToValue for AttachmentManifest {
     }
 }
 
-impl petrel_core::FromValue for AttachmentManifest {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl AttachmentManifest {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             blob: reader.required("blob")?,
             sha256: reader.required("sha256")?,
             ciphertext_size: reader.required("ciphertextSize")?,
-            mime_type_hint: reader.optional("mimeTypeHint"),
+            mime_type_hint: reader.optional("mimeTypeHint")?,
             created_at: reader.required("createdAt")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for AttachmentManifest {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 

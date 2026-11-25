@@ -52,12 +52,22 @@ impl petrel_core::ToValue for Message {
     }
 }
 
-impl petrel_core::FromValue for Message {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+impl Message {
+    fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "place.stream.live.subscribeSegments#segment" => petrel_core::FromValue::from_value(value).map(Self::Segment),
+            "place.stream.live.subscribeSegments#segment" => petrel_core::decode_value(value, strict).map(Self::Segment),
             _ => Ok(Self::Unknown(value)),
         }
+    }
+}
+
+impl petrel_core::FromValue for Message {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_member(value, false)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_member(value, true)
     }
 }
 

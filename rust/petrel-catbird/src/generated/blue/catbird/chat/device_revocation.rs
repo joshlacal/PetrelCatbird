@@ -61,19 +61,30 @@ impl petrel_core::ToValue for DeviceRevocation {
     }
 }
 
-impl petrel_core::FromValue for DeviceRevocation {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl DeviceRevocation {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             target_device_id: reader.required("targetDeviceId")?,
             actor_device_id: reader.required("actorDeviceId")?,
             signer_public_key: reader.required("signerPublicKey")?,
             signature: reader.required("signature")?,
-            algorithm: reader.optional("algorithm"),
-            reason: reader.optional("reason"),
+            algorithm: reader.optional("algorithm")?,
+            reason: reader.optional("reason")?,
             created_at: reader.required("createdAt")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for DeviceRevocation {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 

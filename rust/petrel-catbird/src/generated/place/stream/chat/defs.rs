@@ -55,21 +55,32 @@ impl petrel_core::ToValue for MessageView {
     }
 }
 
-impl petrel_core::FromValue for MessageView {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl MessageView {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             uri: reader.required("uri")?,
             cid: reader.required("cid")?,
             author: reader.required("author")?,
             record: reader.required("record")?,
             indexed_at: reader.required("indexedAt")?,
-            chat_profile: reader.optional("chatProfile"),
-            reply_to: reader.optional("replyTo"),
-            deleted: reader.optional("deleted"),
-            badges: reader.optional("badges"),
+            chat_profile: reader.optional("chatProfile")?,
+            reply_to: reader.optional("replyTo")?,
+            deleted: reader.optional("deleted")?,
+            badges: reader.optional("badges")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for MessageView {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -139,18 +150,29 @@ impl petrel_core::ToValue for PinnedRecordView {
     }
 }
 
-impl petrel_core::FromValue for PinnedRecordView {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl PinnedRecordView {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             uri: reader.required("uri")?,
             cid: reader.required("cid")?,
             record: reader.required("record")?,
             indexed_at: reader.required("indexedAt")?,
-            pinned_by: reader.optional("pinnedBy"),
-            message: reader.optional("message"),
+            pinned_by: reader.optional("pinnedBy")?,
+            message: reader.optional("message")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for PinnedRecordView {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -193,12 +215,22 @@ impl petrel_core::ToValue for MessageViewReplyTo {
     }
 }
 
-impl petrel_core::FromValue for MessageViewReplyTo {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+impl MessageViewReplyTo {
+    fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "place.stream.chat.defs#messageView" => petrel_core::FromValue::from_value(value).map(Self::MessageView),
+            "place.stream.chat.defs#messageView" => petrel_core::decode_value(value, strict).map(Self::MessageView),
             _ => Ok(Self::Unknown(value)),
         }
+    }
+}
+
+impl petrel_core::FromValue for MessageViewReplyTo {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_member(value, false)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_member(value, true)
     }
 }
 

@@ -57,18 +57,29 @@ impl petrel_core::ToValue for Origin {
     }
 }
 
-impl petrel_core::FromValue for Origin {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Origin {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             streamer: reader.required("streamer")?,
             server: reader.required("server")?,
-            broadcaster: reader.optional("broadcaster"),
+            broadcaster: reader.optional("broadcaster")?,
             updated_at: reader.required("updatedAt")?,
-            iroh_ticket: reader.optional("irohTicket"),
-            websocket_url: reader.optional("websocketURL"),
+            iroh_ticket: reader.optional("irohTicket")?,
+            websocket_url: reader.optional("websocketURL")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Origin {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 

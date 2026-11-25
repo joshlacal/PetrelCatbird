@@ -56,9 +56,10 @@ impl petrel_core::ToValue for Key {
     }
 }
 
-impl petrel_core::FromValue for Key {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Key {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             circle_id: reader.required("circleId")?,
             key_version: reader.required("keyVersion")?,
@@ -68,6 +69,16 @@ impl petrel_core::FromValue for Key {
             created_at: reader.required("createdAt")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Key {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -108,12 +119,22 @@ impl petrel_core::ToValue for KeySender {
     }
 }
 
-impl petrel_core::FromValue for KeySender {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+impl KeySender {
+    fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.labyrinth.mek#labyrinthSender" => petrel_core::FromValue::from_value(value).map(Self::LabyrinthSender),
+            "blue.catbird.labyrinth.mek#labyrinthSender" => petrel_core::decode_value(value, strict).map(Self::LabyrinthSender),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
+    }
+}
+
+impl petrel_core::FromValue for KeySender {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_member(value, false)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_member(value, true)
     }
 }
 

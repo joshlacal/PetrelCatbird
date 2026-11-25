@@ -52,17 +52,28 @@ impl petrel_core::ToValue for Video {
     }
 }
 
-impl petrel_core::FromValue for Video {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Video {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             title: reader.required("title")?,
-            duration: reader.optional("duration"),
+            duration: reader.optional("duration")?,
             created_at: reader.required("createdAt")?,
-            thumb: reader.optional("thumb"),
-            description: reader.optional("description"),
+            thumb: reader.optional("thumb")?,
+            description: reader.optional("description")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Video {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 

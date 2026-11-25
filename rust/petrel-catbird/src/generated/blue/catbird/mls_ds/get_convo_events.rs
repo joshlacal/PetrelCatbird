@@ -68,15 +68,26 @@ impl petrel_core::ToValue for Output {
     }
 }
 
-impl petrel_core::FromValue for Output {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Output {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             convo_id: reader.required("convoId")?,
             from_seq_exclusive: reader.required("fromSeqExclusive")?,
             to_seq_inclusive: reader.required("toSeqInclusive")?,
             events: reader.required("events")?,
         })
+    }
+}
+
+impl petrel_core::FromValue for Output {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -226,9 +237,10 @@ impl petrel_core::ToValue for ConvoEventEntry {
     }
 }
 
-impl petrel_core::FromValue for ConvoEventEntry {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl ConvoEventEntry {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             seq: reader.required("seq")?,
             epoch: reader.required("epoch")?,
@@ -237,14 +249,24 @@ impl petrel_core::FromValue for ConvoEventEntry {
             ciphertext: reader.required("ciphertext")?,
             padded_size: reader.required("paddedSize")?,
             created_at: reader.required("createdAt")?,
-            entry_id: reader.optional("entryId"),
-            entry_kind: reader.optional("entryKind"),
-            accepted_payload_sha256: reader.optional("acceptedPayloadSha256"),
-            signed_request: reader.optional("signedRequest"),
-            sequencer_receipt: reader.optional("sequencerReceipt"),
-            outer_fingerprint: reader.optional("outerFingerprint"),
+            entry_id: reader.optional("entryId")?,
+            entry_kind: reader.optional("entryKind")?,
+            accepted_payload_sha256: reader.optional("acceptedPayloadSha256")?,
+            signed_request: reader.optional("signedRequest")?,
+            sequencer_receipt: reader.optional("sequencerReceipt")?,
+            outer_fingerprint: reader.optional("outerFingerprint")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for ConvoEventEntry {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 

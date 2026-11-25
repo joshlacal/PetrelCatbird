@@ -63,9 +63,10 @@ impl petrel_core::ToValue for Post {
     }
 }
 
-impl petrel_core::FromValue for Post {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Post {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             circle_id: reader.required("circleId")?,
             key_version: reader.required("keyVersion")?,
@@ -73,10 +74,20 @@ impl petrel_core::FromValue for Post {
             ciphertext: reader.required("ciphertext")?,
             sig: reader.required("sig")?,
             author_epoch_head: reader.required("authorEpochHead")?,
-            reply: reader.optional("reply"),
-            attachments: reader.optional("attachments"),
+            reply: reader.optional("reply")?,
+            attachments: reader.optional("attachments")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Post {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 

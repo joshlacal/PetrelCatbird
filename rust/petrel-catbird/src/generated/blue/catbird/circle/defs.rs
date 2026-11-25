@@ -50,19 +50,30 @@ impl petrel_core::ToValue for CircleSummary {
     }
 }
 
-impl petrel_core::FromValue for CircleSummary {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl CircleSummary {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             uri: reader.required("uri")?,
             circle_id: reader.required("circleId")?,
             name: reader.required("name")?,
             owner: reader.required("owner")?,
-            member_count: reader.optional("memberCount"),
-            muted: reader.optional("muted"),
-            latest_key_version: reader.optional("latestKeyVersion"),
+            member_count: reader.optional("memberCount")?,
+            muted: reader.optional("muted")?,
+            latest_key_version: reader.optional("latestKeyVersion")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for CircleSummary {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -119,14 +130,25 @@ impl petrel_core::ToValue for FeedItem {
     }
 }
 
-impl petrel_core::FromValue for FeedItem {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl FeedItem {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             post: reader.required("post")?,
             circle: reader.required("circle")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for FeedItem {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -196,18 +218,29 @@ impl petrel_core::ToValue for Notification {
     }
 }
 
-impl petrel_core::FromValue for Notification {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Notification {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             id: reader.required("id")?,
             reason: reader.required("reason")?,
             actor: reader.required("actor")?,
-            subject: reader.optional("subject"),
+            subject: reader.optional("subject")?,
             indexed_at: reader.required("indexedAt")?,
             circle: reader.required("circle")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Notification {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -282,20 +315,31 @@ impl petrel_core::ToValue for EncryptedPostView {
     }
 }
 
-impl petrel_core::FromValue for EncryptedPostView {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl EncryptedPostView {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             uri: reader.required("uri")?,
             cid: reader.required("cid")?,
             author: reader.required("author")?,
             record: reader.required("record")?,
             indexed_at: reader.required("indexedAt")?,
-            like_count: reader.optional("likeCount"),
-            reply_count: reader.optional("replyCount"),
-            viewer: reader.optional("viewer"),
+            like_count: reader.optional("likeCount")?,
+            reply_count: reader.optional("replyCount")?,
+            viewer: reader.optional("viewer")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for EncryptedPostView {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -340,13 +384,23 @@ impl petrel_core::ToValue for FeedItemPost {
     }
 }
 
-impl petrel_core::FromValue for FeedItemPost {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+impl FeedItemPost {
+    fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "app.bsky.feed.defs#feedViewPost" => petrel_core::FromValue::from_value(value).map(Self::FeedViewPost),
-            "blue.catbird.circle.defs#encryptedPostView" => petrel_core::FromValue::from_value(value).map(Self::EncryptedPostView),
+            "app.bsky.feed.defs#feedViewPost" => petrel_core::decode_value(value, strict).map(Self::FeedViewPost),
+            "blue.catbird.circle.defs#encryptedPostView" => petrel_core::decode_value(value, strict).map(Self::EncryptedPostView),
             _ => Ok(Self::Unknown(value)),
         }
+    }
+}
+
+impl petrel_core::FromValue for FeedItemPost {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_member(value, false)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_member(value, true)
     }
 }
 

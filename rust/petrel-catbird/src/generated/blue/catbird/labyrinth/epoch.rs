@@ -59,19 +59,30 @@ impl petrel_core::ToValue for Epoch {
     }
 }
 
-impl petrel_core::FromValue for Epoch {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Epoch {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             public: reader.required("public")?,
-            encrypted_previous_epoch_number: reader.optional("encryptedPreviousEpochNumber"),
-            encrypted_previous_epoch_root_key: reader.optional("encryptedPreviousEpochRootKey"),
+            encrypted_previous_epoch_number: reader.optional("encryptedPreviousEpochNumber")?,
+            encrypted_previous_epoch_root_key: reader.optional("encryptedPreviousEpochRootKey")?,
             opened_by: reader.required("openedBy")?,
-            revocations: reader.optional("revocations"),
-            revocations_sig: reader.optional("revocationsSig"),
+            revocations: reader.optional("revocations")?,
+            revocations_sig: reader.optional("revocationsSig")?,
             created_at: reader.required("createdAt")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Epoch {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 

@@ -58,12 +58,23 @@ impl petrel_core::ToValue for Output {
     }
 }
 
-impl petrel_core::FromValue for Output {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Output {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             peers: reader.required("peers")?,
         })
+    }
+}
+
+impl petrel_core::FromValue for Output {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -167,23 +178,34 @@ impl petrel_core::ToValue for PeerRecord {
     }
 }
 
-impl petrel_core::FromValue for PeerRecord {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl PeerRecord {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             ds_did: reader.required("dsDid")?,
             status: reader.required("status")?,
-            trust_score: reader.optional("trustScore"),
-            max_requests_per_minute: reader.optional("maxRequestsPerMinute"),
-            note: reader.optional("note"),
-            invalid_token_count: reader.optional("invalidTokenCount"),
-            rejected_request_count: reader.optional("rejectedRequestCount"),
-            successful_request_count: reader.optional("successfulRequestCount"),
-            last_seen_at: reader.optional("lastSeenAt"),
-            created_at: reader.optional("createdAt"),
-            updated_at: reader.optional("updatedAt"),
+            trust_score: reader.optional("trustScore")?,
+            max_requests_per_minute: reader.optional("maxRequestsPerMinute")?,
+            note: reader.optional("note")?,
+            invalid_token_count: reader.optional("invalidTokenCount")?,
+            rejected_request_count: reader.optional("rejectedRequestCount")?,
+            successful_request_count: reader.optional("successfulRequestCount")?,
+            last_seen_at: reader.optional("lastSeenAt")?,
+            created_at: reader.optional("createdAt")?,
+            updated_at: reader.optional("updatedAt")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for PeerRecord {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 

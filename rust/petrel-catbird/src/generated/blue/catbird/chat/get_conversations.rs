@@ -76,18 +76,29 @@ impl petrel_core::ToValue for Output {
     }
 }
 
-impl petrel_core::FromValue for Output {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Output {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             items: reader.required("items")?,
             inventory_session_id: reader.required("inventorySessionId")?,
             snapshot_event_cursor: reader.required("snapshotEventCursor")?,
-            next_page_cursor: reader.optional("nextPageCursor"),
+            next_page_cursor: reader.optional("nextPageCursor")?,
             has_more: reader.required("hasMore")?,
             snapshot_expires_at: reader.required("snapshotExpiresAt")?,
-            inventory_scope: reader.optional("inventoryScope"),
+            inventory_scope: reader.optional("inventoryScope")?,
         })
+    }
+}
+
+impl petrel_core::FromValue for Output {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 

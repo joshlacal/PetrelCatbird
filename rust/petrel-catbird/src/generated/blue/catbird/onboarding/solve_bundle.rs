@@ -48,18 +48,26 @@ impl petrel_core::ToValue for Input {
     }
 }
 
-impl petrel_core::FromValue for Input {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Input {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             selections: reader.required("selections")?,
-            swipes: reader.optional_strict("swipes")?,
-            controls: reader.optional_strict("controls")?,
-            target_size: reader.optional_strict("targetSize")?,
-            pinned_dids: reader.optional_strict("pinnedDids")?,
-            excluded_dids: reader.optional_strict("excludedDids")?,
-            seed_follow_dids: reader.optional_strict("seedFollowDids")?,
+            swipes: reader.optional("swipes")?,
+            controls: reader.optional("controls")?,
+            target_size: reader.optional("targetSize")?,
+            pinned_dids: reader.optional("pinnedDids")?,
+            excluded_dids: reader.optional("excludedDids")?,
+            seed_follow_dids: reader.optional("seedFollowDids")?,
         })
+    }
+}
+
+impl petrel_core::FromValue for Input {
+    // An XRPC input: strict however it is reached.
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
@@ -139,9 +147,10 @@ impl petrel_core::ToValue for Output {
     }
 }
 
-impl petrel_core::FromValue for Output {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Output {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             session_id: reader.required("sessionId")?,
             catalog_version: reader.required("catalogVersion")?,
@@ -151,9 +160,19 @@ impl petrel_core::FromValue for Output {
             feeds: reader.required("feeds")?,
             starter_packs: reader.required("starterPacks")?,
             harmonious_neighbors: reader.required("harmoniousNeighbors")?,
-            bench: reader.optional("bench"),
-            already_following_in_scenes: reader.optional("alreadyFollowingInScenes"),
+            bench: reader.optional("bench")?,
+            already_following_in_scenes: reader.optional("alreadyFollowingInScenes")?,
         })
+    }
+}
+
+impl petrel_core::FromValue for Output {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 

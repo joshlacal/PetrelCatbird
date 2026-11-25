@@ -72,22 +72,33 @@ impl petrel_core::ToValue for Device {
     }
 }
 
-impl petrel_core::FromValue for Device {
-    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
-        let mut reader = petrel_core::ObjectReader::new(value)?;
+impl Device {
+    /// Reads the fields. The reader decides whether a malformed optional
+    /// field is an error (an XRPC input) or is kept as raw data.
+    fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             device_key_pubkey: reader.required("deviceKeyPubkey")?,
             epoch_storage_key_pubkey: reader.required("epochStorageKeyPubkey")?,
             epoch_storage_key_sig: reader.required("epochStorageKeySig")?,
-            epoch_storage_auth_key_pubkey: reader.optional("epochStorageAuthKeyPubkey"),
-            epoch_storage_auth_key_sig: reader.optional("epochStorageAuthKeySig"),
+            epoch_storage_auth_key_pubkey: reader.optional("epochStorageAuthKeyPubkey")?,
+            epoch_storage_auth_key_sig: reader.optional("epochStorageAuthKeySig")?,
             r#virtual: reader.required("virtual")?,
-            chat_binding: reader.optional("chatBinding"),
-            revoked_at: reader.optional("revokedAt"),
-            revocation: reader.optional("revocation"),
+            chat_binding: reader.optional("chatBinding")?,
+            revoked_at: reader.optional("revokedAt")?,
+            revocation: reader.optional("revocation")?,
             created_at: reader.required("createdAt")?,
             extra_data: reader.finish(),
         })
+    }
+}
+
+impl petrel_core::FromValue for Device {
+    fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new(value)?)
+    }
+
+    fn from_value_strict(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
+        Self::decode_fields(petrel_core::ObjectReader::new_strict(value)?)
     }
 }
 
