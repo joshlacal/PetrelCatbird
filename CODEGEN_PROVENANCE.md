@@ -1,5 +1,12 @@
 # Private contract generation
 
+## Petrel pin (2026-11-25)
+
+The Petrel pin moved to `a390b43bf50ed0a48d7c2d9ad46e0588bbcd622d` so the
+gateway scope upgrade accepts the Labyrinth space scopes (Petrel `0c9238b5d`
+raised the per-scope limit from 256 to 1024 characters). No contract or
+generated surface changed.
+
 ## Deletion inventory and retry contracts (2026-11-17)
 
 The qualified core and standalone Swift package revision is Petrel
