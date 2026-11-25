@@ -2,63 +2,60 @@ import Foundation
 import Petrel
 
 public extension SpaceRef {
-    /// Parses a canonical `at://{did}/space/{spaceType}/{skey}` reference or normalizes
-    /// legacy `at:space/{did}/{spaceType}/{skey}`, `at://space/{did}/{spaceType}/{skey}`,
-    /// and `at://{did}/com.atproto.space.space/{rkey}` spellings on untrusted read boundaries
-    /// before validating with `SpaceRef(uriString:)`.
+    /// Parses a canonical `at:space/{did}/{spaceType}/{skey}` reference or normalizes
+    /// the Spaces alpha form `at://{did}/space/{spaceType}/{skey}` and the older
+    /// `at://space/{did}/{spaceType}/{skey}` and `at://{did}/com.atproto.space.space/{rkey}`
+    /// spellings on untrusted read boundaries (values read back from storage or records),
+    /// validating each through `SpaceRef`. Never use it on request input, which takes
+    /// only the canonical form.
+    ///
+    /// TODO: remove the alpha-form reading before beta.
     init?(hedgedURIString raw: String) {
         if let canonical = try? SpaceRef(uriString: raw) {
             self = canonical
             return
         }
 
-        if raw.hasPrefix("at://") {
-            let atParts = raw.dropFirst("at://".count)
-                .split(separator: "/", omittingEmptySubsequences: false)
-            if atParts.count == 4, atParts[1] == "com.atproto.space.space" {
-                let rewritten = "at://\(atParts[0])/space/\(atParts[2])/\(atParts[3])"
-                if let normalized = try? SpaceRef(uriString: rewritten) {
-                    self = normalized
-                    return
-                }
-            } else if atParts.count == 3, atParts[1] == "com.atproto.space.space" {
-                let rkey = String(atParts[2])
-                if let colon = rkey.firstIndex(of: ":") {
-                    let st = String(rkey[..<colon])
-                    let sk = String(rkey[rkey.index(after: colon)...])
-                    if let normalized = try? SpaceRef(uriString: "at://\(atParts[0])/space/\(st)/\(sk)") {
-                        self = normalized
-                        return
-                    }
-                }
-                if let normalized = try? SpaceRef(uriString: "at://\(atParts[0])/space/com.atproto.space.space/\(rkey)") {
-                    self = normalized
-                    return
-                }
+        let parts: [String]
+        if raw.hasPrefix("at://space/") {
+            parts = raw.dropFirst("at://space/".count)
+                .split(separator: "/", omittingEmptySubsequences: false).map(String.init)
+            guard parts.count == 3 else {
+                return nil
             }
-        }
-
-        let remainder: Substring
-        if raw.hasPrefix("at:space/") {
-            remainder = raw.dropFirst("at:space/".count)
-        } else if raw.hasPrefix("at://space/") {
-            remainder = raw.dropFirst("at://space/".count)
+        } else if raw.hasPrefix("at://") {
+            let atParts = raw.dropFirst("at://".count)
+                .split(separator: "/", omittingEmptySubsequences: false).map(String.init)
+            if atParts.count == 4, atParts[1] == "space" || atParts[1] == "com.atproto.space.space" {
+                // `at://{did}/space/{type}/{skey}` (alpha) or `.../com.atproto.space.space/{type}/{skey}`.
+                parts = [atParts[0], atParts[2], atParts[3]]
+            } else if atParts.count == 3, atParts[1] == "com.atproto.space.space" {
+                let rkey = atParts[2]
+                if let colon = rkey.firstIndex(of: ":"),
+                   let normalized = try? SpaceRef(
+                       spaceDID: atParts[0],
+                       spaceType: String(rkey[..<colon]),
+                       skey: String(rkey[rkey.index(after: colon)...])
+                   ) {
+                    self = normalized
+                    return
+                }
+                parts = [atParts[0], "com.atproto.space.space", rkey]
+            } else {
+                return nil
+            }
         } else {
             return nil
         }
 
-        let parts = remainder.split(separator: "/", omittingEmptySubsequences: false)
-        guard parts.count == 3 else {
-            return nil
-        }
-        let rewritten = "at://\(parts[0])/space/\(parts[1])/\(parts[2])"
-        guard let normalized = try? SpaceRef(uriString: rewritten) else {
+        guard let normalized = try? SpaceRef(spaceDID: parts[0], spaceType: parts[1], skey: parts[2]) else {
             return nil
         }
         self = normalized
     }
 
-    /// Emits the hedged `at:space/{spaceDID}/{spaceType}/{skey}` spelling.
+    /// The `at:space/{spaceDID}/{spaceType}/{skey}` spelling, which is now the
+    /// canonical form (the same string as `uriString()`).
     var hedgedURIString: String {
         "at:space/\(spaceDID)/\(spaceType)/\(skey)"
     }

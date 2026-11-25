@@ -5,7 +5,9 @@ import Testing
 
 @Suite("Wave 1 Convergence Contracts")
 struct Wave1ConvergenceContractTests {
-    private static let sampleSpace = "at://did:web:ds.catbird.blue/space/blue.catbird.labyrinth.conversation/conv1-0"
+    private static let sampleSpace = "at:space/did:web:ds.catbird.blue/blue.catbird.labyrinth.conversation/conv1-0"
+    /// The same space in the Spaces alpha form, read leniently.
+    private static let alphaSampleSpace = "at://did:web:ds.catbird.blue/space/blue.catbird.labyrinth.conversation/conv1-0"
     private static let sampleRepo = "did:plc:ewvi7nxzyoun6zhxrhs64oiz"
     private static let sampleCid = "bafkreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku"
 
@@ -31,10 +33,8 @@ struct Wave1ConvergenceContractTests {
         let canonical = SpaceRef(hedgedURIString: Self.sampleSpace)
         #expect(canonical?.uriString() == Self.sampleSpace)
 
-        let atColon = SpaceRef(
-            hedgedURIString: "at:space/did:web:ds.catbird.blue/blue.catbird.labyrinth.conversation/conv1-0"
-        )
-        #expect(atColon?.uriString() == Self.sampleSpace)
+        let alpha = SpaceRef(hedgedURIString: Self.alphaSampleSpace)
+        #expect(alpha?.uriString() == Self.sampleSpace)
 
         let atDoubleSlash = SpaceRef(
             hedgedURIString: "at://space/did:web:ds.catbird.blue/blue.catbird.labyrinth.conversation/conv1-0"
@@ -50,10 +50,11 @@ struct Wave1ConvergenceContractTests {
         let bareSpaceRecordForm = SpaceRef(
             hedgedURIString: "at://did:web:ds.catbird.blue/com.atproto.space.space/conv1-0"
         )
-        #expect(bareSpaceRecordForm?.uriString() == "at://did:web:ds.catbird.blue/space/com.atproto.space.space/conv1-0")
+        #expect(bareSpaceRecordForm?.uriString() == "at:space/did:web:ds.catbird.blue/com.atproto.space.space/conv1-0")
 
         #expect(SpaceRef(hedgedURIString: "at://did:plc:ewvi7nxzyoun6zhxrhs64oiz/app.bsky.feed.post/3l2aaaa") == nil)
         #expect(SpaceRef(hedgedURIString: "\(Self.sampleSpace)/\(Self.sampleRepo)/blue.catbird.labyrinth.batch/3l2aaaa") == nil)
+        #expect(SpaceRef(hedgedURIString: "\(Self.alphaSampleSpace)/\(Self.sampleRepo)/blue.catbird.labyrinth.batch/3l2aaaa") == nil)
     }
 
     @Test func spaceBlobLocatorRoundTripsAndNormalizesLegacyFormat() throws {
@@ -68,9 +69,12 @@ struct Wave1ConvergenceContractTests {
         let legacyParsed = try #require(SpaceBlobLocator(parsing: legacyRaw))
         #expect(legacyParsed.encoded == canonicalRaw)
 
-        let hedgedLegacy = "at:space/did:web:ds.catbird.blue/blue.catbird.labyrinth.conversation/conv1-0/\(Self.sampleRepo)#\(Self.sampleCid)"
-        let hedgedParsed = try #require(SpaceBlobLocator(parsing: hedgedLegacy))
-        #expect(hedgedParsed.encoded == canonicalRaw)
+        let alphaLegacy = "\(Self.alphaSampleSpace)/\(Self.sampleRepo)#\(Self.sampleCid)"
+        let alphaParsed = try #require(SpaceBlobLocator(parsing: alphaLegacy))
+        #expect(alphaParsed.encoded == canonicalRaw)
+
+        let alphaPipe = "\(Self.alphaSampleSpace)|\(Self.sampleRepo)|\(Self.sampleCid)"
+        #expect(SpaceBlobLocator(parsing: alphaPipe)?.encoded == canonicalRaw)
 
         let json = try JSONEncoder().encode(legacyParsed)
         let decoded = try JSONDecoder().decode(SpaceBlobLocator.self, from: json)
@@ -224,7 +228,7 @@ struct Wave1ConvergenceContractTests {
         {
             "actorDeviceId": "00000000-0000-4000-8000-000000000001",
             "authorityDid": "did:web:ds.catbird.blue",
-            "space": "at://did:web:ds.catbird.blue/space/blue.catbird.labyrinth.conversation/conv1-0",
+            "space": "at:space/did:web:ds.catbird.blue/blue.catbird.labyrinth.conversation/conv1-0",
             "delegationToken": "eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJzcGFjZSJ9.c2ln",
             "cnfKey": "did:key:zDnaeWM8zmBiwzf8n42vMCPdXAWPvt8T13XQMBXZmZoLB3fCF",
             "spaceRev": "3l2aaaaaaaaaa",

@@ -2,6 +2,10 @@
 
 ## Petrel pin (2026-11-25)
 
+The Petrel pin then moved to `d3d352a96c2f6111bd3cbd3166e54ac0105b5dca`, the merge of
+Petrel#90, which reads and writes Space URIs in the `at:space/` form. It includes
+`a390b43b` below. No contract or generated surface changed.
+
 The Petrel pin moved to `a390b43bf50ed0a48d7c2d9ad46e0588bbcd622d` so the
 gateway scope upgrade accepts the Labyrinth space scopes (Petrel `0c9238b5d`
 raised the per-scope limit from 256 to 1024 characters). No contract or

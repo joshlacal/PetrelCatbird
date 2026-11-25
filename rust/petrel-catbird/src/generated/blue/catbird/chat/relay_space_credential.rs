@@ -9,7 +9,7 @@ pub struct Input {
     pub actor_device_id: crate::generated::blue::catbird::chat::defs::DeviceId,
     /// DID of the Space authority serving com.atproto.space.authorizeSpaceSync; it must be the authority named in space.
     pub authority_did: petrel_core::Did,
-    /// Exactly at://{authorityDid}/space/{spaceType}/{skey}. Other schemes, including at-space://, and Space record URIs are rejected. The returned credential's sub equals this string.
+    /// Exactly at:space/{authorityDid}/{spaceType}/{skey}. Other schemes, including at-space:// and the alpha form at://{authorityDid}/space/..., and Space record URIs are rejected. The returned credential's sub equals this string.
     pub space: petrel_core::SpaceRef,
     /// Single-use delegation JWT minted by the user's PDS (com.atproto.space.getDelegationToken): sub is exactly space, aud is {authorityDid}#atproto_pds, it carries no cnf claim, and it lives at most 60 seconds. The home forwards it to the authority in a POST body without reading it.
     pub delegation_token: String,

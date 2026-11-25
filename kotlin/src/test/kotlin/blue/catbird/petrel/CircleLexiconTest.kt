@@ -18,10 +18,10 @@ class CircleLexiconTest {
 
     @Test
     fun circleSummaryCarriesSpaceIdentityAndCircleId() {
-        val data = """{"uri":"at://did:plc:owner/space/blue.catbird.circle/3abc","circleId":"$circleId","name":"Family","owner":"did:plc:owner","memberCount":3}"""
+        val data = """{"uri":"at:space/did:plc:owner/blue.catbird.circle/3abc","circleId":"$circleId","name":"Family","owner":"did:plc:owner","memberCount":3}"""
         val summary = json.decodeFromString<BlueCatbirdCircleDefsCircleSummary>(data)
         assertEquals("Family", summary.name)
-        assertEquals("at://did:plc:owner/space/blue.catbird.circle/3abc", summary.uri.toString())
+        assertEquals("at:space/did:plc:owner/blue.catbird.circle/3abc", summary.uri.toString())
         assertEquals(circleId, summary.circleId)
         assertEquals(3, summary.memberCount)
     }
@@ -32,7 +32,7 @@ class CircleLexiconTest {
      */
     @Test
     fun circleSummaryOmitsOptionalFieldsWhenAbsent() {
-        val data = """{"uri":"at://did:plc:owner/space/blue.catbird.circle/3abc","circleId":"$circleId","name":"Family","owner":"did:plc:owner"}"""
+        val data = """{"uri":"at:space/did:plc:owner/blue.catbird.circle/3abc","circleId":"$circleId","name":"Family","owner":"did:plc:owner"}"""
         val summary = json.decodeFromString<BlueCatbirdCircleDefsCircleSummary>(data)
         assertNull(summary.memberCount)
         assertNull(summary.muted)
@@ -40,12 +40,12 @@ class CircleLexiconTest {
 
     @Test
     fun metadataCarriesCircleIdAndMigrationPointers() {
-        val data = """{"circleId":"$circleId","name":"Family","createdAt":"2026-08-26T00:00:00Z","migratedFrom":"at://did:plc:owner/space/blue.catbird.circle/3old"}"""
+        val data = """{"circleId":"$circleId","name":"Family","createdAt":"2026-08-26T00:00:00Z","migratedFrom":"at:space/did:plc:owner/blue.catbird.circle/3old"}"""
         val record = json.decodeFromString<BlueCatbirdCircleMetadata>(data)
         assertEquals(circleId, record.circleId)
         assertEquals("Family", record.name)
         assertEquals(
-            "at://did:plc:owner/space/blue.catbird.circle/3old",
+            "at:space/did:plc:owner/blue.catbird.circle/3old",
             record.migratedFrom?.toString()
         )
         assertNull(record.migratedTo)
@@ -57,7 +57,7 @@ class CircleLexiconTest {
      */
     @Test
     fun activateCircleReturnsRefreshedSummary() {
-        val data = """{"circle":{"uri":"at://did:plc:owner/space/blue.catbird.circle/3abc","circleId":"$circleId","name":"Family","owner":"did:plc:owner","memberCount":2}}"""
+        val data = """{"circle":{"uri":"at:space/did:plc:owner/blue.catbird.circle/3abc","circleId":"$circleId","name":"Family","owner":"did:plc:owner","memberCount":2}}"""
         val output = json.decodeFromString<BlueCatbirdCircleActivateCircleOutput>(data)
         assertEquals("Family", output.circle.name)
         assertEquals(circleId, output.circle.circleId)
