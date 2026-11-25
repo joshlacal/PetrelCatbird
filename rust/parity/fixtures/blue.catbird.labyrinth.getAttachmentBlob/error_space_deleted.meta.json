@@ -1,0 +1,12 @@
+{
+  "nsid": "blue.catbird.labyrinth.getAttachmentBlob",
+  "case": "error_space_deleted",
+  "payload_file": "error_space_deleted.json",
+  "kind": "json",
+  "schema_ref": "blue.catbird.labyrinth.getAttachmentBlob#errors",
+  "jacquard_rust_type": "catbird_atproto::blue_catbird::labyrinth::get_attachment_blob::GetAttachmentBlobError",
+  "expect": "roundtrip",
+  "cbor": false,
+  "source_commit": "cb307aee7c12c380f970df72e317fbe05b2325f2",
+  "source_test": "catbird-atproto/tests/conversation_space_contract.rs::deleted_generation_is_a_typed_error_on_both_remaining_read_paths"
+}

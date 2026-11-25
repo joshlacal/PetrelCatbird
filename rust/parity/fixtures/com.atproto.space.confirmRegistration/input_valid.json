@@ -1,0 +1,5 @@
+{
+  "space": "at:space/did:plc:space/app.bsky.group/demo",
+  "token": "opaque-token",
+  "challenge": "opaque-challenge"
+}

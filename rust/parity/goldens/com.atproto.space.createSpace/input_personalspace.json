@@ -1,0 +1,6 @@
+{
+  "policy": {
+    "$type": "com.atproto.personalspace.policy"
+  },
+  "spaceType": "app.bsky.group"
+}

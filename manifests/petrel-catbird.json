@@ -15,5 +15,11 @@
   },
   "kotlin": {
     "output": "../PetrelCatbird/kotlin/src/main/kotlin/blue/catbird/petrel/generated"
+  },
+  "rust": {
+    "output": "../PetrelCatbird/rust/petrel-catbird/src/generated",
+    "crate": "petrel_catbird",
+    "reference_crate": "petrel_api::generated",
+    "crate_path": "crate::generated"
   }
 }

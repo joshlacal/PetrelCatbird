@@ -1,0 +1,7 @@
+{
+  "cbor_hex": null,
+  "cbor_roundtrip_equal": null,
+  "expect": "validate_reject",
+  "status": "validate_err",
+  "validate_error": ".media_type below min length: 0 < 1"
+}

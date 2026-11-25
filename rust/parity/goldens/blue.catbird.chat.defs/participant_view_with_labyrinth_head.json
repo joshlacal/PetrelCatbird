@@ -1,0 +1,13 @@
+{
+  "labyrinthHead": {
+    "attestationKeyId": "key-1",
+    "epochHead": {
+      "$bytes": "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc="
+    },
+    "epochNumber": 3
+  },
+  "leafCount": 1,
+  "role": "member",
+  "status": "active",
+  "userDid": "did:plc:alice"
+}
