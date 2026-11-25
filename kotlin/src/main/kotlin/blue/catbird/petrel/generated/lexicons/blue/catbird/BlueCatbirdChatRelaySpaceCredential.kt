@@ -30,7 +30,7 @@ object BlueCatbirdChatRelaySpaceCredentialDefs {
     data class BlueCatbirdChatRelaySpaceCredentialInput(
         @SerialName("actorDeviceId")
         val actorDeviceId: BlueCatbirdChatDefsDeviceId,// DID of the Space authority serving com.atproto.space.authorizeSpaceSync; it must be the authority named in space.        @SerialName("authorityDid")
-        val authorityDid: DID,// Exactly at://{authorityDid}/space/{spaceType}/{skey}. Other schemes, including at-space://, and Space record URIs are rejected. The returned credential's sub equals this string.        @SerialName("space")
+        val authorityDid: DID,// Exactly at:space/{authorityDid}/{spaceType}/{skey}. Other schemes, including at-space:// and the alpha form at://{authorityDid}/space/..., and Space record URIs are rejected. The returned credential's sub equals this string.        @SerialName("space")
         val space: SpaceRef,// Single-use delegation JWT minted by the user's PDS (com.atproto.space.getDelegationToken): sub is exactly space, aud is {authorityDid}#atproto_pds, it carries no cnf claim, and it lives at most 60 seconds. The home forwards it to the authority in a POST body without reading it.        @SerialName("delegationToken")
         val delegationToken: String,// Client ephemeral P-256 did:key for RFC 9421 proof-of-possession. The authority binds the credential's cnf.kid to it, and the home rejects a credential bound to any other key.        @SerialName("cnfKey")
         val cnfKey: String,// Optional OAuth client attestation JWT forwarded to com.atproto.space.authorizeSpaceSync.        @SerialName("clientAttestation")

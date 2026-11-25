@@ -85,7 +85,7 @@ public struct BlueCatbirdChatRelaySpaceCredential {
         public let actorDeviceId: BlueCatbirdChatDefs.DeviceId
         /// DID of the Space authority serving com.atproto.space.authorizeSpaceSync; it must be the authority named in space.
         public let authorityDid: DID
-        /// Exactly at://{authorityDid}/space/{spaceType}/{skey}. Other schemes, including at-space://, and Space record URIs are rejected. The returned credential's sub equals this string.
+        /// Exactly at:space/{authorityDid}/{spaceType}/{skey}. Other schemes, including at-space:// and the alpha form at://{authorityDid}/space/..., and Space record URIs are rejected. The returned credential's sub equals this string.
         public let space: SpaceRef
         /// Single-use delegation JWT minted by the user's PDS (com.atproto.space.getDelegationToken): sub is exactly space, aud is {authorityDid}#atproto_pds, it carries no cnf claim, and it lives at most 60 seconds. The home forwards it to the authority in a POST body without reading it.
         public let delegationToken: String
