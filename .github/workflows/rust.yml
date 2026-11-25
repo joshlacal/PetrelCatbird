@@ -1,0 +1,66 @@
+name: Rust
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rust-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # The Petrel commit the overlay is generated against and builds with.
+  PETREL_REF: codex/petrel-rust-integration
+
+jobs:
+  rust:
+    name: Rust overlay, regeneration and Jacquard parity
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          path: PetrelCatbird
+          persist-credentials: false
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          repository: joshlacal/Petrel
+          ref: ${{ env.PETREL_REF }}
+          path: Petrel
+          persist-credentials: false
+      - name: Install checksum-pinned rustup and Petrel's toolchain
+        run: |
+          set -euo pipefail
+          bash Petrel/rust/petrel-e2e/ci/install-rustup.sh
+          channel=$(sed -n 's/^channel = "\(.*\)"$/\1/p' Petrel/rust/rust-toolchain.toml)
+          test -n "$channel"
+          "$CARGO_HOME/bin/rustup" toolchain install "$channel" --profile minimal --component clippy,rustfmt
+          printf 'RUSTUP_TOOLCHAIN=%s\n' "$channel" >> "$GITHUB_ENV"
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+      - name: Regenerate the Rust overlay and require a clean projection
+        run: |
+          set -euo pipefail
+          python -m pip install -r Petrel/generator/requirements.txt
+          (cd Petrel && python run.py --manifest ../PetrelCatbird/manifests/petrel-catbird.json --language rust)
+          cd PetrelCatbird
+          git diff --exit-code -- rust/petrel-catbird/src/generated
+          test -z "$(git status --porcelain --untracked-files=all -- rust/petrel-catbird/src/generated)"
+      - name: Format, lint and test petrel-catbird
+        working-directory: PetrelCatbird/rust/petrel-catbird
+        run: |
+          cargo fmt --check
+          cargo clippy --locked --all-targets -- -D warnings
+          cargo test --locked
+      - name: Jacquard 0.13 parity
+        working-directory: PetrelCatbird/rust/parity
+        run: |
+          cargo fmt --check
+          cargo test --locked

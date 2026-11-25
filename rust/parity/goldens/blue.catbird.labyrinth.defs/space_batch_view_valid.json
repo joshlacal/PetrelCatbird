@@ -20,5 +20,5 @@
     }
   ],
   "rkey": "e33325af1ea2ff20a2e4adb3bc57a67e603222f4202931345c9c1ff47187fa90",
-  "space": "at://did:plc:authority/space/blue.catbird.labyrinth.thread/conversation"
+  "space": "at:space/did:plc:authority/blue.catbird.labyrinth.thread/conversation"
 }

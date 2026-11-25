@@ -2,6 +2,6 @@
   "chatGeneration": 2,
   "chatSeq": 11,
   "generation": "a4c334f4-1581-4f8c-9767-e6e7e23e70e2",
-  "space": "at://did:plc:authority/space/blue.catbird.labyrinth.thread/conversation",
+  "space": "at:space/did:plc:authority/blue.catbird.labyrinth.thread/conversation",
   "user": "did:plc:member"
 }

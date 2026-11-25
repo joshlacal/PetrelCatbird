@@ -1,4 +1,4 @@
 {
   "credentialKey": "did:key:zExample",
-  "space": "at://did:plc:space/space/app.bsky.group/demo"
+  "space": "at:space/did:plc:space/app.bsky.group/demo"
 }

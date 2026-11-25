@@ -246,7 +246,7 @@ fn parity_com_atproto_space_surface() {
 
     // Query Params use ToQueryParams rather than JSON Deserialize.
     let mut lw_params = ListWritersParams::new(
-        "at://did:plc:space/space/app.bsky.group/demo"
+        "at:space/did:plc:space/app.bsky.group/demo"
             .parse()
             .unwrap(),
     );
@@ -254,6 +254,10 @@ fn parity_com_atproto_space_surface() {
     let mut pairs = Vec::new();
     lw_params.to_query_params(&mut pairs);
     assert!(pairs.contains(&("cursor", "not-a-tid".to_owned())));
+    assert!(pairs.contains(&(
+        "space",
+        "at:space/did:plc:space/app.bsky.group/demo".to_owned()
+    )));
 
     roundtrip_petrel::<PutMembersInput>("com.atproto.memberspace.putMembers", "input_valid", true);
     roundtrip_petrel::<RemoveMembersInput>(

@@ -3,5 +3,5 @@
   "memberCount": 5,
   "name": "Family",
   "owner": "did:plc:owner",
-  "uri": "at://did:plc:owner/space/blue.catbird.circle/3abc"
+  "uri": "at:space/did:plc:owner/blue.catbird.circle/3abc"
 }
