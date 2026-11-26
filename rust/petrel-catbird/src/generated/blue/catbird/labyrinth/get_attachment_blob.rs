@@ -40,6 +40,18 @@ impl petrel_core::ToQueryParams for Parameters {
     }
 }
 
+impl petrel_core::FromQueryParams for Parameters {
+    fn from_query_params(params: &[(&str, &str)]) -> Result<Self, petrel_core::DecodeError> {
+        Ok(Self {
+            device_key_pubkey: petrel_core::xrpc::pull_param(params, "deviceKeyPubkey")?,
+            blinded_index: petrel_core::xrpc::pull_param(params, "blindedIndex")?,
+            message_id: petrel_core::xrpc::pull_param(params, "messageId")?,
+            blinded_token_salt: petrel_core::xrpc::pull_param(params, "blindedTokenSalt")?,
+            thread_id: petrel_core::xrpc::pull_param(params, "threadId")?,
+        })
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
     OrfStateNotFound,

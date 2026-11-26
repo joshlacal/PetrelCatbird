@@ -26,6 +26,15 @@ impl petrel_core::ToQueryParams for Parameters {
     }
 }
 
+impl petrel_core::FromQueryParams for Parameters {
+    fn from_query_params(params: &[(&str, &str)]) -> Result<Self, petrel_core::DecodeError> {
+        Ok(Self {
+            ticket: petrel_core::xrpc::pull_param(params, "ticket")?,
+            cursor: petrel_core::xrpc::pull_param(params, "cursor")?,
+        })
+    }
+}
+
 pub type Message = crate::generated::blue::catbird::chat::defs::SubscriptionMessage;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -99,4 +108,15 @@ pub struct SubscribeEvents;
 
 impl SubscribeEvents {
     pub const NSID: &'static str = "blue.catbird.chat.subscribeEvents";
+    pub const SUBPROTOCOL: Option<&'static str> = None;
+    pub const KNOWN_MESSAGE_TYPES: &'static [&'static str] = &[];
+}
+
+impl petrel_core::XrpcSubscription for SubscribeEvents {
+    const NSID: &'static str = Self::NSID;
+    const SUBPROTOCOL: Option<&'static str> = Self::SUBPROTOCOL;
+    const KNOWN_MESSAGE_TYPES: &'static [&'static str] = Self::KNOWN_MESSAGE_TYPES;
+    type Params = Parameters;
+    type Message = Message;
+    type Error = Error;
 }

@@ -28,6 +28,15 @@ impl petrel_core::ToQueryParams for Parameters {
     }
 }
 
+impl petrel_core::FromQueryParams for Parameters {
+    fn from_query_params(params: &[(&str, &str)]) -> Result<Self, petrel_core::DecodeError> {
+        Ok(Self {
+            streamer: petrel_core::xrpc::pull_param(params, "streamer")?,
+            rendition: petrel_core::xrpc::pull_param(params, "rendition")?,
+        })
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
     /// This user may not play this stream.

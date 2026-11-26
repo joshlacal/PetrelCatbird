@@ -1,5 +1,11 @@
 # Private contract generation
 
+## Petrel pin (2026-11-26)
+
+The Petrel pin moved to `ca1846a7762a3e3cb12b50a2a8bceb888773dfb9` (`main` after
+the Petrel Rust parity train `#89–#103`) and regenerated the Rust and Kotlin
+projections cleanly against the locked `Petrel/generator` backend.
+
 ## Petrel pin (2026-11-25)
 
 The Petrel pin then moved to `d3d352a96c2f6111bd3cbd3166e54ac0105b5dca`, the merge of

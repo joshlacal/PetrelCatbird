@@ -60,6 +60,10 @@ impl petrel_core::XrpcInput for Input {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for Input {
@@ -134,6 +138,10 @@ impl petrel_core::FromValue for Output {
 impl petrel_core::XrpcInput for Output {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
@@ -273,9 +281,19 @@ impl petrel_core::xrpc::QueryValue for InputPlatform {
     }
 }
 
+impl petrel_core::xrpc::FromQueryValue for InputPlatform {
+    fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
+        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+    }
+}
+
 impl petrel_core::XrpcInput for InputPlatform {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 

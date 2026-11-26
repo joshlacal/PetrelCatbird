@@ -24,14 +24,32 @@ impl petrel_core::ToQueryParams for Parameters {
     }
 }
 
+impl petrel_core::FromQueryParams for Parameters {
+    fn from_query_params(params: &[(&str, &str)]) -> Result<Self, petrel_core::DecodeError> {
+        Ok(Self {
+            streamer: petrel_core::xrpc::pull_param(params, "streamer")?,
+        })
+    }
+}
+
 #[derive(Debug)]
 pub struct SubscribeSegments;
 
 impl SubscribeSegments {
     pub const NSID: &'static str = "place.stream.live.subscribeSegments";
+    pub const SUBPROTOCOL: Option<&'static str> = None;
     pub const KNOWN_MESSAGE_TYPES: &'static [&'static str] = &[
         "place.stream.live.subscribeSegments#segment",
     ];
+}
+
+impl petrel_core::XrpcSubscription for SubscribeSegments {
+    const NSID: &'static str = Self::NSID;
+    const SUBPROTOCOL: Option<&'static str> = Self::SUBPROTOCOL;
+    const KNOWN_MESSAGE_TYPES: &'static [&'static str] = Self::KNOWN_MESSAGE_TYPES;
+    type Params = Parameters;
+    type Message = Message;
+    type Error = petrel_core::xrpc::UndeclaredError;
 }
 
 /// MP4 file of a user's signed livestream segment
@@ -74,6 +92,10 @@ impl petrel_core::FromValue for Message {
 impl petrel_core::XrpcInput for Message {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 

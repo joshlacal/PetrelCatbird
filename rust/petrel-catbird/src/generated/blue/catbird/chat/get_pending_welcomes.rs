@@ -38,6 +38,18 @@ impl petrel_core::ToQueryParams for Parameters {
     }
 }
 
+impl petrel_core::FromQueryParams for Parameters {
+    fn from_query_params(params: &[(&str, &str)]) -> Result<Self, petrel_core::DecodeError> {
+        Ok(Self {
+            actor_device_id: petrel_core::xrpc::pull_param(params, "actorDeviceId")?,
+            inventory_session_id: petrel_core::xrpc::pull_param(params, "inventorySessionId")?,
+            page_cursor: petrel_core::xrpc::pull_optional_param(params, "pageCursor")?,
+            limit: petrel_core::xrpc::pull_default_param(params, "limit", || 50)?,
+            supported_protocol_versions: petrel_core::xrpc::pull_optional_array_param(params, "supportedProtocolVersions")?,
+        })
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Output {
     pub items: Vec<OutputItems>,
@@ -108,6 +120,10 @@ impl petrel_core::FromValue for Output {
 impl petrel_core::XrpcInput for Output {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
@@ -270,9 +286,19 @@ impl petrel_core::xrpc::QueryValue for ParametersSupportedProtocolVersions {
     }
 }
 
+impl petrel_core::xrpc::FromQueryValue for ParametersSupportedProtocolVersions {
+    fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
+        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+    }
+}
+
 impl petrel_core::XrpcInput for ParametersSupportedProtocolVersions {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
@@ -332,6 +358,10 @@ impl petrel_core::FromValue for OutputItems {
 impl petrel_core::XrpcInput for OutputItems {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 

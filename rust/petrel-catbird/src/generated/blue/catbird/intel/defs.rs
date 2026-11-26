@@ -83,6 +83,10 @@ impl petrel_core::XrpcInput for SceneGroup {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for SceneGroup {
@@ -224,6 +228,10 @@ impl petrel_core::XrpcInput for CommunitySummary {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for CommunitySummary {
@@ -333,6 +341,10 @@ impl petrel_core::XrpcInput for CommunityMemberRef {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for CommunityMemberRef {
@@ -416,6 +428,10 @@ impl petrel_core::FromValue for PostSkeletonItem {
 impl petrel_core::XrpcInput for PostSkeletonItem {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 

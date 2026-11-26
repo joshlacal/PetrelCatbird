@@ -77,6 +77,10 @@ impl petrel_core::XrpcInput for Permission {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for Permission {
@@ -160,9 +164,19 @@ impl petrel_core::xrpc::QueryValue for PermissionPermissions {
     }
 }
 
+impl petrel_core::xrpc::FromQueryValue for PermissionPermissions {
+    fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
+        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+    }
+}
+
 impl petrel_core::XrpcInput for PermissionPermissions {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 

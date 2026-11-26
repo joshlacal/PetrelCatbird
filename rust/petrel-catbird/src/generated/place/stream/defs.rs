@@ -70,6 +70,10 @@ impl petrel_core::XrpcInput for BlockView {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for BlockView {
@@ -141,6 +145,10 @@ impl petrel_core::XrpcInput for Renditions {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for Renditions {
@@ -211,6 +219,10 @@ impl petrel_core::FromValue for Rendition {
 impl petrel_core::XrpcInput for Rendition {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 

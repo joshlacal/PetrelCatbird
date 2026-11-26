@@ -100,6 +100,10 @@ impl petrel_core::XrpcInput for EpochPublic {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for EpochPublic {
@@ -178,6 +182,10 @@ impl petrel_core::XrpcInput for TransportAttestation {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for TransportAttestation {
@@ -255,6 +263,10 @@ impl petrel_core::FromValue for DeviceRevocation {
 impl petrel_core::XrpcInput for DeviceRevocation {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
@@ -339,6 +351,10 @@ impl petrel_core::FromValue for OriginalSenderArchiveAttestation {
 impl petrel_core::XrpcInput for OriginalSenderArchiveAttestation {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
@@ -464,6 +480,10 @@ impl petrel_core::XrpcInput for SequencerReceipt {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for SequencerReceipt {
@@ -570,6 +590,10 @@ impl petrel_core::FromValue for SealedMessage {
 impl petrel_core::XrpcInput for SealedMessage {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
@@ -678,6 +702,10 @@ impl petrel_core::XrpcInput for OwnerMessage {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for OwnerMessage {
@@ -759,6 +787,10 @@ impl petrel_core::FromValue for MekRecipient {
 impl petrel_core::XrpcInput for MekRecipient {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
@@ -842,6 +874,10 @@ impl petrel_core::FromValue for ServerOrder {
 impl petrel_core::XrpcInput for ServerOrder {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
@@ -942,6 +978,10 @@ impl petrel_core::XrpcInput for Redaction {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for Redaction {
@@ -1021,6 +1061,10 @@ impl petrel_core::FromValue for SpaceBatchRedaction {
 impl petrel_core::XrpcInput for SpaceBatchRedaction {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
@@ -1124,6 +1168,10 @@ impl petrel_core::FromValue for SpaceBatchView {
 impl petrel_core::XrpcInput for SpaceBatchView {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 

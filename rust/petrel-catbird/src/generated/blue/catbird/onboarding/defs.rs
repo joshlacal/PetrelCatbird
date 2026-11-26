@@ -59,6 +59,10 @@ impl petrel_core::XrpcInput for CommunitySelection {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for CommunitySelection {
@@ -145,6 +149,10 @@ impl petrel_core::FromValue for CalibrationOption {
 impl petrel_core::XrpcInput for CalibrationOption {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
@@ -237,6 +245,10 @@ impl petrel_core::XrpcInput for CalibrationSwipeCard {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for CalibrationSwipeCard {
@@ -320,6 +332,10 @@ impl petrel_core::XrpcInput for CalibrationSwipeAnswer {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for CalibrationSwipeAnswer {
@@ -394,6 +410,10 @@ impl petrel_core::FromValue for BundleControls {
 impl petrel_core::XrpcInput for BundleControls {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
@@ -499,6 +519,10 @@ impl petrel_core::XrpcInput for RecommendedFollow {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for RecommendedFollow {
@@ -578,6 +602,10 @@ impl petrel_core::XrpcInput for RecommendedFeed {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for RecommendedFeed {
@@ -656,6 +684,10 @@ impl petrel_core::FromValue for RecommendedStarterPack {
 impl petrel_core::XrpcInput for RecommendedStarterPack {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
@@ -756,6 +788,10 @@ impl petrel_core::XrpcInput for BundleSummary {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
     }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
+    }
 }
 
 impl petrel_core::XrpcOutput for BundleSummary {
@@ -839,9 +875,19 @@ impl petrel_core::xrpc::QueryValue for CalibrationSwipeAnswerChoice {
     }
 }
 
+impl petrel_core::xrpc::FromQueryValue for CalibrationSwipeAnswerChoice {
+    fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
+        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+    }
+}
+
 impl petrel_core::XrpcInput for CalibrationSwipeAnswerChoice {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
@@ -922,9 +968,19 @@ impl petrel_core::xrpc::QueryValue for BundleControlsPace {
     }
 }
 
+impl petrel_core::xrpc::FromQueryValue for BundleControlsPace {
+    fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
+        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+    }
+}
+
 impl petrel_core::XrpcInput for BundleControlsPace {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
