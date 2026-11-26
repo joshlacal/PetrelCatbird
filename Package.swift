@@ -34,7 +34,7 @@ if let localPetrel = localPetrelPathIfAvailable() {
     // Match the Petrel core used to qualify this overlay in the candidate workspace.
     petrelDependency = .package(
         url: "https://github.com/joshlacal/Petrel.git",
-        revision: "d3d352a96c2f6111bd3cbd3166e54ac0105b5dca"
+        revision: "ca1846a7762a3e3cb12b50a2a8bceb888773dfb9"
     )
 }
 

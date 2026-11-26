@@ -56,6 +56,22 @@ impl petrel_core::ToQueryParams for Parameters {
     }
 }
 
+impl petrel_core::FromQueryParams for Parameters {
+    fn from_query_params(params: &[(&str, &str)]) -> Result<Self, petrel_core::DecodeError> {
+        Ok(Self {
+            thread_id: petrel_core::xrpc::pull_param(params, "threadId")?,
+            sender: petrel_core::xrpc::pull_optional_param(params, "sender")?,
+            from_ms: petrel_core::xrpc::pull_optional_param(params, "fromMs")?,
+            until_ms: petrel_core::xrpc::pull_optional_param(params, "untilMs")?,
+            since: petrel_core::xrpc::pull_optional_param(params, "since")?,
+            until: petrel_core::xrpc::pull_optional_param(params, "until")?,
+            reverse: petrel_core::xrpc::pull_default_param(params, "reverse", || false)?,
+            cursor: petrel_core::xrpc::pull_optional_param(params, "cursor")?,
+            limit: petrel_core::xrpc::pull_optional_param(params, "limit")?,
+        })
+    }
+}
+
 impl petrel_core::xrpc::CursorParams for Parameters {
     fn cursor(&self) -> Option<&str> {
         self.cursor.as_deref()
@@ -118,6 +134,10 @@ impl petrel_core::FromValue for Output {
 impl petrel_core::XrpcInput for Output {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
@@ -259,6 +279,10 @@ impl petrel_core::FromValue for AuthoredView {
 impl petrel_core::XrpcInput for AuthoredView {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 

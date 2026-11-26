@@ -14,7 +14,7 @@ concurrency:
 
 env:
   # The Petrel commit the overlay is generated against and builds with.
-  PETREL_REF: a4d5d480d709e2d3a3195884f9cbbeff878ce5f3
+  PETREL_REF: ca1846a7762a3e3cb12b50a2a8bceb888773dfb9
 
 jobs:
   rust:

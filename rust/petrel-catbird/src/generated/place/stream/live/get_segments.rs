@@ -30,6 +30,16 @@ impl petrel_core::ToQueryParams for Parameters {
     }
 }
 
+impl petrel_core::FromQueryParams for Parameters {
+    fn from_query_params(params: &[(&str, &str)]) -> Result<Self, petrel_core::DecodeError> {
+        Ok(Self {
+            user_did: petrel_core::xrpc::pull_param(params, "userDID")?,
+            limit: petrel_core::xrpc::pull_default_param(params, "limit", || 50)?,
+            before: petrel_core::xrpc::pull_optional_param(params, "before")?,
+        })
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Output {
     pub segments: Option<Vec<crate::generated::place::stream::segment::SegmentView>>,
@@ -82,6 +92,10 @@ impl petrel_core::FromValue for Output {
 impl petrel_core::XrpcInput for Output {
     fn into_body(self) -> Result<Option<Vec<u8>>, petrel_core::EncodeError> {
         petrel_core::xrpc::json_body(&self)
+    }
+
+    fn from_body(body: &[u8]) -> Result<Self, petrel_core::DecodeError> {
+        petrel_core::from_json_strict(body)
     }
 }
 
