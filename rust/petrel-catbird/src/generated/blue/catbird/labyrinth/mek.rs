@@ -153,7 +153,7 @@ impl LabyrinthSender {
             did: reader.required("did")?,
             sender_epoch_head: reader.required("senderEpochHead")?,
             sender_epoch: reader.required("senderEpoch")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -240,7 +240,7 @@ impl TransportSender {
             transport_pubkey: reader.required("transportPubkey")?,
             ephemeral_auth_pubkey: reader.required("ephemeralAuthPubkey")?,
             sig: reader.required("sig")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -301,8 +301,8 @@ impl petrel_core::ToValue for MekSender {
 impl MekSender {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.labyrinth.mek#labyrinthSender" => petrel_core::decode_value(value, strict).map(Self::LabyrinthSender),
-            "blue.catbird.labyrinth.mek#transportSender" => petrel_core::decode_value(value, strict).map(Self::TransportSender),
+            "blue.catbird.labyrinth.mek#labyrinthSender" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LabyrinthSender),
+            "blue.catbird.labyrinth.mek#transportSender" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::TransportSender),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }

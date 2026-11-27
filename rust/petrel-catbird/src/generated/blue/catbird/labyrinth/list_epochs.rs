@@ -188,7 +188,7 @@ impl EpochView {
         Ok(Self {
             epoch_id: reader.required("epochId")?,
             record: reader.required("record")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

@@ -197,7 +197,7 @@ impl ChatDeviceKey {
             signing_public_key: reader.required("signingPublicKey")?,
             created_at: reader.required("createdAt")?,
             revoked_at: reader.optional("revokedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

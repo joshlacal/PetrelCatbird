@@ -53,7 +53,7 @@ impl ConversationPolicy {
             generation: reader.required("generation")?,
             sequencer_did: reader.required("sequencerDid")?,
             publish_policy: reader.optional("publishPolicy")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

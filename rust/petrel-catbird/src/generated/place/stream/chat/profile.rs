@@ -132,7 +132,7 @@ impl Color {
             red: reader.required("red")?,
             green: reader.required("green")?,
             blue: reader.required("blue")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

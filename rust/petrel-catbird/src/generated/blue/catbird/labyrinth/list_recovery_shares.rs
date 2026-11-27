@@ -241,7 +241,7 @@ impl ShareView {
             created_by_device_id: reader.optional("createdByDeviceId")?,
             last_fetched_at: reader.optional("lastFetchedAt")?,
             fetch_count: reader.required("fetchCount")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

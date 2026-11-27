@@ -269,7 +269,7 @@ impl ConvoEventEntry {
             signed_request: reader.optional("signedRequest")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             outer_fingerprint: reader.optional("outerFingerprint")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

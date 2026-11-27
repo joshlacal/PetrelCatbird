@@ -64,7 +64,7 @@ impl ContentRights {
             copyright_year: reader.optional("copyrightYear")?,
             license: reader.optional("license")?,
             credit_line: reader.optional("creditLine")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

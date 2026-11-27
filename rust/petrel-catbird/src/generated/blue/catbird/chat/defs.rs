@@ -79,7 +79,7 @@ impl ConversationCoordinates {
             group_context_hash: reader.required("groupContextHash")?,
             confirmation_tag: reader.required("confirmationTag")?,
             lifecycle: reader.required("lifecycle")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -182,7 +182,7 @@ impl ApplicationFrameContext {
             group_context_hash: reader.required("groupContextHash")?,
             confirmation_tag: reader.required("confirmationTag")?,
             lifecycle: reader.required("lifecycle")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -277,7 +277,7 @@ impl MetadataCryptoContext {
             epoch: reader.required("epoch")?,
             group_context_hash: reader.required("groupContextHash")?,
             confirmation_tag: reader.required("confirmationTag")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -381,7 +381,7 @@ impl MlsAadPriorContext {
             group_context_hash: reader.required("groupContextHash")?,
             confirmation_tag: reader.required("confirmationTag")?,
             lifecycle: reader.required("lifecycle")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -475,7 +475,7 @@ impl KeyPackageArtifact {
             bytes: reader.required("bytes")?,
             sha256: reader.required("sha256")?,
             key_package_ref: reader.required("keyPackageRef")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -563,7 +563,7 @@ impl PublicCommit {
             content_type: reader.required("contentType")?,
             bytes: reader.required("bytes")?,
             sha256: reader.required("sha256")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -651,7 +651,7 @@ impl GroupInfoArtifact {
             content_type: reader.required("contentType")?,
             bytes: reader.required("bytes")?,
             sha256: reader.required("sha256")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -738,7 +738,7 @@ impl PrivateApplicationMessage {
             content_type: reader.required("contentType")?,
             bytes: reader.required("bytes")?,
             sha256: reader.required("sha256")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -870,7 +870,7 @@ impl DeviceCapability {
             metadata_profile: reader.required("metadataProfile")?,
             typing_profile: reader.required("typingProfile")?,
             direct_request_profile: reader.optional("directRequestProfile")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -990,7 +990,7 @@ impl DeviceView {
             device_name: reader.optional("deviceName")?,
             last_active_at: reader.optional("lastActiveAt")?,
             dormant_at: reader.optional("dormantAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -1070,7 +1070,7 @@ impl OwnDeviceView {
         Ok(Self {
             device: reader.required("device")?,
             direct_request_key_pool: reader.optional("directRequestKeyPool")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -1161,7 +1161,7 @@ impl AddressableDevice {
             key_id: reader.required("keyId")?,
             capability: reader.required("capability")?,
             available_package_count: reader.required("availablePackageCount")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -1245,7 +1245,7 @@ impl InvitationProvenance {
             invitation_transition_id: reader.required("invitationTransitionId")?,
             invited_by_did: reader.required("invitedByDid")?,
             invited_by_device_id: reader.required("invitedByDeviceId")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -1333,7 +1333,7 @@ impl Participant {
             role: reader.required("role")?,
             status: reader.required("status")?,
             invitation_provenance: reader.optional("invitationProvenance")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -1429,7 +1429,7 @@ impl ParticipantView {
             invitation_provenance: reader.optional("invitationProvenance")?,
             leaf_count: reader.required("leafCount")?,
             labyrinth_head: reader.optional("labyrinthHead")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -1513,7 +1513,7 @@ impl LabyrinthHead {
             epoch_number: reader.required("epochNumber")?,
             epoch_head: reader.required("epochHead")?,
             attestation_key_id: reader.required("attestationKeyId")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -1601,7 +1601,7 @@ impl DeviceLeaf {
             device_id: reader.required("deviceId")?,
             leaf_origin: reader.required("leafOrigin")?,
             join_key_package_ref: reader.optional("joinKeyPackageRef")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -1697,7 +1697,7 @@ impl DeviceLeafView {
             join_key_package_ref: reader.optional("joinKeyPackageRef")?,
             key_id: reader.required("keyId")?,
             device_status: reader.required("deviceStatus")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -1785,7 +1785,7 @@ impl AddParticipant {
             role: reader.required("role")?,
             status: reader.required("status")?,
             invitation_provenance: reader.required("invitationProvenance")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -1860,7 +1860,7 @@ impl RemoveParticipant {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             user_did: reader.required("userDid")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -1940,7 +1940,7 @@ impl ChangeParticipantRole {
         Ok(Self {
             user_did: reader.required("userDid")?,
             role: reader.required("role")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -2027,7 +2027,7 @@ impl AddLeafByRecovery {
             device_id: reader.required("deviceId")?,
             recovery_request_id: reader.required("recoveryRequestId")?,
             key_package_ref: reader.required("keyPackageRef")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -2106,7 +2106,7 @@ impl RemoveLeaf {
         Ok(Self {
             user_did: reader.required("userDid")?,
             device_id: reader.required("deviceId")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -2185,7 +2185,7 @@ impl RecoveryWelcomeProvenance {
         Ok(Self {
             recovery_request_id: reader.required("recoveryRequestId")?,
             key_package_ref: reader.required("keyPackageRef")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -2269,7 +2269,7 @@ impl WelcomeDelivery {
             recipient_did: reader.required("recipientDid")?,
             recipient_device_id: reader.required("recipientDeviceId")?,
             provenance: reader.required("provenance")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -2365,7 +2365,7 @@ impl WelcomeBundle {
             opaque_welcome: reader.required("opaqueWelcome")?,
             sha256: reader.required("sha256")?,
             deliveries: reader.required("deliveries")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -2481,7 +2481,7 @@ impl WelcomeView {
             recipient_device_id: reader.required("recipientDeviceId")?,
             provenance: reader.required("provenance")?,
             expires_at: reader.required("expiresAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -2573,7 +2573,7 @@ impl CommitAad {
             generation: reader.required("generation")?,
             transition_id: reader.required("transitionId")?,
             prior: reader.required("prior")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -2674,7 +2674,7 @@ impl ApplicationAad {
             prior: reader.required("prior")?,
             archive_commitment: reader.optional("archiveCommitment")?,
             original_sender_attestation: reader.optional("originalSenderAttestation")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -2762,7 +2762,7 @@ impl TransitionManifest {
             leaf_changes: reader.required("leafChanges")?,
             welcome_bundle: reader.optional("welcomeBundle")?,
             leaf_recovery_request_id: reader.optional("leafRecoveryRequestId")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -2842,7 +2842,7 @@ impl CreationManifest {
         Ok(Self {
             participants: reader.required("participants")?,
             actor_leaf: reader.required("actorLeaf")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -2922,7 +2922,7 @@ impl ResetActivationManifest {
         Ok(Self {
             participants: reader.required("participants")?,
             actor_leaf: reader.required("actorLeaf")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -3046,7 +3046,7 @@ impl LeafRecoveryReservation {
             status: reader.required("status")?,
             expires_at: reader.required("expiresAt")?,
             key_package: reader.required("keyPackage")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -3134,7 +3134,7 @@ impl UploadedBlobBinding {
             ciphertext_sha256: reader.required("ciphertextSha256")?,
             ciphertext_size: reader.required("ciphertextSize")?,
             purpose: reader.required("purpose")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -3222,7 +3222,7 @@ impl ApplicationAttachmentBinding {
             ciphertext_sha256: reader.required("ciphertextSha256")?,
             ciphertext_size: reader.required("ciphertextSize")?,
             purpose: reader.required("purpose")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -3310,7 +3310,7 @@ impl MetadataAvatarBinding {
             ciphertext_sha256: reader.required("ciphertextSha256")?,
             ciphertext_size: reader.required("ciphertextSize")?,
             purpose: reader.required("purpose")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -3405,7 +3405,7 @@ impl BlobUploadView {
             ciphertext_size: reader.required("ciphertextSize")?,
             purpose: reader.required("purpose")?,
             expires_at: reader.required("expiresAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -3496,7 +3496,7 @@ impl BlobUsageView {
             quota_bytes: reader.required("quotaBytes")?,
             blob_count: reader.required("blobCount")?,
             live_unbound_count: reader.required("liveUnboundCount")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -3612,7 +3612,7 @@ impl DeviceEnrollmentBody {
             key_packages: reader.required("keyPackages")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -3720,7 +3720,7 @@ impl KeyPackageReplenishmentBody {
             key_packages: reader.required("keyPackages")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -3827,7 +3827,7 @@ impl DeviceRevocationBody {
             target_auth_generation: reader.required("targetAuthGeneration")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -3942,7 +3942,7 @@ impl DeviceApprovalBody {
             target_auth_generation: reader.required("targetAuthGeneration")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -4074,7 +4074,7 @@ impl CreationBody {
             metadata_snapshot: reader.required("metadataSnapshot")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -4202,7 +4202,7 @@ impl CommitTransitionBody {
             metadata_snapshot: reader.required("metadataSnapshot")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -4318,7 +4318,7 @@ impl PolicyTransitionBody {
             participant_changes: reader.required("participantChanges")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -4438,7 +4438,7 @@ impl ParticipantAcceptanceBody {
             invitation_provenance: reader.required("invitationProvenance")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -4559,7 +4559,7 @@ impl ApplicationSendBody {
             application_message: reader.required("applicationMessage")?,
             blob_bindings: reader.required("blobBindings")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -4642,7 +4642,7 @@ impl MessageTarget {
         Ok(Self {
             target_seq: reader.required("targetSeq")?,
             target_message_id: reader.required("targetMessageId")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -4774,7 +4774,7 @@ impl EncryptedImageEmbed {
             blurhash: reader.optional("blurhash")?,
             setter_did: reader.optional("setterDid")?,
             space_blob_cid: reader.optional("spaceBlobCid")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -4902,7 +4902,7 @@ impl EncryptedAudioEmbed {
             transcript: reader.optional("transcript")?,
             setter_did: reader.optional("setterDid")?,
             space_blob_cid: reader.optional("spaceBlobCid")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -4982,7 +4982,7 @@ impl AtprotoRecordEmbed {
         Ok(Self {
             uri: reader.required("uri")?,
             cid: reader.required("cid")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -5066,7 +5066,7 @@ impl ExternalLinkEmbed {
             uri: reader.required("uri")?,
             title: reader.optional("title")?,
             description: reader.optional("description")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -5141,7 +5141,7 @@ impl EncryptedImageEmbedVariant {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             encrypted_image: reader.required("encryptedImage")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -5216,7 +5216,7 @@ impl EncryptedAudioEmbedVariant {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             encrypted_audio: reader.required("encryptedAudio")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -5291,7 +5291,7 @@ impl AtprotoRecordEmbedVariant {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             atproto_record: reader.required("atprotoRecord")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -5366,7 +5366,7 @@ impl ExternalLinkEmbedVariant {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             external_link: reader.required("externalLink")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -5456,7 +5456,7 @@ impl MessageFrameBody {
             text: reader.optional("text")?,
             reply_to: reader.optional("replyTo")?,
             embed: reader.optional("embed")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -5540,7 +5540,7 @@ impl ReactionFrameBody {
             target: reader.required("target")?,
             emoji: reader.required("emoji")?,
             operation: reader.required("operation")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -5620,7 +5620,7 @@ impl EditFrameBody {
         Ok(Self {
             target: reader.required("target")?,
             replacement_text: reader.required("replacementText")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -5696,7 +5696,7 @@ impl TombstoneFrameBody {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             target: reader.required("target")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -5776,7 +5776,7 @@ impl ReadStateFrameBody {
         Ok(Self {
             through_seq: reader.required("throughSeq")?,
             through_message_id: reader.required("throughMessageId")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -5851,7 +5851,7 @@ impl MessageFrameVariant {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             message: reader.required("message")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -5926,7 +5926,7 @@ impl ReactionFrameVariant {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             reaction: reader.required("reaction")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -6001,7 +6001,7 @@ impl EditFrameVariant {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             edit: reader.required("edit")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -6076,7 +6076,7 @@ impl TombstoneFrameVariant {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             tombstone: reader.required("tombstone")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -6151,7 +6151,7 @@ impl ReadStateFrameVariant {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             read_state: reader.required("readState")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -6243,7 +6243,7 @@ impl ApplicationFrame {
             message_id: reader.required("messageId")?,
             context: reader.required("context")?,
             body: reader.required("body")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -6347,7 +6347,7 @@ impl BlobAad {
             purpose: reader.required("purpose")?,
             media_type: reader.required("mediaType")?,
             plaintext_size: reader.required("plaintextSize")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -6487,7 +6487,7 @@ impl MetadataAvatarEmbed {
             original_metadata_version: reader.required("originalMetadataVersion")?,
             setter_did: reader.optional("setterDid")?,
             space_blob_cid: reader.optional("spaceBlobCid")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -6591,7 +6591,7 @@ impl MetadataAvatarBlobAad {
             purpose: reader.required("purpose")?,
             media_type: reader.required("mediaType")?,
             plaintext_size: reader.required("plaintextSize")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -6691,7 +6691,7 @@ impl MetadataExporterContext {
             epoch: reader.required("epoch")?,
             group_context_hash: reader.required("groupContextHash")?,
             metadata_version: reader.required("metadataVersion")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -6778,7 +6778,7 @@ impl MetadataAadAvatarBinding {
             ciphertext_sha256: reader.required("ciphertextSha256")?,
             ciphertext_size: reader.required("ciphertextSize")?,
             purpose: reader.required("purpose")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -6878,7 +6878,7 @@ impl MetadataAad {
             origin_transition_id: reader.required("originTransitionId")?,
             ciphertext_size: reader.required("ciphertextSize")?,
             avatar_binding: reader.optional("avatarBinding")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -6986,7 +6986,7 @@ impl MetadataAuthorProof {
             origin_seq: reader.required("originSeq")?,
             role_at_origin: reader.required("roleAtOrigin")?,
             device_status_at_origin: reader.required("deviceStatusAtOrigin")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -7097,7 +7097,7 @@ impl MetadataContentProjection {
             title: reader.required("title")?,
             description: reader.optional("description")?,
             avatar: reader.optional("avatar")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -7177,7 +7177,7 @@ impl MetadataPlaintext {
         Ok(Self {
             content: reader.required("content")?,
             content_signature: reader.required("contentSignature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -7285,7 +7285,7 @@ impl MetadataSnapshot {
             ciphertext_size: reader.required("ciphertextSize")?,
             avatar_binding: reader.optional("avatarBinding")?,
             author_proof: reader.required("authorProof")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -7401,7 +7401,7 @@ impl MetadataTransitionBody {
             metadata_snapshot: reader.required("metadataSnapshot")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -7509,7 +7509,7 @@ impl TypingBody {
             coordinates: reader.required("coordinates")?,
             is_typing: reader.required("isTyping")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -7605,7 +7605,7 @@ impl TypingEvent {
             actor_device_id: reader.required("actorDeviceId")?,
             is_typing: reader.required("isTyping")?,
             expires_at: reader.required("expiresAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -7736,7 +7736,7 @@ impl BlobUploadPreparationBody {
             purpose: reader.required("purpose")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -7839,7 +7839,7 @@ impl BlobDeletionBody {
             auth_generation: reader.required("authGeneration")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -7950,7 +7950,7 @@ impl ResetRequestBody {
             reason: reader.required("reason")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -8086,7 +8086,7 @@ impl ResetActivationBody {
             metadata_snapshot: reader.required("metadataSnapshot")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -8193,7 +8193,7 @@ impl ResetRequestView {
             status: reader.required("status")?,
             requested_at: reader.required("requestedAt")?,
             expires_at: reader.required("expiresAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -8305,7 +8305,7 @@ impl LeafRecoveryRequestBody {
             recovery_kind: reader.required("recoveryKind")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -8408,7 +8408,7 @@ impl LeafRecoveryCancellationBody {
             auth_generation: reader.required("authGeneration")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -8540,7 +8540,7 @@ impl LeafRecoveryFulfillmentBody {
             metadata_snapshot: reader.required("metadataSnapshot")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -8656,7 +8656,7 @@ impl LeafRecoveryView {
             requested_at: reader.required("requestedAt")?,
             expires_at: reader.required("expiresAt")?,
             signed_request: reader.optional("signedRequest")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -8764,7 +8764,7 @@ impl RecoveryWorkPendingView {
             source_coordinate: reader.required("sourceCoordinate")?,
             status: reader.required("status")?,
             created_at: reader.required("createdAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -8880,7 +8880,7 @@ impl RecoveryWorkCompletedByTransitionView {
             created_at: reader.required("createdAt")?,
             terminal_transition_id: reader.required("terminalTransitionId")?,
             terminal_at: reader.required("terminalAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -8996,7 +8996,7 @@ impl RecoveryWorkSupersededByTransitionView {
             created_at: reader.required("createdAt")?,
             terminal_transition_id: reader.required("terminalTransitionId")?,
             terminal_at: reader.required("terminalAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -9112,7 +9112,7 @@ impl RecoveryWorkSupersededByRevocationView {
             created_at: reader.required("createdAt")?,
             terminal_revocation_id: reader.required("terminalRevocationId")?,
             terminal_at: reader.required("terminalAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -9228,7 +9228,7 @@ impl ConversationCloseBody {
             retired: reader.required("retired")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -9336,7 +9336,7 @@ impl LeaveRequestBody {
             prior: reader.required("prior")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -9448,7 +9448,7 @@ impl ZeroLeafLeaveBody {
             next: reader.required("next")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -9556,7 +9556,7 @@ impl LeaveCancellationBody {
             auth_generation: reader.required("authGeneration")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -9688,7 +9688,7 @@ impl LeaveCommitFulfillmentBody {
             metadata_snapshot: reader.required("metadataSnapshot")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -9791,7 +9791,7 @@ impl LeaveRequestView {
             status: reader.required("status")?,
             requested_at: reader.required("requestedAt")?,
             expires_at: reader.required("expiresAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -9870,7 +9870,7 @@ impl DurableLeaveRequestResult {
         Ok(Self {
             leave_request: reader.required("leaveRequest")?,
             entry: reader.required("entry")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -9949,7 +9949,7 @@ impl ZeroLeafLeaveResult {
         Ok(Self {
             coordinates: reader.required("coordinates")?,
             entry: reader.required("entry")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -10028,7 +10028,7 @@ impl ConversationCreatedResult {
         Ok(Self {
             coordinates: reader.required("coordinates")?,
             entry: reader.required("entry")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -10112,7 +10112,7 @@ impl ExistingDirectConversationResult {
             conversation_kind: reader.required("conversationKind")?,
             conversation_id: reader.required("conversationId")?,
             coordinates: reader.required("coordinates")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -10223,7 +10223,7 @@ impl WelcomeAcknowledgementBody {
             auth_generation: reader.required("authGeneration")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -10338,7 +10338,7 @@ impl WelcomeRejectionBody {
             auth_generation: reader.required("authGeneration")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -10417,7 +10417,7 @@ impl SignedDeviceEnrollment {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -10496,7 +10496,7 @@ impl SignedKeyPackageReplenishment {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -10575,7 +10575,7 @@ impl SignedDeviceRevocation {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -10654,7 +10654,7 @@ impl SignedDeviceApproval {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -10733,7 +10733,7 @@ impl SignedBlobUploadPreparation {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -10812,7 +10812,7 @@ impl SignedBlobDeletion {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -10891,7 +10891,7 @@ impl SignedCreation {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -10970,7 +10970,7 @@ impl SignedCommitTransition {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -11049,7 +11049,7 @@ impl SignedPolicyTransition {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -11128,7 +11128,7 @@ impl SignedParticipantAcceptance {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -11207,7 +11207,7 @@ impl SignedApplicationSend {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -11286,7 +11286,7 @@ impl SignedTyping {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -11365,7 +11365,7 @@ impl SignedMetadataTransition {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -11444,7 +11444,7 @@ impl SignedResetRequest {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -11523,7 +11523,7 @@ impl SignedResetActivation {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -11602,7 +11602,7 @@ impl SignedLeafRecoveryRequest {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -11681,7 +11681,7 @@ impl SignedLeafRecoveryCancellation {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -11760,7 +11760,7 @@ impl SignedLeafRecoveryFulfillment {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -11839,7 +11839,7 @@ impl SignedConversationClose {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -11918,7 +11918,7 @@ impl SignedLeaveRequest {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -11997,7 +11997,7 @@ impl SignedZeroLeafLeave {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -12076,7 +12076,7 @@ impl SignedLeaveCancellation {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -12155,7 +12155,7 @@ impl SignedLeaveCommitFulfillment {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -12234,7 +12234,7 @@ impl SignedWelcomeAcknowledgement {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -12313,7 +12313,7 @@ impl SignedWelcomeRejection {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -12425,7 +12425,7 @@ impl ConversationState {
             sequencer_did: reader.optional("sequencerDid")?,
             sequencer_term: reader.optional("sequencerTerm")?,
             direct_request: reader.optional("directRequest")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -12504,7 +12504,7 @@ impl ConversationInventoryState {
         Ok(Self {
             state: reader.required("state")?,
             direct_request: reader.optional("directRequest")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -12600,7 +12600,7 @@ impl ConversationRemovalTombstone {
             device_id: reader.required("deviceId")?,
             terminal_seq: reader.required("terminalSeq")?,
             removed_at: reader.required("removedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -12700,7 +12700,7 @@ impl ConversationCloseTombstone {
             closed_by_device_id: reader.required("closedByDeviceId")?,
             terminal_seq: reader.required("terminalSeq")?,
             closed_at: reader.required("closedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -12779,7 +12779,7 @@ impl ConversationCloseResult {
         Ok(Self {
             tombstone: reader.required("tombstone")?,
             entry: reader.required("entry")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -12903,7 +12903,7 @@ impl SequencerReceipt {
             sequencer_did: reader.required("sequencerDid")?,
             kid: reader.required("kid")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -13004,7 +13004,7 @@ impl ApplicationEntry {
             payload_pruned: reader.optional("payloadPruned")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -13099,7 +13099,7 @@ impl CommitEntry {
             signed_request: reader.required("signedRequest")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -13194,7 +13194,7 @@ impl PolicyEntry {
             signed_request: reader.required("signedRequest")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -13289,7 +13289,7 @@ impl MetadataEntry {
             signed_request: reader.required("signedRequest")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -13384,7 +13384,7 @@ impl CreationEntry {
             signed_request: reader.required("signedRequest")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -13484,7 +13484,7 @@ impl ParticipantAcceptanceEntry {
             recovery: reader.required("recovery")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -13583,7 +13583,7 @@ impl ConversationCloseEntry {
             tombstone: reader.required("tombstone")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -13678,7 +13678,7 @@ impl ResetRequestEntry {
             signed_request: reader.required("signedRequest")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -13773,7 +13773,7 @@ impl ResetActivationEntry {
             signed_request: reader.required("signedRequest")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -13868,7 +13868,7 @@ impl LeafRecoveryFulfillmentEntry {
             signed_request: reader.required("signedRequest")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -13963,7 +13963,7 @@ impl LeaveRequestEntry {
             signed_request: reader.required("signedRequest")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -14058,7 +14058,7 @@ impl ZeroLeafLeaveEntry {
             signed_request: reader.required("signedRequest")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -14153,7 +14153,7 @@ impl LeaveCancellationEntry {
             signed_request: reader.required("signedRequest")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -14248,7 +14248,7 @@ impl LeaveCommitFulfillmentEntry {
             signed_request: reader.required("signedRequest")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -14332,7 +14332,7 @@ impl AccountDeletionAuthority {
             sequencer_did: reader.required("sequencerDid")?,
             key_id: reader.required("keyId")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -14451,7 +14451,7 @@ impl AccountDeletedEntry {
             actor_write: reader.optional("actorWrite")?,
             key_proof: reader.optional("keyProof")?,
             revocation_proof: reader.optional("revocationProof")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -14536,7 +14536,7 @@ impl AccountDeletionActorWrite {
             write_body: reader.required("writeBody")?,
             signature: reader.required("signature")?,
             payload_bytes: reader.optional("payloadBytes")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -14611,7 +14611,7 @@ impl ConversationChangedEvent {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             conversation_id: reader.required("conversationId")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -14694,7 +14694,7 @@ impl ConversationClosedEvent {
             conversation_id: reader.required("conversationId")?,
             conversation_kind: reader.required("conversationKind")?,
             terminal_seq: reader.required("terminalSeq")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -14773,7 +14773,7 @@ impl MessageAvailableEvent {
         Ok(Self {
             conversation_id: reader.required("conversationId")?,
             seq: reader.required("seq")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -14852,7 +14852,7 @@ impl WelcomeAvailableEvent {
         Ok(Self {
             welcome_id: reader.required("welcomeId")?,
             conversation_id: reader.required("conversationId")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -14931,7 +14931,7 @@ impl WelcomeDispositionEvent {
         Ok(Self {
             welcome_id: reader.required("welcomeId")?,
             status: reader.required("status")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -15010,7 +15010,7 @@ impl ResetRequestedEvent {
         Ok(Self {
             reset_request_id: reader.required("resetRequestId")?,
             conversation_id: reader.required("conversationId")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -15093,7 +15093,7 @@ impl LeafRecoveryEvent {
             recovery_request_id: reader.required("recoveryRequestId")?,
             conversation_id: reader.required("conversationId")?,
             status: reader.required("status")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -15176,7 +15176,7 @@ impl LeaveRequestEvent {
             leave_request_id: reader.required("leaveRequestId")?,
             conversation_id: reader.required("conversationId")?,
             status: reader.required("status")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -15268,7 +15268,7 @@ impl AccessEndedEvent {
             user_did: reader.required("userDid")?,
             device_id: reader.required("deviceId")?,
             terminal_seq: reader.required("terminalSeq")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -15343,7 +15343,7 @@ impl WatermarkEvent {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             issued_at: reader.required("issuedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -15430,7 +15430,7 @@ impl EventEnvelope {
             cursor: reader.required("cursor")?,
             payload: reader.required("payload")?,
             created_at: reader.required("createdAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -15515,7 +15515,7 @@ impl FreshDirectOrigin {
     /// field is an error (an XRPC input) or is kept as raw data.
     fn decode_fields(reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -15594,7 +15594,7 @@ impl LegacyPendingDirectOrigin {
         Ok(Self {
             exact_prior: reader.required("exactPrior")?,
             original_invitation_provenance: reader.required("originalInvitationProvenance")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -15689,7 +15689,7 @@ impl GroupInvitationReference {
             invited_by_did: reader.required("invitedByDid")?,
             invited_by_device_id: reader.required("invitedByDeviceId")?,
             recipient_did: reader.required("recipientDid")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -15820,7 +15820,7 @@ impl DirectRequestGrantBody {
             expires_at: reader.required("expiresAt")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -15899,7 +15899,7 @@ impl SignedDirectRequestGrant {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -15978,7 +15978,7 @@ impl DirectRequestKey {
         Ok(Self {
             key_package: reader.required("keyPackage")?,
             grant: reader.required("grant")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -16093,7 +16093,7 @@ impl DirectRequestKeysPublicationBody {
             keys: reader.required("keys")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -16172,7 +16172,7 @@ impl SignedDirectRequestKeysPublication {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -16299,7 +16299,7 @@ impl DirectRequestPreparationBody {
             profile: reader.required("profile")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -16378,7 +16378,7 @@ impl SignedDirectRequestPreparation {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -16473,7 +16473,7 @@ impl DirectRequestSelectedDevice {
             auth_generation: reader.required("authGeneration")?,
             key_package: reader.required("keyPackage")?,
             grant: reader.required("grant")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -16560,7 +16560,7 @@ impl DirectRequestCreator {
             actor_device_id: reader.required("actorDeviceId")?,
             key_id: reader.required("keyId")?,
             auth_generation: reader.required("authGeneration")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -16701,7 +16701,7 @@ impl DirectRequestPreparationView {
             preparation_request_digest: reader.required("preparationRequestDigest")?,
             authority_did: reader.required("authorityDid")?,
             receipt_key_id: reader.required("receiptKeyId")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -16812,7 +16812,7 @@ impl DirectRequestContext {
             actor_key_id: reader.required("actorKeyId")?,
             recipient_did: reader.required("recipientDid")?,
             preparation_digest: reader.required("preparationDigest")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -16891,7 +16891,7 @@ impl DirectRequestCommitAad {
         Ok(Self {
             protocol_version: reader.required("protocolVersion")?,
             context_hash: reader.required("contextHash")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -16983,7 +16983,7 @@ impl DirectRequestApplicationAad {
             coordinates: reader.required("coordinates")?,
             message_id: reader.required("messageId")?,
             archive_commitment: reader.required("archiveCommitment")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -17063,7 +17063,7 @@ impl DirectRequestIntroduction {
         Ok(Self {
             text: reader.required("text")?,
             invitation: reader.optional("invitation")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -17163,7 +17163,7 @@ impl DirectRequestWelcomeProvenance {
             grant_revision: reader.required("grantRevision")?,
             key_package_ref: reader.required("keyPackageRef")?,
             import_until: reader.required("importUntil")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -17246,7 +17246,7 @@ impl DirectRequestWelcomeDelivery {
             recipient_did: reader.required("recipientDid")?,
             recipient_device_id: reader.required("recipientDeviceId")?,
             provenance: reader.required("provenance")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -17330,7 +17330,7 @@ impl DirectRequestWelcomeBundle {
             opaque_welcome: reader.required("opaqueWelcome")?,
             sha256: reader.required("sha256")?,
             deliveries: reader.required("deliveries")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -17426,7 +17426,7 @@ impl DirectRequestBootstrapArtifacts {
             welcome: reader.required("welcome")?,
             metadata_snapshot: reader.required("metadataSnapshot")?,
             initial_ciphertext: reader.required("initialCiphertext")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -17587,7 +17587,7 @@ impl DirectRequestPublicationBody {
             preparation_request_digest: reader.required("preparationRequestDigest")?,
             archive_commitment: reader.required("archiveCommitment")?,
             original_sender_attestation: reader.required("originalSenderAttestation")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -17666,7 +17666,7 @@ impl SignedDirectRequestPublication {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -17781,7 +17781,7 @@ impl DirectRequestCancellationBody {
             signed_at: reader.required("signedAt")?,
             recipient_did: reader.required("recipientDid")?,
             preparation_request_digest: reader.required("preparationRequestDigest")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -17860,7 +17860,7 @@ impl SignedDirectRequestCancellation {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -17983,7 +17983,7 @@ impl DirectRequestAcceptanceBody {
             invitation_provenance: reader.required("invitationProvenance")?,
             idempotency_key: reader.required("idempotencyKey")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -18062,7 +18062,7 @@ impl SignedDirectRequestAcceptance {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -18137,7 +18137,7 @@ impl DirectRequestUnknownOutcome {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             request_id: reader.required("requestId")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -18212,7 +18212,7 @@ impl DirectRequestPreparedOutcome {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             preparation: reader.required("preparation")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -18335,7 +18335,7 @@ impl DirectRequestPublishedReceipt {
             auth_generation: reader.required("authGeneration")?,
             request_kind: reader.required("requestKind")?,
             sequencer_receipt: reader.required("sequencerReceipt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -18442,7 +18442,7 @@ impl DirectRequestCancelledReceipt {
             actor_key_id: reader.required("actorKeyId")?,
             auth_generation: reader.required("authGeneration")?,
             request_kind: reader.required("requestKind")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -18549,7 +18549,7 @@ impl DirectRequestExpiredReceipt {
             actor_key_id: reader.required("actorKeyId")?,
             auth_generation: reader.required("authGeneration")?,
             request_kind: reader.required("requestKind")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -18660,7 +18660,7 @@ impl DirectRequestRejectedReceipt {
             actor_key_id: reader.required("actorKeyId")?,
             auth_generation: reader.required("authGeneration")?,
             request_kind: reader.required("requestKind")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -18775,7 +18775,7 @@ impl DirectRequestExistingDirectReceipt {
             actor_key_id: reader.required("actorKeyId")?,
             auth_generation: reader.required("authGeneration")?,
             request_kind: reader.required("requestKind")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -18866,7 +18866,7 @@ impl DirectRequestReceiptBody {
             authority_did: reader.required("authorityDid")?,
             key_id: reader.required("keyId")?,
             receipt: reader.required("receipt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -18945,7 +18945,7 @@ impl SignedDirectRequestReceipt {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -19029,7 +19029,7 @@ impl DirectRequestCoverage {
             account_did: reader.required("accountDid")?,
             included_device_ids: reader.required("includedDeviceIds")?,
             unavailable_device_ids: reader.required("unavailableDeviceIds")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -19137,7 +19137,7 @@ impl DirectRequestState {
             context_hash: reader.required("contextHash")?,
             preparation_digest: reader.required("preparationDigest")?,
             acceptance_proof: reader.optional("acceptanceProof")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -19242,7 +19242,7 @@ impl DirectRequestEntry {
             received_at: reader.required("receivedAt")?,
             sequencer_receipt: reader.required("sequencerReceipt")?,
             publication_receipt: reader.required("publicationReceipt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -19337,7 +19337,7 @@ impl DirectRequestAcceptanceEntry {
             signed_request: reader.required("signedRequest")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -19448,7 +19448,7 @@ impl DirectRequestWelcomeView {
             recipient_did: reader.required("recipientDid")?,
             recipient_device_id: reader.required("recipientDeviceId")?,
             provenance: reader.required("provenance")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -19527,7 +19527,7 @@ impl DirectRequestInventoryScope {
         Ok(Self {
             supported_protocol_versions: reader.required("supportedProtocolVersions")?,
             scope_digest: reader.required("scopeDigest")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -19660,7 +19660,7 @@ impl DirectRequestPreparationSnapshot {
             preparation_request_digest: reader.required("preparationRequestDigest")?,
             authority_did: reader.required("authorityDid")?,
             receipt_key_id: reader.required("receiptKeyId")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -19774,7 +19774,7 @@ impl DirectRequestAcceptanceCommitReceiptBody {
             prior: reader.required("prior")?,
             next: reader.required("next")?,
             recorded_at: reader.required("recordedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -19853,7 +19853,7 @@ impl SignedDirectRequestAcceptanceCommitReceipt {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -19932,7 +19932,7 @@ impl DirectRequestAcceptanceProof {
         Ok(Self {
             entry: reader.required("entry")?,
             receipt: reader.required("receipt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -20028,7 +20028,7 @@ impl DirectRequestKeyPoolStats {
             reserved_count: reader.required("reservedCount")?,
             as_of: reader.required("asOf")?,
             usable_until: reader.required("usableUntil")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -20156,7 +20156,7 @@ impl PushRegistrationBody {
             token_sha256: reader.required("tokenSha256")?,
             enabled: reader.required("enabled")?,
             signed_at: reader.required("signedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -20235,7 +20235,7 @@ impl SignedPushRegistration {
         Ok(Self {
             body: reader.required("body")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -20315,7 +20315,7 @@ impl PushRegistrationBinding {
         Ok(Self {
             body: reader.required("body")?,
             binding_digest: reader.required("bindingDigest")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -20402,7 +20402,7 @@ impl ApplicationAadOriginalSenderAttestation {
             sender_device_id: reader.required("senderDeviceId")?,
             sender_transport_pubkey: reader.required("senderTransportPubkey")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -20489,7 +20489,7 @@ impl DirectRequestPublicationBodyOriginalSenderAttestation {
             sender_device_id: reader.required("senderDeviceId")?,
             sender_transport_pubkey: reader.required("senderTransportPubkey")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -20532,17 +20532,21 @@ impl<'de> serde::Deserialize<'de> for DirectRequestPublicationBodyOriginalSender
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProtocolVersion {
     Value1,
     Value2,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl ProtocolVersion {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Value1 => "1",
             Self::Value2 => "2",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -20554,13 +20558,13 @@ impl core::fmt::Display for ProtocolVersion {
 }
 
 impl core::str::FromStr for ProtocolVersion {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "1" => Ok(Self::Value1),
-            "2" => Ok(Self::Value2),
-            _ => Err("unknown variant for ProtocolVersion"),
-        }
+        Ok(match s {
+            "1" => Self::Value1,
+            "2" => Self::Value2,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -20573,11 +20577,11 @@ impl petrel_core::ToValue for ProtocolVersion {
 impl petrel_core::FromValue for ProtocolVersion {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "1" => Ok(Self::Value1),
-            "2" => Ok(Self::Value2),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for ProtocolVersion"))),
-        }
+        Ok(match raw.as_str() {
+            "1" => Self::Value1,
+            "2" => Self::Value2,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -20589,7 +20593,10 @@ impl petrel_core::xrpc::QueryValue for ProtocolVersion {
 
 impl petrel_core::xrpc::FromQueryValue for ProtocolVersion {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -20621,15 +20628,19 @@ impl<'de> serde::Deserialize<'de> for ProtocolVersion {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CipherSuite {
     MLS256XWINGCHACHA20POLY1305SHA256Ed25519,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl CipherSuite {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::MLS256XWINGCHACHA20POLY1305SHA256Ed25519 => "MLS_256_XWING_CHACHA20POLY1305_SHA256_Ed25519",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -20641,12 +20652,12 @@ impl core::fmt::Display for CipherSuite {
 }
 
 impl core::str::FromStr for CipherSuite {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "MLS_256_XWING_CHACHA20POLY1305_SHA256_Ed25519" => Ok(Self::MLS256XWINGCHACHA20POLY1305SHA256Ed25519),
-            _ => Err("unknown variant for CipherSuite"),
-        }
+        Ok(match s {
+            "MLS_256_XWING_CHACHA20POLY1305_SHA256_Ed25519" => Self::MLS256XWINGCHACHA20POLY1305SHA256Ed25519,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -20659,10 +20670,10 @@ impl petrel_core::ToValue for CipherSuite {
 impl petrel_core::FromValue for CipherSuite {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "MLS_256_XWING_CHACHA20POLY1305_SHA256_Ed25519" => Ok(Self::MLS256XWINGCHACHA20POLY1305SHA256Ed25519),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for CipherSuite"))),
-        }
+        Ok(match raw.as_str() {
+            "MLS_256_XWING_CHACHA20POLY1305_SHA256_Ed25519" => Self::MLS256XWINGCHACHA20POLY1305SHA256Ed25519,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -20674,7 +20685,10 @@ impl petrel_core::xrpc::QueryValue for CipherSuite {
 
 impl petrel_core::xrpc::FromQueryValue for CipherSuite {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -20706,17 +20720,21 @@ impl<'de> serde::Deserialize<'de> for CipherSuite {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Lifecycle {
     Active,
     Superseded,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl Lifecycle {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Active => "active",
             Self::Superseded => "superseded",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -20728,13 +20746,13 @@ impl core::fmt::Display for Lifecycle {
 }
 
 impl core::str::FromStr for Lifecycle {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "active" => Ok(Self::Active),
-            "superseded" => Ok(Self::Superseded),
-            _ => Err("unknown variant for Lifecycle"),
-        }
+        Ok(match s {
+            "active" => Self::Active,
+            "superseded" => Self::Superseded,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -20747,11 +20765,11 @@ impl petrel_core::ToValue for Lifecycle {
 impl petrel_core::FromValue for Lifecycle {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "active" => Ok(Self::Active),
-            "superseded" => Ok(Self::Superseded),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for Lifecycle"))),
-        }
+        Ok(match raw.as_str() {
+            "active" => Self::Active,
+            "superseded" => Self::Superseded,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -20763,7 +20781,10 @@ impl petrel_core::xrpc::QueryValue for Lifecycle {
 
 impl petrel_core::xrpc::FromQueryValue for Lifecycle {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -20795,17 +20816,21 @@ impl<'de> serde::Deserialize<'de> for Lifecycle {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConversationKind {
     Direct,
     Group,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl ConversationKind {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Direct => "direct",
             Self::Group => "group",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -20817,13 +20842,13 @@ impl core::fmt::Display for ConversationKind {
 }
 
 impl core::str::FromStr for ConversationKind {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "direct" => Ok(Self::Direct),
-            "group" => Ok(Self::Group),
-            _ => Err("unknown variant for ConversationKind"),
-        }
+        Ok(match s {
+            "direct" => Self::Direct,
+            "group" => Self::Group,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -20836,11 +20861,11 @@ impl petrel_core::ToValue for ConversationKind {
 impl petrel_core::FromValue for ConversationKind {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "direct" => Ok(Self::Direct),
-            "group" => Ok(Self::Group),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for ConversationKind"))),
-        }
+        Ok(match raw.as_str() {
+            "direct" => Self::Direct,
+            "group" => Self::Group,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -20852,7 +20877,10 @@ impl petrel_core::xrpc::QueryValue for ConversationKind {
 
 impl petrel_core::xrpc::FromQueryValue for ConversationKind {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -20884,17 +20912,21 @@ impl<'de> serde::Deserialize<'de> for ConversationKind {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MemberRole {
     Admin,
     Member,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl MemberRole {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Admin => "admin",
             Self::Member => "member",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -20906,13 +20938,13 @@ impl core::fmt::Display for MemberRole {
 }
 
 impl core::str::FromStr for MemberRole {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "admin" => Ok(Self::Admin),
-            "member" => Ok(Self::Member),
-            _ => Err("unknown variant for MemberRole"),
-        }
+        Ok(match s {
+            "admin" => Self::Admin,
+            "member" => Self::Member,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -20925,11 +20957,11 @@ impl petrel_core::ToValue for MemberRole {
 impl petrel_core::FromValue for MemberRole {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "admin" => Ok(Self::Admin),
-            "member" => Ok(Self::Member),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for MemberRole"))),
-        }
+        Ok(match raw.as_str() {
+            "admin" => Self::Admin,
+            "member" => Self::Member,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -20941,7 +20973,10 @@ impl petrel_core::xrpc::QueryValue for MemberRole {
 
 impl petrel_core::xrpc::FromQueryValue for MemberRole {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -20973,17 +21008,21 @@ impl<'de> serde::Deserialize<'de> for MemberRole {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ParticipantStatus {
     Pending,
     Active,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl ParticipantStatus {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Pending => "pending",
             Self::Active => "active",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -20995,13 +21034,13 @@ impl core::fmt::Display for ParticipantStatus {
 }
 
 impl core::str::FromStr for ParticipantStatus {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "pending" => Ok(Self::Pending),
-            "active" => Ok(Self::Active),
-            _ => Err("unknown variant for ParticipantStatus"),
-        }
+        Ok(match s {
+            "pending" => Self::Pending,
+            "active" => Self::Active,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -21014,11 +21053,11 @@ impl petrel_core::ToValue for ParticipantStatus {
 impl petrel_core::FromValue for ParticipantStatus {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "pending" => Ok(Self::Pending),
-            "active" => Ok(Self::Active),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for ParticipantStatus"))),
-        }
+        Ok(match raw.as_str() {
+            "pending" => Self::Pending,
+            "active" => Self::Active,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -21030,7 +21069,10 @@ impl petrel_core::xrpc::QueryValue for ParticipantStatus {
 
 impl petrel_core::xrpc::FromQueryValue for ParticipantStatus {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -21062,19 +21104,23 @@ impl<'de> serde::Deserialize<'de> for ParticipantStatus {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum IncomingConsentPolicy {
     All,
     None,
     Following,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl IncomingConsentPolicy {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::All => "all",
             Self::None => "none",
             Self::Following => "following",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -21086,14 +21132,14 @@ impl core::fmt::Display for IncomingConsentPolicy {
 }
 
 impl core::str::FromStr for IncomingConsentPolicy {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "all" => Ok(Self::All),
-            "none" => Ok(Self::None),
-            "following" => Ok(Self::Following),
-            _ => Err("unknown variant for IncomingConsentPolicy"),
-        }
+        Ok(match s {
+            "all" => Self::All,
+            "none" => Self::None,
+            "following" => Self::Following,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -21106,12 +21152,12 @@ impl petrel_core::ToValue for IncomingConsentPolicy {
 impl petrel_core::FromValue for IncomingConsentPolicy {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "all" => Ok(Self::All),
-            "none" => Ok(Self::None),
-            "following" => Ok(Self::Following),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for IncomingConsentPolicy"))),
-        }
+        Ok(match raw.as_str() {
+            "all" => Self::All,
+            "none" => Self::None,
+            "following" => Self::Following,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -21123,7 +21169,10 @@ impl petrel_core::xrpc::QueryValue for IncomingConsentPolicy {
 
 impl petrel_core::xrpc::FromQueryValue for IncomingConsentPolicy {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -21155,19 +21204,23 @@ impl<'de> serde::Deserialize<'de> for IncomingConsentPolicy {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DeviceStatus {
     Active,
     PendingApproval,
     Revoked,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl DeviceStatus {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Active => "active",
             Self::PendingApproval => "pending_approval",
             Self::Revoked => "revoked",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -21179,14 +21232,14 @@ impl core::fmt::Display for DeviceStatus {
 }
 
 impl core::str::FromStr for DeviceStatus {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "active" => Ok(Self::Active),
-            "pending_approval" => Ok(Self::PendingApproval),
-            "revoked" => Ok(Self::Revoked),
-            _ => Err("unknown variant for DeviceStatus"),
-        }
+        Ok(match s {
+            "active" => Self::Active,
+            "pending_approval" => Self::PendingApproval,
+            "revoked" => Self::Revoked,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -21199,12 +21252,12 @@ impl petrel_core::ToValue for DeviceStatus {
 impl petrel_core::FromValue for DeviceStatus {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "active" => Ok(Self::Active),
-            "pending_approval" => Ok(Self::PendingApproval),
-            "revoked" => Ok(Self::Revoked),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for DeviceStatus"))),
-        }
+        Ok(match raw.as_str() {
+            "active" => Self::Active,
+            "pending_approval" => Self::PendingApproval,
+            "revoked" => Self::Revoked,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -21216,7 +21269,10 @@ impl petrel_core::xrpc::QueryValue for DeviceStatus {
 
 impl petrel_core::xrpc::FromQueryValue for DeviceStatus {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -21248,23 +21304,27 @@ impl<'de> serde::Deserialize<'de> for DeviceStatus {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PackageStatus {
     Available,
     Reserved,
     Consumed,
     Expired,
     Revoked,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl PackageStatus {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Available => "available",
             Self::Reserved => "reserved",
             Self::Consumed => "consumed",
             Self::Expired => "expired",
             Self::Revoked => "revoked",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -21276,16 +21336,16 @@ impl core::fmt::Display for PackageStatus {
 }
 
 impl core::str::FromStr for PackageStatus {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "available" => Ok(Self::Available),
-            "reserved" => Ok(Self::Reserved),
-            "consumed" => Ok(Self::Consumed),
-            "expired" => Ok(Self::Expired),
-            "revoked" => Ok(Self::Revoked),
-            _ => Err("unknown variant for PackageStatus"),
-        }
+        Ok(match s {
+            "available" => Self::Available,
+            "reserved" => Self::Reserved,
+            "consumed" => Self::Consumed,
+            "expired" => Self::Expired,
+            "revoked" => Self::Revoked,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -21298,14 +21358,14 @@ impl petrel_core::ToValue for PackageStatus {
 impl petrel_core::FromValue for PackageStatus {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "available" => Ok(Self::Available),
-            "reserved" => Ok(Self::Reserved),
-            "consumed" => Ok(Self::Consumed),
-            "expired" => Ok(Self::Expired),
-            "revoked" => Ok(Self::Revoked),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for PackageStatus"))),
-        }
+        Ok(match raw.as_str() {
+            "available" => Self::Available,
+            "reserved" => Self::Reserved,
+            "consumed" => Self::Consumed,
+            "expired" => Self::Expired,
+            "revoked" => Self::Revoked,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -21317,7 +21377,10 @@ impl petrel_core::xrpc::QueryValue for PackageStatus {
 
 impl petrel_core::xrpc::FromQueryValue for PackageStatus {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -21349,21 +21412,25 @@ impl<'de> serde::Deserialize<'de> for PackageStatus {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReservationStatus {
     Active,
     Consumed,
     Expired,
     Released,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl ReservationStatus {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Active => "active",
             Self::Consumed => "consumed",
             Self::Expired => "expired",
             Self::Released => "released",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -21375,15 +21442,15 @@ impl core::fmt::Display for ReservationStatus {
 }
 
 impl core::str::FromStr for ReservationStatus {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "active" => Ok(Self::Active),
-            "consumed" => Ok(Self::Consumed),
-            "expired" => Ok(Self::Expired),
-            "released" => Ok(Self::Released),
-            _ => Err("unknown variant for ReservationStatus"),
-        }
+        Ok(match s {
+            "active" => Self::Active,
+            "consumed" => Self::Consumed,
+            "expired" => Self::Expired,
+            "released" => Self::Released,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -21396,13 +21463,13 @@ impl petrel_core::ToValue for ReservationStatus {
 impl petrel_core::FromValue for ReservationStatus {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "active" => Ok(Self::Active),
-            "consumed" => Ok(Self::Consumed),
-            "expired" => Ok(Self::Expired),
-            "released" => Ok(Self::Released),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for ReservationStatus"))),
-        }
+        Ok(match raw.as_str() {
+            "active" => Self::Active,
+            "consumed" => Self::Consumed,
+            "expired" => Self::Expired,
+            "released" => Self::Released,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -21414,7 +21481,10 @@ impl petrel_core::xrpc::QueryValue for ReservationStatus {
 
 impl petrel_core::xrpc::FromQueryValue for ReservationStatus {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -21446,23 +21516,27 @@ impl<'de> serde::Deserialize<'de> for ReservationStatus {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum WelcomeStatus {
     Pending,
     Acknowledged,
     Rejected,
     Expired,
     Superseded,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl WelcomeStatus {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Pending => "pending",
             Self::Acknowledged => "acknowledged",
             Self::Rejected => "rejected",
             Self::Expired => "expired",
             Self::Superseded => "superseded",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -21474,16 +21548,16 @@ impl core::fmt::Display for WelcomeStatus {
 }
 
 impl core::str::FromStr for WelcomeStatus {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "pending" => Ok(Self::Pending),
-            "acknowledged" => Ok(Self::Acknowledged),
-            "rejected" => Ok(Self::Rejected),
-            "expired" => Ok(Self::Expired),
-            "superseded" => Ok(Self::Superseded),
-            _ => Err("unknown variant for WelcomeStatus"),
-        }
+        Ok(match s {
+            "pending" => Self::Pending,
+            "acknowledged" => Self::Acknowledged,
+            "rejected" => Self::Rejected,
+            "expired" => Self::Expired,
+            "superseded" => Self::Superseded,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -21496,14 +21570,14 @@ impl petrel_core::ToValue for WelcomeStatus {
 impl petrel_core::FromValue for WelcomeStatus {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "pending" => Ok(Self::Pending),
-            "acknowledged" => Ok(Self::Acknowledged),
-            "rejected" => Ok(Self::Rejected),
-            "expired" => Ok(Self::Expired),
-            "superseded" => Ok(Self::Superseded),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for WelcomeStatus"))),
-        }
+        Ok(match raw.as_str() {
+            "pending" => Self::Pending,
+            "acknowledged" => Self::Acknowledged,
+            "rejected" => Self::Rejected,
+            "expired" => Self::Expired,
+            "superseded" => Self::Superseded,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -21515,7 +21589,10 @@ impl petrel_core::xrpc::QueryValue for WelcomeStatus {
 
 impl petrel_core::xrpc::FromQueryValue for WelcomeStatus {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -21547,23 +21624,27 @@ impl<'de> serde::Deserialize<'de> for WelcomeStatus {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum WelcomeRejectionReason {
     NoMatchingKeyPackage,
     InvalidWelcome,
     UnsupportedCipherSuite,
     CoordinateMismatch,
     LocalStateConflict,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl WelcomeRejectionReason {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::NoMatchingKeyPackage => "noMatchingKeyPackage",
             Self::InvalidWelcome => "invalidWelcome",
             Self::UnsupportedCipherSuite => "unsupportedCipherSuite",
             Self::CoordinateMismatch => "coordinateMismatch",
             Self::LocalStateConflict => "localStateConflict",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -21575,16 +21656,16 @@ impl core::fmt::Display for WelcomeRejectionReason {
 }
 
 impl core::str::FromStr for WelcomeRejectionReason {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "noMatchingKeyPackage" => Ok(Self::NoMatchingKeyPackage),
-            "invalidWelcome" => Ok(Self::InvalidWelcome),
-            "unsupportedCipherSuite" => Ok(Self::UnsupportedCipherSuite),
-            "coordinateMismatch" => Ok(Self::CoordinateMismatch),
-            "localStateConflict" => Ok(Self::LocalStateConflict),
-            _ => Err("unknown variant for WelcomeRejectionReason"),
-        }
+        Ok(match s {
+            "noMatchingKeyPackage" => Self::NoMatchingKeyPackage,
+            "invalidWelcome" => Self::InvalidWelcome,
+            "unsupportedCipherSuite" => Self::UnsupportedCipherSuite,
+            "coordinateMismatch" => Self::CoordinateMismatch,
+            "localStateConflict" => Self::LocalStateConflict,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -21597,14 +21678,14 @@ impl petrel_core::ToValue for WelcomeRejectionReason {
 impl petrel_core::FromValue for WelcomeRejectionReason {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "noMatchingKeyPackage" => Ok(Self::NoMatchingKeyPackage),
-            "invalidWelcome" => Ok(Self::InvalidWelcome),
-            "unsupportedCipherSuite" => Ok(Self::UnsupportedCipherSuite),
-            "coordinateMismatch" => Ok(Self::CoordinateMismatch),
-            "localStateConflict" => Ok(Self::LocalStateConflict),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for WelcomeRejectionReason"))),
-        }
+        Ok(match raw.as_str() {
+            "noMatchingKeyPackage" => Self::NoMatchingKeyPackage,
+            "invalidWelcome" => Self::InvalidWelcome,
+            "unsupportedCipherSuite" => Self::UnsupportedCipherSuite,
+            "coordinateMismatch" => Self::CoordinateMismatch,
+            "localStateConflict" => Self::LocalStateConflict,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -21616,7 +21697,10 @@ impl petrel_core::xrpc::QueryValue for WelcomeRejectionReason {
 
 impl petrel_core::xrpc::FromQueryValue for WelcomeRejectionReason {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -21648,23 +21732,27 @@ impl<'de> serde::Deserialize<'de> for WelcomeRejectionReason {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum LeafRecoveryStatus {
     Open,
     Fulfilled,
     Cancelled,
     Expired,
     Superseded,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl LeafRecoveryStatus {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Open => "open",
             Self::Fulfilled => "fulfilled",
             Self::Cancelled => "cancelled",
             Self::Expired => "expired",
             Self::Superseded => "superseded",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -21676,16 +21764,16 @@ impl core::fmt::Display for LeafRecoveryStatus {
 }
 
 impl core::str::FromStr for LeafRecoveryStatus {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "open" => Ok(Self::Open),
-            "fulfilled" => Ok(Self::Fulfilled),
-            "cancelled" => Ok(Self::Cancelled),
-            "expired" => Ok(Self::Expired),
-            "superseded" => Ok(Self::Superseded),
-            _ => Err("unknown variant for LeafRecoveryStatus"),
-        }
+        Ok(match s {
+            "open" => Self::Open,
+            "fulfilled" => Self::Fulfilled,
+            "cancelled" => Self::Cancelled,
+            "expired" => Self::Expired,
+            "superseded" => Self::Superseded,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -21698,14 +21786,14 @@ impl petrel_core::ToValue for LeafRecoveryStatus {
 impl petrel_core::FromValue for LeafRecoveryStatus {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "open" => Ok(Self::Open),
-            "fulfilled" => Ok(Self::Fulfilled),
-            "cancelled" => Ok(Self::Cancelled),
-            "expired" => Ok(Self::Expired),
-            "superseded" => Ok(Self::Superseded),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for LeafRecoveryStatus"))),
-        }
+        Ok(match raw.as_str() {
+            "open" => Self::Open,
+            "fulfilled" => Self::Fulfilled,
+            "cancelled" => Self::Cancelled,
+            "expired" => Self::Expired,
+            "superseded" => Self::Superseded,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -21717,7 +21805,10 @@ impl petrel_core::xrpc::QueryValue for LeafRecoveryStatus {
 
 impl petrel_core::xrpc::FromQueryValue for LeafRecoveryStatus {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -21749,17 +21840,21 @@ impl<'de> serde::Deserialize<'de> for LeafRecoveryStatus {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RecoveryWorkSourceKind {
     WelcomeExpired,
     WelcomeRejected,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl RecoveryWorkSourceKind {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::WelcomeExpired => "welcomeExpired",
             Self::WelcomeRejected => "welcomeRejected",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -21771,13 +21866,13 @@ impl core::fmt::Display for RecoveryWorkSourceKind {
 }
 
 impl core::str::FromStr for RecoveryWorkSourceKind {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "welcomeExpired" => Ok(Self::WelcomeExpired),
-            "welcomeRejected" => Ok(Self::WelcomeRejected),
-            _ => Err("unknown variant for RecoveryWorkSourceKind"),
-        }
+        Ok(match s {
+            "welcomeExpired" => Self::WelcomeExpired,
+            "welcomeRejected" => Self::WelcomeRejected,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -21790,11 +21885,11 @@ impl petrel_core::ToValue for RecoveryWorkSourceKind {
 impl petrel_core::FromValue for RecoveryWorkSourceKind {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "welcomeExpired" => Ok(Self::WelcomeExpired),
-            "welcomeRejected" => Ok(Self::WelcomeRejected),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for RecoveryWorkSourceKind"))),
-        }
+        Ok(match raw.as_str() {
+            "welcomeExpired" => Self::WelcomeExpired,
+            "welcomeRejected" => Self::WelcomeRejected,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -21806,7 +21901,10 @@ impl petrel_core::xrpc::QueryValue for RecoveryWorkSourceKind {
 
 impl petrel_core::xrpc::FromQueryValue for RecoveryWorkSourceKind {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -21838,19 +21936,23 @@ impl<'de> serde::Deserialize<'de> for RecoveryWorkSourceKind {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RecoveryWorkStatus {
     Pending,
     Completed,
     Superseded,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl RecoveryWorkStatus {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Pending => "pending",
             Self::Completed => "completed",
             Self::Superseded => "superseded",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -21862,14 +21964,14 @@ impl core::fmt::Display for RecoveryWorkStatus {
 }
 
 impl core::str::FromStr for RecoveryWorkStatus {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "pending" => Ok(Self::Pending),
-            "completed" => Ok(Self::Completed),
-            "superseded" => Ok(Self::Superseded),
-            _ => Err("unknown variant for RecoveryWorkStatus"),
-        }
+        Ok(match s {
+            "pending" => Self::Pending,
+            "completed" => Self::Completed,
+            "superseded" => Self::Superseded,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -21882,12 +21984,12 @@ impl petrel_core::ToValue for RecoveryWorkStatus {
 impl petrel_core::FromValue for RecoveryWorkStatus {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "pending" => Ok(Self::Pending),
-            "completed" => Ok(Self::Completed),
-            "superseded" => Ok(Self::Superseded),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for RecoveryWorkStatus"))),
-        }
+        Ok(match raw.as_str() {
+            "pending" => Self::Pending,
+            "completed" => Self::Completed,
+            "superseded" => Self::Superseded,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -21899,7 +22001,10 @@ impl petrel_core::xrpc::QueryValue for RecoveryWorkStatus {
 
 impl petrel_core::xrpc::FromQueryValue for RecoveryWorkStatus {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -21931,23 +22036,27 @@ impl<'de> serde::Deserialize<'de> for RecoveryWorkStatus {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum LeaveRequestStatus {
     Pending,
     Fulfilled,
     Cancelled,
     Expired,
     Stale,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl LeaveRequestStatus {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Pending => "pending",
             Self::Fulfilled => "fulfilled",
             Self::Cancelled => "cancelled",
             Self::Expired => "expired",
             Self::Stale => "stale",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -21959,16 +22068,16 @@ impl core::fmt::Display for LeaveRequestStatus {
 }
 
 impl core::str::FromStr for LeaveRequestStatus {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "pending" => Ok(Self::Pending),
-            "fulfilled" => Ok(Self::Fulfilled),
-            "cancelled" => Ok(Self::Cancelled),
-            "expired" => Ok(Self::Expired),
-            "stale" => Ok(Self::Stale),
-            _ => Err("unknown variant for LeaveRequestStatus"),
-        }
+        Ok(match s {
+            "pending" => Self::Pending,
+            "fulfilled" => Self::Fulfilled,
+            "cancelled" => Self::Cancelled,
+            "expired" => Self::Expired,
+            "stale" => Self::Stale,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -21981,14 +22090,14 @@ impl petrel_core::ToValue for LeaveRequestStatus {
 impl petrel_core::FromValue for LeaveRequestStatus {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "pending" => Ok(Self::Pending),
-            "fulfilled" => Ok(Self::Fulfilled),
-            "cancelled" => Ok(Self::Cancelled),
-            "expired" => Ok(Self::Expired),
-            "stale" => Ok(Self::Stale),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for LeaveRequestStatus"))),
-        }
+        Ok(match raw.as_str() {
+            "pending" => Self::Pending,
+            "fulfilled" => Self::Fulfilled,
+            "cancelled" => Self::Cancelled,
+            "expired" => Self::Expired,
+            "stale" => Self::Stale,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -22000,7 +22109,10 @@ impl petrel_core::xrpc::QueryValue for LeaveRequestStatus {
 
 impl petrel_core::xrpc::FromQueryValue for LeaveRequestStatus {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -22032,17 +22144,21 @@ impl<'de> serde::Deserialize<'de> for LeaveRequestStatus {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum LeafRecoveryKind {
     Add,
     Replace,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl LeafRecoveryKind {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Add => "add",
             Self::Replace => "replace",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -22054,13 +22170,13 @@ impl core::fmt::Display for LeafRecoveryKind {
 }
 
 impl core::str::FromStr for LeafRecoveryKind {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "add" => Ok(Self::Add),
-            "replace" => Ok(Self::Replace),
-            _ => Err("unknown variant for LeafRecoveryKind"),
-        }
+        Ok(match s {
+            "add" => Self::Add,
+            "replace" => Self::Replace,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -22073,11 +22189,11 @@ impl petrel_core::ToValue for LeafRecoveryKind {
 impl petrel_core::FromValue for LeafRecoveryKind {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "add" => Ok(Self::Add),
-            "replace" => Ok(Self::Replace),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for LeafRecoveryKind"))),
-        }
+        Ok(match raw.as_str() {
+            "add" => Self::Add,
+            "replace" => Self::Replace,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -22089,7 +22205,10 @@ impl petrel_core::xrpc::QueryValue for LeafRecoveryKind {
 
 impl petrel_core::xrpc::FromQueryValue for LeafRecoveryKind {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -22121,17 +22240,21 @@ impl<'de> serde::Deserialize<'de> for LeafRecoveryKind {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum LeafOrigin {
     Genesis,
     KeyPackage,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl LeafOrigin {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Genesis => "genesis",
             Self::KeyPackage => "keyPackage",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -22143,13 +22266,13 @@ impl core::fmt::Display for LeafOrigin {
 }
 
 impl core::str::FromStr for LeafOrigin {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "genesis" => Ok(Self::Genesis),
-            "keyPackage" => Ok(Self::KeyPackage),
-            _ => Err("unknown variant for LeafOrigin"),
-        }
+        Ok(match s {
+            "genesis" => Self::Genesis,
+            "keyPackage" => Self::KeyPackage,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -22162,11 +22285,11 @@ impl petrel_core::ToValue for LeafOrigin {
 impl petrel_core::FromValue for LeafOrigin {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "genesis" => Ok(Self::Genesis),
-            "keyPackage" => Ok(Self::KeyPackage),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for LeafOrigin"))),
-        }
+        Ok(match raw.as_str() {
+            "genesis" => Self::Genesis,
+            "keyPackage" => Self::KeyPackage,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -22178,7 +22301,10 @@ impl petrel_core::xrpc::QueryValue for LeafOrigin {
 
 impl petrel_core::xrpc::FromQueryValue for LeafOrigin {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -22210,21 +22336,25 @@ impl<'de> serde::Deserialize<'de> for LeafOrigin {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ResetReason {
     LocalStateLost,
     PoisonedState,
     EpochDivergence,
     ManualRecovery,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl ResetReason {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::LocalStateLost => "localStateLost",
             Self::PoisonedState => "poisonedState",
             Self::EpochDivergence => "epochDivergence",
             Self::ManualRecovery => "manualRecovery",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -22236,15 +22366,15 @@ impl core::fmt::Display for ResetReason {
 }
 
 impl core::str::FromStr for ResetReason {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "localStateLost" => Ok(Self::LocalStateLost),
-            "poisonedState" => Ok(Self::PoisonedState),
-            "epochDivergence" => Ok(Self::EpochDivergence),
-            "manualRecovery" => Ok(Self::ManualRecovery),
-            _ => Err("unknown variant for ResetReason"),
-        }
+        Ok(match s {
+            "localStateLost" => Self::LocalStateLost,
+            "poisonedState" => Self::PoisonedState,
+            "epochDivergence" => Self::EpochDivergence,
+            "manualRecovery" => Self::ManualRecovery,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -22257,13 +22387,13 @@ impl petrel_core::ToValue for ResetReason {
 impl petrel_core::FromValue for ResetReason {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "localStateLost" => Ok(Self::LocalStateLost),
-            "poisonedState" => Ok(Self::PoisonedState),
-            "epochDivergence" => Ok(Self::EpochDivergence),
-            "manualRecovery" => Ok(Self::ManualRecovery),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for ResetReason"))),
-        }
+        Ok(match raw.as_str() {
+            "localStateLost" => Self::LocalStateLost,
+            "poisonedState" => Self::PoisonedState,
+            "epochDivergence" => Self::EpochDivergence,
+            "manualRecovery" => Self::ManualRecovery,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -22275,7 +22405,10 @@ impl petrel_core::xrpc::QueryValue for ResetReason {
 
 impl petrel_core::xrpc::FromQueryValue for ResetReason {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -22307,17 +22440,21 @@ impl<'de> serde::Deserialize<'de> for ResetReason {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BlobPurpose {
     Attachment,
     Metadata,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl BlobPurpose {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Attachment => "attachment",
             Self::Metadata => "metadata",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -22329,13 +22466,13 @@ impl core::fmt::Display for BlobPurpose {
 }
 
 impl core::str::FromStr for BlobPurpose {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "attachment" => Ok(Self::Attachment),
-            "metadata" => Ok(Self::Metadata),
-            _ => Err("unknown variant for BlobPurpose"),
-        }
+        Ok(match s {
+            "attachment" => Self::Attachment,
+            "metadata" => Self::Metadata,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -22348,11 +22485,11 @@ impl petrel_core::ToValue for BlobPurpose {
 impl petrel_core::FromValue for BlobPurpose {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "attachment" => Ok(Self::Attachment),
-            "metadata" => Ok(Self::Metadata),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for BlobPurpose"))),
-        }
+        Ok(match raw.as_str() {
+            "attachment" => Self::Attachment,
+            "metadata" => Self::Metadata,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -22364,7 +22501,10 @@ impl petrel_core::xrpc::QueryValue for BlobPurpose {
 
 impl petrel_core::xrpc::FromQueryValue for BlobPurpose {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -22416,9 +22556,9 @@ impl petrel_core::ToValue for ParticipantChange {
 impl ParticipantChange {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#addParticipant" => petrel_core::decode_value(value, strict).map(Self::AddParticipant),
-            "blue.catbird.chat.defs#removeParticipant" => petrel_core::decode_value(value, strict).map(Self::RemoveParticipant),
-            "blue.catbird.chat.defs#changeParticipantRole" => petrel_core::decode_value(value, strict).map(Self::ChangeParticipantRole),
+            "blue.catbird.chat.defs#addParticipant" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::AddParticipant),
+            "blue.catbird.chat.defs#removeParticipant" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::RemoveParticipant),
+            "blue.catbird.chat.defs#changeParticipantRole" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ChangeParticipantRole),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -22480,8 +22620,8 @@ impl petrel_core::ToValue for LeafChange {
 impl LeafChange {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#addLeafByRecovery" => petrel_core::decode_value(value, strict).map(Self::AddLeafByRecovery),
-            "blue.catbird.chat.defs#removeLeaf" => petrel_core::decode_value(value, strict).map(Self::RemoveLeaf),
+            "blue.catbird.chat.defs#addLeafByRecovery" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::AddLeafByRecovery),
+            "blue.catbird.chat.defs#removeLeaf" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::RemoveLeaf),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -22525,23 +22665,27 @@ impl<'de> serde::Deserialize<'de> for LeafChange {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EncryptedImageEmbedMimeType {
     ImageHeic,
     ImageJpeg,
     ImagePng,
     ImageWebp,
     ImageGif,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl EncryptedImageEmbedMimeType {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::ImageHeic => "image/heic",
             Self::ImageJpeg => "image/jpeg",
             Self::ImagePng => "image/png",
             Self::ImageWebp => "image/webp",
             Self::ImageGif => "image/gif",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -22553,16 +22697,16 @@ impl core::fmt::Display for EncryptedImageEmbedMimeType {
 }
 
 impl core::str::FromStr for EncryptedImageEmbedMimeType {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "image/heic" => Ok(Self::ImageHeic),
-            "image/jpeg" => Ok(Self::ImageJpeg),
-            "image/png" => Ok(Self::ImagePng),
-            "image/webp" => Ok(Self::ImageWebp),
-            "image/gif" => Ok(Self::ImageGif),
-            _ => Err("unknown variant for EncryptedImageEmbedMimeType"),
-        }
+        Ok(match s {
+            "image/heic" => Self::ImageHeic,
+            "image/jpeg" => Self::ImageJpeg,
+            "image/png" => Self::ImagePng,
+            "image/webp" => Self::ImageWebp,
+            "image/gif" => Self::ImageGif,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -22575,14 +22719,14 @@ impl petrel_core::ToValue for EncryptedImageEmbedMimeType {
 impl petrel_core::FromValue for EncryptedImageEmbedMimeType {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "image/heic" => Ok(Self::ImageHeic),
-            "image/jpeg" => Ok(Self::ImageJpeg),
-            "image/png" => Ok(Self::ImagePng),
-            "image/webp" => Ok(Self::ImageWebp),
-            "image/gif" => Ok(Self::ImageGif),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for EncryptedImageEmbedMimeType"))),
-        }
+        Ok(match raw.as_str() {
+            "image/heic" => Self::ImageHeic,
+            "image/jpeg" => Self::ImageJpeg,
+            "image/png" => Self::ImagePng,
+            "image/webp" => Self::ImageWebp,
+            "image/gif" => Self::ImageGif,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -22594,7 +22738,10 @@ impl petrel_core::xrpc::QueryValue for EncryptedImageEmbedMimeType {
 
 impl petrel_core::xrpc::FromQueryValue for EncryptedImageEmbedMimeType {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -22626,21 +22773,25 @@ impl<'de> serde::Deserialize<'de> for EncryptedImageEmbedMimeType {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EncryptedAudioEmbedMimeType {
     AudioAac,
     AudioMp4,
     AudioOgg,
     AudioOpus,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl EncryptedAudioEmbedMimeType {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::AudioAac => "audio/aac",
             Self::AudioMp4 => "audio/mp4",
             Self::AudioOgg => "audio/ogg",
             Self::AudioOpus => "audio/opus",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -22652,15 +22803,15 @@ impl core::fmt::Display for EncryptedAudioEmbedMimeType {
 }
 
 impl core::str::FromStr for EncryptedAudioEmbedMimeType {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "audio/aac" => Ok(Self::AudioAac),
-            "audio/mp4" => Ok(Self::AudioMp4),
-            "audio/ogg" => Ok(Self::AudioOgg),
-            "audio/opus" => Ok(Self::AudioOpus),
-            _ => Err("unknown variant for EncryptedAudioEmbedMimeType"),
-        }
+        Ok(match s {
+            "audio/aac" => Self::AudioAac,
+            "audio/mp4" => Self::AudioMp4,
+            "audio/ogg" => Self::AudioOgg,
+            "audio/opus" => Self::AudioOpus,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -22673,13 +22824,13 @@ impl petrel_core::ToValue for EncryptedAudioEmbedMimeType {
 impl petrel_core::FromValue for EncryptedAudioEmbedMimeType {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "audio/aac" => Ok(Self::AudioAac),
-            "audio/mp4" => Ok(Self::AudioMp4),
-            "audio/ogg" => Ok(Self::AudioOgg),
-            "audio/opus" => Ok(Self::AudioOpus),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for EncryptedAudioEmbedMimeType"))),
-        }
+        Ok(match raw.as_str() {
+            "audio/aac" => Self::AudioAac,
+            "audio/mp4" => Self::AudioMp4,
+            "audio/ogg" => Self::AudioOgg,
+            "audio/opus" => Self::AudioOpus,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -22691,7 +22842,10 @@ impl petrel_core::xrpc::QueryValue for EncryptedAudioEmbedMimeType {
 
 impl petrel_core::xrpc::FromQueryValue for EncryptedAudioEmbedMimeType {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -22745,10 +22899,10 @@ impl petrel_core::ToValue for ApplicationEmbed {
 impl ApplicationEmbed {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#encryptedImageEmbedVariant" => petrel_core::decode_value(value, strict).map(Self::EncryptedImageEmbedVariant),
-            "blue.catbird.chat.defs#encryptedAudioEmbedVariant" => petrel_core::decode_value(value, strict).map(Self::EncryptedAudioEmbedVariant),
-            "blue.catbird.chat.defs#atprotoRecordEmbedVariant" => petrel_core::decode_value(value, strict).map(Self::AtprotoRecordEmbedVariant),
-            "blue.catbird.chat.defs#externalLinkEmbedVariant" => petrel_core::decode_value(value, strict).map(Self::ExternalLinkEmbedVariant),
+            "blue.catbird.chat.defs#encryptedImageEmbedVariant" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::EncryptedImageEmbedVariant),
+            "blue.catbird.chat.defs#encryptedAudioEmbedVariant" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::EncryptedAudioEmbedVariant),
+            "blue.catbird.chat.defs#atprotoRecordEmbedVariant" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::AtprotoRecordEmbedVariant),
+            "blue.catbird.chat.defs#externalLinkEmbedVariant" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ExternalLinkEmbedVariant),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -22792,17 +22946,21 @@ impl<'de> serde::Deserialize<'de> for ApplicationEmbed {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReactionFrameBodyOperation {
     Add,
     Remove,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl ReactionFrameBodyOperation {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Add => "add",
             Self::Remove => "remove",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -22814,13 +22972,13 @@ impl core::fmt::Display for ReactionFrameBodyOperation {
 }
 
 impl core::str::FromStr for ReactionFrameBodyOperation {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "add" => Ok(Self::Add),
-            "remove" => Ok(Self::Remove),
-            _ => Err("unknown variant for ReactionFrameBodyOperation"),
-        }
+        Ok(match s {
+            "add" => Self::Add,
+            "remove" => Self::Remove,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -22833,11 +22991,11 @@ impl petrel_core::ToValue for ReactionFrameBodyOperation {
 impl petrel_core::FromValue for ReactionFrameBodyOperation {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "add" => Ok(Self::Add),
-            "remove" => Ok(Self::Remove),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for ReactionFrameBodyOperation"))),
-        }
+        Ok(match raw.as_str() {
+            "add" => Self::Add,
+            "remove" => Self::Remove,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -22849,7 +23007,10 @@ impl petrel_core::xrpc::QueryValue for ReactionFrameBodyOperation {
 
 impl petrel_core::xrpc::FromQueryValue for ReactionFrameBodyOperation {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -22905,11 +23066,11 @@ impl petrel_core::ToValue for ApplicationFrameBody {
 impl ApplicationFrameBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#messageFrameVariant" => petrel_core::decode_value(value, strict).map(Self::MessageFrameVariant),
-            "blue.catbird.chat.defs#reactionFrameVariant" => petrel_core::decode_value(value, strict).map(Self::ReactionFrameVariant),
-            "blue.catbird.chat.defs#editFrameVariant" => petrel_core::decode_value(value, strict).map(Self::EditFrameVariant),
-            "blue.catbird.chat.defs#tombstoneFrameVariant" => petrel_core::decode_value(value, strict).map(Self::TombstoneFrameVariant),
-            "blue.catbird.chat.defs#readStateFrameVariant" => petrel_core::decode_value(value, strict).map(Self::ReadStateFrameVariant),
+            "blue.catbird.chat.defs#messageFrameVariant" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::MessageFrameVariant),
+            "blue.catbird.chat.defs#reactionFrameVariant" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ReactionFrameVariant),
+            "blue.catbird.chat.defs#editFrameVariant" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::EditFrameVariant),
+            "blue.catbird.chat.defs#tombstoneFrameVariant" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::TombstoneFrameVariant),
+            "blue.catbird.chat.defs#readStateFrameVariant" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ReadStateFrameVariant),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -22953,21 +23114,25 @@ impl<'de> serde::Deserialize<'de> for ApplicationFrameBody {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MetadataAvatarEmbedMimeType {
     ImageHeic,
     ImageJpeg,
     ImagePng,
     ImageWebp,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl MetadataAvatarEmbedMimeType {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::ImageHeic => "image/heic",
             Self::ImageJpeg => "image/jpeg",
             Self::ImagePng => "image/png",
             Self::ImageWebp => "image/webp",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -22979,15 +23144,15 @@ impl core::fmt::Display for MetadataAvatarEmbedMimeType {
 }
 
 impl core::str::FromStr for MetadataAvatarEmbedMimeType {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "image/heic" => Ok(Self::ImageHeic),
-            "image/jpeg" => Ok(Self::ImageJpeg),
-            "image/png" => Ok(Self::ImagePng),
-            "image/webp" => Ok(Self::ImageWebp),
-            _ => Err("unknown variant for MetadataAvatarEmbedMimeType"),
-        }
+        Ok(match s {
+            "image/heic" => Self::ImageHeic,
+            "image/jpeg" => Self::ImageJpeg,
+            "image/png" => Self::ImagePng,
+            "image/webp" => Self::ImageWebp,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -23000,13 +23165,13 @@ impl petrel_core::ToValue for MetadataAvatarEmbedMimeType {
 impl petrel_core::FromValue for MetadataAvatarEmbedMimeType {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "image/heic" => Ok(Self::ImageHeic),
-            "image/jpeg" => Ok(Self::ImageJpeg),
-            "image/png" => Ok(Self::ImagePng),
-            "image/webp" => Ok(Self::ImageWebp),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for MetadataAvatarEmbedMimeType"))),
-        }
+        Ok(match raw.as_str() {
+            "image/heic" => Self::ImageHeic,
+            "image/jpeg" => Self::ImageJpeg,
+            "image/png" => Self::ImagePng,
+            "image/webp" => Self::ImageWebp,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -23018,7 +23183,10 @@ impl petrel_core::xrpc::QueryValue for MetadataAvatarEmbedMimeType {
 
 impl petrel_core::xrpc::FromQueryValue for MetadataAvatarEmbedMimeType {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -23050,23 +23218,27 @@ impl<'de> serde::Deserialize<'de> for MetadataAvatarEmbedMimeType {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ResetRequestViewStatus {
     Pending,
     Stale,
     Consumed,
     Expired,
     Revoked,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl ResetRequestViewStatus {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Pending => "pending",
             Self::Stale => "stale",
             Self::Consumed => "consumed",
             Self::Expired => "expired",
             Self::Revoked => "revoked",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -23078,16 +23250,16 @@ impl core::fmt::Display for ResetRequestViewStatus {
 }
 
 impl core::str::FromStr for ResetRequestViewStatus {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "pending" => Ok(Self::Pending),
-            "stale" => Ok(Self::Stale),
-            "consumed" => Ok(Self::Consumed),
-            "expired" => Ok(Self::Expired),
-            "revoked" => Ok(Self::Revoked),
-            _ => Err("unknown variant for ResetRequestViewStatus"),
-        }
+        Ok(match s {
+            "pending" => Self::Pending,
+            "stale" => Self::Stale,
+            "consumed" => Self::Consumed,
+            "expired" => Self::Expired,
+            "revoked" => Self::Revoked,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -23100,14 +23272,14 @@ impl petrel_core::ToValue for ResetRequestViewStatus {
 impl petrel_core::FromValue for ResetRequestViewStatus {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "pending" => Ok(Self::Pending),
-            "stale" => Ok(Self::Stale),
-            "consumed" => Ok(Self::Consumed),
-            "expired" => Ok(Self::Expired),
-            "revoked" => Ok(Self::Revoked),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for ResetRequestViewStatus"))),
-        }
+        Ok(match raw.as_str() {
+            "pending" => Self::Pending,
+            "stale" => Self::Stale,
+            "consumed" => Self::Consumed,
+            "expired" => Self::Expired,
+            "revoked" => Self::Revoked,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -23119,7 +23291,10 @@ impl petrel_core::xrpc::QueryValue for ResetRequestViewStatus {
 
 impl petrel_core::xrpc::FromQueryValue for ResetRequestViewStatus {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -23173,10 +23348,10 @@ impl petrel_core::ToValue for RecoveryWorkView {
 impl RecoveryWorkView {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#recoveryWorkPendingView" => petrel_core::decode_value(value, strict).map(Self::RecoveryWorkPendingView),
-            "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView" => petrel_core::decode_value(value, strict).map(Self::RecoveryWorkCompletedByTransitionView),
-            "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView" => petrel_core::decode_value(value, strict).map(Self::RecoveryWorkSupersededByTransitionView),
-            "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView" => petrel_core::decode_value(value, strict).map(Self::RecoveryWorkSupersededByRevocationView),
+            "blue.catbird.chat.defs#recoveryWorkPendingView" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::RecoveryWorkPendingView),
+            "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::RecoveryWorkCompletedByTransitionView),
+            "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::RecoveryWorkSupersededByTransitionView),
+            "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::RecoveryWorkSupersededByRevocationView),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -23244,11 +23419,11 @@ impl petrel_core::ToValue for LeafRecoveryInboxItem {
 impl LeafRecoveryInboxItem {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#leafRecoveryView" => petrel_core::decode_value(value, strict).map(Self::LeafRecoveryView),
-            "blue.catbird.chat.defs#recoveryWorkPendingView" => petrel_core::decode_value(value, strict).map(Self::RecoveryWorkPendingView),
-            "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView" => petrel_core::decode_value(value, strict).map(Self::RecoveryWorkCompletedByTransitionView),
-            "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView" => petrel_core::decode_value(value, strict).map(Self::RecoveryWorkSupersededByTransitionView),
-            "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView" => petrel_core::decode_value(value, strict).map(Self::RecoveryWorkSupersededByRevocationView),
+            "blue.catbird.chat.defs#leafRecoveryView" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LeafRecoveryView),
+            "blue.catbird.chat.defs#recoveryWorkPendingView" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::RecoveryWorkPendingView),
+            "blue.catbird.chat.defs#recoveryWorkCompletedByTransitionView" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::RecoveryWorkCompletedByTransitionView),
+            "blue.catbird.chat.defs#recoveryWorkSupersededByTransitionView" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::RecoveryWorkSupersededByTransitionView),
+            "blue.catbird.chat.defs#recoveryWorkSupersededByRevocationView" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::RecoveryWorkSupersededByRevocationView),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -23310,8 +23485,8 @@ impl petrel_core::ToValue for LeaveOperationResult {
 impl LeaveOperationResult {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#durableLeaveRequestResult" => petrel_core::decode_value(value, strict).map(Self::DurableLeaveRequestResult),
-            "blue.catbird.chat.defs#zeroLeafLeaveResult" => petrel_core::decode_value(value, strict).map(Self::ZeroLeafLeaveResult),
+            "blue.catbird.chat.defs#durableLeaveRequestResult" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DurableLeaveRequestResult),
+            "blue.catbird.chat.defs#zeroLeafLeaveResult" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ZeroLeafLeaveResult),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -23373,8 +23548,8 @@ impl petrel_core::ToValue for ConversationCreationResult {
 impl ConversationCreationResult {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#conversationCreatedResult" => petrel_core::decode_value(value, strict).map(Self::ConversationCreatedResult),
-            "blue.catbird.chat.defs#existingDirectConversationResult" => petrel_core::decode_value(value, strict).map(Self::ExistingDirectConversationResult),
+            "blue.catbird.chat.defs#conversationCreatedResult" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ConversationCreatedResult),
+            "blue.catbird.chat.defs#existingDirectConversationResult" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ExistingDirectConversationResult),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -23434,7 +23609,7 @@ impl petrel_core::ToValue for SignedDeviceEnrollmentBody {
 impl SignedDeviceEnrollmentBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#deviceEnrollmentBody" => petrel_core::decode_value(value, strict).map(Self::DeviceEnrollmentBody),
+            "blue.catbird.chat.defs#deviceEnrollmentBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DeviceEnrollmentBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -23494,7 +23669,7 @@ impl petrel_core::ToValue for SignedKeyPackageReplenishmentBody {
 impl SignedKeyPackageReplenishmentBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#keyPackageReplenishmentBody" => petrel_core::decode_value(value, strict).map(Self::KeyPackageReplenishmentBody),
+            "blue.catbird.chat.defs#keyPackageReplenishmentBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::KeyPackageReplenishmentBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -23554,7 +23729,7 @@ impl petrel_core::ToValue for SignedDeviceRevocationBody {
 impl SignedDeviceRevocationBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#deviceRevocationBody" => petrel_core::decode_value(value, strict).map(Self::DeviceRevocationBody),
+            "blue.catbird.chat.defs#deviceRevocationBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DeviceRevocationBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -23614,7 +23789,7 @@ impl petrel_core::ToValue for SignedDeviceApprovalBody {
 impl SignedDeviceApprovalBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#deviceApprovalBody" => petrel_core::decode_value(value, strict).map(Self::DeviceApprovalBody),
+            "blue.catbird.chat.defs#deviceApprovalBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DeviceApprovalBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -23674,7 +23849,7 @@ impl petrel_core::ToValue for SignedBlobUploadPreparationBody {
 impl SignedBlobUploadPreparationBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#blobUploadPreparationBody" => petrel_core::decode_value(value, strict).map(Self::BlobUploadPreparationBody),
+            "blue.catbird.chat.defs#blobUploadPreparationBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::BlobUploadPreparationBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -23734,7 +23909,7 @@ impl petrel_core::ToValue for SignedBlobDeletionBody {
 impl SignedBlobDeletionBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#blobDeletionBody" => petrel_core::decode_value(value, strict).map(Self::BlobDeletionBody),
+            "blue.catbird.chat.defs#blobDeletionBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::BlobDeletionBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -23794,7 +23969,7 @@ impl petrel_core::ToValue for SignedCreationBody {
 impl SignedCreationBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#creationBody" => petrel_core::decode_value(value, strict).map(Self::CreationBody),
+            "blue.catbird.chat.defs#creationBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::CreationBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -23854,7 +24029,7 @@ impl petrel_core::ToValue for SignedCommitTransitionBody {
 impl SignedCommitTransitionBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#commitTransitionBody" => petrel_core::decode_value(value, strict).map(Self::CommitTransitionBody),
+            "blue.catbird.chat.defs#commitTransitionBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::CommitTransitionBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -23914,7 +24089,7 @@ impl petrel_core::ToValue for SignedPolicyTransitionBody {
 impl SignedPolicyTransitionBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#policyTransitionBody" => petrel_core::decode_value(value, strict).map(Self::PolicyTransitionBody),
+            "blue.catbird.chat.defs#policyTransitionBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::PolicyTransitionBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -23974,7 +24149,7 @@ impl petrel_core::ToValue for SignedParticipantAcceptanceBody {
 impl SignedParticipantAcceptanceBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#participantAcceptanceBody" => petrel_core::decode_value(value, strict).map(Self::ParticipantAcceptanceBody),
+            "blue.catbird.chat.defs#participantAcceptanceBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ParticipantAcceptanceBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24034,7 +24209,7 @@ impl petrel_core::ToValue for SignedApplicationSendBody {
 impl SignedApplicationSendBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#applicationSendBody" => petrel_core::decode_value(value, strict).map(Self::ApplicationSendBody),
+            "blue.catbird.chat.defs#applicationSendBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ApplicationSendBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24094,7 +24269,7 @@ impl petrel_core::ToValue for SignedTypingBody {
 impl SignedTypingBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#typingBody" => petrel_core::decode_value(value, strict).map(Self::TypingBody),
+            "blue.catbird.chat.defs#typingBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::TypingBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24154,7 +24329,7 @@ impl petrel_core::ToValue for SignedMetadataTransitionBody {
 impl SignedMetadataTransitionBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#metadataTransitionBody" => petrel_core::decode_value(value, strict).map(Self::MetadataTransitionBody),
+            "blue.catbird.chat.defs#metadataTransitionBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::MetadataTransitionBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24214,7 +24389,7 @@ impl petrel_core::ToValue for SignedResetRequestBody {
 impl SignedResetRequestBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#resetRequestBody" => petrel_core::decode_value(value, strict).map(Self::ResetRequestBody),
+            "blue.catbird.chat.defs#resetRequestBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ResetRequestBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24274,7 +24449,7 @@ impl petrel_core::ToValue for SignedResetActivationBody {
 impl SignedResetActivationBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#resetActivationBody" => petrel_core::decode_value(value, strict).map(Self::ResetActivationBody),
+            "blue.catbird.chat.defs#resetActivationBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ResetActivationBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24334,7 +24509,7 @@ impl petrel_core::ToValue for SignedLeafRecoveryRequestBody {
 impl SignedLeafRecoveryRequestBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#leafRecoveryRequestBody" => petrel_core::decode_value(value, strict).map(Self::LeafRecoveryRequestBody),
+            "blue.catbird.chat.defs#leafRecoveryRequestBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LeafRecoveryRequestBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24394,7 +24569,7 @@ impl petrel_core::ToValue for SignedLeafRecoveryCancellationBody {
 impl SignedLeafRecoveryCancellationBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#leafRecoveryCancellationBody" => petrel_core::decode_value(value, strict).map(Self::LeafRecoveryCancellationBody),
+            "blue.catbird.chat.defs#leafRecoveryCancellationBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LeafRecoveryCancellationBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24454,7 +24629,7 @@ impl petrel_core::ToValue for SignedLeafRecoveryFulfillmentBody {
 impl SignedLeafRecoveryFulfillmentBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#leafRecoveryFulfillmentBody" => petrel_core::decode_value(value, strict).map(Self::LeafRecoveryFulfillmentBody),
+            "blue.catbird.chat.defs#leafRecoveryFulfillmentBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LeafRecoveryFulfillmentBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24514,7 +24689,7 @@ impl petrel_core::ToValue for SignedConversationCloseBody {
 impl SignedConversationCloseBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#conversationCloseBody" => petrel_core::decode_value(value, strict).map(Self::ConversationCloseBody),
+            "blue.catbird.chat.defs#conversationCloseBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ConversationCloseBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24574,7 +24749,7 @@ impl petrel_core::ToValue for SignedLeaveRequestBody {
 impl SignedLeaveRequestBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#leaveRequestBody" => petrel_core::decode_value(value, strict).map(Self::LeaveRequestBody),
+            "blue.catbird.chat.defs#leaveRequestBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LeaveRequestBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24634,7 +24809,7 @@ impl petrel_core::ToValue for SignedZeroLeafLeaveBody {
 impl SignedZeroLeafLeaveBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#zeroLeafLeaveBody" => petrel_core::decode_value(value, strict).map(Self::ZeroLeafLeaveBody),
+            "blue.catbird.chat.defs#zeroLeafLeaveBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ZeroLeafLeaveBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24696,8 +24871,8 @@ impl petrel_core::ToValue for SignedLeaveOperation {
 impl SignedLeaveOperation {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#signedLeaveRequest" => petrel_core::decode_value(value, strict).map(Self::SignedLeaveRequest),
-            "blue.catbird.chat.defs#signedZeroLeafLeave" => petrel_core::decode_value(value, strict).map(Self::SignedZeroLeafLeave),
+            "blue.catbird.chat.defs#signedLeaveRequest" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::SignedLeaveRequest),
+            "blue.catbird.chat.defs#signedZeroLeafLeave" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::SignedZeroLeafLeave),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24757,7 +24932,7 @@ impl petrel_core::ToValue for SignedLeaveCancellationBody {
 impl SignedLeaveCancellationBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#leaveCancellationBody" => petrel_core::decode_value(value, strict).map(Self::LeaveCancellationBody),
+            "blue.catbird.chat.defs#leaveCancellationBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LeaveCancellationBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24817,7 +24992,7 @@ impl petrel_core::ToValue for SignedLeaveCommitFulfillmentBody {
 impl SignedLeaveCommitFulfillmentBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#leaveCommitFulfillmentBody" => petrel_core::decode_value(value, strict).map(Self::LeaveCommitFulfillmentBody),
+            "blue.catbird.chat.defs#leaveCommitFulfillmentBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LeaveCommitFulfillmentBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24877,7 +25052,7 @@ impl petrel_core::ToValue for SignedWelcomeAcknowledgementBody {
 impl SignedWelcomeAcknowledgementBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#welcomeAcknowledgementBody" => petrel_core::decode_value(value, strict).map(Self::WelcomeAcknowledgementBody),
+            "blue.catbird.chat.defs#welcomeAcknowledgementBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::WelcomeAcknowledgementBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -24937,7 +25112,7 @@ impl petrel_core::ToValue for SignedWelcomeRejectionBody {
 impl SignedWelcomeRejectionBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#welcomeRejectionBody" => petrel_core::decode_value(value, strict).map(Self::WelcomeRejectionBody),
+            "blue.catbird.chat.defs#welcomeRejectionBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::WelcomeRejectionBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -25005,11 +25180,11 @@ impl petrel_core::ToValue for SignedTransition {
 impl SignedTransition {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#signedCommitTransition" => petrel_core::decode_value(value, strict).map(Self::SignedCommitTransition),
-            "blue.catbird.chat.defs#signedPolicyTransition" => petrel_core::decode_value(value, strict).map(Self::SignedPolicyTransition),
-            "blue.catbird.chat.defs#signedLeafRecoveryFulfillment" => petrel_core::decode_value(value, strict).map(Self::SignedLeafRecoveryFulfillment),
-            "blue.catbird.chat.defs#signedMetadataTransition" => petrel_core::decode_value(value, strict).map(Self::SignedMetadataTransition),
-            "blue.catbird.chat.defs#signedLeaveCommitFulfillment" => petrel_core::decode_value(value, strict).map(Self::SignedLeaveCommitFulfillment),
+            "blue.catbird.chat.defs#signedCommitTransition" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::SignedCommitTransition),
+            "blue.catbird.chat.defs#signedPolicyTransition" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::SignedPolicyTransition),
+            "blue.catbird.chat.defs#signedLeafRecoveryFulfillment" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::SignedLeafRecoveryFulfillment),
+            "blue.catbird.chat.defs#signedMetadataTransition" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::SignedMetadataTransition),
+            "blue.catbird.chat.defs#signedLeaveCommitFulfillment" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::SignedLeaveCommitFulfillment),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -25073,9 +25248,9 @@ impl petrel_core::ToValue for ConversationInventoryItem {
 impl ConversationInventoryItem {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#conversationInventoryState" => petrel_core::decode_value(value, strict).map(Self::ConversationInventoryState),
-            "blue.catbird.chat.defs#conversationRemovalTombstone" => petrel_core::decode_value(value, strict).map(Self::ConversationRemovalTombstone),
-            "blue.catbird.chat.defs#conversationCloseTombstone" => petrel_core::decode_value(value, strict).map(Self::ConversationCloseTombstone),
+            "blue.catbird.chat.defs#conversationInventoryState" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ConversationInventoryState),
+            "blue.catbird.chat.defs#conversationRemovalTombstone" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ConversationRemovalTombstone),
+            "blue.catbird.chat.defs#conversationCloseTombstone" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ConversationCloseTombstone),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -25167,23 +25342,23 @@ impl petrel_core::ToValue for ConversationEntry {
 impl ConversationEntry {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#applicationEntry" => petrel_core::decode_value(value, strict).map(Self::ApplicationEntry),
-            "blue.catbird.chat.defs#commitEntry" => petrel_core::decode_value(value, strict).map(Self::CommitEntry),
-            "blue.catbird.chat.defs#policyEntry" => petrel_core::decode_value(value, strict).map(Self::PolicyEntry),
-            "blue.catbird.chat.defs#metadataEntry" => petrel_core::decode_value(value, strict).map(Self::MetadataEntry),
-            "blue.catbird.chat.defs#creationEntry" => petrel_core::decode_value(value, strict).map(Self::CreationEntry),
-            "blue.catbird.chat.defs#participantAcceptanceEntry" => petrel_core::decode_value(value, strict).map(Self::ParticipantAcceptanceEntry),
-            "blue.catbird.chat.defs#conversationCloseEntry" => petrel_core::decode_value(value, strict).map(Self::ConversationCloseEntry),
-            "blue.catbird.chat.defs#resetRequestEntry" => petrel_core::decode_value(value, strict).map(Self::ResetRequestEntry),
-            "blue.catbird.chat.defs#resetActivationEntry" => petrel_core::decode_value(value, strict).map(Self::ResetActivationEntry),
-            "blue.catbird.chat.defs#leafRecoveryFulfillmentEntry" => petrel_core::decode_value(value, strict).map(Self::LeafRecoveryFulfillmentEntry),
-            "blue.catbird.chat.defs#leaveRequestEntry" => petrel_core::decode_value(value, strict).map(Self::LeaveRequestEntry),
-            "blue.catbird.chat.defs#zeroLeafLeaveEntry" => petrel_core::decode_value(value, strict).map(Self::ZeroLeafLeaveEntry),
-            "blue.catbird.chat.defs#leaveCancellationEntry" => petrel_core::decode_value(value, strict).map(Self::LeaveCancellationEntry),
-            "blue.catbird.chat.defs#leaveCommitFulfillmentEntry" => petrel_core::decode_value(value, strict).map(Self::LeaveCommitFulfillmentEntry),
-            "blue.catbird.chat.defs#directRequestEntry" => petrel_core::decode_value(value, strict).map(Self::DirectRequestEntry),
-            "blue.catbird.chat.defs#directRequestAcceptanceEntry" => petrel_core::decode_value(value, strict).map(Self::DirectRequestAcceptanceEntry),
-            "blue.catbird.chat.defs#accountDeletedEntry" => petrel_core::decode_value(value, strict).map(Self::AccountDeletedEntry),
+            "blue.catbird.chat.defs#applicationEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ApplicationEntry),
+            "blue.catbird.chat.defs#commitEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::CommitEntry),
+            "blue.catbird.chat.defs#policyEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::PolicyEntry),
+            "blue.catbird.chat.defs#metadataEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::MetadataEntry),
+            "blue.catbird.chat.defs#creationEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::CreationEntry),
+            "blue.catbird.chat.defs#participantAcceptanceEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ParticipantAcceptanceEntry),
+            "blue.catbird.chat.defs#conversationCloseEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ConversationCloseEntry),
+            "blue.catbird.chat.defs#resetRequestEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ResetRequestEntry),
+            "blue.catbird.chat.defs#resetActivationEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ResetActivationEntry),
+            "blue.catbird.chat.defs#leafRecoveryFulfillmentEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LeafRecoveryFulfillmentEntry),
+            "blue.catbird.chat.defs#leaveRequestEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LeaveRequestEntry),
+            "blue.catbird.chat.defs#zeroLeafLeaveEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ZeroLeafLeaveEntry),
+            "blue.catbird.chat.defs#leaveCancellationEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LeaveCancellationEntry),
+            "blue.catbird.chat.defs#leaveCommitFulfillmentEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LeaveCommitFulfillmentEntry),
+            "blue.catbird.chat.defs#directRequestEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestEntry),
+            "blue.catbird.chat.defs#directRequestAcceptanceEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestAcceptanceEntry),
+            "blue.catbird.chat.defs#accountDeletedEntry" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::AccountDeletedEntry),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -25261,16 +25436,16 @@ impl petrel_core::ToValue for ProtocolEventPayload {
 impl ProtocolEventPayload {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#conversationChangedEvent" => petrel_core::decode_value(value, strict).map(Self::ConversationChangedEvent),
-            "blue.catbird.chat.defs#conversationClosedEvent" => petrel_core::decode_value(value, strict).map(Self::ConversationClosedEvent),
-            "blue.catbird.chat.defs#messageAvailableEvent" => petrel_core::decode_value(value, strict).map(Self::MessageAvailableEvent),
-            "blue.catbird.chat.defs#welcomeAvailableEvent" => petrel_core::decode_value(value, strict).map(Self::WelcomeAvailableEvent),
-            "blue.catbird.chat.defs#welcomeDispositionEvent" => petrel_core::decode_value(value, strict).map(Self::WelcomeDispositionEvent),
-            "blue.catbird.chat.defs#resetRequestedEvent" => petrel_core::decode_value(value, strict).map(Self::ResetRequestedEvent),
-            "blue.catbird.chat.defs#leafRecoveryEvent" => petrel_core::decode_value(value, strict).map(Self::LeafRecoveryEvent),
-            "blue.catbird.chat.defs#leaveRequestEvent" => petrel_core::decode_value(value, strict).map(Self::LeaveRequestEvent),
-            "blue.catbird.chat.defs#accessEndedEvent" => petrel_core::decode_value(value, strict).map(Self::AccessEndedEvent),
-            "blue.catbird.chat.defs#watermarkEvent" => petrel_core::decode_value(value, strict).map(Self::WatermarkEvent),
+            "blue.catbird.chat.defs#conversationChangedEvent" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ConversationChangedEvent),
+            "blue.catbird.chat.defs#conversationClosedEvent" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ConversationClosedEvent),
+            "blue.catbird.chat.defs#messageAvailableEvent" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::MessageAvailableEvent),
+            "blue.catbird.chat.defs#welcomeAvailableEvent" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::WelcomeAvailableEvent),
+            "blue.catbird.chat.defs#welcomeDispositionEvent" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::WelcomeDispositionEvent),
+            "blue.catbird.chat.defs#resetRequestedEvent" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ResetRequestedEvent),
+            "blue.catbird.chat.defs#leafRecoveryEvent" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LeafRecoveryEvent),
+            "blue.catbird.chat.defs#leaveRequestEvent" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LeaveRequestEvent),
+            "blue.catbird.chat.defs#accessEndedEvent" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::AccessEndedEvent),
+            "blue.catbird.chat.defs#watermarkEvent" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::WatermarkEvent),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -25332,8 +25507,8 @@ impl petrel_core::ToValue for SubscriptionMessage {
 impl SubscriptionMessage {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#eventEnvelope" => petrel_core::decode_value(value, strict).map(Self::EventEnvelope),
-            "blue.catbird.chat.defs#typingEvent" => petrel_core::decode_value(value, strict).map(Self::TypingEvent),
+            "blue.catbird.chat.defs#eventEnvelope" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::EventEnvelope),
+            "blue.catbird.chat.defs#typingEvent" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::TypingEvent),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -25395,8 +25570,8 @@ impl petrel_core::ToValue for DirectRequestOrigin {
 impl DirectRequestOrigin {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#freshDirectOrigin" => petrel_core::decode_value(value, strict).map(Self::FreshDirectOrigin),
-            "blue.catbird.chat.defs#legacyPendingDirectOrigin" => petrel_core::decode_value(value, strict).map(Self::LegacyPendingDirectOrigin),
+            "blue.catbird.chat.defs#freshDirectOrigin" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::FreshDirectOrigin),
+            "blue.catbird.chat.defs#legacyPendingDirectOrigin" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LegacyPendingDirectOrigin),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -25456,7 +25631,7 @@ impl petrel_core::ToValue for SignedDirectRequestGrantBody {
 impl SignedDirectRequestGrantBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#directRequestGrantBody" => petrel_core::decode_value(value, strict).map(Self::DirectRequestGrantBody),
+            "blue.catbird.chat.defs#directRequestGrantBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestGrantBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -25516,7 +25691,7 @@ impl petrel_core::ToValue for SignedDirectRequestKeysPublicationBody {
 impl SignedDirectRequestKeysPublicationBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#directRequestKeysPublicationBody" => petrel_core::decode_value(value, strict).map(Self::DirectRequestKeysPublicationBody),
+            "blue.catbird.chat.defs#directRequestKeysPublicationBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestKeysPublicationBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -25576,7 +25751,7 @@ impl petrel_core::ToValue for SignedDirectRequestPreparationBody {
 impl SignedDirectRequestPreparationBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#directRequestPreparationBody" => petrel_core::decode_value(value, strict).map(Self::DirectRequestPreparationBody),
+            "blue.catbird.chat.defs#directRequestPreparationBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestPreparationBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -25636,7 +25811,7 @@ impl petrel_core::ToValue for SignedDirectRequestPublicationBody {
 impl SignedDirectRequestPublicationBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#directRequestPublicationBody" => petrel_core::decode_value(value, strict).map(Self::DirectRequestPublicationBody),
+            "blue.catbird.chat.defs#directRequestPublicationBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestPublicationBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -25696,7 +25871,7 @@ impl petrel_core::ToValue for SignedDirectRequestCancellationBody {
 impl SignedDirectRequestCancellationBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#directRequestCancellationBody" => petrel_core::decode_value(value, strict).map(Self::DirectRequestCancellationBody),
+            "blue.catbird.chat.defs#directRequestCancellationBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestCancellationBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -25756,7 +25931,7 @@ impl petrel_core::ToValue for SignedDirectRequestAcceptanceBody {
 impl SignedDirectRequestAcceptanceBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#directRequestAcceptanceBody" => petrel_core::decode_value(value, strict).map(Self::DirectRequestAcceptanceBody),
+            "blue.catbird.chat.defs#directRequestAcceptanceBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestAcceptanceBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -25800,7 +25975,7 @@ impl<'de> serde::Deserialize<'de> for SignedDirectRequestAcceptanceBody {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DirectRequestErrorCode {
     RecipientKeysUnavailable,
     RequestPolicyDenied,
@@ -25821,10 +25996,13 @@ pub enum DirectRequestErrorCode {
     UnavailableIntroduction,
     RateLimited,
     RecipientAuthorityUnsupported,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl DirectRequestErrorCode {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::RecipientKeysUnavailable => "RecipientKeysUnavailable",
             Self::RequestPolicyDenied => "RequestPolicyDenied",
@@ -25845,6 +26023,7 @@ impl DirectRequestErrorCode {
             Self::UnavailableIntroduction => "UnavailableIntroduction",
             Self::RateLimited => "RateLimited",
             Self::RecipientAuthorityUnsupported => "RecipientAuthorityUnsupported",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -25856,30 +26035,30 @@ impl core::fmt::Display for DirectRequestErrorCode {
 }
 
 impl core::str::FromStr for DirectRequestErrorCode {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "RecipientKeysUnavailable" => Ok(Self::RecipientKeysUnavailable),
-            "RequestPolicyDenied" => Ok(Self::RequestPolicyDenied),
-            "PreparationExpired" => Ok(Self::PreparationExpired),
-            "PreparationCancelled" => Ok(Self::PreparationCancelled),
-            "PreparationRevoked" => Ok(Self::PreparationRevoked),
-            "PreparationConflict" => Ok(Self::PreparationConflict),
-            "ExistingDirect" => Ok(Self::ExistingDirect),
-            "ArtifactTooLarge" => Ok(Self::ArtifactTooLarge),
-            "CapacityUnavailable" => Ok(Self::CapacityUnavailable),
-            "InvalidBootstrap" => Ok(Self::InvalidBootstrap),
-            "ImportHorizonTooShort" => Ok(Self::ImportHorizonTooShort),
-            "StaleLegacyPrior" => Ok(Self::StaleLegacyPrior),
-            "InvalidSignature" => Ok(Self::InvalidSignature),
-            "IdempotencyConflict" => Ok(Self::IdempotencyConflict),
-            "ProtocolUpgradeRequired" => Ok(Self::ProtocolUpgradeRequired),
-            "RequestNotAccepted" => Ok(Self::RequestNotAccepted),
-            "UnavailableIntroduction" => Ok(Self::UnavailableIntroduction),
-            "RateLimited" => Ok(Self::RateLimited),
-            "RecipientAuthorityUnsupported" => Ok(Self::RecipientAuthorityUnsupported),
-            _ => Err("unknown variant for DirectRequestErrorCode"),
-        }
+        Ok(match s {
+            "RecipientKeysUnavailable" => Self::RecipientKeysUnavailable,
+            "RequestPolicyDenied" => Self::RequestPolicyDenied,
+            "PreparationExpired" => Self::PreparationExpired,
+            "PreparationCancelled" => Self::PreparationCancelled,
+            "PreparationRevoked" => Self::PreparationRevoked,
+            "PreparationConflict" => Self::PreparationConflict,
+            "ExistingDirect" => Self::ExistingDirect,
+            "ArtifactTooLarge" => Self::ArtifactTooLarge,
+            "CapacityUnavailable" => Self::CapacityUnavailable,
+            "InvalidBootstrap" => Self::InvalidBootstrap,
+            "ImportHorizonTooShort" => Self::ImportHorizonTooShort,
+            "StaleLegacyPrior" => Self::StaleLegacyPrior,
+            "InvalidSignature" => Self::InvalidSignature,
+            "IdempotencyConflict" => Self::IdempotencyConflict,
+            "ProtocolUpgradeRequired" => Self::ProtocolUpgradeRequired,
+            "RequestNotAccepted" => Self::RequestNotAccepted,
+            "UnavailableIntroduction" => Self::UnavailableIntroduction,
+            "RateLimited" => Self::RateLimited,
+            "RecipientAuthorityUnsupported" => Self::RecipientAuthorityUnsupported,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -25892,28 +26071,28 @@ impl petrel_core::ToValue for DirectRequestErrorCode {
 impl petrel_core::FromValue for DirectRequestErrorCode {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "RecipientKeysUnavailable" => Ok(Self::RecipientKeysUnavailable),
-            "RequestPolicyDenied" => Ok(Self::RequestPolicyDenied),
-            "PreparationExpired" => Ok(Self::PreparationExpired),
-            "PreparationCancelled" => Ok(Self::PreparationCancelled),
-            "PreparationRevoked" => Ok(Self::PreparationRevoked),
-            "PreparationConflict" => Ok(Self::PreparationConflict),
-            "ExistingDirect" => Ok(Self::ExistingDirect),
-            "ArtifactTooLarge" => Ok(Self::ArtifactTooLarge),
-            "CapacityUnavailable" => Ok(Self::CapacityUnavailable),
-            "InvalidBootstrap" => Ok(Self::InvalidBootstrap),
-            "ImportHorizonTooShort" => Ok(Self::ImportHorizonTooShort),
-            "StaleLegacyPrior" => Ok(Self::StaleLegacyPrior),
-            "InvalidSignature" => Ok(Self::InvalidSignature),
-            "IdempotencyConflict" => Ok(Self::IdempotencyConflict),
-            "ProtocolUpgradeRequired" => Ok(Self::ProtocolUpgradeRequired),
-            "RequestNotAccepted" => Ok(Self::RequestNotAccepted),
-            "UnavailableIntroduction" => Ok(Self::UnavailableIntroduction),
-            "RateLimited" => Ok(Self::RateLimited),
-            "RecipientAuthorityUnsupported" => Ok(Self::RecipientAuthorityUnsupported),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for DirectRequestErrorCode"))),
-        }
+        Ok(match raw.as_str() {
+            "RecipientKeysUnavailable" => Self::RecipientKeysUnavailable,
+            "RequestPolicyDenied" => Self::RequestPolicyDenied,
+            "PreparationExpired" => Self::PreparationExpired,
+            "PreparationCancelled" => Self::PreparationCancelled,
+            "PreparationRevoked" => Self::PreparationRevoked,
+            "PreparationConflict" => Self::PreparationConflict,
+            "ExistingDirect" => Self::ExistingDirect,
+            "ArtifactTooLarge" => Self::ArtifactTooLarge,
+            "CapacityUnavailable" => Self::CapacityUnavailable,
+            "InvalidBootstrap" => Self::InvalidBootstrap,
+            "ImportHorizonTooShort" => Self::ImportHorizonTooShort,
+            "StaleLegacyPrior" => Self::StaleLegacyPrior,
+            "InvalidSignature" => Self::InvalidSignature,
+            "IdempotencyConflict" => Self::IdempotencyConflict,
+            "ProtocolUpgradeRequired" => Self::ProtocolUpgradeRequired,
+            "RequestNotAccepted" => Self::RequestNotAccepted,
+            "UnavailableIntroduction" => Self::UnavailableIntroduction,
+            "RateLimited" => Self::RateLimited,
+            "RecipientAuthorityUnsupported" => Self::RecipientAuthorityUnsupported,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -25925,7 +26104,10 @@ impl petrel_core::xrpc::QueryValue for DirectRequestErrorCode {
 
 impl petrel_core::xrpc::FromQueryValue for DirectRequestErrorCode {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -25957,17 +26139,21 @@ impl<'de> serde::Deserialize<'de> for DirectRequestErrorCode {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DirectRequestRejectedReceiptRequestKind {
     Prepare,
     Publish,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl DirectRequestRejectedReceiptRequestKind {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Prepare => "prepare",
             Self::Publish => "publish",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -25979,13 +26165,13 @@ impl core::fmt::Display for DirectRequestRejectedReceiptRequestKind {
 }
 
 impl core::str::FromStr for DirectRequestRejectedReceiptRequestKind {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "prepare" => Ok(Self::Prepare),
-            "publish" => Ok(Self::Publish),
-            _ => Err("unknown variant for DirectRequestRejectedReceiptRequestKind"),
-        }
+        Ok(match s {
+            "prepare" => Self::Prepare,
+            "publish" => Self::Publish,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -25998,11 +26184,11 @@ impl petrel_core::ToValue for DirectRequestRejectedReceiptRequestKind {
 impl petrel_core::FromValue for DirectRequestRejectedReceiptRequestKind {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "prepare" => Ok(Self::Prepare),
-            "publish" => Ok(Self::Publish),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for DirectRequestRejectedReceiptRequestKind"))),
-        }
+        Ok(match raw.as_str() {
+            "prepare" => Self::Prepare,
+            "publish" => Self::Publish,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -26014,7 +26200,10 @@ impl petrel_core::xrpc::QueryValue for DirectRequestRejectedReceiptRequestKind {
 
 impl petrel_core::xrpc::FromQueryValue for DirectRequestRejectedReceiptRequestKind {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -26046,17 +26235,21 @@ impl<'de> serde::Deserialize<'de> for DirectRequestRejectedReceiptRequestKind {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DirectRequestExistingDirectReceiptRequestKind {
     Prepare,
     Publish,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl DirectRequestExistingDirectReceiptRequestKind {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Prepare => "prepare",
             Self::Publish => "publish",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -26068,13 +26261,13 @@ impl core::fmt::Display for DirectRequestExistingDirectReceiptRequestKind {
 }
 
 impl core::str::FromStr for DirectRequestExistingDirectReceiptRequestKind {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "prepare" => Ok(Self::Prepare),
-            "publish" => Ok(Self::Publish),
-            _ => Err("unknown variant for DirectRequestExistingDirectReceiptRequestKind"),
-        }
+        Ok(match s {
+            "prepare" => Self::Prepare,
+            "publish" => Self::Publish,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -26087,11 +26280,11 @@ impl petrel_core::ToValue for DirectRequestExistingDirectReceiptRequestKind {
 impl petrel_core::FromValue for DirectRequestExistingDirectReceiptRequestKind {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "prepare" => Ok(Self::Prepare),
-            "publish" => Ok(Self::Publish),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for DirectRequestExistingDirectReceiptRequestKind"))),
-        }
+        Ok(match raw.as_str() {
+            "prepare" => Self::Prepare,
+            "publish" => Self::Publish,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -26103,7 +26296,10 @@ impl petrel_core::xrpc::QueryValue for DirectRequestExistingDirectReceiptRequest
 
 impl petrel_core::xrpc::FromQueryValue for DirectRequestExistingDirectReceiptRequestKind {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -26159,11 +26355,11 @@ impl petrel_core::ToValue for DirectRequestTerminalReceipt {
 impl DirectRequestTerminalReceipt {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#directRequestPublishedReceipt" => petrel_core::decode_value(value, strict).map(Self::DirectRequestPublishedReceipt),
-            "blue.catbird.chat.defs#directRequestCancelledReceipt" => petrel_core::decode_value(value, strict).map(Self::DirectRequestCancelledReceipt),
-            "blue.catbird.chat.defs#directRequestExpiredReceipt" => petrel_core::decode_value(value, strict).map(Self::DirectRequestExpiredReceipt),
-            "blue.catbird.chat.defs#directRequestRejectedReceipt" => petrel_core::decode_value(value, strict).map(Self::DirectRequestRejectedReceipt),
-            "blue.catbird.chat.defs#directRequestExistingDirectReceipt" => petrel_core::decode_value(value, strict).map(Self::DirectRequestExistingDirectReceipt),
+            "blue.catbird.chat.defs#directRequestPublishedReceipt" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestPublishedReceipt),
+            "blue.catbird.chat.defs#directRequestCancelledReceipt" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestCancelledReceipt),
+            "blue.catbird.chat.defs#directRequestExpiredReceipt" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestExpiredReceipt),
+            "blue.catbird.chat.defs#directRequestRejectedReceipt" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestRejectedReceipt),
+            "blue.catbird.chat.defs#directRequestExistingDirectReceipt" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestExistingDirectReceipt),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -26223,7 +26419,7 @@ impl petrel_core::ToValue for SignedDirectRequestReceiptBody {
 impl SignedDirectRequestReceiptBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#directRequestReceiptBody" => petrel_core::decode_value(value, strict).map(Self::DirectRequestReceiptBody),
+            "blue.catbird.chat.defs#directRequestReceiptBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestReceiptBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -26287,9 +26483,9 @@ impl petrel_core::ToValue for DirectRequestOutcome {
 impl DirectRequestOutcome {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#directRequestUnknownOutcome" => petrel_core::decode_value(value, strict).map(Self::DirectRequestUnknownOutcome),
-            "blue.catbird.chat.defs#directRequestPreparedOutcome" => petrel_core::decode_value(value, strict).map(Self::DirectRequestPreparedOutcome),
-            "blue.catbird.chat.defs#signedDirectRequestReceipt" => petrel_core::decode_value(value, strict).map(Self::SignedDirectRequestReceipt),
+            "blue.catbird.chat.defs#directRequestUnknownOutcome" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestUnknownOutcome),
+            "blue.catbird.chat.defs#directRequestPreparedOutcome" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestPreparedOutcome),
+            "blue.catbird.chat.defs#signedDirectRequestReceipt" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::SignedDirectRequestReceipt),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -26333,21 +26529,25 @@ impl<'de> serde::Deserialize<'de> for DirectRequestOutcome {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DirectRequestStateConsent {
     IncomingPending,
     OutgoingPending,
     Accepted,
     Closed,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl DirectRequestStateConsent {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::IncomingPending => "incomingPending",
             Self::OutgoingPending => "outgoingPending",
             Self::Accepted => "accepted",
             Self::Closed => "closed",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -26359,15 +26559,15 @@ impl core::fmt::Display for DirectRequestStateConsent {
 }
 
 impl core::str::FromStr for DirectRequestStateConsent {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "incomingPending" => Ok(Self::IncomingPending),
-            "outgoingPending" => Ok(Self::OutgoingPending),
-            "accepted" => Ok(Self::Accepted),
-            "closed" => Ok(Self::Closed),
-            _ => Err("unknown variant for DirectRequestStateConsent"),
-        }
+        Ok(match s {
+            "incomingPending" => Self::IncomingPending,
+            "outgoingPending" => Self::OutgoingPending,
+            "accepted" => Self::Accepted,
+            "closed" => Self::Closed,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -26380,13 +26580,13 @@ impl petrel_core::ToValue for DirectRequestStateConsent {
 impl petrel_core::FromValue for DirectRequestStateConsent {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "incomingPending" => Ok(Self::IncomingPending),
-            "outgoingPending" => Ok(Self::OutgoingPending),
-            "accepted" => Ok(Self::Accepted),
-            "closed" => Ok(Self::Closed),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for DirectRequestStateConsent"))),
-        }
+        Ok(match raw.as_str() {
+            "incomingPending" => Self::IncomingPending,
+            "outgoingPending" => Self::OutgoingPending,
+            "accepted" => Self::Accepted,
+            "closed" => Self::Closed,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -26398,7 +26598,10 @@ impl petrel_core::xrpc::QueryValue for DirectRequestStateConsent {
 
 impl petrel_core::xrpc::FromQueryValue for DirectRequestStateConsent {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -26446,7 +26649,7 @@ impl petrel_core::ToValue for DirectRequestEntryPublicationReceipt {
 impl DirectRequestEntryPublicationReceipt {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#signedDirectRequestReceipt" => petrel_core::decode_value(value, strict).map(Self::SignedDirectRequestReceipt),
+            "blue.catbird.chat.defs#signedDirectRequestReceipt" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::SignedDirectRequestReceipt),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -26506,7 +26709,7 @@ impl petrel_core::ToValue for SignedDirectRequestAcceptanceCommitReceiptBody {
 impl SignedDirectRequestAcceptanceCommitReceiptBody {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody" => petrel_core::decode_value(value, strict).map(Self::DirectRequestAcceptanceCommitReceiptBody),
+            "blue.catbird.chat.defs#directRequestAcceptanceCommitReceiptBody" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::DirectRequestAcceptanceCommitReceiptBody),
             other => Err(petrel_core::DecodeError::UnknownType(other.to_owned())),
         }
     }
@@ -26550,15 +26753,19 @@ impl<'de> serde::Deserialize<'de> for SignedDirectRequestAcceptanceCommitReceipt
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PushRegistrationBodyProtocolVersion {
     Value2,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl PushRegistrationBodyProtocolVersion {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Value2 => "2",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -26570,12 +26777,12 @@ impl core::fmt::Display for PushRegistrationBodyProtocolVersion {
 }
 
 impl core::str::FromStr for PushRegistrationBodyProtocolVersion {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "2" => Ok(Self::Value2),
-            _ => Err("unknown variant for PushRegistrationBodyProtocolVersion"),
-        }
+        Ok(match s {
+            "2" => Self::Value2,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -26588,10 +26795,10 @@ impl petrel_core::ToValue for PushRegistrationBodyProtocolVersion {
 impl petrel_core::FromValue for PushRegistrationBodyProtocolVersion {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "2" => Ok(Self::Value2),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for PushRegistrationBodyProtocolVersion"))),
-        }
+        Ok(match raw.as_str() {
+            "2" => Self::Value2,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -26603,7 +26810,10 @@ impl petrel_core::xrpc::QueryValue for PushRegistrationBodyProtocolVersion {
 
 impl petrel_core::xrpc::FromQueryValue for PushRegistrationBodyProtocolVersion {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -26635,17 +26845,21 @@ impl<'de> serde::Deserialize<'de> for PushRegistrationBodyProtocolVersion {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PushRegistrationBodyProvider {
     Apns,
     Fcm,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl PushRegistrationBodyProvider {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Apns => "apns",
             Self::Fcm => "fcm",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -26657,13 +26871,13 @@ impl core::fmt::Display for PushRegistrationBodyProvider {
 }
 
 impl core::str::FromStr for PushRegistrationBodyProvider {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "apns" => Ok(Self::Apns),
-            "fcm" => Ok(Self::Fcm),
-            _ => Err("unknown variant for PushRegistrationBodyProvider"),
-        }
+        Ok(match s {
+            "apns" => Self::Apns,
+            "fcm" => Self::Fcm,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -26676,11 +26890,11 @@ impl petrel_core::ToValue for PushRegistrationBodyProvider {
 impl petrel_core::FromValue for PushRegistrationBodyProvider {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "apns" => Ok(Self::Apns),
-            "fcm" => Ok(Self::Fcm),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for PushRegistrationBodyProvider"))),
-        }
+        Ok(match raw.as_str() {
+            "apns" => Self::Apns,
+            "fcm" => Self::Fcm,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -26692,7 +26906,10 @@ impl petrel_core::xrpc::QueryValue for PushRegistrationBodyProvider {
 
 impl petrel_core::xrpc::FromQueryValue for PushRegistrationBodyProvider {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 

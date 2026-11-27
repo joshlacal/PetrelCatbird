@@ -40,7 +40,7 @@ impl CommunitySelection {
         Ok(Self {
             community_id: reader.required("communityId")?,
             weight: reader.required("weight")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -131,7 +131,7 @@ impl CalibrationOption {
             subtitle: reader.required("subtitle")?,
             scene_title: reader.required("sceneTitle")?,
             sample_post_uris: reader.required("samplePostUris")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -226,7 +226,7 @@ impl CalibrationSwipeCard {
             prompt: reader.required("prompt")?,
             option_a: reader.required("optionA")?,
             option_b: reader.required("optionB")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -313,7 +313,7 @@ impl CalibrationSwipeAnswer {
             community_a: reader.required("communityA")?,
             community_b: reader.required("communityB")?,
             choice: reader.required("choice")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -392,7 +392,7 @@ impl BundleControls {
         Ok(Self {
             pace: reader.required("pace")?,
             originals_only_for_heavy_reposters: reader.required("originalsOnlyForHeavyReposters")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -500,7 +500,7 @@ impl RecommendedFollow {
             why_picked: reader.required("whyPicked")?,
             estimated_posts_per_week: reader.required("estimatedPostsPerWeek")?,
             sample_post_uri: reader.optional("samplePostUri")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -583,7 +583,7 @@ impl RecommendedFeed {
             uri: reader.required("uri")?,
             community_id: reader.required("communityId")?,
             community_title: reader.required("communityTitle")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -666,7 +666,7 @@ impl RecommendedStarterPack {
             uri: reader.required("uri")?,
             community_id: reader.required("communityId")?,
             community_title: reader.required("communityTitle")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -769,7 +769,7 @@ impl BundleSummary {
             originals_only_count: reader.required("originalsOnlyCount")?,
             estimated_daily_posts: reader.required("estimatedDailyPosts")?,
             covered_communities: reader.required("coveredCommunities")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -812,21 +812,25 @@ impl<'de> serde::Deserialize<'de> for BundleSummary {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CalibrationSwipeAnswerChoice {
     A,
     B,
     Both,
     Neither,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl CalibrationSwipeAnswerChoice {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::A => "a",
             Self::B => "b",
             Self::Both => "both",
             Self::Neither => "neither",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -838,15 +842,15 @@ impl core::fmt::Display for CalibrationSwipeAnswerChoice {
 }
 
 impl core::str::FromStr for CalibrationSwipeAnswerChoice {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "a" => Ok(Self::A),
-            "b" => Ok(Self::B),
-            "both" => Ok(Self::Both),
-            "neither" => Ok(Self::Neither),
-            _ => Err("unknown variant for CalibrationSwipeAnswerChoice"),
-        }
+        Ok(match s {
+            "a" => Self::A,
+            "b" => Self::B,
+            "both" => Self::Both,
+            "neither" => Self::Neither,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -859,13 +863,13 @@ impl petrel_core::ToValue for CalibrationSwipeAnswerChoice {
 impl petrel_core::FromValue for CalibrationSwipeAnswerChoice {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "a" => Ok(Self::A),
-            "b" => Ok(Self::B),
-            "both" => Ok(Self::Both),
-            "neither" => Ok(Self::Neither),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for CalibrationSwipeAnswerChoice"))),
-        }
+        Ok(match raw.as_str() {
+            "a" => Self::A,
+            "b" => Self::B,
+            "both" => Self::Both,
+            "neither" => Self::Neither,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -877,7 +881,10 @@ impl petrel_core::xrpc::QueryValue for CalibrationSwipeAnswerChoice {
 
 impl petrel_core::xrpc::FromQueryValue for CalibrationSwipeAnswerChoice {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -909,19 +916,23 @@ impl<'de> serde::Deserialize<'de> for CalibrationSwipeAnswerChoice {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BundleControlsPace {
     Calm,
     Balanced,
     Lively,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl BundleControlsPace {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Calm => "calm",
             Self::Balanced => "balanced",
             Self::Lively => "lively",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -933,14 +944,14 @@ impl core::fmt::Display for BundleControlsPace {
 }
 
 impl core::str::FromStr for BundleControlsPace {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "calm" => Ok(Self::Calm),
-            "balanced" => Ok(Self::Balanced),
-            "lively" => Ok(Self::Lively),
-            _ => Err("unknown variant for BundleControlsPace"),
-        }
+        Ok(match s {
+            "calm" => Self::Calm,
+            "balanced" => Self::Balanced,
+            "lively" => Self::Lively,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -953,12 +964,12 @@ impl petrel_core::ToValue for BundleControlsPace {
 impl petrel_core::FromValue for BundleControlsPace {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "calm" => Ok(Self::Calm),
-            "balanced" => Ok(Self::Balanced),
-            "lively" => Ok(Self::Lively),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for BundleControlsPace"))),
-        }
+        Ok(match raw.as_str() {
+            "calm" => Self::Calm,
+            "balanced" => Self::Balanced,
+            "lively" => Self::Lively,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -970,7 +981,10 @@ impl petrel_core::xrpc::QueryValue for BundleControlsPace {
 
 impl petrel_core::xrpc::FromQueryValue for BundleControlsPace {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 

@@ -101,21 +101,25 @@ impl<'de> serde::Deserialize<'de> for Permission {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PermissionPermissions {
     Ban,
     Hide,
     LivestreamManage,
     MessagePin,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl PermissionPermissions {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Ban => "ban",
             Self::Hide => "hide",
             Self::LivestreamManage => "livestream.manage",
             Self::MessagePin => "message.pin",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -127,15 +131,15 @@ impl core::fmt::Display for PermissionPermissions {
 }
 
 impl core::str::FromStr for PermissionPermissions {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "ban" => Ok(Self::Ban),
-            "hide" => Ok(Self::Hide),
-            "livestream.manage" => Ok(Self::LivestreamManage),
-            "message.pin" => Ok(Self::MessagePin),
-            _ => Err("unknown variant for PermissionPermissions"),
-        }
+        Ok(match s {
+            "ban" => Self::Ban,
+            "hide" => Self::Hide,
+            "livestream.manage" => Self::LivestreamManage,
+            "message.pin" => Self::MessagePin,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -148,13 +152,13 @@ impl petrel_core::ToValue for PermissionPermissions {
 impl petrel_core::FromValue for PermissionPermissions {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "ban" => Ok(Self::Ban),
-            "hide" => Ok(Self::Hide),
-            "livestream.manage" => Ok(Self::LivestreamManage),
-            "message.pin" => Ok(Self::MessagePin),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for PermissionPermissions"))),
-        }
+        Ok(match raw.as_str() {
+            "ban" => Self::Ban,
+            "hide" => Self::Hide,
+            "livestream.manage" => Self::LivestreamManage,
+            "message.pin" => Self::MessagePin,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -166,7 +170,10 @@ impl petrel_core::xrpc::QueryValue for PermissionPermissions {
 
 impl petrel_core::xrpc::FromQueryValue for PermissionPermissions {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 

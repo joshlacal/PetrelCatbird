@@ -69,7 +69,7 @@ impl EnvelopeHeaderV1 {
             sequencer_term: reader.required("sequencerTerm")?,
             received_at: reader.required("receivedAt")?,
             payload_sha256: reader.required("payloadSha256")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -156,7 +156,7 @@ impl EntryLocatorV1 {
             seq: reader.required("seq")?,
             accepted_payload_sha256: reader.required("acceptedPayloadSha256")?,
             outer_entry_fingerprint: reader.required("outerEntryFingerprint")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -279,7 +279,7 @@ impl FederationReceiptV1 {
             source_locator: reader.required("sourceLocator")?,
             completed_at: reader.required("completedAt")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -322,15 +322,19 @@ impl<'de> serde::Deserialize<'de> for FederationReceiptV1 {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProtocolVersion {
     Value1,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl ProtocolVersion {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Value1 => "1",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -342,12 +346,12 @@ impl core::fmt::Display for ProtocolVersion {
 }
 
 impl core::str::FromStr for ProtocolVersion {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "1" => Ok(Self::Value1),
-            _ => Err("unknown variant for ProtocolVersion"),
-        }
+        Ok(match s {
+            "1" => Self::Value1,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -360,10 +364,10 @@ impl petrel_core::ToValue for ProtocolVersion {
 impl petrel_core::FromValue for ProtocolVersion {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "1" => Ok(Self::Value1),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for ProtocolVersion"))),
-        }
+        Ok(match raw.as_str() {
+            "1" => Self::Value1,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -375,7 +379,10 @@ impl petrel_core::xrpc::QueryValue for ProtocolVersion {
 
 impl petrel_core::xrpc::FromQueryValue for ProtocolVersion {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -407,19 +414,23 @@ impl<'de> serde::Deserialize<'de> for ProtocolVersion {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum FederationEndpoint {
     BlueCatbirdMlsDSDeliverWelcome,
     BlueCatbirdMlsDSDeliverMessage,
     BlueCatbirdMlsDSSubmitCommit,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl FederationEndpoint {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::BlueCatbirdMlsDSDeliverWelcome => "blue.catbird.mlsDS.deliverWelcome",
             Self::BlueCatbirdMlsDSDeliverMessage => "blue.catbird.mlsDS.deliverMessage",
             Self::BlueCatbirdMlsDSSubmitCommit => "blue.catbird.mlsDS.submitCommit",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -431,14 +442,14 @@ impl core::fmt::Display for FederationEndpoint {
 }
 
 impl core::str::FromStr for FederationEndpoint {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "blue.catbird.mlsDS.deliverWelcome" => Ok(Self::BlueCatbirdMlsDSDeliverWelcome),
-            "blue.catbird.mlsDS.deliverMessage" => Ok(Self::BlueCatbirdMlsDSDeliverMessage),
-            "blue.catbird.mlsDS.submitCommit" => Ok(Self::BlueCatbirdMlsDSSubmitCommit),
-            _ => Err("unknown variant for FederationEndpoint"),
-        }
+        Ok(match s {
+            "blue.catbird.mlsDS.deliverWelcome" => Self::BlueCatbirdMlsDSDeliverWelcome,
+            "blue.catbird.mlsDS.deliverMessage" => Self::BlueCatbirdMlsDSDeliverMessage,
+            "blue.catbird.mlsDS.submitCommit" => Self::BlueCatbirdMlsDSSubmitCommit,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -451,12 +462,12 @@ impl petrel_core::ToValue for FederationEndpoint {
 impl petrel_core::FromValue for FederationEndpoint {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "blue.catbird.mlsDS.deliverWelcome" => Ok(Self::BlueCatbirdMlsDSDeliverWelcome),
-            "blue.catbird.mlsDS.deliverMessage" => Ok(Self::BlueCatbirdMlsDSDeliverMessage),
-            "blue.catbird.mlsDS.submitCommit" => Ok(Self::BlueCatbirdMlsDSSubmitCommit),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for FederationEndpoint"))),
-        }
+        Ok(match raw.as_str() {
+            "blue.catbird.mlsDS.deliverWelcome" => Self::BlueCatbirdMlsDSDeliverWelcome,
+            "blue.catbird.mlsDS.deliverMessage" => Self::BlueCatbirdMlsDSDeliverMessage,
+            "blue.catbird.mlsDS.submitCommit" => Self::BlueCatbirdMlsDSSubmitCommit,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -468,7 +479,10 @@ impl petrel_core::xrpc::QueryValue for FederationEndpoint {
 
 impl petrel_core::xrpc::FromQueryValue for FederationEndpoint {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 

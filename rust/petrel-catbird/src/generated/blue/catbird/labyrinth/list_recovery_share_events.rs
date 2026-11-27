@@ -236,7 +236,7 @@ impl Event {
             kind: reader.required("kind")?,
             actor_device_id: reader.optional("actorDeviceId")?,
             at: reader.required("at")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

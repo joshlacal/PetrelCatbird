@@ -47,7 +47,7 @@ impl TargetView {
             cid: reader.required("cid")?,
             record: reader.required("record")?,
             latest_event: reader.optional("latestEvent")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -130,7 +130,7 @@ impl Event {
             message: reader.required("message")?,
             status: reader.required("status")?,
             created_at: reader.required("createdAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -173,21 +173,25 @@ impl<'de> serde::Deserialize<'de> for Event {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EventStatus {
     Inactive,
     Pending,
     Active,
     Error,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl EventStatus {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Inactive => "inactive",
             Self::Pending => "pending",
             Self::Active => "active",
             Self::Error => "error",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -199,15 +203,15 @@ impl core::fmt::Display for EventStatus {
 }
 
 impl core::str::FromStr for EventStatus {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "inactive" => Ok(Self::Inactive),
-            "pending" => Ok(Self::Pending),
-            "active" => Ok(Self::Active),
-            "error" => Ok(Self::Error),
-            _ => Err("unknown variant for EventStatus"),
-        }
+        Ok(match s {
+            "inactive" => Self::Inactive,
+            "pending" => Self::Pending,
+            "active" => Self::Active,
+            "error" => Self::Error,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -220,13 +224,13 @@ impl petrel_core::ToValue for EventStatus {
 impl petrel_core::FromValue for EventStatus {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "inactive" => Ok(Self::Inactive),
-            "pending" => Ok(Self::Pending),
-            "active" => Ok(Self::Active),
-            "error" => Ok(Self::Error),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for EventStatus"))),
-        }
+        Ok(match raw.as_str() {
+            "inactive" => Self::Inactive,
+            "pending" => Self::Pending,
+            "active" => Self::Active,
+            "error" => Self::Error,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -238,7 +242,10 @@ impl petrel_core::xrpc::QueryValue for EventStatus {
 
 impl petrel_core::xrpc::FromQueryValue for EventStatus {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 

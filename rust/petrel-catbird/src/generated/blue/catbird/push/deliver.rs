@@ -262,7 +262,7 @@ impl WakePayload {
             seq: reader.required("seq")?,
             epoch: reader.required("epoch")?,
             ciphertext: reader.optional("ciphertext")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -305,21 +305,25 @@ impl<'de> serde::Deserialize<'de> for WakePayload {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum WakePayloadWakeKind {
     ApplicationMessage,
     ControlTransition,
     DirectRequest,
     Welcome,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl WakePayloadWakeKind {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::ApplicationMessage => "applicationMessage",
             Self::ControlTransition => "controlTransition",
             Self::DirectRequest => "directRequest",
             Self::Welcome => "welcome",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -331,15 +335,15 @@ impl core::fmt::Display for WakePayloadWakeKind {
 }
 
 impl core::str::FromStr for WakePayloadWakeKind {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "applicationMessage" => Ok(Self::ApplicationMessage),
-            "controlTransition" => Ok(Self::ControlTransition),
-            "directRequest" => Ok(Self::DirectRequest),
-            "welcome" => Ok(Self::Welcome),
-            _ => Err("unknown variant for WakePayloadWakeKind"),
-        }
+        Ok(match s {
+            "applicationMessage" => Self::ApplicationMessage,
+            "controlTransition" => Self::ControlTransition,
+            "directRequest" => Self::DirectRequest,
+            "welcome" => Self::Welcome,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -352,13 +356,13 @@ impl petrel_core::ToValue for WakePayloadWakeKind {
 impl petrel_core::FromValue for WakePayloadWakeKind {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "applicationMessage" => Ok(Self::ApplicationMessage),
-            "controlTransition" => Ok(Self::ControlTransition),
-            "directRequest" => Ok(Self::DirectRequest),
-            "welcome" => Ok(Self::Welcome),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for WakePayloadWakeKind"))),
-        }
+        Ok(match raw.as_str() {
+            "applicationMessage" => Self::ApplicationMessage,
+            "controlTransition" => Self::ControlTransition,
+            "directRequest" => Self::DirectRequest,
+            "welcome" => Self::Welcome,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -370,7 +374,10 @@ impl petrel_core::xrpc::QueryValue for WakePayloadWakeKind {
 
 impl petrel_core::xrpc::FromQueryValue for WakePayloadWakeKind {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 

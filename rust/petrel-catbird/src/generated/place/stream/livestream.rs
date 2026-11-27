@@ -173,7 +173,7 @@ impl NotificationSettings {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             push_notification: reader.optional("pushNotification")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -269,7 +269,7 @@ impl LivestreamView {
             record: reader.required("record")?,
             indexed_at: reader.required("indexedAt")?,
             viewer_count: reader.optional("viewerCount")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -344,7 +344,7 @@ impl ViewerCount {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             count: reader.required("count")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -440,7 +440,7 @@ impl TeleportArrival {
             chat_profile: reader.optional("chatProfile")?,
             viewer_count: reader.required("viewerCount")?,
             starts_at: reader.required("startsAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -521,7 +521,7 @@ impl TeleportCanceled {
         Ok(Self {
             teleport_uri: reader.required("teleportUri")?,
             reason: reader.required("reason")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -596,7 +596,7 @@ impl StreamplaceAnything {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             livestream: reader.required("livestream")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -639,19 +639,23 @@ impl<'de> serde::Deserialize<'de> for StreamplaceAnything {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TeleportCanceledReason {
     Deleted,
     Denied,
     Expired,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl TeleportCanceledReason {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Deleted => "deleted",
             Self::Denied => "denied",
             Self::Expired => "expired",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -663,14 +667,14 @@ impl core::fmt::Display for TeleportCanceledReason {
 }
 
 impl core::str::FromStr for TeleportCanceledReason {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "deleted" => Ok(Self::Deleted),
-            "denied" => Ok(Self::Denied),
-            "expired" => Ok(Self::Expired),
-            _ => Err("unknown variant for TeleportCanceledReason"),
-        }
+        Ok(match s {
+            "deleted" => Self::Deleted,
+            "denied" => Self::Denied,
+            "expired" => Self::Expired,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -683,12 +687,12 @@ impl petrel_core::ToValue for TeleportCanceledReason {
 impl petrel_core::FromValue for TeleportCanceledReason {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "deleted" => Ok(Self::Deleted),
-            "denied" => Ok(Self::Denied),
-            "expired" => Ok(Self::Expired),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for TeleportCanceledReason"))),
-        }
+        Ok(match raw.as_str() {
+            "deleted" => Self::Deleted,
+            "denied" => Self::Denied,
+            "expired" => Self::Expired,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -700,7 +704,10 @@ impl petrel_core::xrpc::QueryValue for TeleportCanceledReason {
 
 impl petrel_core::xrpc::FromQueryValue for TeleportCanceledReason {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -766,15 +773,15 @@ impl petrel_core::ToValue for StreamplaceAnythingLivestream {
 impl StreamplaceAnythingLivestream {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "place.stream.livestream#livestreamView" => petrel_core::decode_value(value, strict).map(Self::LivestreamView),
-            "place.stream.livestream#viewerCount" => petrel_core::decode_value(value, strict).map(Self::ViewerCount),
-            "place.stream.livestream#teleportArrival" => petrel_core::decode_value(value, strict).map(Self::TeleportArrival),
-            "place.stream.livestream#teleportCanceled" => petrel_core::decode_value(value, strict).map(Self::TeleportCanceled),
-            "place.stream.defs#blockView" => petrel_core::decode_value(value, strict).map(Self::BlockView),
-            "place.stream.defs#renditions" => petrel_core::decode_value(value, strict).map(Self::Renditions),
-            "place.stream.defs#rendition" => petrel_core::decode_value(value, strict).map(Self::Rendition),
-            "place.stream.chat.defs#messageView" => petrel_core::decode_value(value, strict).map(Self::MessageView),
-            "place.stream.chat.defs#pinnedRecordView" => petrel_core::decode_value(value, strict).map(Self::PinnedRecordView),
+            "place.stream.livestream#livestreamView" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LivestreamView),
+            "place.stream.livestream#viewerCount" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::ViewerCount),
+            "place.stream.livestream#teleportArrival" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::TeleportArrival),
+            "place.stream.livestream#teleportCanceled" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::TeleportCanceled),
+            "place.stream.defs#blockView" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::BlockView),
+            "place.stream.defs#renditions" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::Renditions),
+            "place.stream.defs#rendition" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::Rendition),
+            "place.stream.chat.defs#messageView" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::MessageView),
+            "place.stream.chat.defs#pinnedRecordView" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::PinnedRecordView),
             _ => Ok(Self::Unknown(value)),
         }
     }

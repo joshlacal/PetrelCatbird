@@ -165,7 +165,7 @@ impl Actor {
         Ok(Self {
             did: reader.required("did")?,
             handle: reader.required("handle")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

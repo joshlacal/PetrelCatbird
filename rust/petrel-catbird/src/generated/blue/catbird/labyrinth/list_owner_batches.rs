@@ -216,7 +216,7 @@ impl OwnerBatchView {
             rkey: reader.required("rkey")?,
             record: reader.required("record")?,
             order: reader.required("order")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

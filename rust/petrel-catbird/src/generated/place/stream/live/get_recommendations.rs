@@ -161,7 +161,7 @@ impl LivestreamRecommendation {
         Ok(Self {
             did: reader.required("did")?,
             source: reader.required("source")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -222,7 +222,7 @@ impl petrel_core::ToValue for OutputRecommendations {
 impl OutputRecommendations {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "place.stream.live.getRecommendations#livestreamRecommendation" => petrel_core::decode_value(value, strict).map(Self::LivestreamRecommendation),
+            "place.stream.live.getRecommendations#livestreamRecommendation" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::LivestreamRecommendation),
             _ => Ok(Self::Unknown(value)),
         }
     }
@@ -266,19 +266,23 @@ impl<'de> serde::Deserialize<'de> for OutputRecommendations {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum LivestreamRecommendationSource {
     Streamer,
     Follows,
     Host,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl LivestreamRecommendationSource {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Streamer => "streamer",
             Self::Follows => "follows",
             Self::Host => "host",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -290,14 +294,14 @@ impl core::fmt::Display for LivestreamRecommendationSource {
 }
 
 impl core::str::FromStr for LivestreamRecommendationSource {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "streamer" => Ok(Self::Streamer),
-            "follows" => Ok(Self::Follows),
-            "host" => Ok(Self::Host),
-            _ => Err("unknown variant for LivestreamRecommendationSource"),
-        }
+        Ok(match s {
+            "streamer" => Self::Streamer,
+            "follows" => Self::Follows,
+            "host" => Self::Host,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -310,12 +314,12 @@ impl petrel_core::ToValue for LivestreamRecommendationSource {
 impl petrel_core::FromValue for LivestreamRecommendationSource {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "streamer" => Ok(Self::Streamer),
-            "follows" => Ok(Self::Follows),
-            "host" => Ok(Self::Host),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for LivestreamRecommendationSource"))),
-        }
+        Ok(match raw.as_str() {
+            "streamer" => Self::Streamer,
+            "follows" => Self::Follows,
+            "host" => Self::Host,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -327,7 +331,10 @@ impl petrel_core::xrpc::QueryValue for LivestreamRecommendationSource {
 
 impl petrel_core::xrpc::FromQueryValue for LivestreamRecommendationSource {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 

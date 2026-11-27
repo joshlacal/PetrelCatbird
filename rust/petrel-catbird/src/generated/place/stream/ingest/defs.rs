@@ -42,7 +42,7 @@ impl Ingest {
         Ok(Self {
             r#type: reader.required("type")?,
             url: reader.required("url")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

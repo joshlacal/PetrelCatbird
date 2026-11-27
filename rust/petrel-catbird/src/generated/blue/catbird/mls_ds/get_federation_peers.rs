@@ -207,7 +207,7 @@ impl PeerRecord {
             last_seen_at: reader.optional("lastSeenAt")?,
             created_at: reader.optional("createdAt")?,
             updated_at: reader.optional("updatedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

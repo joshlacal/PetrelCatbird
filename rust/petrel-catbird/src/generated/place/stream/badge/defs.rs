@@ -51,7 +51,7 @@ impl BadgeView {
             issuer: reader.required("issuer")?,
             recipient: reader.required("recipient")?,
             signature: reader.optional("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

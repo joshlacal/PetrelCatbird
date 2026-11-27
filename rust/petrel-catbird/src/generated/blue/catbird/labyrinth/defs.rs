@@ -81,7 +81,7 @@ impl EpochPublic {
             self_sig: reader.required("selfSig")?,
             prev_sig: reader.optional("prevSig")?,
             attestation: reader.required("attestation")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -163,7 +163,7 @@ impl TransportAttestation {
         Ok(Self {
             transport_pubkey: reader.required("transportPubkey")?,
             sig: reader.required("sig")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -245,7 +245,7 @@ impl DeviceRevocation {
         Ok(Self {
             revoked_by: reader.required("revokedBy")?,
             sig: reader.required("sig")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -333,7 +333,7 @@ impl OriginalSenderArchiveAttestation {
             sender_device_id: reader.required("senderDeviceId")?,
             sender_transport_pubkey: reader.required("senderTransportPubkey")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -461,7 +461,7 @@ impl SequencerReceipt {
             kid: reader.required("kid")?,
             signature: reader.required("signature")?,
             original_sender_attestation: reader.required("originalSenderAttestation")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -572,7 +572,7 @@ impl SealedMessage {
             signed_enc_message: reader.required("signedEncMessage")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
             redaction: reader.optional("redaction")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -683,7 +683,7 @@ impl OwnerMessage {
             version: reader.required("version")?,
             encrypted: reader.required("encrypted")?,
             sequencer_receipt: reader.optional("sequencerReceipt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -769,7 +769,7 @@ impl MekRecipient {
             did: reader.required("did")?,
             recipient_epoch_head: reader.required("recipientEpochHead")?,
             ciphertext: reader.required("ciphertext")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -856,7 +856,7 @@ impl ServerOrder {
             seq: reader.required("seq")?,
             chat_seq: reader.optional("chatSeq")?,
             received_at: reader.required("receivedAt")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -959,7 +959,7 @@ impl Redaction {
             redacted_at: reader.optional("redactedAt")?,
             by: reader.optional("by")?,
             reason: reader.optional("reason")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -1043,7 +1043,7 @@ impl SpaceBatchRedaction {
             message_id: reader.required("messageId")?,
             timestamp: reader.required("timestamp")?,
             redaction: reader.required("redaction")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -1150,7 +1150,7 @@ impl SpaceBatchView {
             order: reader.required("order")?,
             redactions: reader.required("redactions")?,
             item_count: reader.required("itemCount")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
