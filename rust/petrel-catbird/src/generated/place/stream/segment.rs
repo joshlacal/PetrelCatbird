@@ -170,7 +170,7 @@ impl Audio {
             codec: reader.required("codec")?,
             rate: reader.required("rate")?,
             channels: reader.required("channels")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -261,7 +261,7 @@ impl Video {
             height: reader.required("height")?,
             framerate: reader.optional("framerate")?,
             bframes: reader.optional("bframes")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -340,7 +340,7 @@ impl Framerate {
         Ok(Self {
             num: reader.required("num")?,
             den: reader.required("den")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -419,7 +419,7 @@ impl SegmentView {
         Ok(Self {
             cid: reader.required("cid")?,
             record: reader.required("record")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -462,15 +462,19 @@ impl<'de> serde::Deserialize<'de> for SegmentView {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AudioCodec {
     Opus,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl AudioCodec {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Opus => "opus",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -482,12 +486,12 @@ impl core::fmt::Display for AudioCodec {
 }
 
 impl core::str::FromStr for AudioCodec {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "opus" => Ok(Self::Opus),
-            _ => Err("unknown variant for AudioCodec"),
-        }
+        Ok(match s {
+            "opus" => Self::Opus,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -500,10 +504,10 @@ impl petrel_core::ToValue for AudioCodec {
 impl petrel_core::FromValue for AudioCodec {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "opus" => Ok(Self::Opus),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for AudioCodec"))),
-        }
+        Ok(match raw.as_str() {
+            "opus" => Self::Opus,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -515,7 +519,10 @@ impl petrel_core::xrpc::QueryValue for AudioCodec {
 
 impl petrel_core::xrpc::FromQueryValue for AudioCodec {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 
@@ -547,15 +554,19 @@ impl<'de> serde::Deserialize<'de> for AudioCodec {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VideoCodec {
     H264,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl VideoCodec {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::H264 => "h264",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -567,12 +578,12 @@ impl core::fmt::Display for VideoCodec {
 }
 
 impl core::str::FromStr for VideoCodec {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "h264" => Ok(Self::H264),
-            _ => Err("unknown variant for VideoCodec"),
-        }
+        Ok(match s {
+            "h264" => Self::H264,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -585,10 +596,10 @@ impl petrel_core::ToValue for VideoCodec {
 impl petrel_core::FromValue for VideoCodec {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "h264" => Ok(Self::H264),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for VideoCodec"))),
-        }
+        Ok(match raw.as_str() {
+            "h264" => Self::H264,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -600,7 +611,10 @@ impl petrel_core::xrpc::QueryValue for VideoCodec {
 
 impl petrel_core::xrpc::FromQueryValue for VideoCodec {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 

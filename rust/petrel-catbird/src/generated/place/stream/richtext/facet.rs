@@ -41,7 +41,7 @@ impl Facet {
         Ok(Self {
             index: reader.required("index")?,
             features: reader.required("features")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -104,8 +104,8 @@ impl petrel_core::ToValue for FacetFeatures {
 impl FacetFeatures {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "app.bsky.richtext.facet#mention" => petrel_core::decode_value(value, strict).map(Self::Mention),
-            "app.bsky.richtext.facet#link" => petrel_core::decode_value(value, strict).map(Self::Link),
+            "app.bsky.richtext.facet#mention" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::Mention),
+            "app.bsky.richtext.facet#link" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::Link),
             _ => Ok(Self::Unknown(value)),
         }
     }

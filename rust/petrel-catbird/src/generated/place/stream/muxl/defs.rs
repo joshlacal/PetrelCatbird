@@ -62,7 +62,7 @@ impl Track {
             height: reader.optional("height")?,
             rate: reader.optional("rate")?,
             channels: reader.optional("channels")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

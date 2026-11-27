@@ -251,21 +251,25 @@ impl petrel_core::XrpcRequest for UpdateWebhook {
     type Error = Error;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum InputEvents {
     Chat,
     Livestream,
     Follow,
     Mention,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl InputEvents {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Chat => "chat",
             Self::Livestream => "livestream",
             Self::Follow => "follow",
             Self::Mention => "mention",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -277,15 +281,15 @@ impl core::fmt::Display for InputEvents {
 }
 
 impl core::str::FromStr for InputEvents {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "chat" => Ok(Self::Chat),
-            "livestream" => Ok(Self::Livestream),
-            "follow" => Ok(Self::Follow),
-            "mention" => Ok(Self::Mention),
-            _ => Err("unknown variant for InputEvents"),
-        }
+        Ok(match s {
+            "chat" => Self::Chat,
+            "livestream" => Self::Livestream,
+            "follow" => Self::Follow,
+            "mention" => Self::Mention,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -298,13 +302,13 @@ impl petrel_core::ToValue for InputEvents {
 impl petrel_core::FromValue for InputEvents {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "chat" => Ok(Self::Chat),
-            "livestream" => Ok(Self::Livestream),
-            "follow" => Ok(Self::Follow),
-            "mention" => Ok(Self::Mention),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for InputEvents"))),
-        }
+        Ok(match raw.as_str() {
+            "chat" => Self::Chat,
+            "livestream" => Self::Livestream,
+            "follow" => Self::Follow,
+            "mention" => Self::Mention,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -316,7 +320,10 @@ impl petrel_core::xrpc::QueryValue for InputEvents {
 
 impl petrel_core::xrpc::FromQueryValue for InputEvents {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 

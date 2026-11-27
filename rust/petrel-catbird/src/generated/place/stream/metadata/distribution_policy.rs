@@ -49,7 +49,7 @@ impl DistributionPolicy {
         Ok(Self {
             delete_after: reader.optional("deleteAfter")?,
             allowed_broadcasters: reader.optional("allowedBroadcasters")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

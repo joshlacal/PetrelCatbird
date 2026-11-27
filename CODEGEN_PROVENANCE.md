@@ -1,5 +1,16 @@
 # Private contract generation
 
+## Rust projection pin (2026-11-27)
+
+The Rust projection's Petrel pin (`PETREL_REF` in `.github/workflows/rust.yml`)
+moved to `cd6dda0d25c1d2ab2365eb8f6ba2f4568960dd07`, `main` after the review
+fixes `#104–#108`. Petrel#108 made strings declared with a lexicon `enum`
+forward-compatible, so regeneration changed 62 Rust files: 54 enums gain an
+`Unknown(String)` variant, lose `Copy`, and their `as_str` is no longer `const`.
+No lexicon changed. The Swift and Kotlin projections are untouched and
+`Package.swift` stays on `ca1846a7`, because those fixes changed no Swift source
+and no generated Kotlin.
+
 ## Petrel pin (2026-11-26)
 
 The Petrel pin moved to `ca1846a7762a3e3cb12b50a2a8bceb888773dfb9` (`main` after

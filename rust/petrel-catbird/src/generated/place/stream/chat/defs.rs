@@ -69,7 +69,7 @@ impl MessageView {
             reply_to: reader.optional("replyTo")?,
             deleted: reader.optional("deleted")?,
             badges: reader.optional("badges")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -165,7 +165,7 @@ impl PinnedRecordView {
             indexed_at: reader.required("indexedAt")?,
             pinned_by: reader.optional("pinnedBy")?,
             message: reader.optional("message")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -226,7 +226,7 @@ impl petrel_core::ToValue for MessageViewReplyTo {
 impl MessageViewReplyTo {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "place.stream.chat.defs#messageView" => petrel_core::decode_value(value, strict).map(Self::MessageView),
+            "place.stream.chat.defs#messageView" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::MessageView),
             _ => Ok(Self::Unknown(value)),
         }
     }

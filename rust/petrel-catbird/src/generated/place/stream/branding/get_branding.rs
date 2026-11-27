@@ -182,7 +182,7 @@ impl BrandingAsset {
             data: reader.optional("data")?,
             width: reader.optional("width")?,
             height: reader.optional("height")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

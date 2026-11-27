@@ -243,7 +243,7 @@ impl DeletionReceipt {
         Ok(Self {
             key_id: reader.required("keyId")?,
             signature: reader.required("signature")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

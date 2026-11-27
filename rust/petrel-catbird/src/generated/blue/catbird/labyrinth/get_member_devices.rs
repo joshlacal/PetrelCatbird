@@ -237,7 +237,7 @@ impl MemberDevice {
             signing_public_key: reader.required("signingPublicKey")?,
             joined_seq: reader.required("joinedSeq")?,
             removed_seq: reader.optional("removedSeq")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

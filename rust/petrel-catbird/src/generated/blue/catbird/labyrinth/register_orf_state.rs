@@ -240,7 +240,7 @@ impl Parent {
         Ok(Self {
             device_key_pubkey: reader.required("deviceKeyPubkey")?,
             evolve_token: reader.required("evolveToken")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

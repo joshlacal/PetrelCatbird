@@ -147,7 +147,7 @@ impl Encryption {
     fn decode_fields(mut reader: petrel_core::ObjectReader) -> Result<Self, petrel_core::DecodeError> {
         Ok(Self {
             scheme: reader.required("scheme")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -190,15 +190,19 @@ impl<'de> serde::Deserialize<'de> for Encryption {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EncryptionScheme {
     CircleV1,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl EncryptionScheme {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::CircleV1 => "circle-v1",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -210,12 +214,12 @@ impl core::fmt::Display for EncryptionScheme {
 }
 
 impl core::str::FromStr for EncryptionScheme {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "circle-v1" => Ok(Self::CircleV1),
-            _ => Err("unknown variant for EncryptionScheme"),
-        }
+        Ok(match s {
+            "circle-v1" => Self::CircleV1,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -228,10 +232,10 @@ impl petrel_core::ToValue for EncryptionScheme {
 impl petrel_core::FromValue for EncryptionScheme {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "circle-v1" => Ok(Self::CircleV1),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for EncryptionScheme"))),
-        }
+        Ok(match raw.as_str() {
+            "circle-v1" => Self::CircleV1,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -243,7 +247,10 @@ impl petrel_core::xrpc::QueryValue for EncryptionScheme {
 
 impl petrel_core::xrpc::FromQueryValue for EncryptionScheme {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 

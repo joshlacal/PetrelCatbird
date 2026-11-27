@@ -62,7 +62,7 @@ impl CircleSummary {
             member_count: reader.optional("memberCount")?,
             muted: reader.optional("muted")?,
             latest_key_version: reader.optional("latestKeyVersion")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -141,7 +141,7 @@ impl FeedItem {
         Ok(Self {
             post: reader.required("post")?,
             circle: reader.required("circle")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -237,7 +237,7 @@ impl Notification {
             subject: reader.optional("subject")?,
             indexed_at: reader.required("indexedAt")?,
             circle: reader.required("circle")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -340,7 +340,7 @@ impl EncryptedPostView {
             like_count: reader.optional("likeCount")?,
             reply_count: reader.optional("replyCount")?,
             viewer: reader.optional("viewer")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -403,8 +403,8 @@ impl petrel_core::ToValue for FeedItemPost {
 impl FeedItemPost {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "app.bsky.feed.defs#feedViewPost" => petrel_core::decode_value(value, strict).map(Self::FeedViewPost),
-            "blue.catbird.circle.defs#encryptedPostView" => petrel_core::decode_value(value, strict).map(Self::EncryptedPostView),
+            "app.bsky.feed.defs#feedViewPost" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::FeedViewPost),
+            "blue.catbird.circle.defs#encryptedPostView" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::EncryptedPostView),
             _ => Ok(Self::Unknown(value)),
         }
     }
@@ -448,19 +448,23 @@ impl<'de> serde::Deserialize<'de> for FeedItemPost {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum NotificationReason {
     Reply,
     Like,
     Invite,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl NotificationReason {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Reply => "reply",
             Self::Like => "like",
             Self::Invite => "invite",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -472,14 +476,14 @@ impl core::fmt::Display for NotificationReason {
 }
 
 impl core::str::FromStr for NotificationReason {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "reply" => Ok(Self::Reply),
-            "like" => Ok(Self::Like),
-            "invite" => Ok(Self::Invite),
-            _ => Err("unknown variant for NotificationReason"),
-        }
+        Ok(match s {
+            "reply" => Self::Reply,
+            "like" => Self::Like,
+            "invite" => Self::Invite,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -492,12 +496,12 @@ impl petrel_core::ToValue for NotificationReason {
 impl petrel_core::FromValue for NotificationReason {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "reply" => Ok(Self::Reply),
-            "like" => Ok(Self::Like),
-            "invite" => Ok(Self::Invite),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for NotificationReason"))),
-        }
+        Ok(match raw.as_str() {
+            "reply" => Self::Reply,
+            "like" => Self::Like,
+            "invite" => Self::Invite,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -509,7 +513,10 @@ impl petrel_core::xrpc::QueryValue for NotificationReason {
 
 impl petrel_core::xrpc::FromQueryValue for NotificationReason {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 

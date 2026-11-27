@@ -141,7 +141,7 @@ impl ReplyRef {
         Ok(Self {
             root: reader.required("root")?,
             parent: reader.required("parent")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

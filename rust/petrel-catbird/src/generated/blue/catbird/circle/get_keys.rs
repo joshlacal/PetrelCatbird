@@ -225,7 +225,7 @@ impl KeyEntry {
             cid: reader.required("cid")?,
             key_version: reader.required("keyVersion")?,
             record: reader.required("record")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

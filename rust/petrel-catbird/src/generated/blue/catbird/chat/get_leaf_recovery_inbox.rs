@@ -231,17 +231,21 @@ impl petrel_core::XrpcRequest for GetLeafRecoveryInbox {
     type Error = Error;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ParametersSupportedProtocolVersions {
     Value1,
     Value2,
+    /// A value this build does not know (a newer peer added it), kept
+    /// verbatim so it is written back unchanged.
+    Unknown(String),
 }
 
 impl ParametersSupportedProtocolVersions {
-    pub const fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Value1 => "1",
             Self::Value2 => "2",
+            Self::Unknown(value) => value.as_str(),
         }
     }
 }
@@ -253,13 +257,13 @@ impl core::fmt::Display for ParametersSupportedProtocolVersions {
 }
 
 impl core::str::FromStr for ParametersSupportedProtocolVersions {
-    type Err = &'static str;
+    type Err = core::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "1" => Ok(Self::Value1),
-            "2" => Ok(Self::Value2),
-            _ => Err("unknown variant for ParametersSupportedProtocolVersions"),
-        }
+        Ok(match s {
+            "1" => Self::Value1,
+            "2" => Self::Value2,
+            other => Self::Unknown(other.to_owned()),
+        })
     }
 }
 
@@ -272,11 +276,11 @@ impl petrel_core::ToValue for ParametersSupportedProtocolVersions {
 impl petrel_core::FromValue for ParametersSupportedProtocolVersions {
     fn from_value(value: petrel_core::Value) -> Result<Self, petrel_core::DecodeError> {
         let raw = String::from_value(value)?;
-        match raw.as_str() {
-            "1" => Ok(Self::Value1),
-            "2" => Ok(Self::Value2),
-            other => Err(petrel_core::DecodeError::Custom(format!("unknown variant `{other}` for ParametersSupportedProtocolVersions"))),
-        }
+        Ok(match raw.as_str() {
+            "1" => Self::Value1,
+            "2" => Self::Value2,
+            _ => Self::Unknown(raw),
+        })
     }
 }
 
@@ -288,7 +292,10 @@ impl petrel_core::xrpc::QueryValue for ParametersSupportedProtocolVersions {
 
 impl petrel_core::xrpc::FromQueryValue for ParametersSupportedProtocolVersions {
     fn from_query_value(value: &str) -> Result<Self, petrel_core::DecodeError> {
-        value.parse::<Self>().map_err(|err| petrel_core::DecodeError::Custom(err.to_owned()))
+        Ok(match value.parse::<Self>() {
+            Ok(parsed) => parsed,
+            Err(never) => match never {},
+        })
     }
 }
 

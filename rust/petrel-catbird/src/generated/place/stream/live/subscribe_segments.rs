@@ -73,7 +73,7 @@ impl petrel_core::ToValue for Message {
 impl Message {
     fn decode_member(value: petrel_core::Value, strict: bool) -> Result<Self, petrel_core::DecodeError> {
         match petrel_core::unknown::type_of(&value)? {
-            "place.stream.live.subscribeSegments#segment" => petrel_core::decode_value(value, strict).map(Self::Segment),
+            "place.stream.live.subscribeSegments#segment" => petrel_core::decode_value(petrel_core::unknown::untagged(value), strict).map(Self::Segment),
             _ => Ok(Self::Unknown(value)),
         }
     }

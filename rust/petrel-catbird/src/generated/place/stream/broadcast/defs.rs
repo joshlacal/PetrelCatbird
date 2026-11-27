@@ -47,7 +47,7 @@ impl BroadcastOriginView {
             cid: reader.required("cid")?,
             author: reader.required("author")?,
             record: reader.required("record")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }

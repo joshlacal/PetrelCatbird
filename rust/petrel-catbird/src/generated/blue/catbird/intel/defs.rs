@@ -64,7 +64,7 @@ impl SceneGroup {
             card_count: reader.required("cardCount")?,
             total_eligible_accounts: reader.required("totalEligibleAccounts")?,
             top_community_ids: reader.required("topCommunityIds")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -209,7 +209,7 @@ impl CommunitySummary {
             feed_generator_uris: reader.required("feedGeneratorUris")?,
             starter_pack_uris: reader.required("starterPackUris")?,
             already_following_count: reader.optional("alreadyFollowingCount")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -322,7 +322,7 @@ impl CommunityMemberRef {
             estimated_posts_per_week: reader.required("estimatedPostsPerWeek")?,
             sample_post_uri: reader.optional("samplePostUri")?,
             tier: reader.optional("tier")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
@@ -410,7 +410,7 @@ impl PostSkeletonItem {
             community_id: reader.required("communityId")?,
             community_title: reader.required("communityTitle")?,
             author_role: reader.optional("authorRole")?,
-            extra_data: reader.finish(),
+            extra_data: reader.finish_preserving_type(),
         })
     }
 }
